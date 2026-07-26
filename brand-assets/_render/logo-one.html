@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fi"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next','Inter',sans-serif;padding:46px;width:1180px;}
+  h1{font-size:27px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:24px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{display:flex;gap:10px;align-items:baseline;padding:12px 24px;border-bottom:1px solid #eef1f4;}
+  .ht{font-size:15px;font-weight:800;color:#1a1f24;}.dz{font-size:12.5px;color:#9aa3ad;font-weight:600;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:40px;min-height:130px;}
+  .ref{background:#FBFCFE;}
+  .wm{font-family:'Gabarito';font-weight:700;font-size:72px;letter-spacing:-2px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .deep{color:#0B3A66;}.bright{color:#1B9DF0;}
+  .bo{display:inline-block;width:.6em;height:.6em;vertical-align:-.052em;margin:0 .004em;overflow:visible;}
+  .pb{display:inline-block;width:.26em;height:.6em;vertical-align:-.052em;overflow:visible;}
+  /* symbol tiles */
+  .syms{display:flex;gap:26px;align-items:center;padding:30px 40px;flex-wrap:wrap;}
+  .stk{display:flex;flex-direction:column;align-items:center;}.lab{font-size:11px;color:#9aa3ad;margin-top:9px;font-weight:700;}
+</style></head><body>
+  <h1>Loppusiivous.fi — yksi muistettava tekijä</h1>
+  <div class="sub">Pelkistetään: yksi kupla-o (= myös symboli). Mihin se istuu parhaiten?</div>
+
+  <!-- reference -->
+  <div class="card"><div class="head"><div class="ht" style="color:#9aa3ad">NYKYINEN</div><div class="dz">— monta pientä: 2 kupla-o:ta + karkaavat kuplat + piste-kupla</div></div>
+    <div class="cell ref"><div class="wm">
+      <span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#0B3A66" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/><circle cx="92" cy="6" r="8" fill="#2BB3F7"/><circle cx="104" cy="-10" r="4.5" fill="#7FD0FA"/></svg><span class="bright">us</span><svg class="pb" viewBox="0 0 26 100"><circle cx="13" cy="84" r="12" fill="#1B9DF0"/><circle cx="9" cy="80" r="3.5" fill="#fff"/></svg><span class="deep">fi</span>
+    </div></div>
+  </div>
+
+  <!-- A: single bubble-o on FIRST o -->
+  <div class="card"><div class="head"><div class="ht">A · Yksi kupla-o (ensimmäinen o)</div><div class="dz">— ”L◯ppusiivous.fi”, muuten täysin puhdas</div></div>
+    <div class="cell"><div class="wm">
+      <span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siivous</span><span class="deep">.fi</span>
+    </div></div>
+  </div>
+
+  <!-- B: single bubble-o on LAST o (vous) -->
+  <div class="card"><div class="head"><div class="ht">B · Yksi kupla-o (vous-o)</div><div class="dz">— ”Loppusiiv◯us.fi”, kupla osuu siivous-sanaan</div></div>
+    <div class="cell"><div class="wm">
+      <span class="deep">Loppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="bright">us</span><span class="deep">.fi</span>
+    </div></div>
+  </div>
+
+  <!-- C: .fi period single bubble -->
+  <div class="card"><div class="head"><div class="ht">C · Piste-kupla (.fi)</div><div class="dz">— sana täysin puhdas, yksi kupla verkkotunnuksen pisteenä</div></div>
+    <div class="cell"><div class="wm">
+      <span class="deep">Loppu</span><span class="bright">siivous</span><svg class="pb" viewBox="0 0 26 100"><circle cx="13" cy="84" r="12" fill="#1B9DF0"/><circle cx="8.5" cy="79.5" r="3.5" fill="#fff"/></svg><span class="deep">fi</span>
+    </div></div>
+  </div>
+
+  <!-- D: monochrome + single bright bubble -->
+  <div class="card"><div class="head"><div class="ht">D · Yksivärinen + yksi kirkas kupla</div><div class="dz">— koko sana ink, kupla ainoa väri = vahvin fokus</div></div>
+    <div class="cell"><div class="wm">
+      <span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppusiivous.fi</span>
+    </div></div>
+  </div>
+
+  <!-- E: monochrome + single bubble on vous-o -->
+  <div class="card"><div class="head"><div class="ht">E · Yksivärinen + kupla vous-o:ssa</div><div class="dz">— ink-sana, kupla siivous-sanassa</div></div>
+    <div class="cell"><div class="wm">
+      <span class="deep">Loppusiiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">us.fi</span>
+    </div></div>
+  </div>
+
+  <!-- symbol derived from single bubble -->
+  <div class="card"><div class="head"><div class="ht">Symboli — sama yksi kupla</div><div class="dz">favicon / profiili / vaatteet</div></div>
+    <div class="syms">
+      <div class="stk"><svg width="92" height="92" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="17"/><path d="M37 49 A33 33 0 0 1 53 35" fill="none" stroke="#cdeaff" stroke-width="7.5" stroke-linecap="round"/></svg><div class="lab">SQUIRCLE</div></div>
+      <div class="stk"><svg width="92" height="92" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#0B2342"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="17"/><path d="M37 49 A33 33 0 0 1 53 35" fill="none" stroke="#9fd8fb" stroke-width="7.5" stroke-linecap="round"/></svg><div class="lab">YMPYRÄ</div></div>
+      <div class="stk"><svg width="92" height="92" viewBox="0 0 120 120"><circle cx="60" cy="60" r="33" fill="none" stroke="#1B9DF0" stroke-width="17"/><path d="M37 49 A33 33 0 0 1 53 35" fill="none" stroke="#9fd8fb" stroke-width="7.5" stroke-linecap="round"/></svg><div class="lab">MERKKI</div></div>
+      <div class="stk"><div style="display:flex;gap:10px;align-items:flex-end">
+        <svg width="20" height="20" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="17"/></svg>
+        <svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="17"/><path d="M37 49 A33 33 0 0 1 53 35" fill="none" stroke="#cdeaff" stroke-width="7.5" stroke-linecap="round"/></svg>
+        <svg width="44" height="44" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="17"/><path d="M37 49 A33 33 0 0 1 53 35" fill="none" stroke="#cdeaff" stroke-width="7.5" stroke-linecap="round"/></svg>
+      </div><div class="lab">FAVICON 16/32/48</div></div>
+    </div>
+  </div>
+</body></html>

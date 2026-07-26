@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="brand.css">
+<style>
+  *{margin:0;box-sizing:border-box}
+  body{background:#EAF2FA;display:block;width:900px;font-family:'Gabarito'}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr)}
+  .cell{padding:30px 20px 22px;border-right:1px solid #d7e4f1;border-bottom:1px solid #d7e4f1;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .cell:nth-child(3n){border-right:0}
+  .big{width:108px;height:108px}
+  .chip{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#fff;border:1px solid #d4e3f1}
+  .chip svg{width:34px;height:34px}
+  .tag{font-family:'Inter';font-size:12.5px;font-weight:700;color:#5b7a99;text-align:center}
+  .tag small{display:block;font-weight:400;color:#7d95ad;margin-top:2px;font-size:11px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <!-- shared sparkle -->
+  <g id="spk"><path d="M50 10 C50 18 53 21 61 21 C53 21 50 24 50 32 C50 24 47 21 39 21 C47 21 50 18 50 10 Z" fill="#1B9DF0"/></g>
+
+  <!-- V1 baseline: 2 back flaps -->
+  <symbol id="v1" viewBox="0 0 100 100">
+    <g fill="none" stroke="#0B3A66" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M30 54 L30 74 L50 86 L70 74 L70 54"/><path d="M50 64 L50 86"/>
+      <path d="M30 54 L50 64 L70 54 L50 44 Z"/>
+      <path d="M30 54 L16 46 L36 34 L50 44"/><path d="M70 54 L84 46 L64 34 L50 44"/>
+    </g><use href="#spk"/>
+  </symbol>
+
+  <!-- V2 four flaps -->
+  <symbol id="v2" viewBox="0 0 100 100">
+    <g fill="none" stroke="#0B3A66" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M30 54 L30 74 L50 86 L70 74 L70 54"/><path d="M50 64 L50 86"/>
+      <path d="M30 54 L50 64 L70 54 L50 44 Z"/>
+      <path d="M30 54 L16 46 L36 34 L50 44"/><path d="M70 54 L84 46 L64 34 L50 44"/>
+      <path d="M30 54 L26 64 L48 72 L50 64"/><path d="M70 54 L74 64 L52 72 L50 64"/>
+    </g><use href="#spk"/>
+  </symbol>
+
+  <!-- V3 baseline + tape band -->
+  <symbol id="v3" viewBox="0 0 100 100">
+    <g fill="none" stroke="#0B3A66" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M30 54 L30 74 L50 86 L70 74 L70 54"/><path d="M50 64 L50 86"/>
+      <path d="M30 54 L50 64 L70 54 L50 44 Z"/>
+      <path d="M30 54 L16 46 L36 34 L50 44"/><path d="M70 54 L84 46 L64 34 L50 44"/>
+    </g>
+    <path d="M30 70 L50 80 L70 70" fill="none" stroke="#1B9DF0" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <use href="#spk"/>
+  </symbol>
+
+  <!-- V4 flaps more upright -->
+  <symbol id="v4" viewBox="0 0 100 100">
+    <g fill="none" stroke="#0B3A66" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M30 54 L30 74 L50 86 L70 74 L70 54"/><path d="M50 64 L50 86"/>
+      <path d="M30 54 L50 64 L70 54 L50 44 Z"/>
+      <path d="M30 54 L25 38 L41 34 L50 44"/><path d="M70 54 L75 38 L59 34 L50 44"/>
+    </g><use href="#spk"/>
+  </symbol>
+
+  <!-- V5 sparkle cluster -->
+  <symbol id="v5" viewBox="0 0 100 100">
+    <g fill="none" stroke="#0B3A66" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M30 54 L30 74 L50 86 L70 74 L70 54"/><path d="M50 64 L50 86"/>
+      <path d="M30 54 L50 64 L70 54 L50 44 Z"/>
+      <path d="M30 54 L16 46 L36 34 L50 44"/><path d="M70 54 L84 46 L64 34 L50 44"/>
+    </g>
+    <path d="M52 8 C52 15 55 18 62 18 C55 18 52 21 52 28 C52 21 49 18 42 18 C49 18 52 15 52 8 Z" fill="#1B9DF0"/>
+    <circle cx="33" cy="24" r="3.2" fill="#5AB7F5"/><circle cx="70" cy="26" r="2.6" fill="#5AB7F5"/>
+  </symbol>
+
+  <!-- V6 wider, squatter box -->
+  <symbol id="v6" viewBox="0 0 100 100">
+    <g fill="none" stroke="#0B3A66" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M24 56 L24 74 L50 86 L76 74 L76 56"/><path d="M50 66 L50 86"/>
+      <path d="M24 56 L50 66 L76 56 L50 46 Z"/>
+      <path d="M24 56 L10 48 L32 36 L50 46"/><path d="M76 56 L90 48 L68 36 L50 46"/>
+    </g><use href="#spk"/>
+  </symbol>
+</defs></svg>
+
+<div class="grid">
+  <div class="cell"><svg class="big"><use href="#v1"/></svg><div class="chip"><svg><use href="#v1"/></svg></div><div class="tag">V1 · Perus<small>2 läppää</small></div></div>
+  <div class="cell"><svg class="big"><use href="#v2"/></svg><div class="chip"><svg><use href="#v2"/></svg></div><div class="tag">V2 · 4 läppää<small>täysi avaus</small></div></div>
+  <div class="cell"><svg class="big"><use href="#v3"/></svg><div class="chip"><svg><use href="#v3"/></svg></div><div class="tag">V3 · + teippi<small>sininen nauha</small></div></div>
+  <div class="cell"><svg class="big"><use href="#v4"/></svg><div class="chip"><svg><use href="#v4"/></svg></div><div class="tag">V4 · Pystymmät läpät<small>juuri avattu</small></div></div>
+  <div class="cell"><svg class="big"><use href="#v5"/></svg><div class="chip"><svg><use href="#v5"/></svg></div><div class="tag">V5 · Sparkle-rypäs<small>3 kimallusta</small></div></div>
+  <div class="cell"><svg class="big"><use href="#v6"/></svg><div class="chip"><svg><use href="#v6"/></svg></div><div class="tag">V6 · Leveämpi<small>matalampi laatikko</small></div></div>
+</div>
+</body></html>

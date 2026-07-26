@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EEF1F4;font-family:'Avenir Next','Inter',sans-serif;padding:48px;width:1500px;}
+  h1{font-size:30px;font-weight:800;color:#10243F;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:30px;}
+  .card{background:#fff;border-radius:22px;overflow:hidden;margin-bottom:24px;box-shadow:0 2px 14px rgba(0,0,0,.06);}
+  .head{padding:16px 28px;border-bottom:1px solid #eef1f4;font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#8b95a1;}
+  .pad{padding:42px 48px;}
+  .wmrk{font-weight:800;font-size:62px;letter-spacing:-2.5px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .di{position:relative;}
+  .di .sp{position:absolute;left:56%;transform:translateX(-50%);width:0.42em;height:0.42em;top:-0.27em;}
+  .flex{display:flex;align-items:center;gap:54px;flex-wrap:wrap;}
+  .lab{font-size:12px;color:#9aa3ad;margin-top:14px;text-align:center;font-weight:600;}
+  .stack{display:flex;flex-direction:column;align-items:center;}
+  .pal{display:flex;gap:0;border-radius:14px;overflow:hidden;border:1px solid #e3e8ee;}
+  .sw{width:150px;height:96px;display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px;}
+  .sw b{font-size:12px;font-weight:800;}.sw span{font-size:11px;opacity:.8;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — brändi-identiteetti</h1>
+  <div class="sub">Syvä navy + sähkö-cyan välke · tunnistettava ”L✦”-merkki · favicon, app-ikoni, profiilikuva</div>
+
+  <!-- WORDMARK -->
+  <div class="card">
+    <div class="head">Sanamerkki (päälogo)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;">
+      <div class="pad" style="display:flex;justify-content:center;">
+        <div class="wmrk"><span style="color:#10243F;">Loppusiivous</span><span style="color:#1763C7;">.f</span><span class="di" style="color:#1763C7;">&#305;<svg class="sp" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg></span></div>
+      </div>
+      <div class="pad" style="display:flex;justify-content:center;background:#10243F;">
+        <div class="wmrk"><span style="color:#fff;">Loppusiivous</span><span style="color:#5AA0F0;">.f</span><span class="di" style="color:#5AA0F0;">&#305;<svg class="sp" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRAND MARK / ICON -->
+  <div class="card">
+    <div class="head">Brändimerkki ”L✦” — app-ikoni / favicon / profiilikuva</div>
+    <div class="pad flex" style="justify-content:space-around;">
+      <!-- squircle gradient (PRIMARY) -->
+      <div class="stack">
+        <svg width="132" height="132" viewBox="0 0 120 120">
+          <defs><linearGradient id="ng" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B3B68"/><stop offset="1" stop-color="#0C1B30"/></linearGradient></defs>
+          <rect x="2" y="2" width="116" height="116" rx="30" fill="url(#ng)"/>
+          <polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#fff"/>
+          <svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg>
+        </svg>
+        <div class="lab">PÄÄIKONI · squircle</div>
+      </div>
+      <!-- circle (profile) -->
+      <div class="stack">
+        <svg width="132" height="132" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="58" fill="#10243F"/>
+          <polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#fff"/>
+          <svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg>
+        </svg>
+        <div class="lab">PROFIILIKUVA · ympyrä</div>
+      </div>
+      <!-- inverse white tile -->
+      <div class="stack">
+        <svg width="132" height="132" viewBox="0 0 120 120">
+          <rect x="2" y="2" width="116" height="116" rx="30" fill="#fff" stroke="#e3e8ee"/>
+          <polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#10243F"/>
+          <svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1763C7"/></svg>
+        </svg>
+        <div class="lab">VAALEA · inverse</div>
+      </div>
+      <!-- mark only, no container -->
+      <div class="stack">
+        <svg width="132" height="132" viewBox="0 0 120 120">
+          <polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#10243F"/>
+          <svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg>
+        </svg>
+        <div class="lab">PELKKÄ MERKKI</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USAGE: favicon sizes + browser tab + profile -->
+  <div class="card">
+    <div class="head">Käytössä</div>
+    <div class="pad flex" style="gap:70px;">
+      <!-- favicon sizes -->
+      <div class="stack">
+        <div style="display:flex;align-items:flex-end;gap:18px;">
+          <div class="stack"><svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#10243F"/><polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#fff"/><svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg></svg><div class="lab">16</div></div>
+          <div class="stack"><svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#10243F"/><polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#fff"/><svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg></svg><div class="lab">32</div></div>
+          <div class="stack"><svg width="48" height="48" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#10243F"/><polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#fff"/><svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg></svg><div class="lab">48</div></div>
+        </div>
+        <div class="lab" style="margin-top:18px;">FAVICON-KOOT</div>
+      </div>
+      <!-- browser tab mock -->
+      <div class="stack">
+        <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #dfe4ea;border-radius:10px 10px 0 0;padding:9px 14px;width:230px;box-shadow:0 -1px 0 #eef1f4 inset;">
+          <svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#10243F"/><polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#fff"/><svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg></svg>
+          <span style="font-size:13px;color:#3a434d;font-weight:600;">Loppusiivous.fi</span>
+          <span style="margin-left:auto;color:#b8c0c8;">×</span>
+        </div>
+        <div class="lab" style="margin-top:14px;">SELAINVÄLILEHTI</div>
+      </div>
+      <!-- profile card mock -->
+      <div class="stack">
+        <div style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e3e8ee;border-radius:16px;padding:14px 20px 14px 14px;">
+          <svg width="58" height="58" viewBox="0 0 120 120"><circle cx="60" cy="60" r="60" fill="#10243F"/><polygon points="42,30 60,30 60,73 86,73 86,88 42,88" fill="#fff"/><svg x="66" y="20" width="38" height="38" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#1ECBD8"/></svg></svg>
+          <div><div style="font-weight:800;font-size:16px;color:#10243F;">Loppusiivous.fi</div><div style="font-size:13px;color:#8b95a1;">Muuttosiivoukset · Espoo</div></div>
+        </div>
+        <div class="lab" style="margin-top:14px;">SOME-PROFIILI</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PALETTE -->
+  <div class="card">
+    <div class="head">Väripaletti — ”spice” = navy × cyan</div>
+    <div class="pad">
+      <div class="pal">
+        <div class="sw" style="background:#10243F;color:#fff;"><b>Navy</b><span>#10243F</span></div>
+        <div class="sw" style="background:#1763C7;color:#fff;"><b>Sininen</b><span>#1763C7</span></div>
+        <div class="sw" style="background:#1ECBD8;color:#06303a;"><b>Cyan-välke</b><span>#1ECBD8</span></div>
+        <div class="sw" style="background:#5AA0F0;color:#06223f;"><b>Vaalea sin.</b><span>#5AA0F0</span></div>
+        <div class="sw" style="background:#EAF1F8;color:#10243F;"><b>Tausta</b><span>#EAF1F8</span></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

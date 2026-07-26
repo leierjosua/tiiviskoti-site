@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fi"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next','Inter',sans-serif;padding:48px;width:1040px;}
+  h1{font-size:25px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-.5px;}
+  .sub{font-size:14.5px;color:#6b7480;margin-bottom:22px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{padding:12px 26px;border-bottom:1px solid #eef1f4;font-size:14px;font-weight:800;color:#1a1f24;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:52px 40px 58px;}
+  .dark{background:#0B2342;}
+  .lg{position:relative;display:inline-block;}
+  .wm{font-family:'Gabarito';font-weight:700;font-size:66px;letter-spacing:-2.1px;line-height:1;white-space:nowrap;color:#0B3A66;}
+  .dark .wm{color:#fff;}.blue{color:#1B9DF0;}.dark .blue{color:#5AB7F5;}
+  .wipe{position:absolute;left:0;width:100%;bottom:-22px;overflow:visible;}
+</style></head><body>
+  <h1>Loppusiivous.fi — pyyhkäisy (kunnolla muotoiltu)</h1>
+  <div class="sub">Kapeneva, itsevarma veto ”siivous”-sanan alla = pyyhitään puhtaaksi. Ei symbolia.</div>
+
+  <!-- A tapered wipe under siivous -->
+  <div class="card"><div class="head">A · Kapeneva pyyhkäisy ”siivous”-sanan alla</div>
+    <div class="grid">
+      <div class="cell"><div class="lg">
+        <div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg class="wipe" height="30" viewBox="0 0 500 30">
+          <path d="M196 13 C250 8 330 7 388 8 C404 8.3 416 9 426 11 C414 10 400 12 386 13 C330 16 250 17 198 20 C190 20.5 188 13.5 196 13 Z" fill="#1B9DF0"/>
+        </svg>
+      </div></div>
+      <div class="cell dark"><div class="lg">
+        <div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg class="wipe" height="30" viewBox="0 0 500 30">
+          <path d="M196 13 C250 8 330 7 388 8 C404 8.3 416 9 426 11 C414 10 400 12 386 13 C330 16 250 17 198 20 C190 20.5 188 13.5 196 13 Z" fill="#5AB7F5"/>
+        </svg>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- B tapered wipe with upward flick at end -->
+  <div class="card"><div class="head">B · Sama + kevyt nosto lopussa (liike)</div>
+    <div class="grid">
+      <div class="cell"><div class="lg">
+        <div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg class="wipe" height="34" viewBox="0 0 500 34">
+          <path d="M196 16 C250 11 330 9 392 8 C414 7.6 432 6 444 1 C436 8 420 12 396 14 C332 18 250 19 198 23 C190 23.5 188 16.5 196 16 Z" fill="#1B9DF0"/>
+        </svg>
+      </div></div>
+      <div class="cell dark"><div class="lg">
+        <div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg class="wipe" height="34" viewBox="0 0 500 34">
+          <path d="M196 16 C250 11 330 9 392 8 C414 7.6 432 6 444 1 C436 8 420 12 396 14 C332 18 250 19 198 23 C190 23.5 188 16.5 196 16 Z" fill="#5AB7F5"/>
+        </svg>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- C tapered wipe under whole word -->
+  <div class="card"><div class="head">C · Pyyhkäisy koko sanan alla (tasapainoisempi)</div>
+    <div class="grid">
+      <div class="cell"><div class="lg">
+        <div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg class="wipe" height="34" viewBox="0 0 500 34">
+          <path d="M14 16 C120 10 360 9 470 6 C486 5.5 498 4 500 1 C496 7 484 11 470 12 C360 16 120 17 16 23 C8 23.5 6 16.5 14 16 Z" fill="#1B9DF0"/>
+        </svg>
+      </div></div>
+      <div class="cell dark"><div class="lg">
+        <div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg class="wipe" height="34" viewBox="0 0 500 34">
+          <path d="M14 16 C120 10 360 9 470 6 C486 5.5 498 4 500 1 C496 7 484 11 470 12 C360 16 120 17 16 23 C8 23.5 6 16.5 14 16 Z" fill="#5AB7F5"/>
+        </svg>
+      </div></div>
+    </div>
+  </div>
+
+</body></html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Gabarito',sans-serif;padding:46px;width:1360px;}
+  h1{font-size:30px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:26px;font-weight:600;}
+  .card{background:#fff;border-radius:20px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 14px rgba(0,0,0,.06);}
+  .head{padding:14px 26px;border-bottom:1px solid #eef1f4;font-size:12.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#9aa3ad;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:54px;}
+  /* wordmark */
+  .wm{font-weight:800;font-size:88px;letter-spacing:-2px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .deep{color:#0B3A66;} .bright{color:#1B9DF0;}
+  .bo{display:inline-block;width:0.60em;height:0.60em;vertical-align:-0.05em;margin:0 0.005em;}
+  .di{position:relative;}
+  .tit{position:absolute;left:53%;transform:translateX(-50%);width:0.40em;height:0.40em;top:-0.26em;}
+  /* symbol */
+  .stack{display:flex;flex-direction:column;align-items:center;}
+  .lab{font-size:12px;color:#9aa3ad;margin-top:13px;text-align:center;font-weight:700;}
+  .flex{display:flex;align-items:center;gap:50px;flex-wrap:wrap;justify-content:space-around;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — varsinainen logo · Gabarito</h1>
+  <div class="sub">Kupla-o + sparkle · raikas sininen (loppu #0B3A66 / siivous #1B9DF0)</div>
+
+  <!-- HERO light -->
+  <div class="card">
+    <div class="head">Päälogo — vaalea</div>
+    <div class="cell" style="background:#fff;">
+      <div class="wm">
+        <span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0B3A66" stroke-width="20"/><path d="M26 42 A30 30 0 0 1 50 18" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#1B9DF0" stroke-width="20"/><path d="M26 42 A30 30 0 0 1 50 18" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/></svg><span class="bright">us</span><span class="deep">.f</span><span class="di deep">&#305;<svg class="tit" viewBox="0 0 100 100"><path d="M50 6 C53 34,67 47,94 50 C67 53,53 66,50 94 C47 66,33 53,6 50 C33 47,47 34,50 6 Z" fill="#1B9DF0"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO dark -->
+  <div class="card">
+    <div class="head">Päälogo — tumma</div>
+    <div class="cell" style="background:#0B2B45;">
+      <div class="wm">
+        <span style="color:#fff;">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#fff" stroke-width="20"/><path d="M26 42 A30 30 0 0 1 50 18" fill="none" stroke="#9fd8fb" stroke-width="8" stroke-linecap="round"/></svg><span style="color:#fff;">ppu</span><span style="color:#5AB7F5;">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#5AB7F5" stroke-width="20"/><path d="M26 42 A30 30 0 0 1 50 18" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/></svg><span style="color:#5AB7F5;">us</span><span style="color:#fff;">.f</span><span class="di" style="color:#fff;">&#305;<svg class="tit" viewBox="0 0 100 100"><path d="M50 6 C53 34,67 47,94 50 C67 53,53 66,50 94 C47 66,33 53,6 50 C33 47,47 34,50 6 Z" fill="#5AB7F5"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYMBOL derived -->
+  <div class="card">
+    <div class="head">Symboli — johdettu kupla-o:sta (favicon / profiili / vaatteet)</div>
+    <div class="cell" style="background:#fff;justify-content:space-around;flex-wrap:wrap;gap:40px;">
+      <!-- squircle bright -->
+      <div class="stack">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2BB3F7"/><stop offset="1" stop-color="#1378D4"/></linearGradient></defs>
+          <rect x="2" y="2" width="116" height="116" rx="30" fill="url(#bg)"/>
+          <circle cx="56" cy="62" r="30" fill="none" stroke="#fff" stroke-width="15"/>
+          <path d="M38 56 A23 23 0 0 1 56 38" fill="none" stroke="#bfe6ff" stroke-width="6" stroke-linecap="round"/>
+          <path d="M90 30 C92 42,98 48,110 50 C98 52,92 58,90 70 C88 58,82 52,70 50 C82 48,88 42,90 30 Z" fill="#fff"/>
+        </svg>
+        <div class="lab">Squircle (app/favicon)</div>
+      </div>
+      <!-- circle navy -->
+      <div class="stack">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="58" fill="#0B2B45"/>
+          <circle cx="56" cy="62" r="30" fill="none" stroke="#fff" stroke-width="15"/>
+          <path d="M38 56 A23 23 0 0 1 56 38" fill="none" stroke="#9fd8fb" stroke-width="6" stroke-linecap="round"/>
+          <path d="M90 30 C92 42,98 48,110 50 C98 52,92 58,90 70 C88 58,82 52,70 50 C82 48,88 42,90 30 Z" fill="#5AB7F5"/>
+        </svg>
+        <div class="lab">Ympyrä (profiili)</div>
+      </div>
+      <!-- bare mark -->
+      <div class="stack">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="56" cy="62" r="30" fill="none" stroke="#1B9DF0" stroke-width="15"/>
+          <path d="M38 56 A23 23 0 0 1 56 38" fill="none" stroke="#9fd8fb" stroke-width="6" stroke-linecap="round"/>
+          <path d="M90 30 C92 42,98 48,110 50 C98 52,92 58,90 70 C88 58,82 52,70 50 C82 48,88 42,90 30 Z" fill="#1B9DF0"/>
+        </svg>
+        <div class="lab">Pelkkä merkki</div>
+      </div>
+      <!-- favicon sizes -->
+      <div class="stack">
+        <div style="display:flex;align-items:flex-end;gap:14px;">
+          <svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="url(#bg)"/><circle cx="56" cy="62" r="30" fill="none" stroke="#fff" stroke-width="15"/><path d="M90 30 C92 42,98 48,110 50 C98 52,92 58,90 70 C88 58,82 52,70 50 C82 48,88 42,90 30 Z" fill="#fff"/></svg>
+          <svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="url(#bg)"/><circle cx="56" cy="62" r="30" fill="none" stroke="#fff" stroke-width="15"/><path d="M90 30 C92 42,98 48,110 50 C98 52,92 58,90 70 C88 58,82 52,70 50 C82 48,88 42,90 30 Z" fill="#fff"/></svg>
+          <svg width="48" height="48" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="url(#bg)"/><circle cx="56" cy="62" r="30" fill="none" stroke="#fff" stroke-width="15"/><path d="M90 30 C92 42,98 48,110 50 C98 52,92 58,90 70 C88 58,82 52,70 50 C82 48,88 42,90 30 Z" fill="#fff"/></svg>
+        </div>
+        <div class="lab">16 / 32 / 48 px</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

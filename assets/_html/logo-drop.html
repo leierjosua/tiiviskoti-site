@@ -1,0 +1,78 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="brand.css">
+<style>
+  *{margin:0;box-sizing:border-box}
+  body{background:#EAF2FA;display:block;width:920px;font-family:'Gabarito'}
+  .row{display:flex;align-items:center;gap:28px;padding:32px 50px;border-bottom:1px solid #d7e4f1}
+  .tag{flex:0 0 130px;font-family:'Inter';font-size:13px;font-weight:700;color:#5b7a99;line-height:1.4}
+  .tag small{display:block;font-weight:400;color:#7d95ad;margin-top:3px;font-size:11px}
+  .ico{flex:0 0 auto;width:62px;height:62px}
+  .lg{font-family:'Gabarito';font-weight:700;letter-spacing:-.035em;line-height:1;white-space:nowrap;display:inline-block;position:relative;font-size:48px}
+  .d{color:#0B3A66}.bl{color:#1B9DF0}
+  .b{position:relative;display:inline-block}
+  .wipe{position:absolute;left:-3%;bottom:-.30em;width:106%;height:.26em;overflow:visible}
+  .bub{display:inline-block;width:.28em;height:.28em;border-radius:50%;background:#1B9DF0;position:relative;vertical-align:baseline;margin:0 .02em}
+  .bub i{position:absolute;width:36%;height:36%;border-radius:50%;background:rgba(255,255,255,.92);left:18%;top:15%}
+  .chips{display:flex;gap:10px;margin-left:auto}
+  .chip{width:46px;height:46px;border-radius:11px;display:grid;place-items:center}
+  .cw{background:#fff;border:1px solid #d4e3f1}.cn{background:#0A1F3C}
+  .chip svg{width:34px;height:34px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="sw" viewBox="0 0 200 24" preserveAspectRatio="none"><path d="M10 11 C70 7 140 7 184 9 C190 9.3 193 10.5 193 12 C190 11.5 186 11.3 182 11.6 C140 13 70 14 12 17 C5 17.6 4 11.5 10 11 Z"/></symbol>
+  <!-- D5 -->
+  <symbol id="d5" viewBox="0 0 100 100">
+    <path d="M50 10 C52 26 70 40 70 58 C70 70 61 79 50 79 C39 79 30 70 30 58 C30 40 48 26 50 10 Z" fill="#1B9DF0"/>
+    <path d="M40 40 C35 47 34 54 37 60" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" opacity=".9"/>
+    <path d="M14 88 C36 81 64 80 86 82 C72 87 46 88.5 18 93 C10 94 8 89 14 88 Z" fill="#0B3A66"/>
+  </symbol>
+  <symbol id="d5w" viewBox="0 0 100 100">
+    <path d="M50 10 C52 26 70 40 70 58 C70 70 61 79 50 79 C39 79 30 70 30 58 C30 40 48 26 50 10 Z" fill="#5AB7F5"/>
+    <path d="M40 40 C35 47 34 54 37 60" fill="none" stroke="#0A1F3C" stroke-width="4.5" stroke-linecap="round" opacity=".5"/>
+    <path d="M14 88 C36 81 64 80 86 82 C72 87 46 88.5 18 93 C10 94 8 89 14 88 Z" fill="#fff"/>
+  </symbol>
+  <!-- D6 original -->
+  <symbol id="d6" viewBox="0 0 100 100">
+    <path d="M52 20 C54 34 72 48 72 66 C72 77 63 86 52 86 C41 86 32 77 32 66 C32 48 50 34 52 20 Z" fill="#1B9DF0"/>
+    <path d="M40 48 C35 55 34 62 37 68" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" opacity=".9"/>
+    <path d="M30 14 C30 20 32.5 22.5 38 22.5 C32.5 22.5 30 25 30 31 C30 25 27.5 22.5 22 22.5 C27.5 22.5 30 20 30 14 Z" fill="#2BB3F7"/>
+    <circle cx="20" cy="36" r="3" fill="#5AB7F5"/>
+  </symbol>
+  <symbol id="d6w" viewBox="0 0 100 100">
+    <path d="M52 20 C54 34 72 48 72 66 C72 77 63 86 52 86 C41 86 32 77 32 66 C32 48 50 34 52 20 Z" fill="#5AB7F5"/>
+    <path d="M40 48 C35 55 34 62 37 68" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" opacity=".9"/>
+    <path d="M30 14 C30 20 32.5 22.5 38 22.5 C32.5 22.5 30 25 30 31 C30 25 27.5 22.5 22 22.5 C27.5 22.5 30 20 30 14 Z" fill="#7CC6F2"/>
+    <circle cx="20" cy="36" r="3" fill="#7CC6F2"/>
+  </symbol>
+  <!-- D6b refined: centered droplet, balanced sparkle top-right + small bottom-left -->
+  <symbol id="d6b" viewBox="0 0 100 100">
+    <path d="M50 16 C52 31 71 46 71 64 C71 76 62 85 50 85 C38 85 29 76 29 64 C29 46 48 31 50 16 Z" fill="#1B9DF0"/>
+    <path d="M40 44 C35 51 34 58 37 64" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" opacity=".9"/>
+    <path d="M76 16 C76 22 78.5 24.5 84 24.5 C78.5 24.5 76 27 76 33 C76 27 73.5 24.5 68 24.5 C73.5 24.5 76 22 76 16 Z" fill="#2BB3F7"/>
+    <circle cx="84" cy="40" r="2.6" fill="#5AB7F5"/>
+  </symbol>
+  <symbol id="d6bw" viewBox="0 0 100 100">
+    <path d="M50 16 C52 31 71 46 71 64 C71 76 62 85 50 85 C38 85 29 76 29 64 C29 46 48 31 50 16 Z" fill="#5AB7F5"/>
+    <path d="M40 44 C35 51 34 58 37 64" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" opacity=".9"/>
+    <path d="M76 16 C76 22 78.5 24.5 84 24.5 C78.5 24.5 76 27 76 33 C76 27 73.5 24.5 68 24.5 C73.5 24.5 76 22 76 16 Z" fill="#7CC6F2"/>
+    <circle cx="84" cy="40" r="2.6" fill="#7CC6F2"/>
+  </symbol>
+</defs></svg>
+
+<div class="row"><div class="tag">D5<small>+ pyyhkäisy</small></div>
+  <svg class="ico"><use href="#d5"/></svg>
+  <span class="lg"><span class="d">Loppu</span><span class="b bl">siivous<svg class="wipe"><use href="#sw" fill="#1B9DF0"/></svg></span><span class="bub"><i></i></span><span class="d">fi</span></span>
+  <div class="chips"><div class="chip cw"><svg><use href="#d5"/></svg></div><div class="chip cn"><svg><use href="#d5w"/></svg></div></div>
+</div>
+<div class="row"><div class="tag">D6<small>sparkle-rypäs</small></div>
+  <svg class="ico"><use href="#d6"/></svg>
+  <span class="lg"><span class="d">Loppu</span><span class="b bl">siivous<svg class="wipe"><use href="#sw" fill="#1B9DF0"/></svg></span><span class="bub"><i></i></span><span class="d">fi</span></span>
+  <div class="chips"><div class="chip cw"><svg><use href="#d6"/></svg></div><div class="chip cn"><svg><use href="#d6w"/></svg></div></div>
+</div>
+<div class="row" style="border-bottom:0"><div class="tag">D6b<small>hiottu, tasapainoinen</small></div>
+  <svg class="ico"><use href="#d6b"/></svg>
+  <span class="lg"><span class="d">Loppu</span><span class="b bl">siivous<svg class="wipe"><use href="#sw" fill="#1B9DF0"/></svg></span><span class="bub"><i></i></span><span class="d">fi</span></span>
+  <div class="chips"><div class="chip cw"><svg><use href="#d6b"/></svg></div><div class="chip cn"><svg><use href="#d6bw"/></svg></div></div>
+</div>
+</body></html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="brand.css">
+<style>
+  *{margin:0;box-sizing:border-box}
+  body{background:#fff;display:block;width:960px;font-family:'Gabarito'}
+  .band{padding:54px 64px}
+  .light{background:#EAF2FA}
+  .dark{background:#0A1F3C}
+  .cap{font-family:'Inter';font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8aa1b8;margin-bottom:28px}
+  .dark .cap{color:#5f7d9c}
+  .stack{display:flex;flex-direction:column;gap:44px}
+  .unit{display:flex;align-items:center;gap:22px}
+  .lg{font-family:'Gabarito';font-weight:700;letter-spacing:-.035em;line-height:1;white-space:nowrap;display:inline-block;position:relative;font-size:56px}
+  .d{color:#0B3A66}.bl{color:#1B9DF0}
+  .dark .d{color:#fff}.dark .bl{color:#5AB7F5}
+  .b{position:relative;display:inline-block}
+  .wipe{position:absolute;left:-3%;bottom:-.30em;width:106%;height:.26em;overflow:visible}
+  .bub{display:inline-block;width:.28em;height:.28em;border-radius:50%;background:#1B9DF0;position:relative;vertical-align:baseline;margin:0 .02em}
+  .bub i{position:absolute;width:36%;height:36%;border-radius:50%;background:rgba(255,255,255,.92);left:18%;top:15%}
+  .dark .bub{background:#5AB7F5}
+  .ico{flex:0 0 auto;width:72px;height:72px}
+  .chiprow{display:flex;gap:18px;align-items:center}
+  .chip{width:54px;height:54px;border-radius:13px;display:grid;place-items:center}
+  .cw{background:#fff;border:1px solid #d4e3f1}
+  .cn{background:#0A1F3C}
+  .chip svg{width:40px;height:40px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="sw" viewBox="0 0 200 24" preserveAspectRatio="none">
+    <path d="M10 11 C70 7 140 7 184 9 C190 9.3 193 10.5 193 12 C190 11.5 186 11.3 182 11.6 C140 13 70 14 12 17 C5 17.6 4 11.5 10 11 Z"/>
+  </symbol>
+  <symbol id="box" viewBox="0 0 100 100">
+    <g fill="none" stroke="#0B3A66" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M30 54 L30 74 L50 86 L70 74 L70 54"/><path d="M50 64 L50 86"/>
+      <path d="M30 54 L50 64 L70 54 L50 44 Z"/>
+      <path d="M30 54 L16 46 L36 34 L50 44"/><path d="M70 54 L84 46 L64 34 L50 44"/>
+    </g>
+    <path d="M50 10 C50 18 53 21 61 21 C53 21 50 24 50 32 C50 24 47 21 39 21 C47 21 50 18 50 10 Z" fill="#1B9DF0"/>
+  </symbol>
+  <symbol id="boxw" viewBox="0 0 100 100">
+    <g fill="none" stroke="#fff" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M30 54 L30 74 L50 86 L70 74 L70 54"/><path d="M50 64 L50 86"/>
+      <path d="M30 54 L50 64 L70 54 L50 44 Z"/>
+      <path d="M30 54 L16 46 L36 34 L50 44"/><path d="M70 54 L84 46 L64 34 L50 44"/>
+    </g>
+    <path d="M50 10 C50 18 53 21 61 21 C53 21 50 24 50 32 C50 24 47 21 39 21 C47 21 50 18 50 10 Z" fill="#5AB7F5"/>
+  </symbol>
+</defs></svg>
+
+<div class="band light">
+  <div class="cap">Vaalea</div>
+  <div class="stack">
+    <div class="unit"><span class="lg"><span class="d">Loppu</span><span class="b bl">siivous<svg class="wipe"><use href="#sw" fill="#1B9DF0"/></svg></span><span class="bub"><i></i></span><span class="d">fi</span></span></div>
+    <div class="unit"><svg class="ico"><use href="#box"/></svg><span class="lg"><span class="d">Loppu</span><span class="b bl">siivous<svg class="wipe"><use href="#sw" fill="#1B9DF0"/></svg></span><span class="bub"><i></i></span><span class="d">fi</span></span></div>
+  </div>
+</div>
+
+<div class="band dark">
+  <div class="cap">Tumma</div>
+  <div class="stack">
+    <div class="unit"><svg class="ico"><use href="#boxw"/></svg><span class="lg"><span class="d">Loppu</span><span class="b bl">siivous<svg class="wipe"><use href="#sw" fill="#5AB7F5"/></svg></span><span class="bub"><i></i></span><span class="d">fi</span></span></div>
+  </div>
+</div>
+
+<div class="band light">
+  <div class="cap">Favicon</div>
+  <div class="chiprow">
+    <div class="chip cw"><svg><use href="#box"/></svg></div>
+    <div class="chip cn"><svg><use href="#boxw"/></svg></div>
+  </div>
+</div>
+</body></html>

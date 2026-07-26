@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EEF1F4;font-family:'Avenir Next','Inter',sans-serif;padding:48px;width:1640px;}
+  h1{font-size:30px;font-weight:800;color:#1a1f24;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:36px;}
+  .card{background:#fff;border-radius:22px;overflow:hidden;margin-bottom:28px;box-shadow:0 2px 14px rgba(0,0,0,.06);}
+  .head{display:flex;align-items:center;gap:14px;padding:20px 30px;border-bottom:1px solid #eef1f4;}
+  .num{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;}
+  .htitle{font-size:20px;font-weight:800;color:#1a1f24;}
+  .desc{font-size:13px;color:#8b95a1;margin-left:6px;}
+  .chips{display:flex;gap:7px;margin-left:auto;}
+  .chip{width:26px;height:26px;border-radius:7px;border:1px solid rgba(0,0,0,.08);}
+  .row{display:grid;grid-template-columns:1fr 1fr;}
+  .cell{display:flex;align-items:center;gap:26px;padding:46px 50px;min-height:190px;}
+
+  /* wordmark-led type */
+  .wm{font-weight:800;letter-spacing:-2px;line-height:1;display:flex;align-items:flex-start;font-size:58px;}
+  .spk{margin-left:8px;margin-top:4px;}
+
+  .word{display:flex;flex-direction:column;line-height:1;}
+  .name{font-weight:800;font-size:54px;letter-spacing:-1.8px;}
+  .tag{font-weight:600;font-size:14px;letter-spacing:4px;margin-top:11px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — uudet logoluonnokset</h1>
+  <div class="sub">Nimi + .fi näkyvissä · monipuolisemmat konseptit · vaalea ja tumma tausta</div>
+
+  <!-- 1 — WORDMARK + sparkle dot (teal, agency-clean) -->
+  <div class="card">
+    <div class="head"><div class="num" style="background:#0E7C86;">1</div><div class="htitle">Sanamerkki + välke-piste</div><div class="desc">— ei laatikkoa, ”i”:n piste on välke. Moderni, premium.</div>
+      <div class="chips"><div class="chip" style="background:#16C4CA;"></div><div class="chip" style="background:#0E7C86;"></div><div class="chip" style="background:#0B2B30;"></div></div></div>
+    <div class="row">
+      <div class="cell" style="background:#fff;">
+        <div class="wm">
+          <span style="color:#0B2B30;">loppusiivous</span><span style="color:#0E9AA3;">.fi</span>
+          <svg class="spk" width="34" height="34" viewBox="0 0 100 100"><path d="M50 8 C53 35,65 47,92 50 C65 53,53 65,50 92 C47 65,35 53,8 50 C35 47,47 35,50 8 Z" fill="#16C4CA"/></svg>
+        </div>
+      </div>
+      <div class="cell" style="background:#0B2B30;">
+        <div class="wm">
+          <span style="color:#fff;">loppusiivous</span><span style="color:#16C4CA;">.fi</span>
+          <svg class="spk" width="34" height="34" viewBox="0 0 100 100"><path d="M50 8 C53 35,65 47,92 50 C65 53,53 65,50 92 C47 65,35 53,8 50 C35 47,47 35,50 8 Z" fill="#6FE9D0"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 — WORDMARK two-weight + squeegee underline (deep blue) -->
+  <div class="card">
+    <div class="head"><div class="num" style="background:#1763C7;">2</div><div class="htitle">Kaksipainoinen sanamerkki</div><div class="desc">— ”loppu” paksu + ”siivous” kevyt, alla squeegee-veto. Selkeä, luotettava.</div>
+      <div class="chips"><div class="chip" style="background:#10243F;"></div><div class="chip" style="background:#2E7CE4;"></div><div class="chip" style="background:#E8F1FC;"></div></div></div>
+    <div class="row">
+      <div class="cell" style="background:#fff;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+          <div style="font-size:56px;letter-spacing:-1.5px;line-height:1;">
+            <span style="font-weight:800;color:#10243F;">loppu</span><span style="font-weight:400;color:#2E7CE4;">siivous</span><span style="font-weight:800;color:#10243F;">.fi</span>
+          </div>
+          <svg width="360" height="16" viewBox="0 0 360 16" style="margin-top:10px;"><path d="M2 11 C90 2 270 2 358 9" fill="none" stroke="#2E7CE4" stroke-width="5" stroke-linecap="round"/><path d="M340 4 l8 5 -8 5" fill="none" stroke="#2E7CE4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="cell" style="background:#10243F;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+          <div style="font-size:56px;letter-spacing:-1.5px;line-height:1;">
+            <span style="font-weight:800;color:#fff;">loppu</span><span style="font-weight:400;color:#7FB2F2;">siivous</span><span style="font-weight:800;color:#fff;">.fi</span>
+          </div>
+          <svg width="360" height="16" viewBox="0 0 360 16" style="margin-top:10px;"><path d="M2 11 C90 2 270 2 358 9" fill="none" stroke="#7FB2F2" stroke-width="5" stroke-linecap="round"/><path d="M340 4 l8 5 -8 5" fill="none" stroke="#7FB2F2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 — DROPLET mark (green, fresh) -->
+  <div class="card">
+    <div class="head"><div class="num" style="background:#0E6B3C;">3</div><div class="htitle">Pisaramerkki</div><div class="desc">— vesipisara + välke. Raikas, eko, lähestyttävä.</div>
+      <div class="chips"><div class="chip" style="background:#2BB56E;"></div><div class="chip" style="background:#0E6B3C;"></div><div class="chip" style="background:#A8E6B0;"></div></div></div>
+    <div class="row">
+      <div class="cell" style="background:#fff;">
+        <svg width="104" height="104" viewBox="0 0 132 132"><defs><linearGradient id="d3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2BB56E"/><stop offset="1" stop-color="#0E6B3C"/></linearGradient></defs><path d="M66 10 C96 52 112 74 92 102 A40 40 0 1 1 40 102 C20 74 36 52 66 10 Z" fill="url(#d3)"/><path d="M66 64 C69 82,76 89,93 92 C76 95,69 102,66 120 C63 102,56 95,39 92 C56 89,63 82,66 64 Z" fill="#fff"/><circle cx="50" cy="60" r="8" fill="#fff" opacity="0.5"/></svg>
+        <div class="word"><div class="name" style="color:#0C2A1C;">Loppusiivous<span style="color:#1FA463;">.fi</span></div><div class="tag" style="color:#0E6B3C;">Muuttosiivoukset</div></div>
+      </div>
+      <div class="cell" style="background:#0C2A1C;">
+        <svg width="104" height="104" viewBox="0 0 132 132"><path d="M66 10 C96 52 112 74 92 102 A40 40 0 1 1 40 102 C20 74 36 52 66 10 Z" fill="url(#d3)"/><path d="M66 64 C69 82,76 89,93 92 C76 95,69 102,66 120 C63 102,56 95,39 92 C56 89,63 82,66 64 Z" fill="#fff"/><circle cx="50" cy="60" r="8" fill="#fff" opacity="0.5"/></svg>
+        <div class="word"><div class="name" style="color:#fff;">Loppusiivous<span style="color:#7CE0A0;">.fi</span></div><div class="tag" style="color:#A8E6B0;">Muuttosiivoukset</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 — EMBLEM seal (navy + gold) -->
+  <div class="card">
+    <div class="head"><div class="num" style="background:#0E2038;">4</div><div class="htitle">Leima / emblem</div><div class="desc">— pyöreä sinetti, kehäteksti + välke. Arvokas, perinteinen luotettavuus.</div>
+      <div class="chips"><div class="chip" style="background:#0E2038;"></div><div class="chip" style="background:#C9A24B;"></div><div class="chip" style="background:#F5F1E8;"></div></div></div>
+    <div class="row">
+      <div class="cell" style="background:#F5F1E8;">
+        <svg width="118" height="118" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="66" fill="#0E2038"/><circle cx="70" cy="70" r="60" fill="none" stroke="#C9A24B" stroke-width="1.5"/>
+          <path id="ring1" d="M70 18 a52 52 0 1 1 -0.1 0" fill="none"/>
+          <text font-family="'Avenir Next'" font-weight="700" font-size="11.5" letter-spacing="3.2" fill="#C9A24B"><textPath href="#ring1" startOffset="0%">LOPPUSIIVOUS.FI · MUUTTOSIIVOUKSET · </textPath></text>
+          <path d="M70 44 C73 63,80 70,99 73 C80 76,73 83,70 102 C67 83,60 76,41 73 C60 70,67 63,70 44 Z" fill="#C9A24B"/>
+        </svg>
+        <div class="word"><div class="name" style="color:#0E2038;">Loppusiivous<span style="color:#C9A24B;">.fi</span></div><div class="tag" style="color:#A67C28;letter-spacing:6px;">Muuttosiivoukset</div></div>
+      </div>
+      <div class="cell" style="background:#0E2038;">
+        <svg width="118" height="118" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="66" fill="#16263F"/><circle cx="70" cy="70" r="60" fill="none" stroke="#C9A24B" stroke-width="1.5"/>
+          <path id="ring2" d="M70 18 a52 52 0 1 1 -0.1 0" fill="none"/>
+          <text font-family="'Avenir Next'" font-weight="700" font-size="11.5" letter-spacing="3.2" fill="#C9A24B"><textPath href="#ring2" startOffset="0%">LOPPUSIIVOUS.FI · MUUTTOSIIVOUKSET · </textPath></text>
+          <path d="M70 44 C73 63,80 70,99 73 C80 76,73 83,70 102 C67 83,60 76,41 73 C60 70,67 63,70 44 Z" fill="#C9A24B"/>
+        </svg>
+        <div class="word"><div class="name" style="color:#F5F1E8;">Loppusiivous<span style="color:#C9A24B;">.fi</span></div><div class="tag" style="color:#C9A24B;letter-spacing:6px;">Muuttosiivoukset</div></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

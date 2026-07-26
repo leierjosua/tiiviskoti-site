@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="stylesheet" href="brand.css">
+<style>body{padding:46px;display:flex;gap:50px;align-items:flex-start;background:#fff}
+.col{display:flex;flex-direction:column;align-items:center;gap:16px}.lab{font-family:'Gabarito';font-size:13px;font-weight:800;color:#0B3A66}</style></head><body>
+<svg width="0" height="0"><defs>
+<path id="top" d="M31,98 A69,69 0 0 1 169,98"/><path id="bot" d="M26,98 A74,74 0 0 0 174,98"/></defs></svg>
+<script>
+const C='#0A1F3C', TAIL='#06243a';
+function beads(r,n){let s='';for(let i=0;i<n;i++){const a=i/n*2*Math.PI;const x=100+r*Math.cos(a),y=98+r*Math.sin(a);s+=`<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="1.6" fill="${C}"/>`;}return s;}
+function ticks(r,n,len){let s='';for(let i=0;i<n;i++){const a=i/n*2*Math.PI;const x1=100+r*Math.cos(a),y1=98+r*Math.sin(a),x2=100+(r+len)*Math.cos(a),y2=98+(r+len)*Math.sin(a);s+=`<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="${C}" stroke-width="1.4"/>`;}return s;}
+function seal(extra){return `${extra}
+ <circle cx="100" cy="98" r="80" fill="none" stroke="${C}" stroke-width="3"/>
+ <circle cx="100" cy="98" r="64" fill="none" stroke="${C}" stroke-width="1.3"/>
+ <circle cx="27" cy="98" r="2.2" fill="${C}"/><circle cx="173" cy="98" r="2.2" fill="${C}"/>
+ <text font-family="Gabarito" font-weight="800" font-size="11" letter-spacing="1.8" fill="${C}" text-anchor="middle"><textPath href="#top" startOffset="50%">LOPPUSIIVOUS.FI</textPath></text>
+ <text font-family="Gabarito" font-weight="700" font-size="9" letter-spacing="1.5" fill="${C}" text-anchor="middle"><textPath href="#bot" startOffset="50%">MUUTTOSIIVOUS</textPath></text>
+ <path d="M88 64 l9 10 21 -24" fill="none" stroke="${C}" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round"/>
+ <text x="100" y="104" font-family="Gabarito" font-weight="900" font-size="17.5" letter-spacing="0.4" fill="${C}" text-anchor="middle">HYVÄKSYTTY</text>`;}
+function ribbon(){return `
+ <path d="M66 156 L82 159 L58 203 L50 194 L44 200 Z" fill="${TAIL}"/>
+ <path d="M134 156 L118 159 L142 203 L150 194 L156 200 Z" fill="${TAIL}"/>
+ <path d="M26 148 L40 164 L26 180 L174 180 L160 164 L174 148 Z" fill="${C}"/>
+ <path d="M33 152 L45 164 L33 176 L167 176 L155 164 L167 152 Z" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="1"/>
+ <text x="100" y="168.5" font-family="Gabarito" font-weight="800" font-size="13" letter-spacing="1.6" fill="#fff" text-anchor="middle">LAATUTAKUU</text>`;}
+const A=`<svg width="300" height="330" viewBox="0 0 200 216"><g>${seal('')}${ribbon()}</g></svg>`;
+const B=`<svg width="300" height="330" viewBox="0 0 200 216"><g>${seal(beads(88,46))}${ribbon()}</g></svg>`;
+const D=`<svg width="300" height="330" viewBox="0 0 200 216"><g>${seal(ticks(83,60,4))}${ribbon()}</g></svg>`;
+document.write(`<div class="col">${A}<div class="lab">A · puhdas nauha</div></div>`);
+document.write(`<div class="col">${B}<div class="lab">B · helmireunus (mitali)</div></div>`);
+document.write(`<div class="col">${D}<div class="lab">C · viivareunus (sertifikaatti)</div></div>`);
+</script></body></html>

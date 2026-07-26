@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Gabarito',sans-serif;padding:46px;width:1360px;}
+  h1{font-size:29px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:24px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{padding:13px 26px;border-bottom:1px solid #eef1f4;font-size:12.5px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:#9aa3ad;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:56px;}
+  .wm{font-weight:700;font-size:88px;letter-spacing:-1.5px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .deep{color:#0B3A66;} .bright{color:#1B9DF0;}
+  .bo{display:inline-block;width:0.605em;height:0.605em;vertical-align:-0.055em;margin:0 0.004em;overflow:visible;}
+  .stack{display:flex;flex-direction:column;align-items:center;}
+  .lab{font-size:12px;color:#9aa3ad;margin-top:13px;font-weight:700;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — A ilman tähteä</h1>
+  <div class="sub">Saippuakupla-o + karkaavat pikkukuplat · ei välkettä · Gabarito</div>
+
+  <!-- light -->
+  <div class="card">
+    <div class="head">Päälogo — vaalea</div>
+    <div class="cell" style="background:#fff;">
+      <div class="wm">
+        <span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#0B3A66" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/><circle cx="92" cy="6" r="8" fill="#2BB3F7"/><circle cx="104" cy="-10" r="4.5" fill="#7FD0FA"/></svg><span class="bright">us</span><span class="deep">.fi</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- dark -->
+  <div class="card">
+    <div class="head">Päälogo — tumma</div>
+    <div class="cell" style="background:#0B2342;">
+      <div class="wm">
+        <span style="color:#fff;">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#fff" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#9fd8fb" stroke-width="9" stroke-linecap="round"/></svg><span style="color:#fff;">ppu</span><span style="color:#5AB7F5;">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#5AB7F5" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/><circle cx="92" cy="6" r="8" fill="#2BB3F7"/><circle cx="104" cy="-10" r="4.5" fill="#7FD0FA"/></svg><span style="color:#5AB7F5;">us</span><span style="color:#fff;">.fi</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- symbol -->
+  <div class="card">
+    <div class="head">Symboli — kupla-o (favicon / profiili / vaatteet)</div>
+    <div class="cell" style="background:#fff;justify-content:space-around;flex-wrap:wrap;gap:38px;">
+      <div class="stack">
+        <svg width="118" height="118" viewBox="0 0 120 120"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2BB3F7"/><stop offset="1" stop-color="#1378D4"/></linearGradient></defs><rect x="2" y="2" width="116" height="116" rx="30" fill="url(#bg)"/><circle cx="56" cy="64" r="30" fill="none" stroke="#fff" stroke-width="16"/><path d="M38 52 A30 30 0 0 1 56 36" fill="none" stroke="#cdeaff" stroke-width="7" stroke-linecap="round"/><circle cx="92" cy="34" r="9" fill="#fff"/><circle cx="104" cy="20" r="5" fill="#cdeaff"/></svg>
+        <div class="lab">Squircle (app/favicon)</div>
+      </div>
+      <div class="stack">
+        <svg width="118" height="118" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#0B2342"/><circle cx="56" cy="64" r="30" fill="none" stroke="#fff" stroke-width="16"/><path d="M38 52 A30 30 0 0 1 56 36" fill="none" stroke="#9fd8fb" stroke-width="7" stroke-linecap="round"/><circle cx="92" cy="34" r="9" fill="#5AB7F5"/><circle cx="104" cy="20" r="5" fill="#9fd8fb"/></svg>
+        <div class="lab">Ympyrä (profiili)</div>
+      </div>
+      <div class="stack">
+        <svg width="118" height="118" viewBox="0 0 120 120"><circle cx="56" cy="64" r="30" fill="none" stroke="#1B9DF0" stroke-width="16"/><path d="M38 52 A30 30 0 0 1 56 36" fill="none" stroke="#9fd8fb" stroke-width="7" stroke-linecap="round"/><circle cx="92" cy="34" r="9" fill="#2BB3F7"/><circle cx="104" cy="20" r="5" fill="#7FD0FA"/></svg>
+        <div class="lab">Pelkkä merkki</div>
+      </div>
+      <div class="stack">
+        <div style="display:flex;align-items:flex-end;gap:14px;">
+          <svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="url(#bg)"/><circle cx="56" cy="64" r="30" fill="none" stroke="#fff" stroke-width="16"/><circle cx="92" cy="34" r="9" fill="#fff"/></svg>
+          <svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="url(#bg)"/><circle cx="56" cy="64" r="30" fill="none" stroke="#fff" stroke-width="16"/><circle cx="92" cy="34" r="9" fill="#fff"/></svg>
+          <svg width="48" height="48" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="url(#bg)"/><circle cx="56" cy="64" r="30" fill="none" stroke="#fff" stroke-width="16"/><circle cx="92" cy="34" r="9" fill="#fff"/></svg>
+        </div>
+        <div class="lab">16 / 32 / 48 px</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

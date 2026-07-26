@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+.recharts-responsive-container *:focus,
+.recharts-responsive-container:focus,
+.recharts-wrapper *:focus,
+.recharts-wrapper:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+@theme inline {
+  --color-brand: #0B2342;
+  --color-brand-light: #2BB3F7;
+  --color-accent: #1B9DF0;
+  --color-accent-dark: #1483cf;
+  --color-accent-muted: #1B9DF01a;
+  --color-gold: #f3bb37;
+  --color-gold-dark: #e5a820;
+  --color-gold-muted: #f3bb371a;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F4F9FD;
+  --color-surface-hover: #EAF5FF;
+  --color-border: #DCEAF6;
+  --color-border-strong: #C2D9EC;
+  --color-text-primary: #0B3A66;
+  --color-text-secondary: #33475B;
+  --color-text-muted: #6E8198;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--color-surface-alt);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.ProseMirror p.is-empty::before { display: none; }
+.ProseMirror.is-editor-empty > p.is-empty:first-child::before { display: block; }

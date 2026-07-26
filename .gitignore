@@ -1,0 +1,34 @@
+node_modules/
+assets/_out/
+.DS_Store
+*.log
+
+.vercel/
+*.tmp
+.gk
+
+# env / secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+.supabase-keys.local
+
+# build output
+site/.next/
+admin/dist/
+site/node_modules/
+admin/node_modules/
+
+# supabase local
+supabase/.temp/
+supabase/.branches/
+.vercel
+.env*
+scripts/video/
+
+# tiiviskoti-admin on oma repo (github.com/leierjosua/tiiviskoti)
+tiiviskoti-admin/
+
+# koneen paikalliset Claude-asetukset — sisältää hyväksyttyjä komentoja, joissa voi olla tokeneita
+.claude/settings.local.json

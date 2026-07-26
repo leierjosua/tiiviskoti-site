@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Gabarito',sans-serif;padding:46px;width:1320px;}
+  h1{font-size:29px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:24px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{display:flex;gap:10px;align-items:baseline;padding:13px 26px;border-bottom:1px solid #eef1f4;}
+  .htitle{font-size:15px;font-weight:800;color:#1a1f24;}
+  .desc{font-size:12.5px;color:#9aa3ad;font-weight:600;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:48px;min-height:150px;}
+  .wm{font-weight:700;font-size:82px;letter-spacing:-1.5px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .deep{color:#0B3A66;} .bright{color:#1B9DF0;}
+  .bo{display:inline-block;width:0.605em;height:0.605em;vertical-align:-0.055em;margin:0 0.004em;overflow:visible;}
+  .pb{display:inline-block;width:0.26em;height:0.605em;vertical-align:-0.055em;overflow:visible;} /* period-bubble slot */
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — spice, ei sotkua</h1>
+  <svg width="0" height="0" style="position:absolute"><defs>
+    <linearGradient id="gD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2C6098"/><stop offset="1" stop-color="#0B3A66"/></linearGradient>
+    <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#62C4FF"/><stop offset="1" stop-color="#1378D4"/></linearGradient>
+  </defs></svg>
+
+  <!-- 0 base -->
+  <div class="card">
+    <div class="head"><div class="htitle">0 · Nykyinen A</div><div class="desc">— litteät kuplat, karkaavat pikkukuplat</div></div>
+    <div class="cell">
+      <div class="wm"><span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#0B3A66" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/><circle cx="92" cy="6" r="8" fill="#2BB3F7"/><circle cx="104" cy="-10" r="4.5" fill="#7FD0FA"/></svg><span class="bright">us</span><span class="deep">.fi</span></div>
+    </div>
+  </div>
+
+  <!-- 1 glassy gradient bubbles -->
+  <div class="card">
+    <div class="head"><div class="htitle">1 · Lasikuplat (liukuväri)</div><div class="desc">— kuplissa hieno liukuväri + heijastus = 3D-lasipinta. Spice craftilla, nolla lisäelementtiä.</div></div>
+    <div class="cell">
+      <div class="wm"><span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="url(#gD)" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="url(#gB)" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="bright">us</span><span class="deep">.fi</span></div>
+    </div>
+  </div>
+
+  <!-- 2 .fi period = bubble -->
+  <div class="card">
+    <div class="head"><div class="htitle">2 · ”.fi”:n piste = kupla</div><div class="desc">— nokkela detalji joka sitoo verkkotunnuksen motiiviin. Yksi elementti.</div></div>
+    <div class="cell">
+      <div class="wm"><span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#0B3A66" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="bright">us</span><svg class="pb" viewBox="0 0 26 100"><circle cx="13" cy="84" r="12" fill="#1B9DF0"/><circle cx="9" cy="80" r="3.5" fill="#fff"/></svg><span class="deep">fi</span></div>
+    </div>
+  </div>
+
+  <!-- 3 combo: glassy bubbles + period bubble -->
+  <div class="card">
+    <div class="head"><div class="htitle">3 · Yhdistelmä</div><div class="desc">— lasikuplat + ”.fi”-piste kuplana. Spice maksimissaan, yhä siisti.</div></div>
+    <div class="cell">
+      <div class="wm"><span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="url(#gD)" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="url(#gB)" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="bright">us</span><svg class="pb" viewBox="0 0 26 100"><circle cx="13" cy="84" r="12" fill="url(#gB)"/><circle cx="9" cy="80" r="3.5" fill="#fff"/></svg><span class="deep">fi</span></div>
+    </div>
+  </div>
+
+  <!-- dark of 3 -->
+  <div class="card">
+    <div class="head"><div class="htitle">3 · tummalla</div></div>
+    <div class="cell" style="background:#0B2342;">
+      <div class="wm"><span style="color:#fff;">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#cfe9ff" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#9fd8fb" stroke-width="9" stroke-linecap="round"/></svg><span style="color:#fff;">ppu</span><span style="color:#5AB7F5;">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="url(#gB)" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span style="color:#5AB7F5;">us</span><svg class="pb" viewBox="0 0 26 100"><circle cx="13" cy="84" r="12" fill="#5AB7F5"/><circle cx="9" cy="80" r="3.5" fill="#fff"/></svg><span style="color:#fff;">fi</span></div>
+    </div>
+  </div>
+
+</body>
+</html>

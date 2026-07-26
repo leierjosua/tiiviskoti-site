@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Loppusiivous.fi — favicon: L + pyyhkäisy -->
+  <rect width="120" height="120" rx="30" fill="#1B9DF0"/>
+  <polygon points="42,28 58,28 58,70 86,70 86,84 42,84" fill="#fff"/>
+  <path d="M40 97 C58 93 82 92 99 88 C90 95 70 99 44 102 C37 102.5 35 97.5 40 97 Z" fill="#fff"/>
+</svg>

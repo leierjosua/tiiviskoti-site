@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next','Inter',sans-serif;padding:48px;width:1320px;}
+  h1{font-size:30px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:26px;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+  .head{display:flex;gap:10px;align-items:baseline;padding:13px 24px;border-bottom:1px solid #eef1f4;}
+  .htitle{font-size:16px;font-weight:800;color:#1a1f24;}
+  .desc{font-size:12.5px;color:#9aa3ad;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:46px;min-height:150px;}
+  .wmrk{font-weight:800;font-size:62px;letter-spacing:-2.3px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;position:relative;}
+  .deep{color:#0B3A66;} .bright{color:#1B9DF0;}
+  /* dotless i wrapper */
+  .di{position:relative;}
+  .tit{position:absolute;left:50%;transform:translateX(-50%);}      /* tittle slot */
+  /* bubble-o ring — sized like lowercase o, on baseline */
+  .bo{display:inline-block;width:0.62em;height:0.62em;vertical-align:-0.06em;margin:0 -0.01em;}
+  /* floating bubbles layer */
+  .float{position:absolute;left:0;top:-0.30em;width:100%;height:0.4em;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — motiivi tekstilogoon (kuplat · sparkle)</h1>
+  <div class="sub">Raikas sininen · ”loppu” syvä / ”siivous” kirkas · eri tapoja upottaa merkki kirjaimiin</div>
+
+  <!-- A: bubble-o (round letters become bubbles) -->
+  <div class="card">
+    <div class="head"><div class="htitle">A · Kupla-o</div><div class="desc">— pyöreät o-kirjaimet muuttuvat saippuakupliksi (kiilto sisällä)</div></div>
+    <div class="cell">
+      <div class="wmrk">
+        <span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0B3A66" stroke-width="20"/><path d="M26 42 A30 30 0 0 1 50 18" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">s</span><span class="bright">iiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#1B9DF0" stroke-width="20"/><path d="M26 42 A30 30 0 0 1 50 18" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/></svg><span class="bright">us</span><span class="deep">.f</span><span class="di deep">&#305;<svg class="tit" style="width:0.40em;top:-0.27em" viewBox="0 0 100 100"><path d="M50 6 C53 34,67 47,94 50 C67 53,53 66,50 94 C47 66,33 53,6 50 C33 47,47 34,50 6 Z" fill="#1B9DF0"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- B: bubble i-dots -->
+  <div class="card">
+    <div class="head"><div class="htitle">B · Kupla-pisteet</div><div class="desc">— i-kirjainten pisteet ovat kuplia</div></div>
+    <div class="cell">
+      <div class="wmrk">
+        <span class="deep">Loppus</span><span class="di bright">&#305;<svg class="tit" style="width:0.30em;top:-0.13em" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#1B9DF0"/><circle cx="38" cy="38" r="11" fill="#fff" opacity=".85"/></svg></span><span class="di bright">&#305;<svg class="tit" style="width:0.30em;top:-0.13em" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#1B9DF0"/><circle cx="38" cy="38" r="11" fill="#fff" opacity=".85"/></svg></span><span class="bright">vous</span><span class="deep">.f</span><span class="di deep">&#305;<svg class="tit" style="width:0.30em;top:-0.13em" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#1B9DF0"/><circle cx="38" cy="38" r="11" fill="#fff" opacity=".85"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- C: floating bubbles above siivous + sparkle .fi -->
+  <div class="card">
+    <div class="head"><div class="htitle">C · Nousevat kuplat</div><div class="desc">— pieniä kuplia kohoaa sanan yläpuolelle, sparkle .fi:ssä</div></div>
+    <div class="cell">
+      <div class="wmrk">
+        <svg class="float" viewBox="0 0 600 60" preserveAspectRatio="none" style="overflow:visible">
+          <circle cx="250" cy="44" r="9" fill="#2BB3F7"/><circle cx="247" cy="40" r="2.5" fill="#fff"/>
+          <circle cx="285" cy="26" r="6" fill="#7FD0FA"/>
+          <circle cx="315" cy="38" r="4" fill="#2BB3F7"/>
+        </svg>
+        <span class="deep">Loppu</span><span class="bright">siivous</span><span class="deep">.f</span><span class="di deep">&#305;<svg class="tit" style="width:0.40em;top:-0.27em" viewBox="0 0 100 100"><path d="M50 6 C53 34,67 47,94 50 C67 53,53 66,50 94 C47 66,33 53,6 50 C33 47,47 34,50 6 Z" fill="#1B9DF0"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- D: multi-sparkle -->
+  <div class="card">
+    <div class="head"><div class="htitle">D · Sparkle-pisteet</div><div class="desc">— i-pisteet välkkeinä (sii + .fi)</div></div>
+    <div class="cell">
+      <div class="wmrk">
+        <span class="deep">Loppus</span><span class="di bright">&#305;<svg class="tit" style="width:0.30em;top:-0.20em" viewBox="0 0 100 100"><path d="M50 8 C53 35,65 47,92 50 C65 53,53 65,50 92 C47 65,35 53,8 50 C35 47,47 35,50 8 Z" fill="#1B9DF0"/></svg></span><span class="di bright">&#305;<svg class="tit" style="width:0.24em;top:-0.16em" viewBox="0 0 100 100"><path d="M50 8 C53 35,65 47,92 50 C65 53,53 65,50 92 C47 65,35 53,8 50 C35 47,47 35,50 8 Z" fill="#1B9DF0"/></svg></span><span class="bright">vous</span><span class="deep">.f</span><span class="di deep">&#305;<svg class="tit" style="width:0.40em;top:-0.27em" viewBox="0 0 100 100"><path d="M50 8 C53 35,65 47,92 50 C65 53,53 65,50 92 C47 65,35 53,8 50 C35 47,47 35,50 8 Z" fill="#1B9DF0"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- E: bubble underline -->
+  <div class="card">
+    <div class="head"><div class="htitle">E · Kuplavana alle</div><div class="desc">— rivi kuplia sanan alle, sparkle .fi:ssä</div></div>
+    <div class="cell">
+      <div style="display:flex;flex-direction:column;align-items:flex-start;">
+        <div class="wmrk">
+          <span class="deep">Loppu</span><span class="bright">siivous</span><span class="deep">.f</span><span class="di deep">&#305;<svg class="tit" style="width:0.40em;top:-0.27em" viewBox="0 0 100 100"><path d="M50 6 C53 34,67 47,94 50 C67 53,53 66,50 94 C47 66,33 53,6 50 C33 47,47 34,50 6 Z" fill="#1B9DF0"/></svg></span>
+        </div>
+        <svg width="430" height="22" viewBox="0 0 430 22" style="margin-top:10px;">
+          <circle cx="10" cy="11" r="5" fill="#7FD0FA"/><circle cx="34" cy="11" r="7" fill="#2BB3F7"/><circle cx="62" cy="11" r="6" fill="#1B9DF0"/><circle cx="90" cy="11" r="8" fill="#2BB3F7"/><circle cx="120" cy="11" r="5" fill="#7FD0FA"/><circle cx="146" cy="11" r="7" fill="#1B9DF0"/><circle cx="176" cy="11" r="6" fill="#2BB3F7"/><circle cx="204" cy="11" r="8" fill="#1B9DF0"/><circle cx="234" cy="11" r="5" fill="#7FD0FA"/><circle cx="260" cy="11" r="7" fill="#2BB3F7"/><circle cx="288" cy="11" r="6" fill="#1B9DF0"/><circle cx="316" cy="11" r="8" fill="#2BB3F7"/><circle cx="346" cy="11" r="5" fill="#7FD0FA"/><circle cx="372" cy="11" r="7" fill="#1B9DF0"/><circle cx="400" cy="11" r="6" fill="#2BB3F7"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

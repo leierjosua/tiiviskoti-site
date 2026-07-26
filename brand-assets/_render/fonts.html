@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@800&family=Montserrat:wght@800&family=Nunito:wght@900&family=Quicksand:wght@700&family=Baloo+2:wght@800&family=Fredoka:wght@600&family=Outfit:wght@800&family=Manrope:wght@800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next',sans-serif;padding:46px;width:1340px;}
+  h1{font-size:30px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:26px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);padding:26px 30px;}
+  .fname{font-family:'Avenir Next';font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#9aa3ad;margin-bottom:16px;}
+  .fname b{color:#1B9DF0;}
+  .wm{font-size:42px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .deep{color:#0B3A66;} .bright{color:#1B9DF0;}
+  .spk{margin-left:0.12em;width:0.40em;height:0.40em;align-self:flex-start;margin-top:0.04em;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — fonttivertailu</h1>
+  <div class="sub">Sama sanamerkki 12 fontilla · ”loppu” syvä / ”siivous” kirkas · sparkle .fi:n perässä</div>
+  <div class="grid" id="g"></div>
+
+<script>
+  const fonts = [
+    ["Avenir Next", 800, "(nykyinen) humaani-geometrinen"],
+    ["Poppins", 800, "geometrinen, täydet ympyrä-o:t"],
+    ["Montserrat", 800, "urbaani geometrinen"],
+    ["Futura", 700, "klassikko, terävä geometrinen"],
+    ["Nunito", 900, "pyöreä & lämmin (Avenir-henkinen)"],
+    ["Quicksand", 700, "kevyt pyöreä, ilmava"],
+    ["ui-rounded", 800, "SF Rounded — pehmeä moderni"],
+    ["Baloo 2", 800, "pullea pyöreä — kupla-henkinen"],
+    ["Fredoka", 600, "leikkisä pyöreä"],
+    ["Outfit", 800, "moderni minimal"],
+    ["Manrope", 800, "moderni minimal, tiivis"],
+    ["DIN Alternate", 700, "insinöörimäinen, ryhdikäs"],
+  ];
+  const g = document.getElementById('g');
+  for (const [fam, wt, note] of fonts) {
+    const card = document.createElement('div'); card.className='card';
+    const label = document.createElement('div'); label.className='fname';
+    label.innerHTML = `<b>${fam.replace('ui-rounded','SF Rounded')}</b> · ${note}`;
+    const wm = document.createElement('div'); wm.className='wm';
+    wm.style.fontFamily = `'${fam}', sans-serif`; wm.style.fontWeight = wt;
+    wm.innerHTML = `<span class="deep">Loppu</span><span class="bright">siivous</span><span class="deep">.fi</span>`+
+      `<svg class="spk" viewBox="0 0 100 100"><path d="M50 5 C53 34,66 47,95 50 C66 53,53 66,50 95 C47 66,34 53,5 50 C34 47,47 34,50 5 Z" fill="#1B9DF0"/></svg>`;
+    card.appendChild(label); card.appendChild(wm); g.appendChild(card);
+  }
+</script>
+</body>
+</html>

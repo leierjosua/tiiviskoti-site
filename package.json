@@ -1,0 +1,13 @@
+{
+  "name": "loppusiivous-assets",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Loppusiivous.fi — brändi- ja mainosassettien renderöintipipeline (HTML/CSS + Playwright), sama malli kuin AaltoAir.",
+  "scripts": {
+    "render": "node scripts/render.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.58.2"
+  }
+}

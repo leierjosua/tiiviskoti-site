@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fi"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next','Inter',sans-serif;padding:46px;width:1140px;}
+  h1{font-size:27px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:22px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{display:flex;gap:10px;align-items:baseline;padding:12px 24px;border-bottom:1px solid #eef1f4;}
+  .ht{font-size:15px;font-weight:800;color:#1a1f24;}.dz{font-size:12.5px;color:#9aa3ad;font-weight:600;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:42px;min-height:140px;}
+  .dark{background:#0B2342;}
+  .lg{display:inline-flex;flex-direction:column;align-items:stretch;}
+  .wm{font-family:'Gabarito';font-weight:700;font-size:58px;letter-spacing:-1.8px;line-height:1;white-space:nowrap;color:#0B3A66;}
+  .dark .wm{color:#fff;} .blue{color:#1B9DF0;} .dark .blue{color:#5AB7F5;}
+</style></head><body>
+  <h1>Loppusiivous.fi — viiva tekstin alla (alleviivaus-veto)</h1>
+  <div class="sub">Yksi veto = pyyhkäisy puhtaaksi. Vaalea + tumma.</div>
+
+  <!-- A straight rounded -->
+  <div class="card"><div class="head"><div class="ht">A · Suora veto</div><div class="dz">— rauhallinen, itsevarma</div></div>
+    <div class="grid">
+      <div class="cell"><div class="lg"><div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="20" viewBox="0 0 440 20" preserveAspectRatio="none" style="margin-top:8px"><path d="M6 11 C150 5 300 5 434 9" fill="none" stroke="#1B9DF0" stroke-width="8" stroke-linecap="round"/></svg></div></div>
+      <div class="cell dark"><div class="lg"><div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="20" viewBox="0 0 440 20" preserveAspectRatio="none" style="margin-top:8px"><path d="M6 11 C150 5 300 5 434 9" fill="none" stroke="#5AB7F5" stroke-width="8" stroke-linecap="round"/></svg></div></div>
+    </div>
+  </div>
+
+  <!-- B swoosh flick -->
+  <div class="card"><div class="head"><div class="ht">B · Swoosh (pyyhkäisy ylös)</div><div class="dz">— liike &amp; energia, loppu nousee</div></div>
+    <div class="grid">
+      <div class="cell"><div class="lg"><div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="26" viewBox="0 0 440 26" preserveAspectRatio="none" style="margin-top:6px;overflow:visible"><path d="M6 16 C150 8 320 7 412 2 C420 1 430 3 438 7" fill="none" stroke="#1B9DF0" stroke-width="8" stroke-linecap="round"/></svg></div></div>
+      <div class="cell dark"><div class="lg"><div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="26" viewBox="0 0 440 26" preserveAspectRatio="none" style="margin-top:6px;overflow:visible"><path d="M6 16 C150 8 320 7 412 2 C420 1 430 3 438 7" fill="none" stroke="#5AB7F5" stroke-width="8" stroke-linecap="round"/></svg></div></div>
+    </div>
+  </div>
+
+  <!-- C tapered brush wipe -->
+  <div class="card"><div class="head"><div class="ht">C · Pyyhkäisy (kapeneva)</div><div class="dz">— sivellinveto, paksu → ohut</div></div>
+    <div class="grid">
+      <div class="cell"><div class="lg"><div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="22" viewBox="0 0 440 22" preserveAspectRatio="none" style="margin-top:7px"><path d="M6 9 C140 3 300 3 434 8 C436 11 434 15 428 15 C300 11 140 12 10 17 C5 17 3 12 6 9 Z" fill="#1B9DF0"/></svg></div></div>
+      <div class="cell dark"><div class="lg"><div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="22" viewBox="0 0 440 22" preserveAspectRatio="none" style="margin-top:7px"><path d="M6 9 C140 3 300 3 434 8 C436 11 434 15 428 15 C300 11 140 12 10 17 C5 17 3 12 6 9 Z" fill="#5AB7F5"/></svg></div></div>
+    </div>
+  </div>
+
+  <!-- D underline under siivous only -->
+  <div class="card"><div class="head"><div class="ht">D · Veto vain ”siivous”-sanan alla</div><div class="dz">— korostaa palvelusanaa</div></div>
+    <div class="grid">
+      <div class="cell"><div class="lg" style="align-items:flex-start"><div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="20" viewBox="0 0 440 20" preserveAspectRatio="none" style="margin-top:8px"><path d="M150 11 C210 6 280 6 330 10" fill="none" stroke="#1B9DF0" stroke-width="8" stroke-linecap="round"/></svg></div></div>
+      <div class="cell dark"><div class="lg" style="align-items:flex-start"><div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="20" viewBox="0 0 440 20" preserveAspectRatio="none" style="margin-top:8px"><path d="M150 11 C210 6 280 6 330 10" fill="none" stroke="#5AB7F5" stroke-width="8" stroke-linecap="round"/></svg></div></div>
+    </div>
+  </div>
+
+</body></html>

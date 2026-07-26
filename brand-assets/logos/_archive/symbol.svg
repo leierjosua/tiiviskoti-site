@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Loppusiivous.fi — kupla-symboli (sama kuin sanamerkin o) -->
+  <g transform="translate(17.5,17.5) scale(0.85)">
+    <circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/>
+    <path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="92" cy="6" r="8" fill="#2BB3F7"/>
+    <circle cx="104" cy="-10" r="4.5" fill="#7FD0FA"/>
+  </g>
+</svg>

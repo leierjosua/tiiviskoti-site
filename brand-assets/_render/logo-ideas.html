@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fi"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@300;400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next','Inter',sans-serif;padding:46px;width:1120px;}
+  h1{font-size:27px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:22px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{display:flex;gap:10px;align-items:baseline;padding:12px 24px;border-bottom:1px solid #eef1f4;}
+  .ht{font-size:15px;font-weight:800;color:#1a1f24;}.dz{font-size:12.5px;color:#9aa3ad;font-weight:600;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:50px;min-height:160px;}
+  .g{font-family:'Gabarito';letter-spacing:-1.8px;line-height:1;white-space:nowrap;}
+  .ink{color:#0B3A66;}.blue{color:#1B9DF0;}
+
+  /* E1 layered offset sticker */
+  .layer{position:relative;font-weight:800;font-size:62px;}
+  .layer .b{position:absolute;left:6px;top:6px;color:#1B9DF0;}
+  .layer .f{position:relative;color:#0B3A66;}
+
+  /* E2 weight contrast */
+  .wc{font-size:62px;}
+  .wc .thin{font-weight:300;}.wc .black{font-weight:900;}
+
+  /* E3 diagonal split fill */
+  .diag{font-weight:800;font-size:62px;background:linear-gradient(118deg,#0B3A66 0 50%,#1B9DF0 50% 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+  /* E4 marker swipe behind whole word */
+  .swipe{position:relative;font-weight:800;font-size:60px;color:#fff;z-index:1;display:inline-block;padding:.04em .18em;}
+  .swipe svg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;}
+
+  /* E5 swash-L underline */
+  .swashwrap{display:inline-flex;flex-direction:column;align-items:flex-start;position:relative;}
+  .swash{font-weight:800;font-size:62px;color:#0B3A66;}
+</style></head><body>
+  <h1>Loppusiivous.fi — lisää ideoita (rohkeampia)</h1>
+  <div class="sub">Kaikki tekstilogoja, yksi spice kussakin.</div>
+
+  <!-- E1 layered offset -->
+  <div class="card"><div class="head"><div class="ht">1 · Kerroksellinen siirtymä</div><div class="dz">— sininen ”varjo” tekstin takana, sticker-/pop-henkinen</div></div>
+    <div class="cell"><div class="g layer"><span class="b">Loppusiivous.fi</span><span class="f">Loppusiivous.fi</span></div></div>
+  </div>
+
+  <!-- E2 weight contrast -->
+  <div class="card"><div class="head"><div class="ht">2 · Paksuuskontrasti</div><div class="dz">— ”loppu” ohut + ”siivous” lihava, moderni editorial</div></div>
+    <div class="cell"><div class="g wc"><span class="thin ink">loppu</span><span class="black ink">siivous</span><span class="thin blue">.fi</span></div></div>
+  </div>
+
+  <!-- E3 diagonal split fill -->
+  <div class="card"><div class="head"><div class="ht">3 · Diagonaali väritäyttö</div><div class="dz">— kirjaimet täyttyvät vinosti ink → sininen</div></div>
+    <div class="cell"><div class="g diag">Loppusiivous.fi</div></div>
+  </div>
+
+  <!-- E4 marker swipe -->
+  <div class="card"><div class="head"><div class="ht">4 · Tussiveto koko sanan alla</div><div class="dz">— koko logo valkoisena yhdellä rohkealla sinisellä vedolla</div></div>
+    <div class="cell"><div class="g swipe">Loppusiivous.fi
+      <svg viewBox="0 0 600 130" preserveAspectRatio="none"><path d="M14,38 C120,18 480,16 586,30 C598,52 596,82 584,98 C470,112 150,114 26,100 C8,84 6,54 14,38 Z" fill="#1B9DF0"/></svg>
+    </div></div>
+  </div>
+
+  <!-- E5 swash L -->
+  <div class="card"><div class="head"><div class="ht">5 · L-swash (alleviivaava kaari)</div><div class="dz">— L:stä lähtevä yksi vahva kaari sanan alle</div></div>
+    <div class="cell"><div class="swashwrap">
+      <span class="g swash">Loppu<span class="blue">siivous</span>.fi</span>
+      <svg width="440" height="34" viewBox="0 0 440 34" style="margin-top:-2px"><path d="M8 8 C8 24 24 28 60 28 C200 28 360 24 430 10" fill="none" stroke="#1B9DF0" stroke-width="9" stroke-linecap="round"/></svg>
+    </div></div>
+  </div>
+
+</body></html>

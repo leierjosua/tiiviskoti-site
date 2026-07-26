@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EEF1F4;font-family:'Avenir Next','Inter',sans-serif;padding:48px;width:1440px;}
+  h1{font-size:30px;font-weight:800;color:#10243F;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:28px;}
+  .card{background:#fff;border-radius:20px;overflow:hidden;margin-bottom:22px;box-shadow:0 2px 14px rgba(0,0,0,.06);}
+  .head{padding:15px 26px;border-bottom:1px solid #eef1f4;font-size:13px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#8b95a1;}
+  .pad{padding:40px 46px;}
+  .flex{display:flex;align-items:center;gap:50px;flex-wrap:wrap;}
+  .around{justify-content:space-around;}
+  .stack{display:flex;flex-direction:column;align-items:center;}
+  .lab{font-size:12px;color:#9aa3ad;margin-top:13px;text-align:center;font-weight:700;}
+  .wmrk{font-weight:800;font-size:56px;letter-spacing:-2.3px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .di{position:relative;}
+  .di .sp{position:absolute;left:56%;transform:translateX(-50%);width:0.42em;height:0.42em;top:-0.27em;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — yhtenäinen merkkijärjestelmä</h1>
+  <div class="sub">Sama ”L✦” toimii standalonena ja sanamerkin rinnalla · solidit muodot (brodeeraus/painatus) · navy + koralli</div>
+
+  <!-- defs reused: L + star group as a <symbol> -->
+  <svg width="0" height="0" style="position:absolute"><defs>
+    <g id="Lstar">
+      <polygon points="40,32 58,32 58,73 84,73 84,88 40,88" fill="var(--Lc,#fff)"/>
+      <g fill="var(--star,#FF6A3D)">
+        <path d="M88 36 C90 51,98 59,113 61 C98 63,90 71,88 86 C86 71,78 63,63 61 C78 59,86 51,88 36 Z"/>
+        <path d="M72 20 C73 28,77 32,85 33 C77 34,73 38,72 46 C71 38,67 34,59 33 C67 32,71 28,72 20 Z"/>
+      </g>
+    </g>
+  </defs></svg>
+
+  <!-- THE SYMBOL standalone -->
+  <div class="card">
+    <div class="head">Symboli — standalone (favicon · profiili · vaatteet)</div>
+    <div class="pad flex around">
+      <div class="stack">
+        <svg width="124" height="124" viewBox="0 0 124 124"><rect x="2" y="2" width="120" height="120" rx="30" fill="#10243F"/><use href="#Lstar"/></svg>
+        <div class="lab">Squircle (app/favicon)</div>
+      </div>
+      <div class="stack">
+        <svg width="124" height="124" viewBox="0 0 124 124"><circle cx="62" cy="62" r="60" fill="#10243F"/><use href="#Lstar"/></svg>
+        <div class="lab">Ympyrä (profiili/merkki)</div>
+      </div>
+      <div class="stack">
+        <svg width="124" height="124" viewBox="0 0 124 124" style="--Lc:#10243F;--star:#FF6A3D"><use href="#Lstar"/></svg>
+        <div class="lab">Pelkkä merkki (vaalea pohja)</div>
+      </div>
+      <div class="stack">
+        <svg width="124" height="124" viewBox="0 0 124 124" style="--Lc:#fff;--star:#fff"><circle cx="62" cy="62" r="60" fill="#10243F"/><use href="#Lstar"/></svg>
+        <div class="lab">1-värinen (brodeeraus)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCKUPS -->
+  <div class="card">
+    <div class="head">Logot — merkki + sanamerkki</div>
+    <div class="pad" style="display:flex;flex-direction:column;gap:36px;">
+      <!-- horizontal -->
+      <div class="flex" style="gap:24px;">
+        <svg width="92" height="92" viewBox="0 0 124 124"><rect x="2" y="2" width="120" height="120" rx="30" fill="#10243F"/><use href="#Lstar"/></svg>
+        <div class="wmrk"><span style="color:#10243F;">Loppu</span><span style="color:#FF6A3D;">siivous</span><span style="color:#10243F;">.f</span><span class="di" style="color:#10243F;">&#305;<svg class="sp" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#FF6A3D"/></svg></span></div>
+        <span style="margin-left:14px;font-size:12px;color:#b8c0c8;font-weight:700;">VAAKA</span>
+      </div>
+      <!-- wordmark only -->
+      <div class="flex" style="gap:24px;">
+        <div class="wmrk"><span style="color:#10243F;">Loppu</span><span style="color:#FF6A3D;">siivous</span><span style="color:#10243F;">.f</span><span class="di" style="color:#10243F;">&#305;<svg class="sp" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#FF6A3D"/></svg></span></div>
+        <span style="margin-left:14px;font-size:12px;color:#b8c0c8;font-weight:700;">PELKKÄ SANAMERKKI</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOTHING -->
+  <div class="card">
+    <div class="head">Vaatteet — sama symboli brodeerattuna / painettuna</div>
+    <div class="pad flex around" style="background:#f6f8fa;">
+      <!-- POLO navy with chest badge -->
+      <div class="stack">
+        <svg width="230" height="230" viewBox="0 0 200 200">
+          <path d="M28,72 L52,46 L78,46 Q100,64 122,46 L148,46 L172,72 L158,94 L146,82 L146,176 L54,176 L54,82 L42,94 Z" fill="#10243F"/>
+          <path d="M78,46 Q100,64 122,46 L116,52 Q100,66 84,52 Z" fill="#0b1a2e"/>
+          <!-- chest badge -->
+          <g transform="translate(68,74) scale(0.30)"><circle cx="62" cy="62" r="60" fill="#fff"/><g style="--Lc:#10243F;--star:#FF6A3D"><use href="#Lstar"/></g></g>
+        </svg>
+        <div class="lab">Pikeepaita — rintamerkki</div>
+      </div>
+      <!-- TEE white with chest badge -->
+      <div class="stack">
+        <svg width="230" height="230" viewBox="0 0 200 200">
+          <path d="M28,72 L52,46 L78,46 Q100,64 122,46 L148,46 L172,72 L158,94 L146,82 L146,176 L54,176 L54,82 L42,94 Z" fill="#fff" stroke="#e3e8ee"/>
+          <path d="M78,46 Q100,64 122,46 L116,52 Q100,66 84,52 Z" fill="#f0f3f6"/>
+          <g transform="translate(68,74) scale(0.30)"><circle cx="62" cy="62" r="60" fill="#10243F"/><use href="#Lstar"/></g>
+        </svg>
+        <div class="lab">T-paita — rintamerkki</div>
+      </div>
+      <!-- CAP -->
+      <div class="stack">
+        <svg width="230" height="170" viewBox="0 0 200 150">
+          <path d="M40,108 C40,52 160,52 160,108 Z" fill="#10243F"/>
+          <path d="M150,104 Q192,104 194,120 Q150,120 150,104 Z" fill="#0b1a2e"/>
+          <path d="M40,108 Q100,118 160,108 L160,114 Q100,124 40,114 Z" fill="#0b1a2e"/>
+          <g transform="translate(74,58) scale(0.36)"><g style="--Lc:#fff;--star:#FF6A3D"><use href="#Lstar"/></g></g>
+        </svg>
+        <div class="lab">Lippis — brodeeraus</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAVICON sizes -->
+  <div class="card">
+    <div class="head">Favicon-koot (luettavuus pienenä)</div>
+    <div class="pad" style="display:flex;align-items:flex-end;gap:26px;">
+      <div class="stack"><svg width="16" height="16" viewBox="0 0 124 124"><rect width="124" height="124" rx="30" fill="#10243F"/><use href="#Lstar"/></svg><div class="lab">16</div></div>
+      <div class="stack"><svg width="32" height="32" viewBox="0 0 124 124"><rect width="124" height="124" rx="30" fill="#10243F"/><use href="#Lstar"/></svg><div class="lab">32</div></div>
+      <div class="stack"><svg width="48" height="48" viewBox="0 0 124 124"><rect width="124" height="124" rx="30" fill="#10243F"/><use href="#Lstar"/></svg><div class="lab">48</div></div>
+      <div class="stack"><svg width="64" height="64" viewBox="0 0 124 124"><rect width="124" height="124" rx="30" fill="#10243F"/><use href="#Lstar"/></svg><div class="lab">64</div></div>
+    </div>
+  </div>
+
+</body>
+</html>

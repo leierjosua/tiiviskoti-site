@@ -1,0 +1,102 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="brand.css">
+<style>
+  body{background:#EAF2FA;padding:0;display:block;width:900px;font-family:'Gabarito'}
+  .row{display:flex;align-items:center;gap:26px;padding:26px 44px;border-bottom:1px solid #d7e4f1}
+  .row:last-child{border-bottom:0}
+  .tag{flex:0 0 180px;font-family:'Inter';font-size:13px;font-weight:700;color:#5b7a99;line-height:1.45}
+  .tag small{display:block;font-weight:400;color:#7d95ad;margin-top:3px;font-size:12px}
+  .big{width:104px;height:104px}
+  .chip{width:48px;height:48px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto}
+  .chip svg{width:36px;height:36px}
+  .cw{background:#fff;border:1px solid #dbe7f3}
+  .cn{background:#0A1F3C}
+  .lab{font-family:'Inter';font-size:10px;color:#94a8bb;text-align:center;margin-top:2px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+
+  <!-- M1 emoji-style: top flaps closed, tape seam, lid line, sparkle -->
+  <symbol id="m1" viewBox="0 0 100 100">
+    <!-- top face -->
+    <path d="M26 38 L50 26 L74 38 L50 50 Z" fill="#7CC6F2"/>
+    <!-- left front face -->
+    <path d="M26 38 L50 50 L50 80 L26 68 Z" fill="#1B9DF0"/>
+    <!-- right front face -->
+    <path d="M50 50 L74 38 L74 68 L50 80 Z" fill="#0B3A66"/>
+    <!-- top flap seam (two flaps meet) -->
+    <path d="M50 26 L50 50" stroke="#0A1F3C" stroke-width="2.4" opacity=".5"/>
+    <!-- tape down the front corner -->
+    <path d="M50 50 L50 80" stroke="#0A1F3C" stroke-width="5.5" opacity=".55"/>
+    <!-- lid fold lines on each front face -->
+    <path d="M26 47 L50 59" stroke="#0A1F3C" stroke-width="2" opacity=".28"/>
+    <path d="M74 47 L50 59" stroke="#0A1F3C" stroke-width="2" opacity=".28"/>
+    <!-- sparkle -->
+    <path d="M84 18 C84 25 87 28 94 28 C87 28 84 31 84 38 C84 31 81 28 74 28 C81 28 84 25 84 18 Z" fill="#2BB3F7"/>
+  </symbol>
+
+  <!-- M2 open flaps splayed + sparkles rising -->
+  <symbol id="m2" viewBox="0 0 100 100">
+    <!-- body -->
+    <path d="M28 50 L50 62 L50 86 L28 74 Z" fill="#1B9DF0"/>
+    <path d="M72 50 L50 62 L50 86 L72 74 Z" fill="#0B3A66"/>
+    <!-- opening rim -->
+    <path d="M28 50 L50 44 L72 50 L50 56 Z" fill="#0A1F3C"/>
+    <!-- four open flaps -->
+    <path d="M28 50 L50 44 L46 32 L20 40 Z" fill="#7CC6F2"/>
+    <path d="M50 44 L72 50 L80 40 L54 32 Z" fill="#5AB7F5"/>
+    <path d="M28 50 L50 44 L52 56 L26 60 Z" fill="#9AD4F5" opacity=".0"/>
+    <!-- sparkles rising -->
+    <path d="M50 8 C50 16 53 19 61 19 C53 19 50 22 50 30 C50 22 47 19 39 19 C47 19 50 16 50 8 Z" fill="#2BB3F7"/>
+    <circle cx="34" cy="24" r="3.4" fill="#5AB7F5"/>
+    <circle cx="66" cy="26" r="2.6" fill="#5AB7F5"/>
+  </symbol>
+
+  <!-- M3 front box + up-arrows (this way up) + tape + sparkle -->
+  <symbol id="m3" viewBox="0 0 100 100">
+    <rect x="22" y="30" width="48" height="48" rx="4" fill="#0B3A66"/>
+    <!-- tape across top -->
+    <path d="M22 42 H70" stroke="#5AB7F5" stroke-width="4"/>
+    <path d="M46 30 V42" stroke="#5AB7F5" stroke-width="3.4"/>
+    <!-- this-way-up arrows -->
+    <path d="M37 70 V52 M37 52 l-5 6 M37 52 l5 6" stroke="#5AB7F5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M55 70 V52 M55 52 l-5 6 M55 52 l5 6" stroke="#5AB7F5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- sparkle -->
+    <path d="M80 18 C80 25 83 28 90 28 C83 28 80 31 80 38 C80 31 77 28 70 28 C77 28 80 25 80 18 Z" fill="#2BB3F7"/>
+  </symbol>
+
+  <!-- M4 closed taped box, simpler 3/4 + bold tape cross -->
+  <symbol id="m4" viewBox="0 0 100 100">
+    <path d="M24 40 L50 28 L76 40 L50 52 Z" fill="#7CC6F2"/>
+    <path d="M24 40 L50 52 L50 82 L24 70 Z" fill="#1B9DF0"/>
+    <path d="M50 52 L76 40 L76 70 L50 82 Z" fill="#0B3A66"/>
+    <!-- bold tape over top seam + down front -->
+    <path d="M37 34 L63 34 L50 40 Z" fill="#0A1F3C" opacity="0"/>
+    <path d="M50 28 L50 52 L50 82" stroke="#EAF2FA" stroke-width="4.5" opacity=".85"/>
+    <path d="M24 40 L76 40" stroke="#EAF2FA" stroke-width="3" opacity=".55"/>
+    <path d="M84 20 C84 27 87 30 94 30 C87 30 84 33 84 40 C84 33 81 30 74 30 C81 30 84 27 84 20 Z" fill="#2BB3F7"/>
+  </symbol>
+
+</defs></svg>
+
+<div class="row"><div class="tag">M1 · Emoji-tyyli<small>läpät kiinni, teippi + saumat</small></div>
+  <svg class="big"><use href="#m1"/></svg>
+  <div><div class="chip cw"><svg><use href="#m1"/></svg></div><div class="lab">favicon</div></div>
+  <div class="chip cn"><svg><use href="#m1"/></svg></div></div>
+
+<div class="row"><div class="tag">M2 · Avoimet läpät<small>sparkle nousee ulos</small></div>
+  <svg class="big"><use href="#m2"/></svg>
+  <div><div class="chip cw"><svg><use href="#m2"/></svg></div><div class="lab">favicon</div></div>
+  <div class="chip cn"><svg><use href="#m2"/></svg></div></div>
+
+<div class="row"><div class="tag">M3 · Nuolet ylös<small>"this way up" + teippi</small></div>
+  <svg class="big"><use href="#m3"/></svg>
+  <div><div class="chip cw"><svg><use href="#m3"/></svg></div><div class="lab">favicon</div></div>
+  <div class="chip cn"><svg><use href="#m3"/></svg></div></div>
+
+<div class="row"><div class="tag">M4 · Teipattu laatikko<small>vaalea teippi-sauma</small></div>
+  <svg class="big"><use href="#m4"/></svg>
+  <div><div class="chip cw"><svg><use href="#m4"/></svg></div><div class="lab">favicon</div></div>
+  <div class="chip cn"><svg><use href="#m4"/></svg></div></div>
+
+</body></html>

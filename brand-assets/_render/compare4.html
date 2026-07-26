@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EEF1F4;font-family:'Avenir Next','Inter',sans-serif;padding:48px;width:1500px;}
+  h1{font-size:30px;font-weight:800;color:#1a1f24;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:32px;}
+  .card{background:#fff;border-radius:22px;overflow:hidden;margin-bottom:26px;box-shadow:0 2px 14px rgba(0,0,0,.06);}
+  .head{display:flex;align-items:center;gap:14px;padding:18px 30px;border-bottom:1px solid #eef1f4;}
+  .num{min-width:30px;height:30px;padding:0 11px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;}
+  .htitle{font-size:19px;font-weight:800;color:#1a1f24;}
+  .row{display:grid;grid-template-columns:1fr 1fr;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:56px;min-height:180px;}
+  .wmrk{font-weight:800;font-size:70px;letter-spacing:-2.5px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .di{position:relative;}
+  .di .sp{position:absolute;left:50%;top:-0.17em;transform:translateX(-50%);}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — tähden paikka</h1>
+  <div class="sub">Uusi idea: välke .fi:n i:n päällä · vs. nykyinen siivous-i:ssä · teal</div>
+
+  <!-- Variant Y: star on .fi i -->
+  <div class="card">
+    <div class="head"><div class="num" style="background:#0E7C86;">Y · UUSI</div><div class="htitle">Välke = ”.fi”:n i:n piste</div></div>
+    <div class="row">
+      <div class="cell" style="background:#fff;">
+        <div class="wmrk"><span style="color:#0B2B30;">Loppusiivous</span><span style="color:#0E9AA3;">.f</span><span class="di" style="color:#0E9AA3;">&#305;<svg class="sp" style="width:0.27em;height:0.27em" viewBox="0 0 100 100"><path d="M50 5 C53 34,66 47,95 50 C66 53,53 66,50 95 C47 66,34 53,5 50 C34 47,47 34,50 5 Z" fill="#16C4CA"/></svg></span></div>
+      </div>
+      <div class="cell" style="background:#0B2B30;">
+        <div class="wmrk"><span style="color:#fff;">Loppusiivous</span><span style="color:#16C4CA;">.f</span><span class="di" style="color:#16C4CA;">&#305;<svg class="sp" style="width:0.27em;height:0.27em" viewBox="0 0 100 100"><path d="M50 5 C53 34,66 47,95 50 C66 53,53 66,50 95 C47 66,34 53,5 50 C34 47,47 34,50 5 Z" fill="#6FE9D0"/></svg></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variant X: star on siivous i (current) -->
+  <div class="card">
+    <div class="head"><div class="num" style="background:#9AA7B5;">X · NYKYINEN</div><div class="htitle">Välke = ”siivous”-i:n piste (vertailu)</div></div>
+    <div class="row">
+      <div class="cell" style="background:#fff;">
+        <div class="wmrk"><span style="color:#0B2B30;">Loppus</span><span class="di" style="color:#0B2B30;">&#305;<svg class="sp" style="width:0.27em;height:0.27em" viewBox="0 0 100 100"><path d="M50 5 C53 34,66 47,95 50 C66 53,53 66,50 95 C47 66,34 53,5 50 C34 47,47 34,50 5 Z" fill="#16C4CA"/></svg></span><span style="color:#0B2B30;">ivous</span><span style="color:#0E9AA3;">.fi</span></div>
+      </div>
+      <div class="cell" style="background:#0B2B30;">
+        <div class="wmrk"><span style="color:#fff;">Loppus</span><span class="di" style="color:#fff;">&#305;<svg class="sp" style="width:0.27em;height:0.27em" viewBox="0 0 100 100"><path d="M50 5 C53 34,66 47,95 50 C66 53,53 66,50 95 C47 66,34 53,5 50 C34 47,47 34,50 5 Z" fill="#6FE9D0"/></svg></span><span style="color:#fff;">ivous</span><span style="color:#16C4CA;">.fi</span></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

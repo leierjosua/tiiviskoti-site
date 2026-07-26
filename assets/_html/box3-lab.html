@@ -1,0 +1,81 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="brand.css">
+<style>
+  body{background:#EAF2FA;padding:0;display:block;width:1000px;font-family:'Gabarito'}
+  .row{display:flex;align-items:center;gap:30px;padding:34px 48px;border-bottom:1px solid #d7e4f1}
+  .row:last-child{border-bottom:0}
+  .tag{flex:0 0 150px;font-family:'Inter';font-size:13px;font-weight:700;color:#5b7a99;line-height:1.45}
+  .tag small{display:block;font-weight:400;color:#7d95ad;margin-top:3px;font-size:12px}
+  .big{width:100px;height:100px;flex:0 0 auto}
+  .chip{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto}
+  .chip svg{width:36px;height:36px}
+  .cw{background:#fff;border:1px solid #dbe7f3}
+  .cn{background:#0A1F3C}
+  .lock{display:flex;align-items:center;gap:14px;flex:0 0 auto}
+  .lock svg{width:54px;height:54px}
+  .lg{font-family:'Gabarito';font-weight:700;letter-spacing:-.04em;line-height:1;white-space:nowrap;font-size:40px;position:relative}
+  .ink{color:#0B3A66}.bl{color:#1B9DF0}
+  .b{position:relative;display:inline-block}
+  .wipe{position:absolute;left:0;bottom:-.15em;width:100%;height:.30em;overflow:visible}
+  .bub{display:inline-block;width:.3em;height:.3em;border-radius:50%;background:#1B9DF0;position:relative;vertical-align:baseline;margin:0 .03em}
+  .bub i{position:absolute;width:36%;height:36%;border-radius:50%;background:rgba(255,255,255,.92);left:18%;top:15%}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+
+  <!-- O1 refined dimensional open box -->
+  <symbol id="o1" viewBox="0 0 100 100">
+    <path d="M26 54 L50 42 L74 54 L50 66 Z" fill="#0A2742"/>
+    <path d="M26 54 L50 66 L50 88 L26 76 Z" fill="#0B3A66"/>
+    <path d="M74 54 L50 66 L50 88 L74 76 Z" fill="#1B9DF0"/>
+    <path d="M26 54 L50 42 L50 25 L15 39 Z" fill="#5AB7F5"/>
+    <path d="M50 42 L74 54 L85 39 L50 25 Z" fill="#7CC6F2"/>
+    <path d="M50 14 C50 22 53 25 61 25 C53 25 50 28 50 36 C50 28 47 25 39 25 C47 25 50 22 50 14 Z" fill="#2BB3F7"/>
+    <circle cx="31" cy="30" r="3.4" fill="#5AB7F5"/>
+    <circle cx="69" cy="32" r="2.7" fill="#5AB7F5"/>
+  </symbol>
+  <symbol id="o1w" viewBox="0 0 100 100">
+    <path d="M26 54 L50 42 L74 54 L50 66 Z" fill="#0A1F3C"/>
+    <path d="M26 54 L50 66 L50 88 L26 76 Z" fill="#9FD3F2"/>
+    <path d="M74 54 L50 66 L50 88 L74 76 Z" fill="#5AB7F5"/>
+    <path d="M26 54 L50 42 L50 25 L15 39 Z" fill="#fff"/>
+    <path d="M50 42 L74 54 L85 39 L50 25 Z" fill="#DCEFFB"/>
+    <path d="M50 14 C50 22 53 25 61 25 C53 25 50 28 50 36 C50 28 47 25 39 25 C47 25 50 22 50 14 Z" fill="#7CC6F2"/>
+    <circle cx="31" cy="30" r="3.4" fill="#fff"/>
+    <circle cx="69" cy="32" r="2.7" fill="#fff"/>
+  </symbol>
+
+  <!-- O2 minimal flat open box -->
+  <symbol id="o2" viewBox="0 0 100 100">
+    <path d="M34 52 L66 52 L62 86 L38 86 Z" fill="#1B9DF0"/>
+    <path d="M34 52 L50 47 L66 52 L50 57 Z" fill="#0B3A66"/>
+    <path d="M34 52 L50 52 L44 36 L24 40 Z" fill="#5AB7F5"/>
+    <path d="M50 52 L66 52 L76 40 L56 36 Z" fill="#5AB7F5"/>
+    <path d="M50 12 C50 20 53 23 61 23 C53 23 50 26 50 34 C50 26 47 23 39 23 C47 23 50 20 50 12 Z" fill="#2BB3F7"/>
+  </symbol>
+  <symbol id="o2w" viewBox="0 0 100 100">
+    <path d="M34 52 L66 52 L62 86 L38 86 Z" fill="#5AB7F5"/>
+    <path d="M34 52 L50 47 L66 52 L50 57 Z" fill="#0A1F3C"/>
+    <path d="M34 52 L50 52 L44 36 L24 40 Z" fill="#fff"/>
+    <path d="M50 52 L66 52 L76 40 L56 36 Z" fill="#fff"/>
+    <path d="M50 12 C50 20 53 23 61 23 C53 23 50 26 50 34 C50 26 47 23 39 23 C47 23 50 20 50 12 Z" fill="#7CC6F2"/>
+  </symbol>
+</defs></svg>
+
+<!-- O1 -->
+<div class="row"><div class="tag">1 · Hiottu<small>dimensionaalinen</small></div>
+  <svg class="big"><use href="#o1"/></svg>
+  <div><div class="chip cw"><svg><use href="#o1"/></svg></div><div class="lab"></div></div>
+  <div class="chip cn"><svg><use href="#o1w"/></svg></div>
+  <div class="lock"><svg><use href="#o1"/></svg><span class="lg"><span class="ink">Loppu</span><span class="b bl">siivous<svg class="wipe" viewBox="0 0 214 16" preserveAspectRatio="none"><path d="M5 10 C58 6 140 5 196 3 C204 2.6 209 1.4 212 0 C209 3 203 4 195 4.6 C140 7 58 9 9 12.5 C2.5 13 -.5 10 5 10 Z" fill="#1B9DF0"/></svg></span><span class="bub"><i></i></span><span class="ink">fi</span></span></div>
+</div>
+
+<!-- O2 -->
+<div class="row"><div class="tag">2 · Pelkistetty<small>flätti, läpät auki</small></div>
+  <svg class="big"><use href="#o2"/></svg>
+  <div><div class="chip cw"><svg><use href="#o2"/></svg></div><div class="lab"></div></div>
+  <div class="chip cn"><svg><use href="#o2w"/></svg></div>
+  <div class="lock"><svg><use href="#o2"/></svg><span class="lg"><span class="ink">Loppu</span><span class="b bl">siivous<svg class="wipe" viewBox="0 0 214 16" preserveAspectRatio="none"><path d="M5 10 C58 6 140 5 196 3 C204 2.6 209 1.4 212 0 C209 3 203 4 195 4.6 C140 7 58 9 9 12.5 C2.5 13 -.5 10 5 10 Z" fill="#1B9DF0"/></svg></span><span class="bub"><i></i></span><span class="ink">fi</span></span></div>
+</div>
+
+</body></html>

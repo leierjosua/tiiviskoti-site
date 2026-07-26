@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loppusiivous.fi — Muuttosiivous kiinteällä hinnalla · Laske hintasi heti</title>
+<meta name="description" content="Muuttosiivous pääkaupunkiseudulla kiinteällä hinnalla. Laske hintasi heti — alkaen 210 €, kotitalousvähennys −35 %, tyytyväisyystakuu ja vakuus takaisin. Jälki, joka kestää tarkastuksen.">
+<meta property="og:title" content="Loppusiivous.fi — Muuttosiivous kiinteällä hinnalla">
+<meta property="og:description" content="Laske hintasi heti — kiinteä hinta alkaen 210 €, kotitalousvähennys −35 %, tyytyväisyystakuu.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/assets/og.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/assets/favicon.svg?v=3" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=3" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Loppusiivous.fi — v4 — light, premium, reputable
+   ============================================================ */
+:root{
+  --blue:#1B9DF0; --blue-d:#1683d6; --blue2:#2BB3F7; --sky:#5AB7F5; --cy:#7FD0FF;
+  --ink:#0B3A66; --ink2:#103a63; --navy:#0A1F3C; --soft:#37526f;
+  --wash:#EFF7FE; --wash2:#F8FCFF; --paper:#fff;
+  --text:#47607a; --mute:#7C92A9; --line:#E2EDF7; --line2:#D2E2F1;
+  --r:16px; --r-lg:22px; --r-xl:30px;
+  --sh-s:0 2px 10px rgba(11,58,102,.05);
+  --sh:0 12px 36px rgba(11,58,102,.10);
+  --sh-l:0 30px 70px rgba(11,58,102,.16);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --max:1200px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--text);background:var(--paper);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Gabarito',sans-serif;color:var(--ink);font-weight:800;line-height:1.05;letter-spacing:-.025em}
+a{color:inherit;text-decoration:none}
+img,svg{display:block;max-width:100%}
+::selection{background:var(--blue);color:#fff}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:24px;position:relative;z-index:2}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:'Gabarito';font-weight:700;font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);margin-bottom:20px}
+.eyebrow::before{content:"";width:22px;height:2px;border-radius:2px;background:var(--blue)}
+.center{text-align:center}.center .eyebrow{justify-content:center}
+.h2{font-size:clamp(31px,4vw,50px);font-weight:900}
+.lead{font-size:19px;color:var(--mute);line-height:1.6;max-width:620px}
+.center .lead{margin-inline:auto}
+.sec{padding:clamp(72px,9vw,120px) 0;position:relative}
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:'Gabarito';font-weight:700;font-size:16px;padding:15px 28px;border-radius:999px;border:1.6px solid transparent;cursor:pointer;transition:.2s var(--ease);white-space:nowrap;line-height:1}
+.btn svg{transition:transform .2s var(--ease)}
+.btn-p{background:var(--blue);color:#fff;box-shadow:0 10px 24px rgba(27,157,240,.3)}
+.btn-p:hover{background:var(--blue-d);transform:translateY(-2px);box-shadow:0 16px 34px rgba(27,157,240,.4)}
+.btn-p:hover svg{transform:translateX(4px)}
+.btn-g{background:#fff;color:var(--ink);border-color:var(--line2)}
+.btn-g:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px)}
+.btn-w{background:#fff;color:var(--ink)}.btn-w:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+.btn-lg{padding:17px 34px;font-size:17px}
+.btn-shim{position:relative;overflow:hidden}
+.btn-shim::after{content:"";position:absolute;top:0;left:-130%;width:60%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-18deg)}
+.btn-shim:hover::after{animation:shim .9s var(--ease)}
+@keyframes shim{to{left:170%}}
+
+/* topbar + nav */
+.tbar{background:var(--navy);color:#bcd3ea;font-size:13px}
+.tbar .wrap{display:flex;justify-content:space-between;align-items:center;height:40px}
+.tbar a{color:#fff;font-weight:600}.tbar span{display:inline-flex;align-items:center;gap:7px}
+nav.top{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.82);backdrop-filter:blur(18px) saturate(1.5);border-bottom:1px solid transparent;transition:.25s var(--ease)}
+nav.top.scr{border-color:var(--line);box-shadow:0 6px 26px rgba(11,58,102,.06)}
+nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
+.logo{display:inline-flex;align-items:center;gap:9px;font-family:'Gabarito';font-weight:700;font-size:26px;letter-spacing:-.04em;white-space:nowrap;line-height:1}
+.logo .ico{width:1.5em;height:1.5em;flex:0 0 auto}
+.logo .d{color:var(--ink)}.logo .b{color:var(--blue);position:relative;display:inline-block}
+.logo .wipe{position:absolute;left:-3%;bottom:-.30em;width:106%;height:.26em;overflow:visible}
+.logo .bub{display:inline-block;width:.28em;height:.28em;border-radius:50%;background:var(--blue);position:relative;vertical-align:baseline;margin:0 .02em}
+.logo .bub i{position:absolute;width:36%;height:36%;border-radius:50%;background:rgba(255,255,255,.92);left:18%;top:15%}
+.nlinks{display:flex;gap:4px;margin-left:auto;margin-right:6px}
+.nlinks a{font-weight:500;font-size:15px;color:var(--soft);padding:9px 14px;border-radius:10px;transition:.15s}
+.nlinks a:hover{background:var(--wash);color:var(--ink)}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+.burger span{width:24px;height:2.5px;background:var(--ink);border-radius:2px}
+
+/* ===== HERO ===== */
+.hero{position:relative;overflow:hidden;padding:clamp(50px,6vw,86px) 0 clamp(60px,7vw,96px);
+  background:radial-gradient(900px 600px at 88% -6%,#DCEEFE 0,rgba(220,238,254,0) 58%),radial-gradient(680px 540px at 4% 106%,#E7F4FE 0,rgba(231,244,254,0) 56%),linear-gradient(180deg,#FBFDFF,#F3FAFF)}
+.hero .mesh{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.hero .mesh i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:drift 16s ease-in-out infinite alternate}
+.hero .mesh i:nth-child(1){width:420px;height:420px;background:#cfe8fd;top:-120px;right:6%}
+.hero .mesh i:nth-child(2){width:340px;height:340px;background:#dbf0ff;bottom:-120px;left:10%;animation-delay:-6s}
+@keyframes drift{to{transform:translate3d(0,30px,0) scale(1.1)}}
+.hero .drop{position:absolute;z-index:0;pointer-events:none;animation:bob 9s var(--ease) infinite}
+.hero .drop.b{animation-delay:-4s}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-16px) rotate(-4deg)}}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.06fr .94fr;gap:clamp(32px,4vw,58px);align-items:center}
+.rate{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 16px 7px 11px;box-shadow:var(--sh-s);font-size:13.5px;color:var(--soft);font-weight:600;margin-bottom:22px}
+.rate .st{display:inline-flex;gap:1px}
+.hero h1{font-size:clamp(40px,5.4vw,66px);font-weight:900;color:var(--ink);letter-spacing:-.035em}
+.hero h1 .g{background:linear-gradient(120deg,var(--blue),var(--blue2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1 .ln{display:block;overflow:hidden}
+.hero h1 .ln>span{display:inline-block;transform:translateY(110%);animation:rise .85s var(--ease) forwards}
+@keyframes rise{to{transform:none}}
+.hero .sub{font-size:clamp(17px,1.7vw,20px);color:var(--soft);margin:22px 0 0;max-width:520px;opacity:0;animation:fadeUp .8s .45s var(--ease) forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.hero .micro{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;opacity:0;animation:fadeUp .8s .6s var(--ease) forwards}
+.hero .micro span{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--soft)}
+
+/* calculator card */
+.calc{background:#fff;border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--sh-l);padding:32px;position:relative;opacity:0;animation:fadeUp .9s .35s var(--ease) forwards}
+.calc::before{content:"";position:absolute;inset:0;border-radius:var(--r-xl);padding:1.5px;background:linear-gradient(140deg,rgba(27,157,240,.45),rgba(90,183,245,0) 55%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.calc .ct{display:flex;align-items:center;gap:11px;font-family:'Gabarito';font-weight:800;color:var(--ink);font-size:18px;margin-bottom:4px}
+.calc .ct .pin{width:36px;height:36px;border-radius:11px;background:var(--wash);display:grid;place-items:center;flex:0 0 auto}
+.calc .csub{font-size:13.5px;color:var(--mute);margin-bottom:24px}
+.calc .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.calc .top .lbl{font-size:12.5px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.07em}
+.calc .top .m2{font-family:'Gabarito';font-weight:900;color:var(--blue);font-size:23px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;background:var(--wash);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--blue);border:5px solid #fff;box-shadow:0 4px 14px rgba(27,157,240,.5);cursor:grab}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--blue);border:5px solid #fff;box-shadow:0 4px 14px rgba(27,157,240,.5);cursor:grab}
+.ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--mute);margin-top:9px}
+.calc .quick{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}
+.calc .quick button{font-family:'Gabarito';font-weight:700;font-size:13px;color:var(--soft);background:var(--wash);border:1px solid var(--line);border-radius:999px;padding:8px 15px;cursor:pointer;transition:.15s}
+.calc .quick button:hover,.calc .quick button.on{background:var(--blue);color:#fff;border-color:transparent}
+.calc .price{margin:22px 0 6px;padding:24px;border-radius:var(--r);background:linear-gradient(155deg,#0B3A66,#0E4C86);color:#fff;position:relative;overflow:hidden}
+.calc .price .pblob{position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(127,208,255,.22);filter:blur(60px);right:-80px;top:-90px}
+.calc .price .pt{font-size:12.5px;color:#a9cdec;font-weight:600;position:relative}
+.calc .price .pv{font-family:'Gabarito';font-weight:900;font-size:56px;line-height:1;position:relative;display:flex;align-items:baseline;gap:8px;margin-top:2px}
+.calc .price .pv small{font-size:.4em;color:var(--cy)}
+.calc .price .net{font-size:13.5px;color:#cfe3f5;margin-top:8px;position:relative}
+.calc .price .net b{color:var(--cy)}
+.calc .cbtn{margin-top:16px;width:100%}
+.calc .cnote{font-size:11.5px;color:var(--mute);text-align:center;margin-top:12px}
+
+/* trust bar */
+.tbar2{background:#fff;border-block:1px solid var(--line)}
+.tbar2 .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:26px 24px}
+.tbar2 .ti{display:flex;align-items:center;gap:12px}
+.tbar2 .ti .ic{width:44px;height:44px;border-radius:12px;background:var(--wash);display:grid;place-items:center;flex:0 0 auto}
+.tbar2 .ti b{display:block;font-family:'Gabarito';font-weight:800;color:var(--ink);font-size:15px;line-height:1.15}
+.tbar2 .ti span{font-size:12.5px;color:var(--mute)}
+
+/* steps */
+.wash{background:var(--wash2)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:54px}
+.step{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:34px 30px;position:relative;transition:.25s var(--ease)}
+.step:hover{transform:translateY(-5px);box-shadow:var(--sh)}
+.step .n{width:50px;height:50px;border-radius:15px;background:linear-gradient(150deg,var(--blue),var(--blue2));color:#fff;font-family:'Gabarito';font-weight:900;font-size:22px;display:grid;place-items:center;margin-bottom:20px;box-shadow:0 10px 22px rgba(27,157,240,.32)}
+.step h3{font-size:21px;margin-bottom:9px}.step p{font-size:15.5px;color:var(--mute)}
+
+/* guarantee — navy band (the reputable gravitas moment) */
+.gband{background:linear-gradient(160deg,#0B3A66,#0A1F3C);color:#fff;position:relative;overflow:hidden}
+.gband .gblob{position:absolute;border-radius:50%;filter:blur(90px)}
+.gband .gblob.x{width:480px;height:480px;background:rgba(27,157,240,.3);top:-160px;right:-120px}
+.gband .gblob.y{width:360px;height:360px;background:rgba(90,183,245,.2);bottom:-150px;left:-100px}
+.gband .wrap{position:relative;z-index:1;display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.gband .eyebrow{color:var(--cy)}.gband .eyebrow::before{background:var(--cy)}
+.gband h2{color:#fff}
+.gband .gp{list-style:none;display:flex;flex-direction:column;gap:18px;margin-top:26px}
+.gband .gp li{display:flex;gap:14px;align-items:flex-start;font-size:16px;color:#dbeaf7}
+.gband .gp li svg{flex:0 0 auto;margin-top:2px}
+.gband .gp b{color:#fff;font-family:'Gabarito';font-weight:700}
+.gseal{display:grid;place-items:center}
+.gseal .ring{width:300px;max-width:78%;aspect-ratio:1;border-radius:50%;border:2px dashed rgba(127,208,255,.4);display:grid;place-items:center;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gseal .core{width:62%;aspect-ratio:1;border-radius:50%;background:linear-gradient(150deg,var(--blue),var(--blue2));display:grid;place-items:center;box-shadow:0 24px 60px rgba(27,157,240,.4);animation:spin 40s linear infinite reverse}
+.gseal .core svg{width:46%}
+.gseal{position:relative}.gseal .tag{position:absolute;bottom:4%;background:#fff;color:var(--ink);font-family:'Gabarito';font-weight:800;font-size:13px;letter-spacing:.1em;padding:8px 18px;border-radius:999px;box-shadow:var(--sh)}
+
+/* includes */
+.inc3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:54px}
+.inccard{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;transition:.25s var(--ease)}
+.inccard:hover{box-shadow:var(--sh);transform:translateY(-4px)}
+.inccard .ih{display:flex;align-items:center;gap:13px;padding:24px 26px;background:var(--wash)}
+.inccard .ih .ic{width:46px;height:46px;border-radius:13px;background:#fff;display:grid;place-items:center;box-shadow:var(--sh-s);flex:0 0 auto}
+.inccard .ih h3{font-size:19px}
+.inccard ul{list-style:none;padding:22px 26px 28px;display:flex;flex-direction:column;gap:12px}
+.inccard li{display:flex;gap:11px;font-size:15px;color:var(--soft);align-items:flex-start}
+.inccard li svg{flex:0 0 auto;margin-top:3px}
+
+/* pricing */
+.ptab{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:50px}
+.pr{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px 18px;transition:.18s var(--ease)}
+.pr:hover{border-color:var(--line2);box-shadow:var(--sh-s)}
+.pr .k{font-size:14.5px;color:var(--soft);font-weight:500}
+.pr .v{font-family:'Gabarito';font-weight:800;color:var(--ink);font-size:16px}
+.pr.q .v{color:var(--blue);font-size:14px}
+.kv{display:flex;align-items:center;gap:34px;background:linear-gradient(135deg,#0B3A66,#0E4C86);color:#fff;border-radius:var(--r-xl);padding:38px 44px;margin-top:30px;position:relative;overflow:hidden}
+.kv .kvb{position:absolute;width:340px;height:340px;border-radius:50%;background:rgba(127,208,255,.2);filter:blur(80px);right:-90px;top:-120px}
+.kv .big{font-family:'Gabarito';font-weight:900;font-size:84px;line-height:.9;color:var(--cy);flex:0 0 auto;position:relative}
+.kv .kb{position:relative}.kv h3{color:#fff;font-size:26px;margin-bottom:8px}
+.kv p{color:#cfe3f5;font-size:15.5px;max-width:560px}
+.kv .ex{display:inline-flex;align-items:center;gap:12px;margin-top:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:11px 18px;font-family:'Gabarito';font-weight:800;font-size:17px}
+.kv .ex .o{color:#9fc4e6;text-decoration:line-through}.kv .ex .n{color:#fff}.kv .ex .ar{color:var(--cy)}
+.addons{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+.ad{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--line);border-radius:13px;padding:16px 18px}
+.ad .an{font-family:'Gabarito';font-weight:700;color:var(--ink);font-size:15px}
+.ad .ap{font-family:'Gabarito';font-weight:800;color:var(--blue);font-size:14px;background:var(--wash);padding:5px 11px;border-radius:999px}
+
+/* report */
+.report .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.chips .c{font-size:13px;font-weight:600;color:var(--ink);background:var(--wash);border:1px solid var(--line);border-radius:999px;padding:7px 14px}
+.rcard{background:#fff;border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--sh-l);overflow:hidden}
+.rcard .rh{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--wash2)}
+.rcard .rh .ic{width:40px;height:40px;border-radius:11px;background:var(--blue);display:grid;place-items:center;flex:0 0 auto}
+.rcard .rh b{font-family:'Gabarito';font-weight:800;color:var(--ink);font-size:16px;display:block;line-height:1.1}
+.rcard .rh span{font-size:12px;color:var(--mute)}
+.rcard .rh .ok{margin-left:auto;font-family:'Gabarito';font-weight:800;font-size:11.5px;color:#13884f;background:#E6F8EE;padding:6px 12px;border-radius:999px}
+.rrow{display:flex;align-items:center;gap:14px;padding:13px 22px;border-bottom:1px solid var(--line)}
+.rrow img{width:58px;height:44px;object-fit:cover;border-radius:8px;flex:0 0 auto}
+.rrow .nm{flex:1;font-weight:600;color:var(--ink);font-size:14.5px}
+.rrow .nm small{display:block;font-weight:500;color:var(--mute);font-size:12px}
+.rrow .ck{width:26px;height:26px;border-radius:50%;background:#13B36A;display:grid;place-items:center;flex:0 0 auto}
+
+/* reviews */
+.revs{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:50px}
+.rev{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:30px;display:flex;flex-direction:column;gap:16px;transition:.25s var(--ease)}
+.rev:hover{box-shadow:var(--sh);transform:translateY(-4px)}
+.rev .st{display:inline-flex;gap:2px}
+.rev p{font-size:15.5px;color:var(--soft);flex:1;line-height:1.6}
+.rev .by{display:flex;align-items:center;gap:12px}
+.rev .av{width:44px;height:44px;border-radius:50%;background:linear-gradient(150deg,var(--blue),var(--blue2));display:grid;place-items:center;color:#fff;font-family:'Gabarito';font-weight:800;flex:0 0 auto}
+.rev .by b{display:block;font-family:'Gabarito';color:var(--ink);font-size:15px;line-height:1.1}
+.rev .by span{font-size:13px;color:var(--mute)}
+
+/* faq */
+.faq{max-width:820px;margin:50px auto 0}
+.q{border:1px solid var(--line);border-radius:var(--r);background:#fff;margin-bottom:12px;overflow:hidden;transition:.2s}
+.q.op{border-color:var(--line2);box-shadow:var(--sh-s)}
+.q button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 24px;background:none;border:none;cursor:pointer;font-family:'Gabarito';font-weight:700;font-size:17px;color:var(--ink);text-align:left}
+.q .cv{flex:0 0 auto;transition:.25s var(--ease);color:var(--blue)}
+.q.op .cv{transform:rotate(180deg)}
+.q .a{max-height:0;overflow:hidden;transition:max-height .3s var(--ease)}
+.q .a p{padding:0 24px 22px;font-size:15.5px;color:var(--mute)}
+
+/* final cta — navy */
+.fcta{position:relative;overflow:hidden;background:linear-gradient(150deg,#0B3A66,#0A1F3C);color:#fff;border-radius:var(--r-xl);padding:clamp(40px,6vw,72px);text-align:center}
+.fcta .fb{position:absolute;border-radius:50%;filter:blur(90px)}
+.fcta .fb.a{width:400px;height:400px;background:rgba(27,157,240,.32);top:-140px;left:-80px}
+.fcta .fb.b{width:340px;height:340px;background:rgba(90,183,245,.24);bottom:-150px;right:-70px}
+.fcta h2{color:#fff;position:relative;font-size:clamp(28px,3.4vw,42px)}
+.fcta h2 .g{background:linear-gradient(120deg,var(--cy),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+.fcta p{color:#cfe3f5;position:relative;margin:14px auto 28px;max-width:520px;font-size:18px}
+.fcta .fa{position:relative;display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+
+/* footer */
+footer{background:var(--navy);color:#9fb4cc;padding:64px 0 30px}
+.fg{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:38px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,.09)}
+.logo.dk .d{color:#fff}.logo.dk .b{color:var(--sky)}.logo.dk .bub{background:var(--sky)}.logo.dk .bub i{background:var(--navy)}
+footer h4{color:#fff;font-size:13.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:16px}
+footer a{display:block;color:#9fb4cc;font-size:14.5px;margin-bottom:11px;transition:.15s}
+footer a:hover{color:var(--sky)}
+.fintro{font-size:14.5px;max-width:300px;margin-top:16px;color:#8ba2bd}
+.fbot{display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-size:13px;color:#6f88a4;flex-wrap:wrap;gap:10px}
+
+/* mobile cta */
+.mcta{position:fixed;left:0;right:0;bottom:0;z-index:85;display:none;gap:10px;padding:11px 14px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(11,58,102,.1)}
+.mcta .btn{flex:1;padding:14px}.mcta .btn.g{flex:0 0 auto;background:var(--wash);color:var(--ink)}
+
+/* hero team avatars */
+.rate .ava{display:inline-flex;align-items:center}
+.rate .ava img{width:25px;height:25px;border-radius:50%;object-fit:cover;border:2px solid #fff;margin-left:-9px;box-shadow:var(--sh-s)}
+.rate .ava img:first-child{margin-left:0}
+/* split photo section */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(34px,4vw,58px);align-items:center}
+.split-ph{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r-xl);box-shadow:var(--sh-l)}
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:16px;margin-top:24px}
+.feat-list li{display:flex;gap:13px;align-items:flex-start}
+.feat-list .ic{width:42px;height:42px;border-radius:12px;background:var(--wash);display:grid;place-items:center;flex:0 0 auto}
+.feat-list b{display:block;font-family:'Gabarito';color:var(--ink);font-size:16px}
+.feat-list span{font-size:14px;color:var(--mute)}
+/* team */
+.team{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:50px}
+.tc{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;transition:.25s var(--ease)}
+.tc:hover{transform:translateY(-5px);box-shadow:var(--sh)}
+.tc img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--wash)}
+.tc .tb{padding:20px 22px}
+.tc .tn{font-family:'Gabarito';font-weight:800;font-size:19px;color:var(--ink)}
+.tc .tr{font-size:13.5px;color:var(--blue);font-weight:600;margin-top:2px}
+.tc .td{font-size:13.5px;color:var(--mute);margin-top:9px}
+/* showcase gallery */
+.gal{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:16px;margin-top:50px}
+.gal img{width:100%;height:100%;min-height:300px;object-fit:cover;border-radius:var(--r-lg);box-shadow:var(--sh-s)}
+@media(max-width:880px){.gal{grid-template-columns:1fr 1fr}.gal img{min-height:220px}.gal img:first-child{grid-column:1/-1}}
+@media(max-width:560px){.gal{grid-template-columns:1fr}}
+/* wide image banner */
+.vanb{margin-top:30px;border-radius:var(--r-xl);overflow:hidden;position:relative;box-shadow:var(--sh)}
+.vanb img{width:100%;height:340px;object-fit:cover;object-position:center 30%}
+.vanb .cap{position:absolute;left:0;bottom:0;right:0;padding:26px 30px;background:linear-gradient(0deg,rgba(10,31,60,.88),rgba(10,31,60,0));color:#fff}
+.vanb .cap b{font-family:'Gabarito';font-size:21px;display:block}
+.vanb .cap span{font-size:14.5px;color:#cfe3f5}
+/* guarantee result image + stamp */
+.gpic{position:relative}
+.gpic>img:first-child{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r-xl);box-shadow:var(--sh-l)}
+.gstamp{position:absolute;bottom:-26px;right:-18px;width:138px;height:auto;filter:drop-shadow(0 14px 28px rgba(0,0,0,.4))}
+@media(max-width:980px){.gstamp{width:104px;bottom:-16px;right:10px}}
+/* includes detail image */
+.incpic{margin-top:42px;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh)}
+.incpic img{width:100%;height:300px;object-fit:cover;object-position:center 55%;display:block}
+@media(max-width:680px){.incpic img{height:200px}}
+@media(max-width:980px){
+  .split{grid-template-columns:1fr;gap:32px}
+  .team{grid-template-columns:1fr 1fr}
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .tbar2 .wrap{grid-template-columns:1fr 1fr;gap:18px 16px}
+  .steps,.inc3,.revs,.addons{grid-template-columns:1fr}
+  .gband .wrap,.report .wrap{grid-template-columns:1fr;gap:40px}
+  .gseal{order:-1}.ptab{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .nlinks{display:none}.burger{display:flex}
+  .nlinks.op{display:flex;position:absolute;top:74px;left:0;right:0;flex-direction:column;background:#fff;padding:14px 24px;box-shadow:var(--sh);border-bottom:1px solid var(--line)}
+  .tbar .hide{display:none}.ptab{grid-template-columns:1fr}
+  .kv{flex-direction:column;text-align:center;padding:30px}.kv p{margin-inline:auto}
+  .fg{grid-template-columns:1fr}.mcta{display:flex}body{padding-bottom:76px}
+  .drop{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="tbar"><div class="wrap">
+  <span class="hide"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z" stroke="#7fc3f5" stroke-width="1.8"/><circle cx="12" cy="10" r="2.3" stroke="#7fc3f5" stroke-width="1.8"/></svg> Helsinki · Espoo · Vantaa</span>
+  <span>Vastaamme tunnissa · <a href="tel:+358401234567">040 123 4567</a></span>
+</div></div>
+
+<nav class="top" id="nav"><div class="wrap">
+  <a href="#" class="logo" id="logo"></a>
+  <div class="nlinks" id="nlinks"><a href="#hinta">Hinta</a><a href="#takuu">Laatutakuu</a><a href="#sisaltyy">Mitä sisältyy</a><a href="#arvostelut">Arvostelut</a><a href="#tiimi">Tiimi</a><a href="#ukk">UKK</a></div>
+  <a href="#hinta" class="btn btn-p" style="padding:11px 22px">Laske hinta</a>
+  <button class="burger" id="burger" aria-label="Valikko"><span></span><span></span><span></span></button>
+</div></nav>
+
+<!-- HERO -->
+<header class="hero" id="hinta">
+  <div class="mesh"><i></i><i></i></div>
+  
+  
+  <div class="wrap hero-grid">
+    <div>
+      <span class="rate"><span class="ava"><img src="/assets/photos/own/team-josua.jpg" alt="Josua"><img src="/assets/photos/own/team-olivia.jpg" alt="Olivia"><img src="/assets/photos/own/team-jenika.jpg" alt="Jenika"><img src="/assets/photos/own/team-sara.jpg" alt="Sara"></span> Tutut tekijät · Tyytyväisyystakuu</span>
+      <h1>
+        <span class="ln"><span style="animation-delay:.04s">Muutit jo.</span></span>
+        <span class="ln"><span style="animation-delay:.13s">Me hoidamme</span></span>
+        <span class="ln"><span class="g" style="animation-delay:.22s">loppusiivouksen.</span></span>
+      </h1>
+      <p class="sub">Kiinteä hinta, taattu jälki ja vakuus takaisin. Laske hintasi vieressä — ei tuntiarvioita, ei piilokuluja.</p>
+      <div class="micro">
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#E1F1FD"/><path d="M7 12.5l3 3 7-7.5" stroke="#1B9DF0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Vakuus takaisin — tai korjaamme</span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#E1F1FD"/><path d="M7 12.5l3 3 7-7.5" stroke="#1B9DF0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Kotitalousvähennys −35 %</span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#E1F1FD"/><path d="M7 12.5l3 3 7-7.5" stroke="#1B9DF0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Välineet mukana</span>
+      </div>
+    </div>
+    <div class="calc">
+      <div class="ct"><span class="pin"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3c2 5 6 8 6 12a6 6 0 11-12 0c0-4 4-7 6-12z" stroke="#1B9DF0" stroke-width="1.8" stroke-linejoin="round"/></svg></span> Laske muuttosiivouksesi hinta</div>
+      <div class="csub">Hinta määräytyy asunnon koon mukaan — näet sen heti.</div>
+      <div class="quick" id="quick"><button data-m="30">Yksiö</button><button data-m="55">Kaksio</button><button data-m="75">Kolmio</button><button data-m="100">Iso</button></div>
+      <div class="top"><span class="lbl">Asunnon koko</span><span class="m2" id="m2v">60 m²</span></div>
+      <input type="range" id="m2" min="25" max="195" step="5" value="60">
+      <div class="ticks"><span>25 m²</span><span>110 m²</span><span>195+ m²</span></div>
+      <div class="price">
+        <div class="pblob"></div>
+        <div class="pt">Kiinteä hinta (sis. alv)</div>
+        <div class="pv" id="pv">350<small>€</small></div>
+        <div class="net" id="net">Kotitalousvähennyksen jälkeen <b>n. 228 €</b></div>
+      </div>
+      <a href="#cta" class="btn btn-p btn-lg btn-shim cbtn">Varaa tämä hinta <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <div class="cnote">Ilmainen, ei sitoumusta · vahvistus sähköpostiin</div>
+    </div>
+  </div>
+</header>
+
+<!-- trust bar -->
+<section class="tbar2"><div class="wrap">
+  <div class="ti"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" stroke="#1B9DF0" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4.5" stroke="#1B9DF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Tyytyväisyystakuu</b><span>Tarkastus läpäisee tai korjaamme</span></div></div>
+  <div class="ti"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#1B9DF0" stroke-width="1.8"/><path d="M8.6 8.6h.01M15.4 15.4h.01M16 8l-8 8" stroke="#1B9DF0" stroke-width="1.9" stroke-linecap="round"/></svg></span><div><b>Kotitalousvähennys</b><span>Jopa −35 % työn osuudesta</span></div></div>
+  <div class="ti"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3c2 5 6 8 6 12a6 6 0 11-12 0c0-4 4-7 6-12z" stroke="#1B9DF0" stroke-width="1.8" stroke-linejoin="round"/></svg></span><div><b>Välineet &amp; aineet</b><span>Sinun ei tarvitse järjestää mitään</span></div></div>
+  <div class="ti"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#1B9DF0" stroke-width="1.8"/><path d="M12 7v5l3.5 2" stroke="#1B9DF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Vastaamme tunnissa</b><span>Nopea vahvistus</span></div></div>
+</div></section>
+
+<!-- steps -->
+<section class="sec">
+  <div class="wrap">
+    <div class="center rv"><div class="eyebrow">Näin se toimii</div><h2 class="h2">Kolme askelta puhtaaseen lähtöön</h2>
+    <p class="lead">Laske hintasi minuutissa. Me hoidamme loput. Sinä lähdet puhtaalta pöydältä.</p></div>
+    <div class="steps">
+      <div class="step rv"><div class="n">1</div><h3>Laske &amp; varaa</h3><p>Syötä neliöt — näet kiinteän hinnan heti. Valitse aika ja vahvista verkossa.</p></div>
+      <div class="step rv"><div class="n">2</div><h3>Me siivoamme</h3><p>Ammattitiimi tulee paikalle välineineen. Sinun ei tarvitse olla edes paikalla.</p></div>
+      <div class="step rv"><div class="n">3</div><h3>Vakuus takaisin</h3><p>Jälki kestää tarkastuksen — sinä lähdet puhtaalta pöydältä ja saat vuokravakuutesi.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- guarantee -->
+<section class="sec gband" id="takuu">
+  <span class="gblob x"></span><span class="gblob y"></span>
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">Laatutakuu</div>
+      <h2 class="h2">Emme lähde, ennen kuin jälki kestää tarkastuksen</h2>
+      <ul class="gp">
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(127,208,255,.2)"/><path d="M7 12.5l3 3 7-7.5" stroke="#7fd0ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Tarkastus läpäisee — tai korjaamme.</b> Jos jokin jää huomautettavaa, korjaamme sen veloituksetta 48 h sisällä.</span></li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(127,208,255,.2)"/><path d="M7 12.5l3 3 7-7.5" stroke="#7fd0ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Vakuus takaisin.</b> Siivoamme muuttotarkastuksen vaatimustason mukaan — saat vuokravakuutesi.</span></li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(127,208,255,.2)"/><path d="M7 12.5l3 3 7-7.5" stroke="#7fd0ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Ei yllätyksiä.</b> Kiinteä hinta etukäteen — näet summan ennen kuin varaat.</span></li>
+      </ul>
+      <a href="#hinta" class="btn btn-w btn-lg btn-shim" style="margin-top:30px">Laske hintasi laatutakuulla <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="gpic rv">
+      <img src="/assets/photos/brand/bright-empty.jpg" alt="Säkenöivän puhdas tyhjä asunto muuttosiivouksen jälkeen">
+      <img class="gstamp" src="/assets/stamp.png" alt="Laatutakuu — tarkastettu ja hyväksytty">
+    </div>
+  </div>
+</section>
+
+<!-- includes -->
+<section class="sec wash" id="sisaltyy">
+  <div class="wrap">
+    <div class="center rv"><div class="eyebrow">Mitä sisältyy</div><h2 class="h2">Kattava puhdistus joka huoneeseen</h2>
+    <p class="lead">Vakiohintaan kuuluu kaikki olennainen — keittiöstä kylpyhuoneeseen.</p></div>
+    <div class="inc3">
+      <div class="inccard rv">
+        <div class="ih"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 10l9-7 9 7v9a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#1B9DF0" stroke-width="1.8" stroke-linejoin="round"/></svg></span><h3>Yleiset tilat</h3></div>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Hyllyt ja tasopinnat (alle 180 cm)</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Ovet, karmit ja kahvat</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Peilit ja lasipinnat</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Vaatekaapit (sisä &amp; ulko)</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Lattioiden imurointi ja pesu</li>
+        </ul>
+      </div>
+      <div class="inccard rv">
+        <div class="ih"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 2v7a2 2 0 002 2 2 2 0 002-2V2M9 11v11M17 2c-1.5 1-2 3-2 5s.5 4 2 4v11" stroke="#1B9DF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h3>Keittiö</h3></div>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Tasot, lavuaarit ja hanat</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Kaikki kaapit (sisä &amp; ulko)</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Liesituuletin ja mikro</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Uunin ja jääkaapin ulkopinnat</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Laattaseinät</li>
+        </ul>
+      </div>
+      <div class="inccard rv">
+        <div class="ih"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12V6a2 2 0 012-2 2 2 0 012 2M4 12h16v2a4 4 0 01-4 4H8a4 4 0 01-4-4zM7 18l-1 3M17 18l1 3" stroke="#1B9DF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h3>Kylpyhuone &amp; WC</h3></div>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Hanat, lavuaarit ja peilit</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Suihku ja kylpyamme</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Laattaseinät ja näkyvät putket</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> WC-istuin ja kaapit</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1B9DF0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Lattia ja lattiakaivo</li>
+        </ul>
+      </div>
+    </div>
+    <div class="incpic rv"><img src="/assets/photos/brand/detail-wipe.jpg" alt="Perusteellinen pintojen puhdistus ammattiaineilla" loading="lazy"></div>
+  </div>
+</section>
+
+<!-- ease / photo split -->
+<section class="sec" id="helppous">
+  <div class="wrap split">
+    <div class="rv">
+      <div class="eyebrow">Helppoa sinulle</div>
+      <h2 class="h2">Sinun ei tarvitse järjestää mitään</h2>
+      <p class="lead" style="margin-top:16px">Tulemme paikalle omalla autolla, välineet ja aineet mukana. Sinä keskityt muuttoon — me huolehdimme, että vanha koti jää moitteettomaan kuntoon.</p>
+      <ul class="feat-list">
+        <li><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 13l4 4L20 5" stroke="#1B9DF0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><b>Et stressaa siivouksesta</b><span>Hoidamme loppusiivouksen alusta loppuun — et nosta sormeakaan.</span></div></li>
+        <li><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 7a4 4 0 11-1 7l-5 5H6v-3l5-5a4 4 0 014-4z" stroke="#1B9DF0" stroke-width="1.8" stroke-linejoin="round"/></svg></span><div><b>Joustava avainten luovutus</b><span>Et halua olla paikalla? Sovitaan avaimista — saat ilmoituksen kun valmista.</span></div></li>
+        <li><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3c2 5 6 8 6 12a6 6 0 11-12 0c0-4 4-7 6-12z" stroke="#1B9DF0" stroke-width="1.8" stroke-linejoin="round"/></svg></span><div><b>Välineet ja aineet mukana</b><span>Ammattilaitteet ja -aineet kuuluvat hintaan. Et tarvitse omia.</span></div></li>
+      </ul>
+    </div>
+    <div class="rv"><img class="split-ph" src="/assets/photos/brand/woman-logo.jpg" alt="Loppusiivous-ammattilainen siivoamassa kirkasta kotia" loading="lazy"></div>
+  </div>
+</section>
+
+<!-- pricing -->
+<section class="sec wash" id="hinnoittelu">
+  <div class="wrap">
+    <div class="center rv"><div class="eyebrow">Hinnoittelu</div><h2 class="h2">Kiinteä hinta — tiedät summan etukäteen</h2>
+    <p class="lead">Hinta määräytyy asunnon koon mukaan. Ei tuntiarvioita, ei yllätyksiä.</p></div>
+    <div class="ptab rv">
+      <div class="pr"><span class="k">Alle 40 m²</span><span class="v">210 €</span></div>
+      <div class="pr"><span class="k">40–49 m²</span><span class="v">245 €</span></div>
+      <div class="pr"><span class="k">50–59 m²</span><span class="v">280 €</span></div>
+      <div class="pr"><span class="k">60–69 m²</span><span class="v">350 €</span></div>
+      <div class="pr"><span class="k">70–84 m²</span><span class="v">385 €</span></div>
+      <div class="pr"><span class="k">85–99 m²</span><span class="v">420 €</span></div>
+      <div class="pr"><span class="k">100–114 m²</span><span class="v">455 €</span></div>
+      <div class="pr"><span class="k">115–129 m²</span><span class="v">525 €</span></div>
+      <div class="pr"><span class="k">130–144 m²</span><span class="v">560 €</span></div>
+      <div class="pr"><span class="k">145–159 m²</span><span class="v">630 €</span></div>
+      <div class="pr"><span class="k">160–174 m²</span><span class="v">665 €</span></div>
+      <div class="pr"><span class="k">175–190 m²</span><span class="v">700 €</span></div>
+      <div class="pr q"><span class="k">Yli 190 m²</span><span class="v">Tarjouksesta</span></div>
+    </div>
+    <div class="kv rv">
+      <div class="kvb"></div>
+      <div class="big">−35<span style="font-size:.5em">%</span></div>
+      <div class="kb"><h3>Kotitalousvähennys — valttikorttisi</h3>
+        <p>Loppusiivous on kotitaloustyötä, joten voit vähentää työn osuudesta jopa 35 % verotuksessasi. Käytännössä siivous maksaa murto-osan listahinnasta.</p>
+        <span class="ex"><span class="o">350 €</span><span class="ar">→</span><span class="n">n. 228 €</span></span>
+      </div>
+    </div>
+    <h3 style="font-family:'Gabarito';font-weight:800;font-size:20px;color:var(--ink);margin:44px 0 6px">Lisäpalvelut</h3>
+    <p style="color:var(--mute);font-size:15px">Kiinteä lisähinta per palvelu — valitse varauksen yhteydessä.</p>
+    <div class="addons rv">
+      <div class="ad"><span class="an">Jääkaappi &amp; pakastin</span><span class="ap">+70 €</span></div>
+      <div class="ad"><span class="an">Uuni</span><span class="ap">+70 €</span></div>
+      <div class="ad"><span class="an">Sauna</span><span class="ap">+70 €</span></div>
+      <div class="ad"><span class="an">Silitys</span><span class="ap">+35 €</span></div>
+      <div class="ad"><span class="an">Roskakaappi</span><span class="ap">+18 €</span></div>
+      <div class="ad"><span class="an">Ikkunanpesu</span><span class="ap">Tarjouksesta</span></div>
+    </div>
+    <div class="center rv" style="margin-top:40px"><a href="#hinta" class="btn btn-p btn-lg btn-shim">Laske oma hintasi &amp; varaa <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</section>
+
+<!-- reviews -->
+<section class="sec" id="arvostelut">
+  <div class="wrap">
+    <div class="center rv"><div class="eyebrow">Asiakkaat</div><h2 class="h2">Mielenrauha, jonka asiakkaamme tuntevat</h2></div>
+    <div class="revs">
+      <div class="rev rv"><p>"Asunto oli loppusiivouksen jälkeen kuin uusi. Vuokranantaja ei löytänyt sanottavaa ja vakuus tuli takaisin täysimääräisenä."</p><div class="by"><div class="av">M</div><div><b>Maria K.</b><span>Espoo · 2h+k</span></div></div></div>
+      <div class="rev rv"><p>"Hinta oli selkeä eikä yllätyksiä tullut. Sain kiinteän hinnan heti ja lasku oli juuri sen mukainen. Suosittelen lämpimästi."</p><div class="by"><div class="av">J</div><div><b>Joonas R.</b><span>Helsinki · 3h+k</span></div></div></div>
+      <div class="rev rv"><p>"Stressasin muuttoa, mutta siivouksesta ei tarvinnut huolehtia lainkaan. Luovutin avaimet ja sain ilmoituksen kun valmista."</p><div class="by"><div class="av">S</div><div><b>Sanna L.</b><span>Vantaa · Yksiö</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- team -->
+<section class="sec wash" id="tiimi">
+  <div class="wrap">
+    <div class="center rv"><div class="eyebrow">Tiimi</div><h2 class="h2">Tutut tekijät, joihin voit luottaa</h2>
+    <p class="lead">Sama ammattitiimi hoitaa kotisi huolella — ei vaihtuvia, kasvottomia siivoojia.</p></div>
+    <div class="team">
+      <div class="tc rv"><img src="/assets/photos/own/team-josua.jpg" alt="Josua Leier"><div class="tb"><div class="tn">Josua Leier</div><div class="tr">Perustaja</div><div class="td">Vastaa työn laadusta ja siitä, että jälki kestää tarkastuksen.</div></div></div>
+      <div class="tc rv"><img src="/assets/photos/own/team-olivia.jpg" alt="Olivia" loading="lazy"><div class="tb"><div class="tn">Olivia</div><div class="tr">Siivousammattilainen</div><div class="td">Huolellinen ja tarkka — pienetkin yksityiskohdat hoituvat.</div></div></div>
+      <div class="tc rv"><img src="/assets/photos/own/team-jenika.jpg" alt="Jenika" loading="lazy"><div class="tb"><div class="tn">Jenika</div><div class="tr">Siivousammattilainen</div><div class="td">Tehokas ja luotettava — koti loistaa aikataulussa.</div></div></div>
+      <div class="tc rv"><img src="/assets/photos/own/team-sara.jpg" alt="Sara" loading="lazy"><div class="tb"><div class="tn">Sara</div><div class="tr">Siivousammattilainen</div><div class="td">Ripeä ja tunnollinen — lopputulos viimeistä yksityiskohtaa myöten.</div></div></div>
+    </div>
+    <div class="vanb rv"><img src="/assets/photos/brand/team-action.jpg" alt="Loppusiivous-tiimi työssä"><div class="cap"><b>Sama tiimi joka kohteessa</b><span>Ammattilaiset, joihin voit luottaa — välineet ja aineet mukana.</span></div></div>
+  </div>
+</section>
+
+<!-- faq -->
+<section class="sec" id="ukk">
+  <div class="wrap">
+    <div class="center rv"><div class="eyebrow">Usein kysyttyä</div><h2 class="h2">Hyvä tietää muuttosiivouksesta</h2></div>
+    <div class="faq" id="faq">
+      <div class="q"><button>Mitä muuttosiivous maksaa?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="a"><p>Kiinteä hinta asunnon koon mukaan, alkaen 210 €. Näet summan heti laskurista — ei tuntiarvioita. Lisäksi kotitalousvähennys jopa 35 % työn osuudesta.</p></div></div>
+      <div class="q"><button>Tarvitseeko minun olla paikalla?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="a"><p>Et välttämättä. Sovimme avainten luovutuksesta — saat ilmoituksen kun työ on valmis.</p></div></div>
+      <div class="q"><button>Saanko vakuuteni takaisin?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="a"><p>Siivoamme muuttotarkastuksen vaatimustason mukaan. Jos jokin jää huomautettavaa, korjaamme sen veloituksetta — tyytyväisyystakuu.</p></div></div>
+      <div class="q"><button>Tuotteko välineet ja aineet?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="a"><p>Kyllä. Ammattivälineet ja -aineet sisältyvät hintaan — sinun ei tarvitse järjestää mitään.</p></div></div>
+      <div class="q"><button>Millä alueella toimitte?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="a"><p>Pääkaupunkiseudulla — Helsinki, Espoo, Vantaa ja lähikunnat. Varmista postinumerolla varauksen yhteydessä.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- final cta -->
+<section class="sec" id="cta">
+  <div class="wrap">
+    <div class="fcta rv">
+      <span class="fb a"></span><span class="fb b"></span>
+      <h2>Valmis <span class="g">puhtaaseen lähtöön?</span></h2>
+      <p>Laske hintasi sekunnissa ja varaa muuttosiivous. Me hoidamme loput.</p>
+      <div class="fa"><a href="#hinta" class="btn btn-w btn-lg">Laske hinta</a><a href="tel:+358401234567" class="btn btn-lg" style="background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)">040 123 4567</a></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fg">
+      <div><a href="#" class="logo dk" id="logof"></a><p class="fintro">Muuttosiivouksen erikoisliike pääkaupunkiseudulla. Jälki, joka kestää tarkastuksen.</p></div>
+      <div><h4>Palvelu</h4><a href="#hinta">Laske hinta</a><a href="#sisaltyy">Mitä sisältyy</a><a href="#hinnoittelu">Hinnoittelu</a></div>
+      <div><h4>Yritys</h4><a href="/meista">Meistä</a><a href="#takuu">Laatutakuu</a><a href="/tietosuoja">Tietosuoja</a><a href="/kayttoehdot">Käyttöehdot</a></div>
+      <div><h4>Yhteys</h4><a href="mailto:info@loppusiivous.fi">info@loppusiivous.fi</a><a href="tel:+358401234567">040 123 4567</a><span style="color:#8ba2bd;font-size:14.5px">Pääkaupunkiseutu</span></div>
+    </div>
+    <div class="fbot"><span>© 2026 Loppusiivous.fi · Y-tunnus 0000000-0 · ALV rek.</span><span><a href="/tietosuoja" style="display:inline;color:inherit">Tietosuoja</a> · <a href="/kayttoehdot" style="display:inline;color:inherit">Käyttöehdot</a></span></div>
+  </div>
+</footer>
+
+<div class="mcta">
+  <a href="tel:+358401234567" class="btn g"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></a>
+  <a href="#hinta" class="btn btn-p">Laske hinta &amp; varaa</a>
+</div>
+
+<script>
+const LOGO=(d)=>{const c=d?'#5AB7F5':'#1B9DF0';const sp=d?'#7CC6F2':'#2BB3F7';const s2=d?'#7CC6F2':'#5AB7F5';return `<svg class="ico" viewBox="0 0 100 100"><path d="M50 16C52 31 71 46 71 64C71 76 62 85 50 85C38 85 29 76 29 64C29 46 48 31 50 16Z" fill="${c}"/><path d="M40 44C35 51 34 58 37 64" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" opacity=".9"/><path d="M76 16C76 22 78.5 24.5 84 24.5C78.5 24.5 76 27 76 33C76 27 73.5 24.5 68 24.5C73.5 24.5 76 22 76 16Z" fill="${sp}"/><circle cx="84" cy="40" r="2.6" fill="${s2}"/></svg><span class="lw"><span class="d">Loppu</span><span class="b">siivous<svg class="wipe" viewBox="0 0 200 24" preserveAspectRatio="none"><path d="M10 11C70 7 140 7 184 9C190 9.3 193 10.5 193 12C190 11.5 186 11.3 182 11.6C140 13 70 14 12 17C5 17.6 4 11.5 10 11Z" fill="${c}"/></svg></span><span class="bub"><i></i></span><span class="d">fi</span></span>`;};
+document.getElementById('logo').innerHTML=LOGO(false);
+document.getElementById('logof').innerHTML=LOGO(true);
+
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>nav.classList.toggle('scr',scrollY>10));
+const nl=document.getElementById('nlinks');
+document.getElementById('burger').onclick=()=>nl.classList.toggle('op');
+nl.querySelectorAll('a').forEach(a=>a.onclick=()=>nl.classList.remove('op'));
+
+// calculator with morph
+const BANDS=[[40,210],[50,245],[60,280],[70,350],[85,385],[100,420],[115,455],[130,525],[145,560],[160,630],[175,665],[191,700]];
+const priceFor=m=>{for(const[l,p]of BANDS)if(m<l)return p;return null;};
+const m2=document.getElementById('m2'),m2v=document.getElementById('m2v'),pv=document.getElementById('pv'),net=document.getElementById('net'),quick=document.getElementById('quick');
+let cur=350;
+function morph(to){const from=cur,t0=performance.now();(function step(t){const k=Math.min(1,(t-t0)/350);const v=Math.round(from+(to-from)*(1-Math.pow(1-k,3)));pv.innerHTML=v+'<small>€</small>';if(k<1)requestAnimationFrame(step);else cur=to;})(t0);}
+function upd(anim){const v=+m2.value;m2v.textContent=(v>=195?'195+ ':v+' ')+'m²';const p=priceFor(v);quick.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.m===v));
+  if(p==null){pv.innerHTML='Tarjous';net.innerHTML='Yli 190 m² — annamme kiinteän tarjouksen.';cur=0;return;}
+  net.innerHTML='Kotitalousvähennyksen jälkeen <b>n. '+Math.round(p*.65)+' €</b>';
+  if(anim)morph(p);else{pv.innerHTML=p+'<small>€</small>';cur=p;}}
+m2.addEventListener('input',()=>upd(true));
+quick.querySelectorAll('button').forEach(b=>b.onclick=()=>{m2.value=b.dataset.m;upd(true);});
+upd(false);
+
+document.querySelectorAll('#faq .q').forEach(q=>{const a=q.querySelector('.a');q.querySelector('button').onclick=()=>{const o=q.classList.contains('op');document.querySelectorAll('#faq .q').forEach(x=>{x.classList.remove('op');x.querySelector('.a').style.maxHeight=null;});if(!o){q.classList.add('op');a.style.maxHeight=a.scrollHeight+'px';}};});
+
+// reveal (scroll-based + safety net)
+document.querySelectorAll('.steps,.inc3,.revs,.addons').forEach(g=>[...g.children].forEach((c,i)=>c.style.transitionDelay=(i*80)+'ms'));
+const rvEls=[...document.querySelectorAll('.rv')];
+function rvv(){for(const el of rvEls)if(!el.classList.contains('in')&&el.getBoundingClientRect().top<innerHeight*.92)el.classList.add('in');}
+rvv();addEventListener('scroll',rvv,{passive:true});addEventListener('resize',rvv);addEventListener('load',rvv);
+setTimeout(()=>rvEls.forEach(el=>el.classList.add('in')),1800);
+</script>
+</body>
+</html>

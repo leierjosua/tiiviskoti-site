@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@800&family=Space+Grotesk:wght@700&family=Unbounded:wght@800&family=Bricolage+Grotesque:wght@800&family=Hanken+Grotesk:wght@800&family=Gabarito:wght@800&family=Epilogue:wght@800&family=Red+Hat+Display:wght@800&family=Albert+Sans:wght@800&family=Onest:wght@800&family=Familjen+Grotesk:wght@700&family=Schibsted+Grotesk:wght@800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next',sans-serif;padding:46px;width:1340px;}
+  h1{font-size:30px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:26px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);padding:26px 30px;}
+  .fname{font-family:'Avenir Next';font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#9aa3ad;margin-bottom:16px;}
+  .fname b{color:#1B9DF0;}
+  .wm{font-size:42px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .deep{color:#0B3A66;} .bright{color:#1B9DF0;}
+  .spk{margin-left:0.12em;width:0.40em;height:0.40em;align-self:flex-start;margin-top:0.04em;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — fontit, satsi 2 (erottuva mutta clean)</h1>
+  <div class="sub">Karaktääristä groteskia & omaleimaista geometriaa · ”loppu” syvä / ”siivous” kirkas</div>
+  <div class="grid" id="g"></div>
+
+<script>
+  const fonts = [
+    ["Space Grotesk", 700, "karaktääriä, tech-clean"],
+    ["Sora", 800, "geometrinen, rauhallinen moderni"],
+    ["Unbounded", 800, "erikoinen pyöreä — hyvin omaleimainen"],
+    ["Bricolage Grotesque", 800, "trendikäs, persoonallinen groteski"],
+    ["Hanken Grotesk", 800, "ystävällinen groteski, clean"],
+    ["Gabarito", 800, "pyöreä & ystävällinen, erottuva"],
+    ["Epilogue", 800, "terävä geometrinen"],
+    ["Red Hat Display", 800, "geometrinen, hillitty karaktääri"],
+    ["Albert Sans", 800, "puhdas geometrinen"],
+    ["Onest", 800, "neutraali, moderni clean"],
+    ["Familjen Grotesk", 700, "skandi-groteski, omaleimainen"],
+    ["Schibsted Grotesk", 800, "moderni mediagroteski"],
+  ];
+  const g = document.getElementById('g');
+  for (const [fam, wt, note] of fonts) {
+    const card = document.createElement('div'); card.className='card';
+    const label = document.createElement('div'); label.className='fname';
+    label.innerHTML = `<b>${fam}</b> · ${note}`;
+    const wm = document.createElement('div'); wm.className='wm';
+    wm.style.fontFamily = `'${fam}', sans-serif`; wm.style.fontWeight = wt;
+    wm.innerHTML = `<span class="deep">Loppu</span><span class="bright">siivous</span><span class="deep">.fi</span>`+
+      `<svg class="spk" viewBox="0 0 100 100"><path d="M50 5 C53 34,66 47,95 50 C66 53,53 66,50 95 C47 66,34 53,5 50 C34 47,47 34,50 5 Z" fill="#1B9DF0"/></svg>`;
+    card.appendChild(label); card.appendChild(wm); g.appendChild(card);
+  }
+</script>
+</body>
+</html>

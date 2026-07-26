@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><link rel="stylesheet" href="brand.css">
+<style>body{padding:46px;display:flex;gap:46px;align-items:flex-start;background:#fff}
+.col{display:flex;flex-direction:column;align-items:center;gap:16px}.lab{font-family:'Gabarito';font-size:13px;font-weight:800;color:#0B3A66}</style></head><body>
+<svg width="0" height="0"><defs>
+<path id="top" d="M29,98 A71,71 0 0 1 171,98"/><path id="bot" d="M24,98 A76,76 0 0 0 176,98"/></defs></svg>
+<script>
+const C='#0A1F3C';
+// badge(sealColor, ribbonFill, ribbonText, textColor, tailColor)
+function badge(C, RF, RT, TC, TAIL){
+ return `<svg width="300" height="320" viewBox="0 0 200 214"><g>
+  <circle cx="100" cy="98" r="83" fill="none" stroke="${C}" stroke-width="3.2"/>
+  <circle cx="100" cy="98" r="66" fill="none" stroke="${C}" stroke-width="1.4"/>
+  <circle cx="24.5" cy="98" r="2.3" fill="${C}"/><circle cx="175.5" cy="98" r="2.3" fill="${C}"/>
+  <text font-family="Gabarito" font-weight="800" font-size="11.5" letter-spacing="2" fill="${C}" text-anchor="middle"><textPath href="#top" startOffset="50%">LOPPUSIIVOUS.FI</textPath></text>
+  <text font-family="Gabarito" font-weight="700" font-size="9.5" letter-spacing="1.6" fill="${C}" text-anchor="middle"><textPath href="#bot" startOffset="50%">MUUTTOSIIVOUS</textPath></text>
+  <path d="M88 64 l9 10 21 -24" fill="none" stroke="${C}" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="100" y="104" font-family="Gabarito" font-weight="900" font-size="18" letter-spacing="0.4" fill="${C}" text-anchor="middle">HYVÄKSYTTY</text>
+  <!-- ribbon tails (behind) -->
+  <path d="M66 158 L44 206 L60 198 L80 166 Z" fill="${TAIL}"/>
+  <path d="M134 158 L156 206 L140 198 L120 166 Z" fill="${TAIL}"/>
+  <!-- main banner with swallowtail ends -->
+  <path d="M26 150 L40 165 L26 180 L174 180 L160 165 L174 150 Z" fill="${RF}"/>
+  <text x="100" y="170" font-family="Gabarito" font-weight="800" font-size="12.5" letter-spacing="1.4" fill="${TC}" text-anchor="middle">${RT}</text>
+ </g></svg>`;
+}
+document.write(`<div class="col">${badge('#0A1F3C','#0A1F3C','TYYTYVÄISYYSTAKUU','#fff','#06243a')}<div class="lab">A · navy · "TYYTYVÄISYYSTAKUU"</div></div>`);
+document.write(`<div class="col">${badge('#0A1F3C','#1B9DF0','TYYTYVÄISYYSTAKUU','#fff','#127ac0')}<div class="lab">B · sininen nauha</div></div>`);
+document.write(`<div class="col">${badge('#0A1F3C','#0A1F3C','LAATUTAKUU','#fff','#06243a')}<div class="lab">C · "LAATUTAKUU"</div></div>`);
+</script></body></html>

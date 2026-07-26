@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next',sans-serif;padding:46px;width:1200px;}
+  h1{font-size:28px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:26px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{display:flex;gap:10px;align-items:baseline;padding:13px 26px;border-bottom:1px solid #eef1f4;}
+  .htitle{font-size:15px;font-weight:800;color:#1a1f24;}
+  .desc{font-size:12.5px;color:#9aa3ad;font-weight:600;}
+  .row{display:flex;align-items:center;gap:34px;padding:34px 40px;}
+  .stack{display:flex;flex-direction:column;align-items:center;}
+  .lab{font-size:11px;color:#9aa3ad;margin-top:10px;font-weight:700;}
+  .favs{display:flex;align-items:flex-end;gap:14px;margin-left:auto;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — symboli uusiksi (täsmällinen sommittelu)</h1>
+  <div class="sub">Kupla-aihe, mutta keskitetty ja tasapainoinen · sama merkki squircle / ympyrä / favicon</div>
+
+  <!-- A single bubble centered -->
+  <div class="card">
+    <div class="head"><div class="htitle">A · Yksi kupla (keskitetty)</div><div class="desc">— rengas + lyhyt heijastus ylävasemmalla, täydellisesti keskellä</div></div>
+    <div class="row">
+      <div class="stack"><svg width="100" height="100" viewBox="0 0 120 120"><rect x="2" y="2" width="116" height="116" rx="30" fill="#1B9DF0"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="16"/><path d="M37 49 A33 33 0 0 1 53 35" fill="none" stroke="#bfe6ff" stroke-width="7" stroke-linecap="round"/></svg><div class="lab">SQUIRCLE</div></div>
+      <div class="stack"><svg width="100" height="100" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#0B2342"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="16"/><path d="M37 49 A33 33 0 0 1 53 35" fill="none" stroke="#9fd8fb" stroke-width="7" stroke-linecap="round"/></svg><div class="lab">YMPYRÄ</div></div>
+      <div class="favs">
+        <div class="stack"><svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="16"/></svg><div class="lab">16</div></div>
+        <div class="stack"><svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="16"/></svg><div class="lab">32</div></div>
+        <div class="stack"><svg width="48" height="48" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="60" cy="60" r="33" fill="none" stroke="#fff" stroke-width="16"/></svg><div class="lab">48</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B bubble pair: big ring + small filled satellite (balanced diagonal) -->
+  <div class="card">
+    <div class="head"><div class="htitle">B · Kuplapari (iso + pieni)</div><div class="desc">— iso rengas + pieni täysi kupla tasapainossa · selkeästi ”kuplat”</div></div>
+    <div class="row">
+      <div class="stack"><svg width="100" height="100" viewBox="0 0 120 120"><rect x="2" y="2" width="116" height="116" rx="30" fill="#1B9DF0"/><circle cx="52" cy="66" r="30" fill="none" stroke="#fff" stroke-width="15"/><path d="M31 56 A30 30 0 0 1 45 43" fill="none" stroke="#bfe6ff" stroke-width="6.5" stroke-linecap="round"/><circle cx="90" cy="38" r="13" fill="#fff"/></svg><div class="lab">SQUIRCLE</div></div>
+      <div class="stack"><svg width="100" height="100" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#0B2342"/><circle cx="52" cy="66" r="30" fill="none" stroke="#fff" stroke-width="15"/><path d="M31 56 A30 30 0 0 1 45 43" fill="none" stroke="#9fd8fb" stroke-width="6.5" stroke-linecap="round"/><circle cx="90" cy="38" r="13" fill="#5AB7F5"/></svg><div class="lab">YMPYRÄ</div></div>
+      <div class="favs">
+        <div class="stack"><svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="52" cy="66" r="30" fill="none" stroke="#fff" stroke-width="15"/><circle cx="90" cy="38" r="13" fill="#fff"/></svg><div class="lab">16</div></div>
+        <div class="stack"><svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="52" cy="66" r="30" fill="none" stroke="#fff" stroke-width="15"/><circle cx="90" cy="38" r="13" fill="#fff"/></svg><div class="lab">32</div></div>
+        <div class="stack"><svg width="48" height="48" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="52" cy="66" r="30" fill="none" stroke="#fff" stroke-width="15"/><circle cx="90" cy="38" r="13" fill="#fff"/></svg><div class="lab">48</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C two rings -->
+  <div class="card">
+    <div class="head"><div class="htitle">C · Kaksi rengasta</div><div class="desc">— iso + pieni rengas, kevyempi ilme</div></div>
+    <div class="row">
+      <div class="stack"><svg width="100" height="100" viewBox="0 0 120 120"><rect x="2" y="2" width="116" height="116" rx="30" fill="#1B9DF0"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><circle cx="86" cy="40" r="15" fill="none" stroke="#fff" stroke-width="10"/></svg><div class="lab">SQUIRCLE</div></div>
+      <div class="stack"><svg width="100" height="100" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#0B2342"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><circle cx="86" cy="40" r="15" fill="none" stroke="#5AB7F5" stroke-width="10"/></svg><div class="lab">YMPYRÄ</div></div>
+      <div class="favs">
+        <div class="stack"><svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><circle cx="86" cy="40" r="15" fill="none" stroke="#fff" stroke-width="10"/></svg><div class="lab">16</div></div>
+        <div class="stack"><svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><circle cx="86" cy="40" r="15" fill="none" stroke="#fff" stroke-width="10"/></svg><div class="lab">32</div></div>
+        <div class="stack"><svg width="48" height="48" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><circle cx="86" cy="40" r="15" fill="none" stroke="#fff" stroke-width="10"/></svg><div class="lab">48</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D three bubbles -->
+  <div class="card">
+    <div class="head"><div class="htitle">D · Kolme kuplaa</div><div class="desc">— iso rengas + kaksi pikkukuplaa, eloisin</div></div>
+    <div class="row">
+      <div class="stack"><svg width="100" height="100" viewBox="0 0 120 120"><rect x="2" y="2" width="116" height="116" rx="30" fill="#1B9DF0"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><path d="M31 59 A28 28 0 0 1 44 47" fill="none" stroke="#bfe6ff" stroke-width="6" stroke-linecap="round"/><circle cx="86" cy="42" r="13" fill="#fff"/><circle cx="92" cy="76" r="7" fill="#fff"/></svg><div class="lab">SQUIRCLE</div></div>
+      <div class="stack"><svg width="100" height="100" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#0B2342"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><path d="M31 59 A28 28 0 0 1 44 47" fill="none" stroke="#9fd8fb" stroke-width="6" stroke-linecap="round"/><circle cx="86" cy="42" r="13" fill="#5AB7F5"/><circle cx="92" cy="76" r="7" fill="#5AB7F5"/></svg><div class="lab">YMPYRÄ</div></div>
+      <div class="favs">
+        <div class="stack"><svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><circle cx="86" cy="42" r="13" fill="#fff"/><circle cx="92" cy="76" r="7" fill="#fff"/></svg><div class="lab">16</div></div>
+        <div class="stack"><svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><circle cx="86" cy="42" r="13" fill="#fff"/><circle cx="92" cy="76" r="7" fill="#fff"/></svg><div class="lab">32</div></div>
+        <div class="stack"><svg width="48" height="48" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="50" cy="68" r="28" fill="none" stroke="#fff" stroke-width="14"/><circle cx="86" cy="42" r="13" fill="#fff"/><circle cx="92" cy="76" r="7" fill="#fff"/></svg><div class="lab">48</div></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

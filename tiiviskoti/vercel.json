@@ -1,0 +1,13 @@
+{
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.tiiviskoti.fi" }],
+      "destination": "https://tiiviskoti.fi/$1",
+      "permanent": true
+    }
+  ]
+}

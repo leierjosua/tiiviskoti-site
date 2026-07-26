@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Gabarito',sans-serif;padding:46px;width:1320px;}
+  h1{font-size:29px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:24px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{display:flex;gap:10px;align-items:baseline;padding:13px 26px;border-bottom:1px solid #eef1f4;}
+  .htitle{font-size:15px;font-weight:800;color:#1a1f24;}
+  .desc{font-size:12.5px;color:#9aa3ad;font-weight:600;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:50px;min-height:150px;}
+  .wm{font-weight:700;font-size:82px;letter-spacing:-1.5px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  .deep{color:#0B3A66;} .bright{color:#1B9DF0;}
+  .bo{display:inline-block;width:0.605em;height:0.605em;vertical-align:-0.055em;margin:0 0.004em;overflow:visible;}
+  .pb{display:inline-block;width:0.26em;height:0.605em;vertical-align:-0.055em;overflow:visible;}
+  .stack{display:flex;flex-direction:column;align-items:center;}
+  .lab{font-size:12px;color:#9aa3ad;margin-top:13px;font-weight:700;}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — spice ilman gradientteja (litteä)</h1>
+  <div class="sub">Spice = ”.fi”:n piste on kupla · litteät värit</div>
+
+  <!-- X: clean — period bubble only -->
+  <div class="card">
+    <div class="head"><div class="htitle">X · Piste-kupla (siistein)</div><div class="desc">— kupla-o:t + ”.fi”:n piste kuplana, ei karkaavia kuplia</div></div>
+    <div class="cell">
+      <div class="wm"><span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#0B3A66" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="bright">us</span><svg class="pb" viewBox="0 0 26 100"><circle cx="13" cy="84" r="12" fill="#1B9DF0"/><circle cx="9" cy="80" r="3.5" fill="#fff"/></svg><span class="deep">fi</span></div>
+    </div>
+  </div>
+
+  <!-- Y: period bubble + escaping bubbles -->
+  <div class="card">
+    <div class="head"><div class="htitle">Y · Piste-kupla + karkaavat kuplat (eloisampi)</div><div class="desc">— sama, mutta ”vous”:n o:sta karkaa pikkukuplia</div></div>
+    <div class="cell">
+      <div class="wm"><span class="deep">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#0B3A66" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span class="deep">ppu</span><span class="bright">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#1B9DF0" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/><circle cx="92" cy="6" r="8" fill="#2BB3F7"/><circle cx="104" cy="-10" r="4.5" fill="#7FD0FA"/></svg><span class="bright">us</span><svg class="pb" viewBox="0 0 26 100"><circle cx="13" cy="84" r="12" fill="#1B9DF0"/><circle cx="9" cy="80" r="3.5" fill="#fff"/></svg><span class="deep">fi</span></div>
+    </div>
+  </div>
+
+  <!-- X dark -->
+  <div class="card">
+    <div class="head"><div class="htitle">X · tummalla</div></div>
+    <div class="cell" style="background:#0B2342;">
+      <div class="wm"><span style="color:#fff;">L</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#fff" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#9fd8fb" stroke-width="9" stroke-linecap="round"/></svg><span style="color:#fff;">ppu</span><span style="color:#5AB7F5;">siiv</span><svg class="bo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#5AB7F5" stroke-width="22"/><path d="M19 30 A38 38 0 0 1 38 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg><span style="color:#5AB7F5;">us</span><svg class="pb" viewBox="0 0 26 100"><circle cx="13" cy="84" r="12" fill="#5AB7F5"/><circle cx="9" cy="80" r="3.5" fill="#fff"/></svg><span style="color:#fff;">fi</span></div>
+    </div>
+  </div>
+
+  <!-- symbol -->
+  <div class="card">
+    <div class="head">Symboli — kupla-o + piste-kupla</div>
+    <div class="cell" style="background:#fff;justify-content:space-around;flex-wrap:wrap;gap:38px;">
+      <div class="stack">
+        <svg width="116" height="116" viewBox="0 0 120 120"><rect x="2" y="2" width="116" height="116" rx="30" fill="#1B9DF0"/><circle cx="54" cy="58" r="30" fill="none" stroke="#fff" stroke-width="16"/><path d="M36 46 A30 30 0 0 1 54 30" fill="none" stroke="#cdeaff" stroke-width="7" stroke-linecap="round"/><circle cx="92" cy="86" r="11" fill="#fff"/></svg>
+        <div class="lab">Squircle (favicon)</div>
+      </div>
+      <div class="stack">
+        <svg width="116" height="116" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="#0B2342"/><circle cx="54" cy="58" r="30" fill="none" stroke="#fff" stroke-width="16"/><path d="M36 46 A30 30 0 0 1 54 30" fill="none" stroke="#9fd8fb" stroke-width="7" stroke-linecap="round"/><circle cx="92" cy="86" r="11" fill="#5AB7F5"/></svg>
+        <div class="lab">Ympyrä (profiili)</div>
+      </div>
+      <div class="stack">
+        <svg width="116" height="116" viewBox="0 0 120 120"><circle cx="54" cy="58" r="30" fill="none" stroke="#1B9DF0" stroke-width="16"/><path d="M36 46 A30 30 0 0 1 54 30" fill="none" stroke="#9fd8fb" stroke-width="7" stroke-linecap="round"/><circle cx="92" cy="86" r="11" fill="#1B9DF0"/></svg>
+        <div class="lab">Pelkkä merkki</div>
+      </div>
+      <div class="stack">
+        <div style="display:flex;align-items:flex-end;gap:14px;">
+          <svg width="16" height="16" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="54" cy="58" r="30" fill="none" stroke="#fff" stroke-width="16"/><circle cx="92" cy="86" r="11" fill="#fff"/></svg>
+          <svg width="32" height="32" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="54" cy="58" r="30" fill="none" stroke="#fff" stroke-width="16"/><circle cx="92" cy="86" r="11" fill="#fff"/></svg>
+          <svg width="48" height="48" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#1B9DF0"/><circle cx="54" cy="58" r="30" fill="none" stroke="#fff" stroke-width="16"/><circle cx="92" cy="86" r="11" fill="#fff"/></svg>
+        </div>
+        <div class="lab">16 / 32 / 48 px</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

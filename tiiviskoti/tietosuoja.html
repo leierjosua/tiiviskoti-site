@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tietosuojaseloste — TiivisKoti</title>
+<meta name="description" content="Miten TiivisKoti Oy käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat oikeutesi." />
+<meta name="robots" content="index,follow" />
+<meta name="theme-color" content="#F6F7F3" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23217A4E'/%3E%3Crect x='31' y='20' width='38' height='60' rx='3' fill='none' stroke='%23F6F7F3' stroke-width='5'/%3E%3Crect x='35' y='20' width='4' height='60' fill='%23F6F7F3'/%3E%3C/svg%3E" />
+<style>
+/* ============================================================
+   TIIVISKOTI — vaalea & luotettava (AaltoAir-layout)
+   Kirkas off-white pohja, luottamusta herättävä syvä vihreä,
+   ryhtiä tuovat syvänvihreät paneelit. Ei synkkä, ei ankea.
+   Manrope. Isot pyöristetyt kuvalohkot, mittarit, kaupunkilista.
+   ============================================================ */
+:root{
+  --bg:#F6F7F3; --alt:#ECF0E9; --card:#FFFFFF; --imgtop:#EAF1EC;
+  --ink:#183A28; --text:#4A544D; --mute:#7B857D;
+  --green:#217A4E; --green-d:#1A6340; --green-l:#2E9E63; --green-soft:#E4F0E9;
+  --deep:#163A28; --deep2:#1E4A34; --onwhite:#FFFFFF;
+  --line:#E4E8E0; --line2:#D2D9CE; --star:#E0A63A;
+  --dtext:#D7E4DB; --dmute:#9DB2A5;
+  --r:12px; --r-lg:18px; --max:1200px; --ease:cubic-bezier(.2,.6,.3,1);
+  --sh:0 1px 2px rgba(24,58,40,.04), 0 18px 40px -26px rgba(24,58,40,.32);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{overflow-x:clip}
+body{font-family:'Manrope',system-ui,sans-serif;color:var(--text);background:var(--bg);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Manrope',sans-serif;color:var(--ink);font-weight:800;line-height:1.1;letter-spacing:-.02em}
+a{color:inherit;text-decoration:none}
+img,svg{display:block;max-width:100%}
+b,strong{font-weight:700;color:var(--ink)}
+::selection{background:var(--green);color:#fff}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:26px}
+.sec{padding:clamp(60px,7vw,100px) 0;position:relative}
+.alt{background:var(--alt)}
+.kicker{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.kicker::before{content:"";width:20px;height:2px;background:var(--green);border-radius:2px}
+h2.title{font-size:clamp(29px,3.8vw,44px);font-weight:800;max-width:18ch;letter-spacing:-.025em;color:var(--ink)}
+.sub{font-size:18px;color:var(--mute);max-width:56ch;margin-top:14px}
+.center{text-align:center}.center .kicker{justify-content:center}.center .title,.center .sub{margin-inline:auto}
+.rv{opacity:0;transform:translateY(16px);transition:.7s var(--ease)}.rv.in{opacity:1;transform:none}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:16px;padding:14px 26px;border-radius:10px;border:1.5px solid transparent;cursor:pointer;transition:.18s var(--ease)}
+.btn svg{width:18px;height:18px}
+.btn-p{background:var(--green);color:#fff}.btn-p:hover{background:var(--green-d)}
+a.btn-p{color:#fff}
+.btn-o{background:var(--card);color:var(--ink);border-color:var(--line2)}.btn-o:hover{border-color:var(--green);color:var(--green)}
+.btn-lg{padding:16px 32px}
+.arrow{transition:transform .18s}.btn:hover .arrow{transform:translateX(3px)}
+.lnk{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--green);font-size:15px}
+.lnk .arrow{width:15px;height:15px}
+.on-deep.btn-o{background:transparent;color:#fff;border-color:rgba(246,247,243,.4)}.on-deep.btn-o:hover{border-color:#fff;color:#fff;background:rgba(246,247,243,.08)}
+
+/* nav */
+nav.top{position:sticky;top:0;z-index:60;background:rgba(246,247,243,.9);backdrop-filter:saturate(1.1);border-bottom:1px solid transparent;transition:.25s}
+nav.top.scr{border-color:var(--line);background:var(--bg)}
+nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
+.logo{display:inline-flex;align-items:center;gap:11px;font-weight:800;font-size:23px;letter-spacing:-.03em;color:var(--ink)}
+.logo .mark{width:34px;height:34px}
+.logo .b{color:var(--green)}
+.nlinks{display:flex;gap:2px;margin-left:auto;margin-right:8px}
+.nlinks a{font-weight:600;font-size:15px;color:var(--text);padding:8px 12px;border-radius:8px}
+.nlinks a:hover{color:var(--green)}
+.ntel{font-weight:700;font-size:15px;color:var(--ink)}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+.burger span{width:24px;height:2px;background:var(--ink)}
+
+/* HERO — valoisa split: teksti + iso pyöristetty kuvalohko */
+.hero{padding:clamp(30px,4vw,56px) 0 clamp(20px,3vw,32px)}
+.hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(32px,5vw,60px);align-items:center}
+.hero .rating{display:inline-flex;align-items:center;gap:9px;font-size:14.5px;color:var(--text);margin-bottom:18px;font-weight:600}
+.hero .rating .st{color:var(--star);letter-spacing:1px}
+.hero h1{font-size:clamp(36px,5.2vw,60px);font-weight:800;line-height:1.03;letter-spacing:-.03em;color:var(--ink);text-wrap:balance}
+.hero h1 .a{color:var(--green)}
+.hero-sub{font-size:19px;color:var(--text);max-width:45ch;margin-top:20px}
+.hero-cta{display:flex;gap:13px;flex-wrap:wrap;margin-top:28px}
+.hero-fine{font-size:14px;color:var(--mute);margin-top:16px;display:flex;align-items:center;gap:8px}
+.hero-fine svg{color:var(--green);flex:0 0 auto}
+.hero-card{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh);border:1px solid var(--line);aspect-ratio:5/4}
+.hero-card svg{width:100%;height:100%;display:block}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px 28px;box-shadow:var(--sh)}
+.metric b{display:block;font-size:32px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1;white-space:nowrap}
+.metric b .a{color:var(--green)}
+.metric span{display:block;font-size:14.5px;color:var(--mute);margin-top:8px}
+
+/* SERVICE CARDS */
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:clamp(34px,4vw,50px)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column;transition:.2s var(--ease);box-shadow:var(--sh)}
+.card:hover{border-color:var(--green);transform:translateY(-4px)}
+.card-fig{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--imgtop);border-bottom:1px solid var(--line)}
+.card-fig svg.pic{position:absolute;inset:0;width:100%;height:100%}
+.card-fig .tag{position:absolute;left:16px;bottom:14px;z-index:2;background:var(--green);color:#fff;font-weight:700;font-size:13px;padding:5px 12px;border-radius:999px}
+.card-body{padding:22px 24px 24px;display:flex;flex-direction:column;flex:1}
+.card h3{font-size:21px;color:var(--ink)}
+.card p{font-size:15px;color:var(--mute);flex:1;margin-top:8px}
+.card .lnk{margin-top:16px}
+
+/* LASKURI — vaalea kortti + syvänvihreä yhteenveto */
+.calc-wrap{display:grid;grid-template-columns:1.35fr .9fr;gap:clamp(22px,3vw,34px);margin-top:clamp(34px,4vw,50px);align-items:start}
+.order{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh)}
+.order-hd{display:flex;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.calc-types{display:flex;flex-direction:column}
+.wtype{display:flex;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid var(--line)}
+.wtype.has{background:var(--green-soft)}
+.wtype-ic{width:28px;height:28px;color:var(--green);opacity:.8;flex:0 0 auto}.wtype.has .wtype-ic{opacity:1}
+.wtype-ic svg{width:28px;height:28px}
+.wtype-top{flex:1;min-width:0}
+.wtype-name{font-weight:700;font-size:16.5px;color:var(--ink)}
+.wtype-desc{font-size:12.5px;color:var(--mute);margin-top:2px}
+.wtype-price{font-size:12.5px;color:var(--green);font-weight:700;margin-top:4px;display:inline-block}
+.stepper{flex:0 0 auto}.stepper .unit{display:none}
+.stepper-btns{display:flex;align-items:center;gap:7px}
+.stp{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--line2);background:var(--card);color:var(--green);font-size:19px;font-weight:700;cursor:pointer;display:grid;place-items:center;line-height:0;padding-bottom:2px}
+.stp:hover{border-color:var(--green)}.stp:disabled{opacity:.35;cursor:not-allowed}
+.stp.plus{background:var(--green);color:#fff;border-color:var(--green)}
+.qty{font-weight:800;font-size:20px;color:var(--ink);min-width:28px;text-align:center;font-variant-numeric:tabular-nums}
+.extras-hd{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);padding:14px 22px 2px}
+.extras{display:grid;grid-template-columns:1fr 1fr}
+.extra{display:flex;align-items:center;gap:10px;padding:11px 22px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;text-align:left;font-family:inherit}
+.extra:nth-child(2n){border-left:1px solid var(--line)}
+.extra.on{background:var(--green-soft)}
+.extra-chk{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:11px;color:transparent;flex:0 0 auto}
+.extra.on .extra-chk{background:var(--green);border-color:var(--green);color:#fff}
+.extra-nm{font-size:14px;color:var(--text);flex:1}
+.extra-pr{font-weight:700;font-size:13px;color:var(--green)}
+.quote{position:sticky;top:88px;background:var(--deep);color:var(--dtext);border-radius:var(--r-lg);padding:26px}
+.q-t{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dmute)}
+.rc-lines{margin:16px 0 4px;min-height:40px}
+.rc-empty{font-size:15px;color:var(--dmute)}
+.cp-line{display:flex;justify-content:space-between;gap:12px;font-size:15px;color:var(--dtext);padding:8px 0;border-bottom:1px solid rgba(246,247,243,.13)}
+.cp-line b{font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.cp-line .cnt{color:var(--green-l);font-weight:700}
+.q-total{margin-top:16px;padding-top:16px;border-top:1px solid rgba(246,247,243,.25)}
+.q-total .pt{font-size:12px;color:var(--dmute)}
+.q-total .pv{font-weight:800;font-size:50px;line-height:1;display:flex;align-items:baseline;gap:4px;margin-top:6px;color:#fff;font-variant-numeric:tabular-nums}
+.q-total .pv small{font-size:.38em;color:var(--green-l)}
+.q-net{font-size:14px;color:var(--dtext);margin-top:10px}.q-net b{color:var(--green-l)}
+.q-meta{display:flex;gap:20px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(246,247,243,.13)}
+.q-meta b{display:block;font-weight:800;font-size:19px;color:#fff}
+.q-meta span{font-size:12px;color:var(--dmute)}
+.q-btn{margin-top:18px;width:100%;background:var(--green-l);border:none;color:#06231a}.q-btn:hover{background:#37b071}
+.q-note{font-size:11.5px;color:var(--dmute);text-align:center;margin-top:11px}
+
+/* BOOKING */
+.book-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(22px,3vw,34px);margin-top:clamp(34px,4vw,50px);align-items:start}
+.bcal{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;box-shadow:var(--sh)}
+.bcal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.mname{font-weight:800;font-size:19px;color:var(--ink);text-transform:capitalize}
+.mnav{width:36px;height:36px;border-radius:9px;border:1.5px solid var(--line2);background:var(--card);color:var(--green);cursor:pointer;display:grid;place-items:center}
+.mnav:hover{border-color:var(--green)}.mnav:disabled{opacity:.35;cursor:not-allowed}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+.dow span{text-align:center;font-size:11.5px;font-weight:700;color:var(--mute);text-transform:uppercase}
+.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{aspect-ratio:1;border-radius:9px;border:1.5px solid transparent;background:var(--alt);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative}
+.day.empty{background:transparent;cursor:default}
+.day.off{background:transparent;color:var(--line2);cursor:not-allowed}
+.day.full{color:var(--line2);cursor:not-allowed;text-decoration:line-through}
+.day.free{background:var(--card);border-color:var(--line)}
+.day.free:hover{border-color:var(--green)}
+.day.free .dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
+.day.sel{background:var(--green);color:#fff;border-color:var(--green)}.day.sel .dot{background:#fff}
+.day.today::after{content:"";position:absolute;bottom:6px;width:12px;height:2px;background:var(--green)}
+.slots-wrap{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.slots-title{font-weight:700;font-size:14px;color:var(--ink);margin-bottom:11px}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.slot{padding:11px 6px;border-radius:9px;border:1.5px solid var(--line2);background:var(--card);color:var(--green);font-weight:700;font-size:14.5px;cursor:pointer;text-align:center;font-variant-numeric:tabular-nums}
+.slot:hover{border-color:var(--green)}.slot.sel{background:var(--green);color:#fff;border-color:var(--green)}
+.slots-empty{font-size:14px;color:var(--mute)}
+.bside{position:sticky;top:88px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px;box-shadow:var(--sh)}
+.bside h3{font-size:20px;margin-bottom:4px;color:var(--ink)}
+.bsub{font-size:14px;color:var(--mute);margin-bottom:18px}
+.bsum{background:var(--deep);color:var(--dtext);border-radius:var(--r);padding:16px 18px;margin-bottom:18px;font-size:13.5px}
+.bsum b{color:#fff;font-weight:700}
+.bsum .price{font-weight:800;font-size:23px;color:var(--green-l);display:block;margin-top:4px}
+.bsum .when{margin-top:10px;display:flex;gap:8px;align-items:center;color:var(--green-l);font-weight:700;font-size:13px}
+.bk-field{margin-bottom:12px}
+.bk-field label{display:block;font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:5px}
+.bk-input{width:100%;padding:12px 14px;border-radius:9px;border:1.5px solid var(--line2);background:var(--bg);font-family:inherit;font-size:15px;color:var(--ink)}
+.bk-input:focus{outline:none;border-color:var(--green)}
+.bk-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.bk-err{background:#f4e2d3;color:#9a5a1c;border-radius:9px;padding:11px 14px;font-size:13.5px;margin:8px 0}
+.bk-trust{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--mute);margin-top:13px}
+.book-done{text-align:center;padding:8px 0}
+.book-done .ok{width:58px;height:58px;border-radius:50%;background:var(--green-soft);display:grid;place-items:center;margin:0 auto 16px;color:var(--green)}
+.book-done .refno{font-weight:800;font-size:22px;color:var(--green);margin:8px 0}
+
+/* WHY */
+.why{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(34px,5vw,64px);align-items:center}
+.why h2{font-size:clamp(28px,3.6vw,40px);letter-spacing:-.025em;color:var(--ink)}
+.why p{margin-top:18px;font-size:17px;color:var(--text);max-width:52ch}
+.grev{display:flex;align-items:center;gap:15px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 20px;margin-top:28px;box-shadow:var(--sh);transition:.2s var(--ease)}
+.grev:hover{border-color:var(--green);transform:translateY(-2px)}
+.grev-g{flex:0 0 auto;width:38px;height:38px}
+.grev-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.grev-score{display:flex;align-items:baseline;gap:11px}
+.grev-score b{font-size:clamp(30px,4vw,38px);font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.grev-stars{color:var(--star);font-size:19px;letter-spacing:2px;white-space:nowrap}
+.grev-sub{font-size:14px;color:var(--mute);font-weight:600}
+.why-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.wstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
+.wstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.wstat b .a{color:var(--green)}
+.wstat span{font-size:13.5px;color:var(--mute);margin-top:4px;display:block}
+.why-fig{border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/5;box-shadow:var(--sh);border:1px solid var(--line)}
+.why-fig svg{width:100%;height:100%;display:block}
+
+/* REVIEWS */
+.revs{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:clamp(34px,4vw,50px)}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--sh)}
+.rev .st{color:var(--star);letter-spacing:1px;font-size:14px}
+.rev p{font-size:15.5px;color:var(--text);flex:1}
+.rev .by{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:14px}
+.rev .av{width:42px;height:42px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-weight:800;flex:0 0 auto}
+.rev .by b{display:block;color:var(--ink);font-size:15px}
+.rev .by span{font-size:13px;color:var(--mute)}
+
+/* CTA — syvänvihreä lohko (ryhtiä, luottamusta) */
+.cta{background:var(--deep);border-radius:var(--r-lg);padding:clamp(36px,5vw,60px);text-align:center;color:var(--dtext)}
+.cta h2{color:#fff;font-size:clamp(26px,3.4vw,38px)}
+.cta p{color:var(--dtext);margin-top:12px;font-size:17px;max-width:48ch;margin-inline:auto}
+.cta-btns{display:flex;gap:13px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.cta .btn-p{background:var(--green-l);color:#06231a}.cta .btn-p:hover{background:#37b071}
+
+/* FAQ */
+.faq{max-width:800px;margin:clamp(30px,4vw,46px) auto 0}
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden;box-shadow:var(--sh)}
+.q.op{border-color:var(--green)}
+.q button{width:100%;display:flex;justify-content:space-between;gap:16px;align-items:center;padding:18px 22px;background:none;border:none;cursor:pointer;font-weight:700;font-size:17px;color:var(--ink);text-align:left;font-family:inherit}
+.q .cv{color:var(--green);transition:.25s}.q.op .cv{transform:rotate(45deg)}
+.q .a{max-height:0;overflow:hidden;transition:max-height .3s var(--ease)}
+.q .a p{padding:0 22px 20px;color:var(--mute);font-size:15px}
+
+/* FOOTER — syvänvihreä */
+.mfoot{background:var(--deep);color:var(--dmute);padding:clamp(54px,7vw,84px) 0 30px}
+.mf-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:36px;padding-bottom:34px;border-bottom:1px solid rgba(246,247,243,.14)}
+.mf-brand .logo{color:#fff}.mf-brand .logo .d{color:#fff}
+.mf-brand p{max-width:32ch;margin-top:14px;font-size:14.5px;color:var(--dmute)}
+.mf-rate{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-size:14px;color:var(--dtext);font-weight:600}
+.mf-rate .st{color:var(--star)}
+.mf-col h4{color:#fff;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.mf-col a{display:block;color:var(--dmute);font-size:14.5px;margin-bottom:10px}.mf-col a:hover{color:var(--green-l)}
+.mf-cities{padding:26px 0;border-bottom:1px solid rgba(246,247,243,.14)}
+.mf-cities h4{color:#fff;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.mf-cities .list{display:flex;flex-wrap:wrap;gap:8px 10px}
+.mf-cities .list a{color:var(--dmute);font-size:14px}.mf-cities .list a:hover{color:var(--green-l)}
+.mf-cities .list a::after{content:"·";margin-left:10px;color:#3f5a49}
+.mf-cities .list a:last-child::after{content:""}
+.mf-bot{display:flex;justify-content:space-between;padding-top:22px;font-size:13px;color:#7a9384;flex-wrap:wrap;gap:8px}
+.mf-bot a:hover{color:var(--green-l)}
+
+/* mobile sticky cta */
+.mcta{position:fixed;left:0;right:0;bottom:0;z-index:85;display:none;gap:10px;padding:11px 14px;background:var(--bg);border-top:1px solid var(--line2)}
+.mcta .btn{flex:1;padding:14px}.mcta .btn.tel{flex:0 0 auto}
+
+@media(max-width:960px){
+  .hero-grid,.calc-wrap,.book-wrap,.why{grid-template-columns:1fr;gap:36px}
+  .hero-card,.why-fig{order:-1;aspect-ratio:16/10}.quote,.bside{position:static}
+  .metrics,.cards3,.revs{grid-template-columns:1fr}
+  .mf-grid{grid-template-columns:1fr 1fr}
+  .ntel{display:none}
+}
+@media(max-width:620px){
+  .sec{padding:52px 0}
+  /* NAV — kompakti oikea ryhmä puhelimessa (nappi+burger oikealle, ei logon päälle) */
+  .nlinks{display:none}
+  nav.top .btn-p{margin-left:auto;padding:8px 15px;font-size:14px}
+  .burger{display:flex;margin-left:0}
+  .nlinks.op{display:flex;position:absolute;top:74px;left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border-bottom:1px solid var(--line)}
+  .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
+  .why-stats{grid-template-columns:1fr}
+  .slots{grid-template-columns:repeat(3,1fr)}
+  .mcta{display:flex}body{padding-bottom:76px}
+}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
+
+/* ---------- tietosuojaseloste ---------- */
+.lg{max-width:820px;margin-inline:auto}
+.lg .lead{font-size:19px;color:var(--text);margin-bottom:8px}
+.lg .upd{display:inline-block;font-size:14px;font-weight:700;color:var(--green);
+  background:var(--green-soft);border-radius:999px;padding:6px 14px;margin-bottom:26px}
+.lg h2{font-size:clamp(22px,2.4vw,27px);margin:44px 0 14px;padding-top:22px;border-top:1px solid var(--line)}
+.lg h2:first-of-type{border-top:0;padding-top:0;margin-top:34px}
+.lg h3{font-size:18px;margin:24px 0 8px}
+.lg p{margin-bottom:14px}
+.lg ul{margin:0 0 16px 22px}
+.lg li{margin-bottom:8px}
+.lg a{color:var(--green);font-weight:700}
+.lg .box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:24px 26px;margin-bottom:18px;box-shadow:var(--sh)}
+.lg .box p:last-child{margin-bottom:0}
+.lg dl.kv{margin:0}
+.lg dl.kv div{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.lg dl.kv div:last-child{border-bottom:0}
+.lg dl.kv dt{flex:1 1 58%;color:var(--ink);font-weight:600}
+.lg dl.kv dd{flex:0 1 42%;color:var(--mute);font-size:15px}
+@media(max-width:620px){
+  .lg dl.kv div{flex-direction:column;gap:4px}
+  .lg dl.kv dt,.lg dl.kv dd{flex:1 1 auto}
+}
+</style>
+</head>
+<body>
+<nav class="top" id="nav"><div class="wrap">
+  <a href="index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
+  <div class="nlinks" id="nlinks">
+    <a href="index.html#palvelut">Palvelut</a><a href="index.html#laskuri">Hinta</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="index.html#laskuri">Varaa aika</a><a href="index.html#miksi">Miksi me</a><a href="index.html#arviot">Arviot</a>
+  </div>
+  <a href="tel:+358458755996" class="ntel">045 875 5996</a>
+  <a href="tel:+358458755996" class="btn btn-p" style="padding:10px 20px">Soita</a>
+  <button class="burger" id="burger" aria-label="Valikko"><span></span><span></span><span></span></button>
+</div></nav>
+
+<!-- TIETOSUOJASELOSTE -->
+<section class="sec" id="tietosuoja" style="padding-top:clamp(40px,5vw,72px)"><div class="wrap">
+  <div class="lg">
+    <div class="kicker">Tietosuoja</div>
+    <h1 class="title" style="font-size:clamp(30px,4vw,44px);margin-bottom:16px">Tietosuojaseloste</h1>
+    <p class="lead">Tämä seloste kertoo, miten TiivisKoti Oy käsittelee henkilötietoja tiiviskoti.fi-sivustolla ja
+      asiakassuhteissa. Noudatamme EU:n yleistä tietosuoja-asetusta (GDPR) ja Suomen tietosuojalakia.</p>
+    <span class="upd">Päivitetty 26.7.2026</span>
+
+    <h2>1. Rekisterinpitäjä</h2>
+    <div class="box">
+      <p><b>TiivisKoti Oy</b><br />
+      Y-tunnus 3414418-4<br />
+      Järvipuistonkatu 5, 04400 Järvenpää<br />
+      Sähköposti: <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><br />
+      Puhelin: <a href="tel:+358458755996">045 875 5996</a></p>
+      <p style="color:var(--mute);font-size:15px">Tietosuoja-asioissa voit olla yhteydessä suoraan yllä oleviin
+        yhteystietoihin. Emme ole nimittäneet erillistä tietosuojavastaavaa, sillä toimintamme laajuus ei sitä edellytä.</p>
+    </div>
+
+    <h2>2. Mitä tietoja käsittelemme</h2>
+    <h3>Ajanvaraus</h3>
+    <p>Kun varaat ajan verkkosivuiltamme, käsittelemme: etu- ja sukunimi, sähköpostiosoite, puhelinnumero,
+      katuosoite ja postinumero, valitsemasi ovi- ja ikkunatyypit sekä niiden määrät, valitsemasi lisäpalvelut,
+      valitsemasi päivämäärä ja aikaikkuna, vapaaehtoisesti antamasi lisätiedot sekä varauksen laskettu hinta.</p>
+    <h3>Yhteydenotot ja tarjouspyynnöt</h3>
+    <p>Nimi, yhteystiedot ja viestin sisältö silloin kun otat meihin yhteyttä puhelimitse, sähköpostilla tai
+      taloyhtiöiden tarjouspyyntölomakkeella.</p>
+    <h3>Työn toteutus</h3>
+    <p>Käyntiin ja tehtyyn työhön liittyvät merkinnät, kohteen tiedot sekä laskutus- ja maksutiedot.</p>
+    <h3>Tekniset tiedot</h3>
+    <p>Palvelun teknisissä lokeissa käsitellään IP-osoitetta ja selaintietoja tietoturvan varmistamiseksi ja
+      virhetilanteiden selvittämiseksi.</p>
+    <p>Emme kerää arkaluonteisia henkilötietoja emmekä tietoisesti käsittele alaikäisten tietoja.</p>
+
+    <h2>3. Mihin tietoja käytetään ja millä perusteella</h2>
+    <dl class="kv">
+      <div><dt>Varauksen vastaanotto, vahvistus ja työn toteuttaminen</dt><dd>Sopimus (GDPR 6.1 b)</dd></div>
+      <div><dt>Varausta koskevat vahvistus- ja muistutusviestit</dt><dd>Sopimus (GDPR 6.1 b)</dd></div>
+      <div><dt>Laskutus, kirjanpito ja lakisääteiset velvoitteet</dt><dd>Lakisääteinen velvoite (GDPR 6.1 c)</dd></div>
+      <div><dt>Takuuasiat ja asiakaspalautteen käsittely</dt><dd>Sopimus (GDPR 6.1 b)</dd></div>
+      <div><dt>Palvelun tekninen toiminta, virheselvitys ja tietoturva</dt><dd>Oikeutettu etu (GDPR 6.1 f)</dd></div>
+    </dl>
+    <p style="margin-top:18px">Emme tee automaattista päätöksentekoa emmekä profilointia. Emme lähetä
+      suoramarkkinointia ilman erillistä suostumustasi, emmekä myy tai luovuta tietojasi kolmansille
+      markkinointitarkoituksiin.</p>
+    <p>Tietojen antaminen on vapaaehtoista, mutta ilman nimeä, yhteystietoja ja kohteen osoitetta emme voi ottaa
+      varausta vastaan emmekä toteuttaa työtä.</p>
+
+    <h2>4. Kuinka kauan tietoja säilytetään</h2>
+    <ul>
+      <li><b>Asiakas- ja varaustiedot:</b> asiakassuhteen ajan.</li>
+      <li><b>Laskutus- ja kirjanpitotiedot:</b> kirjanpitolain mukaisesti kuusi vuotta sen tilikauden päättymisestä,
+        jonka aikana työ on tehty.</li>
+      <li><b>Toteutumattomat varaukset ja tarjouspyynnöt:</b> 12 kuukautta.</li>
+      <li><b>Tekniset lokit:</b> enintään 12 kuukautta.</li>
+    </ul>
+    <p>Säilytysajan päätyttyä tiedot poistetaan.</p>
+
+    <h2>5. Kenelle tietoja luovutetaan</h2>
+    <p>Käytämme tietojen käsittelyssä alla lueteltuja palveluntarjoajia. Ne käsittelevät tietoja
+      toimeksiannostamme henkilötietojen käsittelijöinä, eivät omiin tarkoituksiinsa.</p>
+    <ul>
+      <li><b>Vercel Inc.</b> — verkkosivuston ylläpito ja varauslomakkeen tekninen käsittely.</li>
+      <li><b>Supabase</b> — asiakas- ja varaustietokanta. Tiedot sijaitsevat Lontoon konesalissa
+        (Yhdistynyt kuningaskunta).</li>
+      <li><b>Google</b> — varausvahvistusten lähetys sähköpostilla sekä asennusaikojen kalenterisynkronointi.</li>
+      <li><b>Google Fonts</b> — sivuston kirjasimet ladataan Googlen palvelimelta, jolloin selaimesi IP-osoite
+        välittyy Googlelle sivun latautuessa.</li>
+    </ul>
+    <p>Lisäksi tietoja luovutetaan kirjanpidosta huolehtivalle taholle sekä viranomaisille silloin kun laki
+      sitä edellyttää.</p>
+
+    <h2>6. Tietojen siirto EU:n ulkopuolelle</h2>
+    <p>Osa palveluntarjoajistamme on yhdysvaltalaisia yrityksiä. Näissä siirroissa nojaudumme Euroopan komission
+      hyväksymiin vakiosopimuslausekkeisiin ja soveltuvin osin EU:n ja Yhdysvaltojen väliseen
+      tietosuojakehykseen (Data Privacy Framework). Tietokantamme sijaitsee Yhdistyneessä kuningaskunnassa,
+      jonka tietosuojan tason Euroopan komissio on todennut riittäväksi.</p>
+
+    <h2>7. Evästeet</h2>
+    <p>Sivustollamme <b>ei käytetä seuranta-, analytiikka- eikä mainosevästeitä</b>. Emme seuraa kävijöitä
+      emmekä jaa kävijätietoja mainosverkostoille. Siksi sivustolla ei ole evästebanneria.</p>
+    <p>Käytämme yhtä selaimen istuntomuistiin (sessionStorage) tallennettavaa tietoa nimeltä
+      <code>tk_booking</code>. Se säilyttää hintalaskurissa tekemäsi valinnat, kun siirryt varaussivulle, ja
+      poistuu kun suljet selainvälilehden. Tietoa ei lähetetä kolmansille. Kyseessä on palvelun pyytämäsi
+      toiminnon kannalta välttämätön tieto, joten se ei edellytä suostumusta.</p>
+
+    <h2>8. Oikeutesi</h2>
+    <p>Sinulla on oikeus:</p>
+    <ul>
+      <li>saada tietää, mitä tietoja sinusta käsittelemme, ja saada niistä jäljennös</li>
+      <li>saada virheelliset tai puutteelliset tiedot oikaistuiksi</li>
+      <li>pyytää tietojesi poistamista, kun käsittelylle ei ole enää laillista perustetta</li>
+      <li>rajoittaa käsittelyä tai vastustaa sitä</li>
+      <li>saada antamasi tiedot koneellisesti luettavassa muodossa</li>
+      <li>peruuttaa antamasi suostumus milloin tahansa</li>
+    </ul>
+    <div class="box">
+      <p>Käytä oikeuksiasi lähettämällä pyyntö osoitteeseen
+        <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a>. Vastaamme pyyntöön kuukauden kuluessa.
+        Voimme joutua varmistamaan henkilöllisyytesi ennen tietojen luovuttamista.</p>
+    </div>
+    <p>Jos katsot, että käsittelemme henkilötietojasi tietosuojalainsäädännön vastaisesti, voit tehdä valituksen
+      valvontaviranomaiselle:</p>
+    <p style="color:var(--mute);font-size:15px">Tietosuojavaltuutetun toimisto<br />
+      PL 800, 00531 Helsinki<br />
+      <a href="mailto:tietosuoja@om.fi">tietosuoja@om.fi</a> · p. 029 566 6700</p>
+
+    <h2>9. Tietoturva</h2>
+    <p>Sivusto ja varauslomake toimivat salatun HTTPS-yhteyden yli. Asiakas- ja varaustiedot ovat
+      pääsynhallinnan takana, ja niitä käsittelevät vain ne henkilöt, joiden työtehtävät sitä edellyttävät.
+      Tietokannan täydet käyttöoikeudet ovat ainoastaan palvelinpuolella — niitä ei koskaan välitetä selaimeen.</p>
+
+    <h2>10. Muutokset tähän selosteeseen</h2>
+    <p>Kehitämme palveluamme, joten tätä selostetta voidaan päivittää. Ajantasainen versio on aina tällä sivulla,
+      ja päivityspäivä näkyy sivun alussa.</p>
+  </div>
+</div></section>
+
+<footer class="mfoot"><div class="wrap">
+  <div class="mf-grid">
+    <div class="mf-brand">
+      <a href="index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
+      <p>Ulko-ovien tiivistevaihto koko Uudellamaalla. Veto loppuu, lämpö jää kotiin.</p>
+      <div class="mf-rate"><span class="st">★★★★★</span> 4,9/5 · 300+ arviota</div>
+    </div>
+    <div class="mf-col"><h4>Palvelut</h4><a href="index.html#palvelut">Ulko-ovet</a><a href="index.html#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="index.html#laskuri">Hintalaskuri</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="index.html#miksi">Miksi me</a><a href="index.html#arviot">Arviot</a><a href="index.html#ukk">UKK</a><a href="index.html#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Yhteys</h4><a href="tel:+358458755996">045 875 5996</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="varaa.html">Koko Uusimaa</a></div>
+  </div>
+  <div class="mf-cities">
+    <h4>Toiminta-alueet</h4>
+    <div class="list">
+      <a href="varaa.html">Helsinki</a><a href="varaa.html">Espoo</a><a href="varaa.html">Vantaa</a><a href="varaa.html">Kauniainen</a><a href="varaa.html">Kirkkonummi</a><a href="varaa.html">Kerava</a><a href="varaa.html">Järvenpää</a><a href="varaa.html">Tuusula</a><a href="varaa.html">Nurmijärvi</a><a href="varaa.html">Hyvinkää</a><a href="varaa.html">Sipoo</a><a href="varaa.html">Vihti</a>
+    </div>
+  </div>
+  <div class="mf-bot"><span>© <span id="yr"></span> TiivisKoti Oy · Y-tunnus 3414418-4</span><span><a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span></div>
+</div></footer>
+
+<div class="mcta">
+  <a href="tel:+358458755996" class="btn btn-o tel" aria-label="Soita"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></a>
+  <a href="index.html#laskuri" class="btn btn-p">Varaa aika</a>
+</div>
+
+<script src="_shared.js"></script>
+</body>
+</html>

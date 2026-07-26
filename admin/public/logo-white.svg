@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 120" fill="none">
+  <!-- Lasikiilto — valkoinen sanamerkki: ikkuna-symboli + teksti -->
+  <rect x="16" y="24" width="72" height="84" rx="10" fill="none" stroke="#ffffff" stroke-width="8"/>
+  <line x1="52" y1="24" x2="52" y2="108" stroke="#ffffff" stroke-width="8"/>
+  <line x1="16" y1="66" x2="88" y2="66" stroke="#ffffff" stroke-width="8"/>
+  <path d="M28 36 L40 48" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity=".7"/>
+  <text x="110" y="84" font-family="Gabarito, Arial, sans-serif" font-weight="800" font-size="66" letter-spacing="-2.5" fill="#ffffff">Lasi<tspan fill="#7FD0FF">kiilto</tspan></text>
+</svg>

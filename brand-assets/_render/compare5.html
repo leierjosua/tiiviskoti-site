@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EEF1F4;font-family:'Avenir Next','Inter',sans-serif;padding:48px;width:1500px;}
+  h1{font-size:30px;font-weight:800;color:#1a1f24;margin-bottom:4px;letter-spacing:-0.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:32px;}
+  .card{background:#fff;border-radius:22px;overflow:hidden;margin-bottom:26px;box-shadow:0 2px 14px rgba(0,0,0,.06);}
+  .head{display:flex;align-items:center;gap:14px;padding:18px 30px;border-bottom:1px solid #eef1f4;}
+  .num{min-width:30px;height:30px;padding:0 11px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;}
+  .htitle{font-size:19px;font-weight:800;color:#1a1f24;}
+  .row{display:grid;grid-template-columns:1fr 1fr;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:56px;min-height:190px;}
+  .wmrk{font-weight:800;font-size:72px;letter-spacing:-2.5px;line-height:1;white-space:nowrap;display:inline-flex;align-items:baseline;}
+  /* dotless i for .fi; sparkle nudged onto the i stem */
+  .di{position:relative;}
+  .di .sp{position:absolute;left:56%;transform:translateX(-50%);}
+</style>
+</head>
+<body>
+  <h1>Loppusiivous.fi — tähti kohdalleen + isompi</h1>
+  <div class="sub">Tähti siirretty i:n stemin päälle · kaksi kokoa · teal</div>
+
+  <!-- Option M: medium-big -->
+  <div class="card">
+    <div class="head"><div class="num" style="background:#0E7C86;">M</div><div class="htitle">Tähti isompi (0.40em)</div></div>
+    <div class="row">
+      <div class="cell" style="background:#fff;">
+        <div class="wmrk"><span style="color:#0B2B30;">Loppusiivous</span><span style="color:#0E9AA3;">.f</span><span class="di" style="color:#0E9AA3;">&#305;<svg class="sp" style="width:0.40em;height:0.40em;top:-0.26em" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#16C4CA"/></svg></span></div>
+      </div>
+      <div class="cell" style="background:#0B2B30;">
+        <div class="wmrk"><span style="color:#fff;">Loppusiivous</span><span style="color:#16C4CA;">.f</span><span class="di" style="color:#16C4CA;">&#305;<svg class="sp" style="width:0.40em;height:0.40em;top:-0.26em" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#6FE9D0"/></svg></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option L: extra big -->
+  <div class="card">
+    <div class="head"><div class="num" style="background:#0E7C86;">L</div><div class="htitle">Tähti vielä isompi (0.50em)</div></div>
+    <div class="row">
+      <div class="cell" style="background:#fff;">
+        <div class="wmrk"><span style="color:#0B2B30;">Loppusiivous</span><span style="color:#0E9AA3;">.f</span><span class="di" style="color:#0E9AA3;">&#305;<svg class="sp" style="width:0.50em;height:0.50em;top:-0.34em" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#16C4CA"/></svg></span></div>
+      </div>
+      <div class="cell" style="background:#0B2B30;">
+        <div class="wmrk"><span style="color:#fff;">Loppusiivous</span><span style="color:#16C4CA;">.f</span><span class="di" style="color:#16C4CA;">&#305;<svg class="sp" style="width:0.50em;height:0.50em;top:-0.34em" viewBox="0 0 100 100"><path d="M50 4 C53 33,67 47,96 50 C67 53,53 67,50 96 C47 67,33 53,4 50 C33 47,47 33,50 4 Z" fill="#6FE9D0"/></svg></span></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

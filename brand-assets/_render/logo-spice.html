@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fi"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#EFF4F8;font-family:'Avenir Next','Inter',sans-serif;padding:46px;width:1120px;}
+  h1{font-size:27px;font-weight:800;color:#0B3A66;margin-bottom:4px;letter-spacing:-.5px;}
+  .sub{font-size:15px;color:#6b7480;margin-bottom:22px;font-weight:600;}
+  .card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .head{display:flex;gap:10px;align-items:baseline;padding:12px 24px;border-bottom:1px solid #eef1f4;}
+  .ht{font-size:15px;font-weight:800;color:#1a1f24;}.dz{font-size:12.5px;color:#9aa3ad;font-weight:600;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;}
+  .cell{display:flex;align-items:center;justify-content:center;padding:46px;min-height:150px;}
+  .dark{background:#0B2342;}
+  .wm{font-family:'Gabarito';font-weight:700;font-size:62px;letter-spacing:-1.8px;line-height:1.05;white-space:nowrap;color:#0B3A66;}
+  .dark .wm{color:#fff;}
+  .blue{color:#1B9DF0;}.dark .blue{color:#5AB7F5;}
+  /* A highlight tag */
+  .tag{background:#1B9DF0;color:#fff;border-radius:.16em;padding:.02em .1em;-webkit-box-decoration-break:clone;box-decoration-break:clone;}
+  /* B pill */
+  .pill{background:#1B9DF0;color:#fff;border-radius:.5em;padding:.04em .22em;margin-left:.06em;}
+  .dark .pill{background:#1B9DF0;color:#fff;}
+  /* C underline swipe handled with svg */
+  .ul{display:inline-flex;flex-direction:column;}
+</style></head><body>
+  <h1>Loppusiivous.fi — tekstilogo + yksi spice</h1>
+  <div class="sub">Spice suoraan typografiassa, ei erillistä kuvamerkkiä. Vaalea + tumma.</div>
+
+  <!-- A highlight tag on siivous -->
+  <div class="card"><div class="head"><div class="ht">A · Värilaatta ”siivous”</div><div class="dz">— knockout valkoinen sinisellä laatalla, rohkea ja muistettava</div></div>
+    <div class="grid">
+      <div class="cell"><div class="wm">Loppu<span class="tag">siivous</span>.fi</div></div>
+      <div class="cell dark"><div class="wm">Loppu<span class="tag">siivous</span>.fi</div></div>
+    </div>
+  </div>
+
+  <!-- B .fi pill -->
+  <div class="card"><div class="head"><div class="ht">B · ”.fi” pilleri</div><div class="dz">— verkkotunnus rohkeana nappina, muu sana puhdas</div></div>
+    <div class="grid">
+      <div class="cell"><div class="wm">Loppusiivous<span class="pill">.fi</span></div></div>
+      <div class="cell dark"><div class="wm">Loppusiivous<span class="pill">.fi</span></div></div>
+    </div>
+  </div>
+
+  <!-- C underline swipe -->
+  <div class="card"><div class="head"><div class="ht">C · Vahva alleviivaus-veto</div><div class="dz">— yksi itsevarma pyyhkäisy sanan alle</div></div>
+    <div class="grid">
+      <div class="cell"><div class="ul">
+        <div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="22" viewBox="0 0 420 22" preserveAspectRatio="none" style="margin-top:6px"><path d="M6 15 C120 4 300 4 414 11" fill="none" stroke="#1B9DF0" stroke-width="8" stroke-linecap="round"/></svg>
+      </div></div>
+      <div class="cell dark"><div class="ul">
+        <div class="wm">Loppu<span class="blue">siivous</span>.fi</div>
+        <svg width="100%" height="22" viewBox="0 0 420 22" preserveAspectRatio="none" style="margin-top:6px"><path d="M6 15 C120 4 300 4 414 11" fill="none" stroke="#5AB7F5" stroke-width="8" stroke-linecap="round"/></svg>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- D highlight tag on .fi only (variant) -->
+  <div class="card"><div class="head"><div class="ht">D · Värilaatta ”.fi”</div><div class="dz">— sama laatta-idea, mutta vain verkkotunnuksessa</div></div>
+    <div class="grid">
+      <div class="cell"><div class="wm">Loppusiivous<span class="tag">.fi</span></div></div>
+      <div class="cell dark"><div class="wm">Loppusiivous<span class="tag">.fi</span></div></div>
+    </div>
+  </div>
+
+</body></html>
