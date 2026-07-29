@@ -1,14 +1,15 @@
 // TiivisKoti — julkinen varausendpoint.
 // Ottaa vastaan varauslomakkeen, luo asiakkaan + varauksen Supabaseen
-// service_role-avaimella (vain palvelinpuolella). Hinta lasketaan aina
-// uudelleen kannan hinnoilla — clientin summaan ei luoteta.
+// service_role-avaimella (vain palvelinpuolella).
+//
+// Hinta lasketaan aina uudelleen pricing.mjs:stä — samasta moduulista jota
+// sivun laskuri käyttää — eikä clientin lähettämiin summiin luoteta lainkaan.
+// Lomake lähettää vain raa'at valinnat (`counts`, `extras`).
+
+import { TYPES, EXTRAS, computePricing } from '../pricing.mjs';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
-// Kiinteä aloitusmaksu, jonka päälle kaikki tilatut kohteet lasketaan.
-// Vastaa sivun BASE_PRICE 99 € (_shared.js) — pidä nämä samana.
-const BASE_PRICE_CENTS = 9900;
-const BASE_PRICE_NAME = 'Aloitusmaksu';
 
 const baseHeaders = () => ({
   apikey: SERVICE_ROLE,
@@ -139,8 +140,8 @@ export default async function handler(req, res) {
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
     const { name, email, phone, address, postal, notes, date, slot } = body;
-    const items = Array.isArray(body.items) ? body.items : [];
-    const extras = Array.isArray(body.extras) ? body.extras : [];
+    const counts = (body.counts && typeof body.counts === 'object') ? body.counts : {};
+    const extras = (body.extras && typeof body.extras === 'object') ? body.extras : {};
 
     // --- validointi ---
     const fields = [];
@@ -153,11 +154,14 @@ export default async function handler(req, res) {
     if (!/^\d{2}:\d{2}$/.test(String(slot || ''))) fields.push('slot');
     if (fields.length) return res.status(400).json({ error: 'validation', fields });
 
+    // --- hinta: sama laskenta kuin sivun laskurissa ---
+    const quote = computePricing(counts, extras);
+
     // Emme tee ilmaisia kartoituskäyntejä: varaus vaatii vähintään yhden kohteen.
     // Aiemmin nolla kohdetta tuotti hiljaisesti 0 €:n "veloituksettoman
     // kartoituskäynnin" — ja koska laskurin valinta ei siirtynyt varaussivulle,
     // JOKA verkkovaraus osui siihen haaraan.
-    if (!items.some((it) => (parseInt(it.qty, 10) || 0) > 0)) {
+    if (quote.total <= 0 || quote.count <= 0) {
       return res.status(400).json({ error: 'no_items' });
     }
 
@@ -172,81 +176,66 @@ export default async function handler(req, res) {
     const cal = (calRows && calRows[0]) || null;
     if (!service) return res.status(500).json({ error: 'no_service_configured' });
 
-    // --- rakenna rivit, laske hinta kannan hinnoilla ---
-    const lines = [];
+    // --- rakenna kannan rivit lasketun hinnoittelun pohjalta ---
+    // Hinta, määrä ja kesto tulevat AINA pricing.mjs:stä. Kantaa käytetään vain
+    // rivin linkittämiseen katalogiin (variant_id / addon_service_id), jotta
+    // admin ja tarjous-PDF osaavat näyttää oikean tuotteen. Jos linkkiä ei
+    // löydy, rivi kirjataan `custom`-rivinä oikealla hinnalla — katalogivirhe
+    // ei saa muuttaa asiakkaan laskua eikä kaataa varausta.
     const unmatched = [];
-    let subtotal = 0;
     let primaryVariant = null;
 
-    for (const it of items) {
-      const qty = Math.max(0, parseInt(it.qty, 10) || 0);
-      if (qty <= 0) continue;
-      const v = matchByName(variants, 'label', it.name);
-      if (!v) { unmatched.push(it.name); continue; }
-      if (!primaryVariant) primaryVariant = v;
-      subtotal += v.price_cents * qty;
-      lines.push({
-        line_type: 'service',
-        service_id: service.id,
-        variant_id: v.id,
-        addon_service_id: null,
-        name: v.label,
-        price_cents: v.price_cents,
-        quantity: qty,
-        duration_minutes: v.duration_minutes || 0,
-        sort_order: lines.length,
-      });
-    }
-    for (const exName of extras) {
-      const a = matchByName(addons, 'name', exName);
-      if (!a) { unmatched.push(exName); continue; }
-      subtotal += a.price_cents;
-      lines.push({
-        line_type: 'addon_service',
+    const lines = quote.lines.map((l, i) => {
+      const base = {
         service_id: null,
         variant_id: null,
-        addon_service_id: a.id,
-        name: a.name,
-        price_cents: a.price_cents,
-        quantity: 1,
-        duration_minutes: a.duration_minutes || 0,
-        sort_order: lines.length,
-      });
-    }
-    if (unmatched.length) {
-      console.error('create-booking: nimet joita ei löytynyt kannasta:', unmatched.join(' | '));
-    }
-    // Turvaraja: jos asiakas valitsi kohteita mutta yksikään ei täsmännyt kannan
-    // riveihin, älä laskuta 0 € oikeasta työstä — katkaise virheeseen.
-    // Kohteiden olemassaolo on jo validoitu, joten tämä tarkoittaa katalogivirhettä.
-    if (lines.length === 0) {
-      return res.status(500).json({ error: 'catalog_mismatch' });
-    }
-
-    // Aloitusmaksu 99 € + kaikki tilatut kohteet sen päälle.
-    // Lisätään omana `custom`-rivinään, jotta rivien summa täsmää varauksen
-    // hintaan (muuten admin ja lasku näyttäisivät 99 € vähemmän kuin veloitetaan).
-    lines.unshift({
-      line_type: 'custom',
-      service_id: null,
-      variant_id: null,
-      addon_service_id: null,
-      name: BASE_PRICE_NAME,
-      price_cents: BASE_PRICE_CENTS,
-      quantity: 1,
-      duration_minutes: 0,
-      sort_order: 0,
+        addon_service_id: null,
+        name: l.name,
+        price_cents: Math.round(l.unit * 100),
+        quantity: l.qty,
+        duration_minutes: l.min || 0,
+        sort_order: i,
+      };
+      if (l.kind === 'type') {
+        const t = TYPES.find((x) => x.id === l.id);
+        const v = matchByName(variants, 'label', t ? t.name : l.name);
+        if (v) {
+          if (!primaryVariant) primaryVariant = v;
+          return { ...base, line_type: 'service', service_id: service.id, variant_id: v.id, name: v.label };
+        }
+        unmatched.push(l.name);
+        return { ...base, line_type: 'custom' };
+      }
+      if (l.kind === 'extra') {
+        const e = EXTRAS.find((x) => x.id === l.id);
+        // Osan hinta ei sisälly (kahvan vaihto) — merkitään riville, jotta
+        // asentaja ja lasku näkevät sen ilman erillistä muistisääntöä.
+        const suffix = l.note ? ` (${l.note})` : '';
+        const a = matchByName(addons, 'name', e ? e.name : l.name);
+        if (a) return { ...base, line_type: 'addon_service', addon_service_id: a.id, name: a.name + suffix };
+        unmatched.push(l.name);
+        return { ...base, line_type: 'custom', name: base.name + suffix };
+      }
+      return { ...base, line_type: 'custom' }; // aloitusmaksu
     });
-    lines.forEach((l, i) => { l.sort_order = i; });
-    const total = BASE_PRICE_CENTS + subtotal;
 
-    // Kalenteritapahtuman kesto = rivien kestojen summa (määrä huomioiden).
-    // Vähintään 30 min, ettei kalenteriin synny nollan mittaisia tapahtumia
-    // jos kannassa ei ole kestoja.
-    const durationMinutes = Math.max(
-      30,
-      lines.reduce((sum, l) => sum + (l.duration_minutes || 0) * (l.quantity || 1), 0),
-    );
+    if (unmatched.length) {
+      console.error('create-booking: katalogista puuttuu:', unmatched.join(' | '));
+    }
+
+    const total = Math.round(quote.total * 100);
+
+    // Varmiste: rivien summan on täsmättävä veloitettavaan hintaan, muuten
+    // admin ja lasku näyttäisivät eri luvun kuin asiakkaalta veloitetaan.
+    const lineSum = lines.reduce((s, l) => s + l.price_cents * l.quantity, 0);
+    if (lineSum !== total) {
+      console.error('create-booking: rivisumma', lineSum, '!= kokonaishinta', total);
+      return res.status(500).json({ error: 'pricing_mismatch' });
+    }
+
+    // Kalenteritapahtuman kesto. Vähintään 30 min, ettei kalenteriin synny
+    // nollan mittaisia tapahtumia.
+    const durationMinutes = Math.max(30, quote.minutes);
 
     // --- asiakas: etsi sähköpostilla tai luo uusi ---
     const parts = String(name).trim().split(/\s+/);

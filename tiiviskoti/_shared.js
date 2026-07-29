@@ -1,10 +1,15 @@
 /* =========================================================
    TiivisKoti — shared functionality for all visions.
-   Kiinteät hinnat (Uudenmaan alue, tutkittu 7/2026).
    Design-agnostic: only touches DOM by id/class, no colors.
    Kaikki lohkot on suojattu: laskuri, kalenteri, FAQ ja lomake
    ajetaan vain jos niiden DOM-elementit ovat sivulla.
+
+   Hinnat EIVÄT ole täällä — ne tulevat pricing.mjs:stä, jota myös
+   api/create-booking.mjs käyttää. Näin laskurin näyttämä ja veloitettava
+   hinta lasketaan samasta koodista eivätkä voi erota toisistaan.
    ========================================================= */
+import { TYPES, EXTRAS, BASE_PRICE, NET_FACTOR, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
+
 const ico = {
   ulko:'<svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3" width="12" height="18" rx="1.5" stroke="currentColor" stroke-width="1.8"/><circle cx="14.5" cy="12" r="1.2" fill="currentColor"/></svg>',
   parveke:'<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="18" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="18" rx="1" stroke="currentColor" stroke-width="1.8"/></svg>',
@@ -13,32 +18,42 @@ const ico = {
   ikkuna:'<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v18M4 12h16" stroke="currentColor" stroke-width="1.6"/></svg>',
   kynnys:'<svg viewBox="0 0 24 24" fill="none"><path d="M3 18h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><rect x="6" y="6" width="12" height="8" rx="1.2" stroke="currentColor" stroke-width="1.7"/></svg>'
 };
-const TYPES = [
-  {id:'ulko',    name:'Ulko-ovi',            desc:'Sivutiivisteet + kynnyskumi, käynnin säätö', price:89, min:40, ic:ico.ulko},
-  {id:'parveke', name:'Parvekeovi',          desc:'Puu-/alumiiniparvekeovi, koko kehä',         price:79, min:35, ic:ico.parveke},
-  {id:'terassi', name:'Terassi- / liukuovi', desc:'Iso lasiovi tai liukuovi, kiskon huolto',    price:109,min:45, ic:ico.terassi},
-  {id:'vali',    name:'Väli- / huoneovi',    desc:'Sisäoven ääni- ja vetotiiviste',             price:49, min:25, ic:ico.vali},
-  {id:'ikkuna',  name:'Ikkuna',              desc:'Karmi- ja puitetiivisteet, per ikkuna',      price:39, min:20, ic:ico.ikkuna},
-  {id:'kynnys',  name:'Pelkkä kynnyskumi',   desc:'Alaslistan / kynnyksen tiivisteen vaihto',   price:45, min:20, ic:ico.kynnys}
-];
-const EXTRAS = [
-  {id:'poisto',  name:'Vanhan liiman poisto', price:15}
-];
+/* Ikkunan porrastuksen selite: näytetään kortissa, jotta asiakas näkee
+   miksi yksikköhinta muuttuu määrää kasvattaessa. */
+const TIER_HINT = 'Mitä useampi ikkuna, sitä halvempi: 5+ 85 € · 10+ 75 € · 20+ 65 €';
+
 const FAQ = [
-  ['Paljonko tiivistys maksaa?','Varauksen aloitusmaksu on 99 €, ja sen päälle lisätään valitsemasi kohteet kiinteillä hinnoilla: ulko-ovi 89 €, parvekeovi 79 €, ikkuna 39 € (sis. tiivisteet, työn ja oven säädön). Esimerkiksi kolme ulko-ovea on 99 € + 3 × 89 € = 366 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
+  ['Paljonko tiivistys maksaa?','Varauksen aloitusmaksu on 99 € (sis. matkat, kartoituksen ja lämpökamerakuvauksen), ja sen päälle lisätään valitsemasi kohteet kiinteillä hinnoilla. Ikkuna maksaa 95 € kappaleelta, ja hinta laskee määrän mukaan: 5–9 ikkunaa 85 €, 10–19 ikkunaa 75 € ja 20 ikkunasta ylöspäin 65 € kappaleelta. Ulko- ja parvekeovi on 119 €, terassin liuku- tai pariovi 149 €. Esimerkiksi kuusi ikkunaa on 99 € + 6 × 85 € = 609 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
+  ['Miksi ovi on halvempi kun tilaan samalla muutakin?','Suurin yksittäinen kustannus pienessä työssä on matka ja työpisteen pystytys. Kun asentaja on jo paikalla, seuraava kohde maksaa vähemmän: ulko- ja parvekeovi 119 € → 99 € ja väli- tai huoneovi 89 € → 59 €, kun samaan käyntiin kuuluu vähintään yksi muu ovi tai ikkuna. Laskuri huomioi tämän automaattisesti.'],
   ['Mitä tiivisteiden vaihtoon sisältyy?','Vanhojen tiivisteiden poisto, pintojen puhdistus, uudet laadukkaat EPDM- tai silikonitiivisteet sekä oven käynnin säätö niin, että ovi painuu tasaisesti tiivisteitä vasten. Ulko-oviin kuuluu myös kynnyskumi.'],
   ['Kannattaako vetävä ovi tiivistää vai vaihtaa?','Jos ovilehti ja karmi ovat suorassa ja ovi toimii, pelkkä tiivisteiden uusiminen riittää lähes aina — se maksaa murto-osan uuden oven (2 200–4 900 €) hinnasta ja poistaa vedon. Arvioimme kunnon paikan päällä ja kerromme rehellisesti.'],
   ['Kuinka paljon säästän lämmityksessä?','Yksi vetävä ulko-ovi voi nostaa lämmityskuluja 10–15 %. Kun veto loppuu, lämpö pysyy sisällä ja lämmitystarve pienenee — tiivistys maksaa itsensä usein takaisin jo yhden lämmityskauden aikana.'],
   ['Millä alueella toimitte?','Koko Uudenmaan alueella — Helsinki, Espoo, Vantaa ja kehyskunnat. Kerro postinumerosi varauksen yhteydessä, niin vahvistamme, että palvelemme alueellasi.'],
-  ['Miten ajanvaraus toimii?','Valitset laskurista ovet, näet kiinteän hinnan ja siirryt varaamaan vapaan ajan kalenterista. Saat vahvistuksen sähköpostiin. Hinta on kiinteä jo ennen varausta — tarkistamme sen vielä paikan päällä ennen työn aloitusta.'],
+  ['Miten ajanvaraus toimii?','Valitset laskurista ovet ja ikkunat, näet kiinteän hinnan ja siirryt varaamaan vapaan ajan kalenterista. Saat vahvistuksen sähköpostiin. Hinta on kiinteä jo ennen varausta — tarkistamme sen vielä paikan päällä ennen työn aloitusta.'],
   ['Miten kotitalousvähennys toimii?','Ovien ja ikkunoiden tiivistys on kotitaloustyötä. Saat meiltä laskun, jossa työn osuus on valmiiksi eritelty — ilmoitat sen OmaVerossa ja vähennät jopa 40 % työn osuudesta (enintään 2 250 € / henkilö vuonna 2026).']
 ];
 
-/* ---------- laskuri ---------- */
-const state = {}; TYPES.forEach(t=>state[t.id]=0);
+/* ---------- laskuri ----------
+   `state` pitää sekä kohdemäärät (tyypin id) että askeltimella valittavien
+   lisätöiden määrät avaimella `extra_<id>` — computePricing lukee molemmat
+   samasta oliosta. `extraState` on päälle/pois valittavien lisätöiden tila. */
+const QTY_EXTRAS = EXTRAS.filter(e=>e.per==='kpl');
+const state = {}; TYPES.forEach(t=>state[t.id]=0); QTY_EXTRAS.forEach(e=>state['extra_'+e.id]=0);
 const extraState = {}; EXTRAS.forEach(e=>extraState[e.id]=false);
-const BASE_PRICE = 99; /* aloitusmaksu — kaikki tilattu tulee tämän päälle */
-const NET_FACTOR = 1 - 0.40 * 0.70;
+
+const totalItems = ()=>TYPES.reduce((s,t)=>s+(state[t.id]||0),0);
+
+/* Kortissa näytettävä yksikköhinta lasketaan aina nykyisellä valinnalla,
+   jotta ikkunoiden määräporras ja ovien saman käynnin hinta näkyvät heti.
+   Kun kohdetta ei ole vielä valittu, hinta lasketaan ikään kuin yksi
+   lisättäisiin — muuten kortti lupaisi kalliimman hinnan kuin klikkaus antaa. */
+function unitInfo(t){
+  const qty = state[t.id]||0, tot = totalItems();
+  const eff = qty>0 ? tot : tot+1;
+  const now = unitPriceFor(t, Math.max(qty,1), eff);
+  const list = t.tiers ? tierPriceFor(1) : t.price;
+  return {now, was: now<list ? list : null};
+}
 
 const typesEl = document.getElementById('calcTypes');
 const extrasEl = document.getElementById('calcExtras');
@@ -47,17 +62,38 @@ if(typesEl && extrasEl){
     const c = document.createElement('div');
     c.className='wtype'; c.dataset.id=t.id;
     c.innerHTML =
-      `<div class="wtype-ic">${t.ic}</div>
-       <div class="wtype-top"><div class="wtype-name">${t.name}</div><div class="wtype-desc">${t.desc}</div><span class="wtype-price">${t.price} €/kpl</span></div>
+      `<div class="wtype-ic">${ico[t.id]}</div>
+       <div class="wtype-top"><div class="wtype-name">${t.name}</div><div class="wtype-desc">${t.desc}${t.tiers?`<span class="wtype-tier">${TIER_HINT}</span>`:''}</div><span class="wtype-price" data-p="${t.id}">${t.price} €/kpl</span></div>
        <div class="stepper"><div class="stepper-btns"><button class="stp minus" aria-label="Vähennä" data-a="-1" disabled>−</button><span class="qty" data-q="${t.id}">0</span><button class="stp plus" aria-label="Lisää" data-a="1">+</button></div></div>`;
     typesEl.appendChild(c);
   });
   EXTRAS.forEach(e=>{
-    const b = document.createElement('button');
-    b.type='button'; b.className='extra'; b.dataset.id=e.id;
-    b.innerHTML = `<span class="extra-chk">✓</span><span class="extra-nm">${e.name}</span><span class="extra-pr">+${e.price} €</span>`;
-    b.addEventListener('click',()=>{ extraState[e.id]=!extraState[e.id]; b.classList.toggle('on',extraState[e.id]); render(); });
-    extrasEl.appendChild(b);
+    const unit = e.unit ? `/${e.unit}` : '';
+    const pr = `+${e.price} €${unit}${e.note?` <span class="extra-note">${e.note}</span>`:''}`;
+    if(e.per==='kpl'){
+      /* Määrällinen lisätyö tarvitsee oman askeltimen, eikä nappia voi
+         upottaa nappiin — siksi div eikä button. */
+      const d = document.createElement('div');
+      d.className='extra extra-q'; d.dataset.id=e.id;
+      d.innerHTML = `<span class="extra-nm">${e.name}</span><span class="extra-pr">${pr}</span>`+
+        `<span class="extra-stp"><button type="button" class="stp minus" aria-label="Vähennä ${e.name}" data-a="-1" disabled>−</button><span class="qty" data-q="extra_${e.id}">0</span><button type="button" class="stp plus" aria-label="Lisää ${e.name}" data-a="1">+</button></span>`;
+      d.addEventListener('click',ev=>{
+        const btn = ev.target.closest('.stp'); if(!btn) return;
+        const k = 'extra_'+e.id;
+        state[k] = Math.max(0, Math.min(99, state[k] + +btn.dataset.a));
+        d.querySelector('.qty').textContent = state[k];
+        d.querySelector('.minus').disabled = state[k]===0;
+        d.classList.toggle('on', state[k]>0);
+        render();
+      });
+      extrasEl.appendChild(d);
+    } else {
+      const b = document.createElement('button');
+      b.type='button'; b.className='extra'; b.dataset.id=e.id;
+      b.innerHTML = `<span class="extra-chk">✓</span><span class="extra-nm">${e.name}</span><span class="extra-pr">${pr}</span>`;
+      b.addEventListener('click',()=>{ extraState[e.id]=!extraState[e.id]; b.classList.toggle('on',extraState[e.id]); render(); });
+      extrasEl.appendChild(b);
+    }
   });
   typesEl.addEventListener('click', e=>{
     const btn = e.target.closest('.stp'); if(!btn) return;
@@ -84,37 +120,62 @@ function tweenPrice(target){
 }
 const booking = { total:0, count:0, lines:[], serviceLabel:'Valitse kohteet laskurista' };
 function render(){
-  if(!document.getElementById('cpLines')) return;
-  const lines=[]; let subtotal=0, count=0, minutes=0; const lineLabels=[];
-  TYPES.forEach(t=>{ const n=state[t.id]; if(n>0){ const sum=n*t.price; subtotal+=sum; count+=n; minutes+=n*t.min;
-    lines.push(`<div class="cp-line"><span><span class="cnt">${n}×</span> ${t.name}</span><b>${sum} €</b></div>`); lineLabels.push(`${n}× ${t.name}`); } });
-  EXTRAS.forEach(e=>{ if(extraState[e.id]){ subtotal+=e.price; minutes+=10; lines.push(`<div class="cp-line"><span>${e.name}</span><b>${e.price} €</b></div>`); lineLabels.push(e.name);} });
-  /* Aloitusmaksu 99 € on kiinteä pohja, jonka päälle valitut kohteet lasketaan.
-     Näytetään omana rivinään, jotta asiakas näkee mistä summa muodostuu.
-     Pidä sama kuin BASE_PRICE_CENTS api/create-booking.mjs:ssä. */
-  const total = subtotal>0 ? BASE_PRICE + subtotal : 0;
-  const linesEl=document.getElementById('cpLines');
-  linesEl.innerHTML = subtotal===0 ? '<div class="rc-empty">Lisää ovia tai ikkunoita nähdäksesi hinnan.</div>'
-    : `<div class="cp-line"><span>Aloitusmaksu</span><b>${BASE_PRICE} €</b></div>` + lines.join('');
-  tweenPrice(total);
-  document.getElementById('cpNet').textContent = (total>0?Math.round(total*NET_FACTOR).toLocaleString('fi-FI'):'0')+' €';
-  document.getElementById('cpCount').textContent = count;
-  const hrs = minutes/60;
-  document.getElementById('cpTime').textContent = total===0?'0 h':(hrs<1?Math.round(minutes)+' min':(Math.round(hrs*2)/2).toLocaleString('fi-FI')+' h');
-  const btn=document.getElementById('cpBtn'), active = subtotal>0;
-  btn.style.pointerEvents=active?'auto':'none'; btn.style.opacity=active?'1':'.5';
-  booking.total = total; booking.count = count; booking.lines = lineLabels;
-  booking.serviceLabel = count>0 ? `Tiivistys: ${lineLabels.join(', ')}` : 'Valitse kohteet laskurista';
+  const windows = state.ikkuna||0;
+  /* Ikkunakohtainen lisätyö ei voi jäädä päälle ilman ikkunoita. */
+  EXTRAS.forEach(e=>{ if(e.per==='ikkuna' && windows===0) extraState[e.id]=false; });
+
+  /* Korttien yksikköhinnat elävät valinnan mukana: ikkunan määräporras ja
+     ovien saman käynnin hinta näkyvät heti, ei vasta yhteenvedossa. */
+  if(typesEl) TYPES.forEach(t=>{
+    const el = typesEl.querySelector(`[data-p="${t.id}"]`); if(!el) return;
+    const u = unitInfo(t);
+    el.innerHTML = (u.was?`<s>${u.was} €</s> `:'')+`${u.now} €/kpl`;
+    el.classList.toggle('disc', !!u.was);
+  });
+  if(extrasEl) EXTRAS.forEach(e=>{
+    const el = extrasEl.querySelector(`.extra[data-id="${e.id}"]`); if(!el) return;
+    if(e.per==='ikkuna'){ el.disabled = windows===0; el.classList.toggle('off', windows===0); }
+    el.classList.toggle('on', e.per==='kpl' ? (state['extra_'+e.id]||0)>0 : !!extraState[e.id]);
+  });
+
+  const q = computePricing(state, extraState);
+  booking.total = q.total; booking.count = q.count;
+  /* Yhteenvetoteksti listaa vain ovet ja ikkunat — lisätyöt vain lukumääränä,
+     muuten teksti kasvaa varaussivulla ja kalenteritapahtuman otsikossa
+     lukukelvottomaksi. Täysi erittely menee joka tapauksessa riveinä kantaan. */
+  booking.lines = q.lines.filter(l=>l.kind==='type').map(l=>l.qty>1?`${l.qty}× ${l.name}`:l.name);
+  const nExtra = q.lines.filter(l=>l.kind==='extra').length;
+  booking.serviceLabel = q.count>0
+    ? `Tiivistys: ${booking.lines.join(', ')}`+(nExtra?` + ${nExtra} lisätyö${nExtra>1?'tä':''}`:'')
+    : 'Valitse kohteet laskurista';
+
   /* Säilytä laskurin valinta varaus-sivulle.
-     KRIITTINEN: mukana on oltava ovikohtainen erittely (items/extraIds), ei vain
-     summa. Varaussivulla ei ole laskurin DOMia, joten `state` on siellä nollilla —
-     ilman tätä lomake lähettäisi items:[] ja jokainen varaus tallentuisi 0 €:na. */
+     KRIITTINEN: mukana on oltava kohdekohtainen erittely, ei vain summa.
+     Varaussivulla ei ole laskurin DOMia, joten `state` on siellä nollilla —
+     ilman tätä lomake lähettäisi tyhjän valinnan ja jokainen varaus
+     tallentuisi 0 €:na (näin kävi kertaalleen oikeasti). */
   try{ sessionStorage.setItem('tk_booking', JSON.stringify({
     total: booking.total, count: booking.count, serviceLabel: booking.serviceLabel,
-    items: TYPES.map(t=>({id:t.id, qty:state[t.id]||0})).filter(i=>i.qty>0),
-    extraIds: EXTRAS.filter(x=>extraState[x.id]).map(x=>x.id),
+    counts: {...state}, extras: {...extraState},
   })); }catch(_){}
   syncBookingSummary();
+
+  if(!document.getElementById('cpLines')) return;
+  const linesEl=document.getElementById('cpLines');
+  linesEl.innerHTML = q.total===0 ? '<div class="rc-empty">Lisää ovia tai ikkunoita nähdäksesi hinnan.</div>'
+    : q.lines.map(l=>{
+        const cnt = l.qty>1 ? `<span class="cnt">${l.qty}×</span> ` : '';
+        const unit = l.qty>1 ? ` <span class="cp-unit">${l.unit} €/${l.unitName}</span>` : '';
+        const note = l.note ? ` <span class="cp-unit">${l.note}</span>` : '';
+        return `<div class="cp-line"><span>${cnt}${l.name}${unit}${note}</span><b>${l.sum.toLocaleString('fi-FI')} €</b></div>`;
+      }).join('');
+  tweenPrice(q.total);
+  document.getElementById('cpNet').textContent = (q.total>0?Math.round(q.total*NET_FACTOR).toLocaleString('fi-FI'):'0')+' €';
+  document.getElementById('cpCount').textContent = q.count;
+  const hrs = q.minutes/60;
+  document.getElementById('cpTime').textContent = q.total===0?'0 h':(hrs<1?Math.round(q.minutes)+' min':(Math.round(hrs*2)/2).toLocaleString('fi-FI')+' h');
+  const btn=document.getElementById('cpBtn'), active = q.total>0;
+  btn.style.pointerEvents=active?'auto':'none'; btn.style.opacity=active?'1':'.5';
 }
 
 /* ---------- FAQ ---------- */
@@ -241,8 +302,10 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     notes: document.getElementById('fNotes').value.trim(),
     date: keyOf(selDay),
     slot: selSlot,
-    items: TYPES.map(t=>({name:t.name, qty:state[t.id]||0})).filter(i=>i.qty>0),
-    extras: EXTRAS.filter(x=>extraState[x.id]).map(x=>x.name),
+    /* Lähetetään raaka valinta, ei hintoja: palvelin laskee summan samasta
+       pricing.mjs:stä eikä luota clientin lukuihin. */
+    counts: {...state},
+    extras: {...extraState},
   };
 
   try{
@@ -298,10 +361,10 @@ if(document.getElementById('bServiceName') && !document.getElementById('cpLines'
   try{ const saved=JSON.parse(sessionStorage.getItem('tk_booking')||'null');
     if(saved && saved.total>0){
       booking.total=saved.total; booking.count=saved.count; booking.serviceLabel=saved.serviceLabel;
-      /* Palauta ovikohtainen valinta state/extraStateen — payload.items luetaan niistä.
-         Ilman tätä varaus lähtisi tyhjänä ja tallentuisi 0 €:na. */
-      (saved.items||[]).forEach(i=>{ if(Object.prototype.hasOwnProperty.call(state,i.id)) state[i.id]=i.qty; });
-      (saved.extraIds||[]).forEach(id=>{ if(Object.prototype.hasOwnProperty.call(extraState,id)) extraState[id]=true; });
+      /* Palauta kohdekohtainen valinta state/extraStateen — lomakkeen payload
+         luetaan niistä. Ilman tätä varaus lähtisi tyhjänä ja tallentuisi 0 €:na. */
+      Object.entries(saved.counts||{}).forEach(([k,v])=>{ if(Object.prototype.hasOwnProperty.call(state,k)) state[k]=Math.max(0,parseInt(v,10)||0); });
+      Object.entries(saved.extras||{}).forEach(([k,v])=>{ if(Object.prototype.hasOwnProperty.call(extraState,k)) extraState[k]=!!v; });
     }
   }catch(_){}
   gateBookingOnCalculator();

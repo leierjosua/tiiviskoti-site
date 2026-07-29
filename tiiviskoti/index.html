@@ -133,7 +133,20 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .extra-chk{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:11px;color:transparent;flex:0 0 auto}
 .extra.on .extra-chk{background:var(--green);border-color:var(--green);color:#fff}
 .extra-nm{font-size:14px;color:var(--text);flex:1}
-.extra-pr{font-weight:700;font-size:13px;color:var(--green)}
+.extra-pr{font-weight:700;font-size:13px;color:var(--green);white-space:nowrap}
+.extra-note{font-weight:600;font-size:11.5px;color:var(--mute)}
+/* Määrällinen lisätyö: div eikä button (askellin ei mahdu napin sisään),
+   joten vasen reunus tasataan käsin valintaruudullisten kanssa. Vie oman
+   rivinsä, koska nimi + hinta + askellin ei mahdu puolikkaaseen sarakkeeseen.
+   Kaksoisluokka voittaa .extra:nth-child(2n):n reunuksen. */
+.extra.extra-q{cursor:default;padding-left:51px;grid-column:1/-1;border-left:none}
+.extra-stp{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+.extra-stp .stp{width:27px;height:27px;border-radius:7px;font-size:16px}
+.extra-stp .qty{font-size:15px;min-width:18px}
+.extra.off{opacity:.4;cursor:not-allowed}
+.wtype-tier{display:block;margin-top:3px;color:var(--green);font-weight:600}
+.wtype-price s{opacity:.55;font-weight:600}
+.cp-unit{font-size:12px;color:var(--dmute);font-weight:600}
 .quote{position:sticky;top:88px;background:var(--deep);color:var(--dtext);border-radius:var(--r-lg);padding:26px}
 .q-t{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dmute)}
 .rc-lines{margin:16px 0 4px;min-height:40px}
@@ -347,7 +360,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
       <a href="#laskuri" class="btn btn-p btn-lg">Laske hinta</a>
       <a href="#palvelut" class="btn btn-o btn-lg">Katso palvelut</a>
     </div>
-    <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta · kotitalousvähennys −40 %</p>
+    <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta · lämpökamerakartoitus veloituksetta · kotitalousvähennys −40 %</p>
   </div>
   <div class="hero-card rv">
     <img src="img/hero-entrance.jpg" alt="Suomalainen punainen puutalo valkoisin puittein kesäauringossa" width="1500" height="2250" fetchpriority="high">
@@ -357,7 +370,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 <!-- METRICS -->
 <section class="wrap" style="padding-bottom:clamp(16px,3vw,32px)">
   <div class="metrics rv">
-    <div class="metric"><b><span class="a">89 €</span></b><span>per ovi · ikkuna 39&nbsp;€</span></div>
+    <div class="metric"><b><span class="a">95 €</span></b><span>per ikkuna · ovi 119&nbsp;€</span></div>
     <div class="metric"><b><span class="a">&lt; 1 min</span></b><span>ajanvaraus verkosta</span></div>
     <div class="metric"><b><span class="a">4,9/5</span></b><span>300+ arvostelua</span></div>
   </div>
@@ -371,14 +384,14 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     <div class="card rv">
       <div class="card-fig">
         <img class="pic" src="img/ulko-ovet.jpg" alt="Punainen puinen ulko-ovi suomalaisessa kivitalossa" width="900" height="600" loading="lazy">
-        <span class="tag">89 €/ovi + 99 € aloitusmaksu</span>
+        <span class="tag">119 €/ovi + 99 € aloitusmaksu</span>
       </div>
       <div class="card-body"><h3>Ovien tiivistys</h3><p>Pää-, taka- ja parvekeovet. Sivutiivisteet, kynnyskumi ja oven säätö.</p><a href="#laskuri" class="lnk">Laske hinta <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
     <div class="card rv">
       <div class="card-fig">
         <img class="pic" src="img/ikkunat.jpg" alt="Asentaja uusii ikkunan tiivisteet" width="900" height="601" loading="lazy">
-        <span class="tag">39 €/ikkuna + 99 € aloitusmaksu</span>
+        <span class="tag">95 €/ikkuna + 99 € aloitusmaksu</span>
       </div>
       <div class="card-body"><h3>Ikkunoiden tiivistys</h3><p>Vetävät ja natisevat ikkunat kuntoon. Karmi- ja puitetiivisteet uusiksi.</p><a href="#laskuri" class="lnk">Laske hinta <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
@@ -410,7 +423,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
       <div class="q-net">Kotitalousvähennyksen jälkeen n. <b id="cpNet">0 €</b></div>
       <div class="q-meta"><div><b id="cpCount">0</b><span>kohdetta</span></div><div><b id="cpTime">0 h</b><span>arvioitu kesto</span></div></div>
       <a href="varaa.html" class="btn btn-lg q-btn" id="cpBtn" style="pointer-events:none;opacity:.5">Varaa aika kalenterista</a>
-      <div class="q-note">Sisältää 99 € aloitusmaksun · hinta vahvistetaan mittauksessa</div>
+      <div class="q-note">Sisältää 99 € aloitusmaksun (matkat, kartoitus ja lämpökamerakuvaus) · hinta vahvistetaan mittauksessa</div>
     </aside>
   </div>
 </div></section>
@@ -494,6 +507,6 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <a href="#laskuri" class="btn btn-p">Varaa aika</a>
 </div>
 
-<script src="_shared.js"></script>
+<script type="module" src="_shared.js"></script>
 </body>
 </html>
