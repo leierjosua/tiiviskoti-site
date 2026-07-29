@@ -91,7 +91,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .metric{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px 28px;box-shadow:var(--sh)}
 .metric b{display:block;font-size:32px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1;white-space:nowrap}
 .metric b .a{color:var(--green)}
-.metric span{display:block;font-size:14.5px;color:var(--mute);margin-top:8px}
+.metric>span{display:block;font-size:14.5px;color:var(--mute);margin-top:8px}
 
 /* SERVICE CARDS */
 .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:clamp(34px,4vw,50px)}
@@ -208,9 +208,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .grev-sub{font-size:14px;color:var(--mute);font-weight:600}
 .why-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
 .wstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
-.wstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.wstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.1;white-space:nowrap}
 .wstat b .a{color:var(--green)}
-.wstat span{font-size:13.5px;color:var(--mute);margin-top:4px;display:block}
+.wstat>span{font-size:13.5px;color:var(--mute);margin-top:4px;display:block}
 .why-fig{border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/5;box-shadow:var(--sh);border:1px solid var(--line)}
 .why-fig svg{width:100%;height:100%;display:block}
 
@@ -273,12 +273,18 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .sec{padding:52px 0}
   /* NAV — kompakti oikea ryhmä puhelimessa (nappi+burger oikealle, ei logon päälle) */
   .nlinks{display:none}
-  nav.top .btn-p{margin-left:auto;padding:8px 15px;font-size:14px}
-  .burger{display:flex;margin-left:0}
+  /* Nappi pois navista puhelimessa: alalaidan .mcta-palkki kantaa saman CTA:n,
+     ja 23px logo + nappi + burger eivat mahtuneet 390px leveyteen (nappi meni logon paalle). */
+  nav.top .btn-p{display:none}
+  .burger{display:flex;margin-left:auto}
   .nlinks.op{display:flex;position:absolute;top:74px;left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border-bottom:1px solid var(--line)}
   .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
   .why-stats{grid-template-columns:1fr}
   .slots{grid-template-columns:repeat(3,1fr)}
+  /* Footer puhelimessa: brandi omalle riville, linkkipalstat pareittain.
+     Kahden palstan ruudukossa "4,9/5 · 300+ arviota" katkesi kolmelle riville. */
+  .mf-grid{grid-template-columns:1fr 1fr;gap:26px}
+  .mf-brand{grid-column:1/-1}
   .mcta{display:flex}body{padding-bottom:76px}
 }
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
@@ -443,7 +449,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <div class="mf-grid">
     <div class="mf-brand">
       <a href="index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
-      <p>Ulko-ovien tiivistevaihto koko Uudellamaalla. Veto loppuu, lämpö jää kotiin.</p>
+      <p>Ovien ja ikkunoiden tiivistevaihto koko Uudellamaalla. Veto loppuu, lämpö jää kotiin.</p>
       <div class="mf-rate"><span class="st">★★★★★</span> 4,9/5 · 300+ arviota</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="index.html#palvelut">Ulko-ovet</a><a href="index.html#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="index.html#laskuri">Hintalaskuri</a></div>

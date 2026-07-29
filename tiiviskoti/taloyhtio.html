@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Taloyhtiöt — TiivisKoti | Ovien tiivistys sopimushinnalla</title>
-<meta name="description" content="TiivisKoti tiivistää taloyhtiön ovet kerralla kuntoon: rappukäytävät, yhteistilat ja ulko-ovet kiinteällä sopimushinnalla. Kartoitus, kirjallinen tarjous ja raportti hallitukselle." />
+<title>Taloyhtiöt — TiivisKoti | Ovien ja ikkunoiden tiivistys sopimushinnalla</title>
+<meta name="description" content="TiivisKoti tiivistää taloyhtiön ovet ja ikkunat kerralla kuntoon: rappukäytävät, yhteistilat ja ulko-ovet kiinteällä sopimushinnalla. Kartoitus, kirjallinen tarjous ja raportti hallitukselle." />
 <meta name="theme-color" content="#F6F7F3" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -90,7 +90,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .metric{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px 28px;box-shadow:var(--sh)}
 .metric b{display:block;font-size:32px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1;white-space:nowrap}
 .metric b .a{color:var(--green)}
-.metric span{display:block;font-size:14.5px;color:var(--mute);margin-top:8px}
+.metric>span{display:block;font-size:14.5px;color:var(--mute);margin-top:8px}
 
 /* SERVICE CARDS */
 .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:clamp(34px,4vw,50px)}
@@ -207,9 +207,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .grev-sub{font-size:14px;color:var(--mute);font-weight:600}
 .why-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
 .wstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
-.wstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.wstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.1;white-space:nowrap}
 .wstat b .a{color:var(--green)}
-.wstat span{font-size:13.5px;color:var(--mute);margin-top:4px;display:block}
+.wstat>span{font-size:13.5px;color:var(--mute);margin-top:4px;display:block}
 .why-fig{border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/5;box-shadow:var(--sh);border:1px solid var(--line)}
 .why-fig svg{width:100%;height:100%;display:block}
 
@@ -272,12 +272,18 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .sec{padding:52px 0}
   /* NAV — kompakti oikea ryhmä puhelimessa (nappi+burger oikealle, ei logon päälle) */
   .nlinks{display:none}
-  nav.top .btn-p{margin-left:auto;padding:8px 15px;font-size:14px}
-  .burger{display:flex;margin-left:0}
+  /* Nappi pois navista puhelimessa: alalaidan .mcta-palkki kantaa saman CTA:n,
+     ja 23px logo + nappi + burger eivat mahtuneet 390px leveyteen (nappi meni logon paalle). */
+  nav.top .btn-p{display:none}
+  .burger{display:flex;margin-left:auto}
   .nlinks.op{display:flex;position:absolute;top:74px;left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border-bottom:1px solid var(--line)}
   .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
   .why-stats{grid-template-columns:1fr}
   .slots{grid-template-columns:repeat(3,1fr)}
+  /* Footer puhelimessa: brandi omalle riville, linkkipalstat pareittain.
+     Kahden palstan ruudukossa "4,9/5 · 300+ arviota" katkesi kolmelle riville. */
+  .mf-grid{grid-template-columns:1fr 1fr;gap:26px}
+  .mf-brand{grid-column:1/-1}
   .mcta{display:flex}body{padding-bottom:76px}
 }
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
@@ -333,8 +339,8 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 <header class="hero"><div class="wrap hero-grid">
   <div>
     <div class="rating"><span class="st">★★★★★</span> Luotettu kumppani taloyhtiöille Uudellamaalla</div>
-    <h1>Taloyhtiön ovet<br>kuntoon <span class="a">kerralla.</span></h1>
-    <p class="hero-sub">Tiivistämme rappukäytävien, yhteistilojen ja ulko-ovien tiivisteet kiinteällä sopimushinnalla. Yksi kumppani, selkeä tarjous ja raportti hallitukselle.</p>
+    <h1>Taloyhtiön ovet ja ikkunat<br>kuntoon <span class="a">kerralla.</span></h1>
+    <p class="hero-sub">Tiivistämme rappukäytävät, yhteistilat ja ikkunat kiinteällä sopimushinnalla. Yksi kumppani ja selkeä tarjous hallitukselle.</p>
     <div class="hero-cta">
       <a href="#tarjous" class="btn btn-p btn-lg">Pyydä tarjous</a>
       <a href="tel:+358458755996" class="btn btn-o btn-lg">Soita 045 875 5996</a>
@@ -349,9 +355,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 <!-- METRICS -->
 <section class="wrap" style="padding-bottom:clamp(16px,3vw,32px)">
   <div class="metrics rv">
-    <div class="metric"><b><span class="a">Yksi sopimus</span></b><span>talon kaikki ovet kerralla</span></div>
-    <div class="metric"><b><span class="a">Kiinteä hinta</span></b><span>kirjallinen tarjous ennen työtä</span></div>
-    <div class="metric"><b><span class="a">Raportti</span></b><span>dokumentti hallitukselle + takuu</span></div>
+    <div class="metric"><b><span class="a">1 sopimus</span></b><span>talon ovet ja ikkunat kerralla</span></div>
+    <div class="metric"><b><span class="a">0 €</span></b><span>kartoituskäynti</span></div>
+    <div class="metric"><b><span class="a">4,9/5</span></b><span>300+ arvostelua</span></div>
   </div>
 </section>
 
@@ -381,13 +387,14 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 
 <!-- MITÄ TEEMME -->
 <section class="sec alt" id="mita"><div class="wrap">
-  <div class="center rv"><div class="kicker">Mitä teemme</div><h2 class="title">Talon kaikki ovet samalla käynnillä</h2>
-    <p class="sub">Yleisimmät kohteet taloyhtiössä — tarkennamme listan kartoituskäynnillä.</p></div>
+  <div class="center rv"><div class="kicker">Mitä teemme</div><h2 class="title">Talon ovet ja ikkunat samalla käynnillä</h2>
+    <p class="sub">Tarkennamme listan kartoituskäynnillä.</p></div>
   <ul class="tincl rv">
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Rappukäytävien ulko-ovet ja porrasovet</li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kellari-, ullakko- ja varastokäytävien ovet</li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Yhteistilojen ovet: pesula, kerho, tekninen tila</li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Väestönsuojan oven tiivisteet</li>
+    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Rappukäytävien ja yhteistilojen ikkunat</li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kynnyskumit ja oven alaslistat</li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Oven käynnin ja ovipumpun säätö</li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Palo-ovien tiivisteet paloluokitus huomioiden</li>
@@ -427,7 +434,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
           <div class="tf"><label>Taloyhtiön osoite</label><input id="qAddr" required placeholder="Katuosoite, postinumero" /></div>
         </div>
         <div class="row">
-          <div class="tf"><label>Ovien määrä (arvio)</label><select id="qDoors"><option>1–5 ovea</option><option>6–15 ovea</option><option>16–30 ovea</option><option>Yli 30 ovea</option><option>En osaa sanoa</option></select></div>
+          <div class="tf"><label>Ovien ja ikkunoiden määrä (arvio)</label><select id="qDoors"><option>1–5 kpl</option><option>6–15 kpl</option><option>16–30 kpl</option><option>Yli 30 kpl</option><option>En osaa sanoa</option></select></div>
           <div class="tf"><label>Aikataulutoive (valinnainen)</label><input id="qWhen" placeholder="Esim. syksy 2026" /></div>
         </div>
         <div class="tf"><label>Lisätiedot (valinnainen)</label><textarea id="qMsg" placeholder="Kerro esim. talotyypistä, ovien kunnosta tai erityistoiveista."></textarea></div>
@@ -461,10 +468,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <div class="mf-grid">
     <div class="mf-brand">
       <a href="index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
-      <p>Ulko-ovien tiivistevaihto koko Uudellamaalla. Veto loppuu, lämpö jää kotiin.</p>
+      <p>Ovien ja ikkunoiden tiivistevaihto koko Uudellamaalla. Veto loppuu, lämpö jää kotiin.</p>
       <div class="mf-rate"><span class="st">★★★★★</span> 4,9/5 · 300+ arviota</div>
     </div>
-    <div class="mf-col"><h4>Palvelut</h4><a href="index.html#palvelut">Ulko-ovet</a><a href="index.html#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="index.html#laskuri">Hintalaskuri</a></div>
+    <div class="mf-col"><h4>Palvelut</h4><a href="index.html#palvelut">Ovet</a><a href="index.html#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="index.html#laskuri">Hintalaskuri</a></div>
     <div class="mf-col"><h4>Taloyhtiöille</h4><a href="#edut">Miksi me</a><a href="#prosessi">Näin etenemme</a><a href="#ukk">UKK</a><a href="#tarjous">Pyydä tarjous</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:+358458755996">045 875 5996</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="#tarjous">Koko Uusimaa</a></div>
   </div>

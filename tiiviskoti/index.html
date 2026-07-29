@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TiivisKoti — Ulko-ovien tiivistevaihto | Uusimaa</title>
-<meta name="description" content="TiivisKoti vaihtaa ulko-oviesi tiivisteet kiinteään hintaan. Veto loppuu, lämpö jää sisälle. Varaa aika verkosta — kotitalousvähennys −40 %." />
+<title>TiivisKoti — Ovien ja ikkunoiden tiivistevaihto | Uusimaa</title>
+<meta name="description" content="TiivisKoti vaihtaa ovien ja ikkunoiden tiivisteet kiinteään hintaan. Veto loppuu, lämpö jää sisälle. Varaa aika verkosta — kotitalousvähennys −40 %." />
 <meta name="theme-color" content="#F6F7F3" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -90,7 +90,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .metric{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px 28px;box-shadow:var(--sh)}
 .metric b{display:block;font-size:32px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1;white-space:nowrap}
 .metric b .a{color:var(--green)}
-.metric span{display:block;font-size:14.5px;color:var(--mute);margin-top:8px}
+/* HUOM: suora lapsi. Pelkkä ".metric span" osui myös <b>:n sisällä olevaan
+   <span class="a">:han ja kutisti luvun 32px → 14.5px. Sama koski .wstat:ia. */
+.metric>span{display:block;font-size:14.5px;color:var(--mute);margin-top:8px}
 
 /* SERVICE CARDS */
 .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:clamp(34px,4vw,50px)}
@@ -207,9 +209,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .grev-sub{font-size:14px;color:var(--mute);font-weight:600}
 .why-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
 .wstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
-.wstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.wstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.1;white-space:nowrap}
 .wstat b .a{color:var(--green)}
-.wstat span{font-size:13.5px;color:var(--mute);margin-top:4px;display:block}
+.wstat>span{font-size:13.5px;color:var(--mute);margin-top:4px;display:block}
 .why-fig{border-radius:var(--r-lg);overflow:hidden;aspect-ratio:4/5;box-shadow:var(--sh);border:1px solid var(--line)}
 .why-fig svg,.why-fig img{width:100%;height:100%;display:block;object-fit:cover}
 
@@ -278,8 +280,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   nav.top:not(.scr) .burger span{background:#fff}
   nav.top.scr{background:var(--bg);border-color:var(--line);backdrop-filter:saturate(1.1)}
   .nlinks{display:none}
-  nav.top .btn-p{margin-left:auto;padding:8px 15px;font-size:14px}
-  .burger{display:flex;margin-left:0}
+  /* Nappi pois navista puhelimessa: alalaidan .mcta-palkki kantaa saman CTA:n,
+     ja 23px logo + nappi + burger eivat mahtuneet 390px leveyteen (nappi meni logon paalle). */
+  nav.top .btn-p{display:none}
+  .burger{display:flex;margin-left:auto}
   .nlinks.op{display:flex;position:absolute;top:62px;left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border-bottom:1px solid var(--line)}
 
   /* HERO — koko levyinen taustakuva + tumma peitto + keskitetty valkoinen teksti */
@@ -290,7 +294,6 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .hero-card img{width:100%;height:100%;object-fit:cover}
   .hero-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,42,30,.42),rgba(16,42,30,.72) 55%,rgba(16,42,30,.88))}
   .hero .rating{justify-content:center;color:#fff;font-size:13.5px;background:rgba(255,255,255,.15);padding:8px 16px;border-radius:999px;margin:0 auto 18px;width:max-content;max-width:100%}
-  .r-long{display:none}
   .hero h1{color:#fff}
   .hero h1 .a{color:#8FE3B4}
   .hero-sub{color:rgba(255,255,255,.9);margin:20px auto 0}
@@ -304,11 +307,20 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .metrics{grid-template-columns:repeat(3,1fr);gap:9px;margin-top:-92px;position:relative;z-index:3}
   .metric{padding:15px 7px;text-align:center;border-radius:14px}
   .metric b{font-size:19px}
-  .metric span{font-size:10.5px;margin-top:6px}
+  .metric>span{font-size:10.5px;margin-top:6px;line-height:1.35}
 
   .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
-  .why-stats{grid-template-columns:1fr}
+
+  /* Miksi-osion luvut samaan kompaktiin kolmen palstan riviin kuin hero:n mittarit */
+  .why-stats{grid-template-columns:repeat(3,1fr);gap:9px}
+  .wstat{padding:15px 7px;text-align:center;border-radius:14px}
+  .wstat b{font-size:19px}
+  .wstat>span{font-size:10.5px;margin-top:6px;line-height:1.35}
   .slots{grid-template-columns:repeat(3,1fr)}
+  /* Footer puhelimessa: brandi omalle riville, linkkipalstat pareittain.
+     Kahden palstan ruudukossa "4,9/5 · 300+ arviota" katkesi kolmelle riville. */
+  .mf-grid{grid-template-columns:1fr 1fr;gap:26px}
+  .mf-brand{grid-column:1/-1}
   .mcta{display:flex}body{padding-bottom:76px}
 }
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
@@ -328,14 +340,14 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 <!-- HERO -->
 <header class="hero"><div class="wrap hero-grid">
   <div>
-    <div class="rating"><span class="st">★★★★★</span> <span class="r-txt">4,9/5 · yli 500 ovea<span class="r-long"> tiivistetty tänä vuonna</span></span></div>
+    <div class="rating"><span class="st">★★★★★</span> <span class="r-txt">4,9/5 · yli 500 ovea ja ikkunaa</span></div>
     <h1>Vedoton koti.<br>Lämpö sisällä. <span class="a">Aina.</span></h1>
-    <p class="hero-sub">Vaihdamme ulko-oviesi tiivisteet kiinteään hintaan. Veto loppuu, lämmityslasku pienenee — ja varaat ajan verkosta alle minuutissa.</p>
+    <p class="hero-sub">Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan. Varaat ajan verkosta alle minuutissa.</p>
     <div class="hero-cta">
-      <a href="#palvelut" class="btn btn-p btn-lg">Katso palvelut</a>
-      <a href="#laskuri" class="btn btn-o btn-lg">Varaa aika</a>
+      <a href="#laskuri" class="btn btn-p btn-lg">Laske hinta</a>
+      <a href="#palvelut" class="btn btn-o btn-lg">Katso palvelut</a>
     </div>
-    <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta ilman tarjouspyyntöjä · kotitalousvähennys −40 %</p>
+    <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta · kotitalousvähennys −40 %</p>
   </div>
   <div class="hero-card rv">
     <img src="img/hero-entrance.jpg" alt="Suomalainen punainen puutalo valkoisin puittein kesäauringossa" width="1500" height="2250" fetchpriority="high">
@@ -345,45 +357,45 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 <!-- METRICS -->
 <section class="wrap" style="padding-bottom:clamp(16px,3vw,32px)">
   <div class="metrics rv">
-    <div class="metric"><b><span class="a">89 €</span></b><span>per ulko-ovi · + 99 € aloitusmaksu</span></div>
+    <div class="metric"><b><span class="a">89 €</span></b><span>per ovi · ikkuna 39&nbsp;€</span></div>
     <div class="metric"><b><span class="a">&lt; 1 min</span></b><span>ajanvaraus verkosta</span></div>
-    <div class="metric"><b><span class="a">4,9/5</span></b><span>keskiarvo · 300+ arvostelua</span></div>
+    <div class="metric"><b><span class="a">4,9/5</span></b><span>300+ arvostelua</span></div>
   </div>
 </section>
 
 <!-- PALVELUT -->
 <section class="sec" id="palvelut"><div class="wrap">
-  <div class="center rv"><div class="kicker">Palvelut</div><h2 class="title">Kiinteä hinta jokaiselle ovelle</h2>
-    <p class="sub">Kodeista taloyhtiöihin — tiivisteet, kynnykset ja oven käynnin säätö samalla käynnillä.</p></div>
+  <div class="center rv"><div class="kicker">Palvelut</div><h2 class="title">Kiinteä hinta ovelle ja ikkunalle</h2>
+    <p class="sub">Tiivisteet, kynnykset ja säädöt samalla käynnillä.</p></div>
   <div class="cards3">
     <div class="card rv">
       <div class="card-fig">
         <img class="pic" src="img/ulko-ovet.jpg" alt="Punainen puinen ulko-ovi suomalaisessa kivitalossa" width="900" height="600" loading="lazy">
         <span class="tag">89 €/ovi + 99 € aloitusmaksu</span>
       </div>
-      <div class="card-body"><h3>Ulko-ovien tiivistys</h3><p>Pää-, takaovet ja parvekeovet. Sivutiivisteet, kynnyskumi ja oven säätö — veto loppuu, lämpö jää.</p><a href="#laskuri" class="lnk">Laske hinta <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      <div class="card-body"><h3>Ovien tiivistys</h3><p>Pää-, taka- ja parvekeovet. Sivutiivisteet, kynnyskumi ja oven säätö.</p><a href="#laskuri" class="lnk">Laske hinta <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
     <div class="card rv">
       <div class="card-fig">
         <img class="pic" src="img/ikkunat.jpg" alt="Asentaja uusii ikkunan tiivisteet" width="900" height="601" loading="lazy">
         <span class="tag">39 €/ikkuna + 99 € aloitusmaksu</span>
       </div>
-      <div class="card-body"><h3>Ikkunatiivistys</h3><p>Vetävät ja natisevat ikkunat kuntoon. Karmi- ja puitetiivisteet uusiksi — pienempi vetotunne joka huoneessa.</p><a href="#laskuri" class="lnk">Laske hinta <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      <div class="card-body"><h3>Ikkunoiden tiivistys</h3><p>Vetävät ja natisevat ikkunat kuntoon. Karmi- ja puitetiivisteet uusiksi.</p><a href="#laskuri" class="lnk">Laske hinta <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
     <div class="card rv">
       <div class="card-fig">
         <img class="pic" src="img/taloyhtiot.jpg" alt="Taloyhtiön julkisivu ja parvekkeet" width="900" height="599" loading="lazy">
         <span class="tag">Tarjouksesta</span>
       </div>
-      <div class="card-body"><h3>Taloyhtiöt</h3><p>Rappukäytävät ja yhteistilojen ovet kerralla kuntoon. Sopimushinta ja aikataulu isännöitsijän kanssa.</p><a href="taloyhtio.html" class="lnk">Taloyhtiöille <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      <div class="card-body"><h3>Taloyhtiöt</h3><p>Rappukäytävät ja yhteistilat kerralla kuntoon sopimushinnalla.</p><a href="taloyhtio.html" class="lnk">Taloyhtiöille <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
   </div>
 </div></section>
 
 <!-- HINTALASKURI -->
 <section class="sec alt" id="laskuri"><div class="wrap">
-  <div class="center rv"><div class="kicker">Hintalaskuri</div><h2 class="title">Laske oviesi hinta heti</h2>
-    <p class="sub">Valitse ovet ja määrät — kiinteä hinta päivittyy heti. Ei tarjouspyyntöjä.</p></div>
+  <div class="center rv"><div class="kicker">Hintalaskuri</div><h2 class="title">Laske hinta heti</h2>
+    <p class="sub">Valitse ovet ja ikkunat — kiinteä hinta päivittyy heti.</p></div>
   <div class="calc-wrap rv">
     <div class="order">
       <div class="order-hd"><span>Kohde</span><span>Määrä</span></div>
@@ -393,7 +405,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     </div>
     <aside class="quote">
       <div class="q-t">Yhteenveto</div>
-      <div class="rc-lines" id="cpLines"><div class="rc-empty">Lisää ovia nähdäksesi hinnan.</div></div>
+      <div class="rc-lines" id="cpLines"><div class="rc-empty">Lisää ovia tai ikkunoita nähdäksesi hinnan.</div></div>
       <div class="q-total"><div class="pt">Kiinteä hinta · sis. ALV 25,5 %</div><div class="pv"><span id="cpPrice">0</span><small>€</small></div></div>
       <div class="q-net">Kotitalousvähennyksen jälkeen n. <b id="cpNet">0 €</b></div>
       <div class="q-meta"><div><b id="cpCount">0</b><span>kohdetta</span></div><div><b id="cpTime">0 h</b><span>arvioitu kesto</span></div></div>
@@ -409,7 +421,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <div class="rv">
     <div class="kicker">Miksi TiivisKoti</div>
     <h2>Teemme jokaisen työn kuin omaan kotiin</h2>
-    <p>Ei tarjouspyyntöjä, ei piilokuluja. Näet kiinteän hinnan laskurista, koulutettu asentaja hoitaa työn siististi ja säädämme oven käynnin kohdilleen. Ellet tunne eroa ovella, palaamme veloituksetta.</p>
+    <p>Ei tarjouspyyntöjä, ei piilokuluja. Näet kiinteän hinnan laskurista, ja koulutettu asentaja hoitaa työn siististi. Ellet tunne eroa, palaamme veloituksetta.</p>
     <a class="grev" href="#arviot" aria-label="Google-arvostelut 4,9 / 5">
       <svg class="grev-g" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
       <span class="grev-main">
@@ -418,9 +430,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
       </span>
     </a>
     <div class="why-stats">
-      <div class="wstat"><b>Kiinteä hinta</b><span>eritelty ennen työtä</span></div>
+      <div class="wstat"><b><span class="a">2 v</span></b><span>takuu työlle</span></div>
       <div class="wstat"><b><span class="a">−40 %</span></b><span>kotitalousvähennys</span></div>
-      <div class="wstat"><b>500+</b><span>tyytyväistä asiakasta</span></div>
+      <div class="wstat"><b><span class="a">500+</span></b><span>tyytyväistä asiakasta</span></div>
     </div>
   </div>
   <div class="why-fig rv">
@@ -430,8 +442,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 
 <!-- ARVIOT -->
 <section class="sec" id="arviot"><div class="wrap">
-  <div class="center rv"><div class="kicker">Arviot</div><h2 class="title">Mitä asiakkaamme sanovat</h2>
-    <p class="sub">Keskiarvo 4,9/5 · yli 300 arviota Uudeltamaalta.</p></div>
+  <div class="center rv"><div class="kicker">Arviot</div><h2 class="title">Mitä asiakkaamme sanovat</h2></div>
   <div class="revs">
     <div class="rev rv"><div class="st">★★★★★</div><p>&ldquo;Eteinen veti kylmää koko talven. Vaihdon jälkeen ero oli välitön — lattia ei ole enää jääkylmä.&rdquo;</p><div class="by"><div class="av">M</div><div><b>Marika S.</b><span>Espoo · omakotitalo</span></div></div></div>
     <div class="rev rv"><div class="st">★★★★★</div><p>&ldquo;Hinta näkyi heti laskurista eikä muuttunut. Asentaja tuli sovittuna aamuna. Nopeaa ja siistiä.&rdquo;</p><div class="by"><div class="av">P</div><div><b>Petri N.</b><span>Helsinki · rivitalo</span></div></div></div>
@@ -443,7 +454,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 <section class="sec" style="padding-top:0"><div class="wrap">
   <div class="cta rv">
     <h2>Tarvitsetko apua?</h2>
-    <p>Varaa aika verkosta alle minuutissa tai soita — autamme mielellämme.</p>
+    <p>Varaa aika verkosta alle minuutissa tai soita.</p>
     <div class="cta-btns">
       <a href="#laskuri" class="btn btn-p btn-lg">Varaa aika</a>
       <a href="tel:+358458755996" class="btn btn-o on-deep btn-lg">045 875 5996</a>
@@ -453,7 +464,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 
 <!-- UKK -->
 <section class="sec alt" id="ukk"><div class="wrap">
-  <div class="center rv"><div class="kicker">Usein kysyttyä</div><h2 class="title">Hyvä tietää ovien tiivistyksestä</h2></div>
+  <div class="center rv"><div class="kicker">Usein kysyttyä</div><h2 class="title">Hyvä tietää tiivistyksestä</h2></div>
   <div class="faq" id="faq"></div>
 </div></section>
 
@@ -462,10 +473,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <div class="mf-grid">
     <div class="mf-brand">
       <a href="#" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
-      <p>Ulko-ovien tiivistevaihto koko Uudellamaalla. Veto loppuu, lämpö jää kotiin.</p>
+      <p>Ovien ja ikkunoiden tiivistevaihto koko Uudellamaalla. Veto loppuu, lämpö jää kotiin.</p>
       <div class="mf-rate"><span class="st">★★★★★</span> 4,9/5 · 300+ arviota</div>
     </div>
-    <div class="mf-col"><h4>Palvelut</h4><a href="#palvelut">Ulko-ovet</a><a href="#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
+    <div class="mf-col"><h4>Palvelut</h4><a href="#palvelut">Ovet</a><a href="#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
     <div class="mf-col"><h4>Yritys</h4><a href="#miksi">Miksi me</a><a href="#arviot">Arviot</a><a href="#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:+358458755996">045 875 5996</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="varaa.html">Koko Uusimaa</a></div>
   </div>

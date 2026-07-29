@@ -25,7 +25,7 @@ const EXTRAS = [
   {id:'poisto',  name:'Vanhan liiman poisto', price:15}
 ];
 const FAQ = [
-  ['Paljonko ovien tiivistys maksaa?','Varauksen aloitusmaksu on 99 €, ja sen päälle lisätään valitsemasi kohteet kiinteillä hinnoilla: ulko-ovi 89 €, parvekeovi 79 €, ikkuna 39 € (sis. tiivisteet, työn ja oven säädön). Esimerkiksi kolme ulko-ovea on 99 € + 3 × 89 € = 366 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
+  ['Paljonko tiivistys maksaa?','Varauksen aloitusmaksu on 99 €, ja sen päälle lisätään valitsemasi kohteet kiinteillä hinnoilla: ulko-ovi 89 €, parvekeovi 79 €, ikkuna 39 € (sis. tiivisteet, työn ja oven säädön). Esimerkiksi kolme ulko-ovea on 99 € + 3 × 89 € = 366 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
   ['Mitä tiivisteiden vaihtoon sisältyy?','Vanhojen tiivisteiden poisto, pintojen puhdistus, uudet laadukkaat EPDM- tai silikonitiivisteet sekä oven käynnin säätö niin, että ovi painuu tasaisesti tiivisteitä vasten. Ulko-oviin kuuluu myös kynnyskumi.'],
   ['Kannattaako vetävä ovi tiivistää vai vaihtaa?','Jos ovilehti ja karmi ovat suorassa ja ovi toimii, pelkkä tiivisteiden uusiminen riittää lähes aina — se maksaa murto-osan uuden oven (2 200–4 900 €) hinnasta ja poistaa vedon. Arvioimme kunnon paikan päällä ja kerromme rehellisesti.'],
   ['Kuinka paljon säästän lämmityksessä?','Yksi vetävä ulko-ovi voi nostaa lämmityskuluja 10–15 %. Kun veto loppuu, lämpö pysyy sisällä ja lämmitystarve pienenee — tiivistys maksaa itsensä usein takaisin jo yhden lämmityskauden aikana.'],
@@ -82,7 +82,7 @@ function tweenPrice(target){
   }
   rafId=requestAnimationFrame(frame);
 }
-const booking = { total:0, count:0, lines:[], serviceLabel:'Valitse ovet laskurista' };
+const booking = { total:0, count:0, lines:[], serviceLabel:'Valitse kohteet laskurista' };
 function render(){
   if(!document.getElementById('cpLines')) return;
   const lines=[]; let subtotal=0, count=0, minutes=0; const lineLabels=[];
@@ -94,7 +94,7 @@ function render(){
      Pidä sama kuin BASE_PRICE_CENTS api/create-booking.mjs:ssä. */
   const total = subtotal>0 ? BASE_PRICE + subtotal : 0;
   const linesEl=document.getElementById('cpLines');
-  linesEl.innerHTML = subtotal===0 ? '<div class="rc-empty">Lisää ovia nähdäksesi hinnan.</div>'
+  linesEl.innerHTML = subtotal===0 ? '<div class="rc-empty">Lisää ovia tai ikkunoita nähdäksesi hinnan.</div>'
     : `<div class="cp-line"><span>Aloitusmaksu</span><b>${BASE_PRICE} €</b></div>` + lines.join('');
   tweenPrice(total);
   document.getElementById('cpNet').textContent = (total>0?Math.round(total*NET_FACTOR).toLocaleString('fi-FI'):'0')+' €';
@@ -104,7 +104,7 @@ function render(){
   const btn=document.getElementById('cpBtn'), active = subtotal>0;
   btn.style.pointerEvents=active?'auto':'none'; btn.style.opacity=active?'1':'.5';
   booking.total = total; booking.count = count; booking.lines = lineLabels;
-  booking.serviceLabel = count>0 ? `Tiivistys: ${lineLabels.join(', ')}` : 'Valitse ovet laskurista';
+  booking.serviceLabel = count>0 ? `Tiivistys: ${lineLabels.join(', ')}` : 'Valitse kohteet laskurista';
   /* Säilytä laskurin valinta varaus-sivulle.
      KRIITTINEN: mukana on oltava ovikohtainen erittely (items/extraIds), ei vain
      summa. Varaussivulla ei ole laskurin DOMia, joten `state` on siellä nollilla —
@@ -189,7 +189,7 @@ function syncBookingSummary(){
   const priceEl = document.getElementById('bPrice');
   if(booking.total>0){ const net = Math.round(booking.total*NET_FACTOR);
     priceEl.innerHTML = `${booking.total.toLocaleString('fi-FI')} € <span style="font-size:13px;opacity:.75;font-weight:600">· vähennyksen jälk. n. ${net.toLocaleString('fi-FI')} €</span>`;
-  } else { priceEl.textContent = 'Valitse ovet hintalaskurista nähdäksesi hinnan'; }
+  } else { priceEl.textContent = 'Valitse kohteet hintalaskurista nähdäksesi hinnan'; }
   const whenEl=document.getElementById('bWhen'), whenTxt=document.getElementById('bWhenText'); whenEl.style.display='flex';
   if(selDay && selSlot){ const wd=['su','ma','ti','ke','to','pe','la'][selDay.getDay()];
     whenTxt.textContent = `${wd} ${selDay.getDate()}.${selDay.getMonth()+1}.${selDay.getFullYear()} klo ${selSlot}`; }
@@ -211,7 +211,7 @@ function gateBookingOnCalculator(){
       note=document.createElement('div');
       note.id='bNeedCalc';
       note.style.cssText='background:var(--green-soft);border:1px solid var(--line2);border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:14.5px;line-height:1.5';
-      note.innerHTML='Valitse ensin ovet ja määrät hintalaskurista — näet kiinteän hinnan ennen varausta. <a href="index.html#laskuri" style="color:var(--green);font-weight:700;text-decoration:underline">Siirry laskuriin</a>';
+      note.innerHTML='Valitse ensin ovet ja ikkunat hintalaskurista — näet kiinteän hinnan ennen varausta. <a href="index.html#laskuri" style="color:var(--green);font-weight:700;text-decoration:underline">Siirry laskuriin</a>';
       form.parentNode.insertBefore(note, form);
     }
     note.style.display='block';
@@ -221,7 +221,7 @@ const bFormEl=document.getElementById('bForm');
 if(bFormEl) bFormEl.addEventListener('submit',async e=>{
   e.preventDefault(); const err=document.getElementById('bErr'); err.style.display='none';
   if(!(booking.count>0 && booking.total>0)){
-    err.innerHTML='Valitse ensin ovet hintalaskurista. <a href="index.html#laskuri" style="text-decoration:underline;font-weight:700">Siirry laskuriin</a>';
+    err.innerHTML='Valitse ensin ovet tai ikkunat hintalaskurista. <a href="index.html#laskuri" style="text-decoration:underline;font-weight:700">Siirry laskuriin</a>';
     err.style.display='block'; return;
   }
   if(!selDay || !selSlot){ err.textContent='Valitse ensin vapaa päivä ja aika kalenterista.'; err.style.display='block'; return; }
