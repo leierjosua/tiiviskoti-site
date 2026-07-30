@@ -289,6 +289,8 @@ async function loadAvailability(){
      varata sen), joten valinta nollataan jos se ei enää ole tarjolla. */
   if(selDay && selSlot && !freeSlots(selDay).some(s=>s.time===selSlot)){ selSlot=null; }
   renderCal(); renderSlots(); syncBookingSummary();
+  /* Alue voi tuoda matkalisän, joka muuttaa kortissa näkyvää summaa. */
+  if(window.__renderGatePrice) window.__renderGatePrice();
 }
 
 function freeSlots(d){
@@ -595,6 +597,77 @@ if(fPostalEl){
   });
 }
 
+/* ---------- ALOITUSKORTTI ----------
+   Varauksen ensimmäinen vaihe. Kalenteri on piilossa kunnes postinumero on
+   annettu ja "Näytä vapaat ajat" painettu: aiemmin kalenteri oli heti näkyvissä
+   tyhjänä, mikä näytti rikkinäiseltä ennen kuin postinumero oli syötetty.
+
+   Taloyhtiö ei varaa aikaa verkosta — sen hinta muodostuu kartoituksessa —
+   joten se polku ohjaa taloyhtiösivulle. */
+const gateEl = document.getElementById('gate');
+if(gateEl){
+  const tabKoti=document.getElementById('tabKoti'), tabYhtio=document.getElementById('tabYhtio');
+  const paneKoti=document.getElementById('gateKoti'), paneYhtio=document.getElementById('gateYhtio');
+  const bookWrap=document.getElementById('bookWrap');
+  const gShow=document.getElementById('gShow');
+
+  function pickPath(koti){
+    tabKoti.classList.toggle('on', koti);   tabKoti.setAttribute('aria-selected', String(koti));
+    tabYhtio.classList.toggle('on', !koti); tabYhtio.setAttribute('aria-selected', String(!koti));
+    paneKoti.hidden = !koti; paneYhtio.hidden = koti;
+    /* Taloyhtiöön siirryttäessä kalenteri piiloon: sen ajat eivät koske
+       taloyhtiötä, eikä auki jäänyt kalenteri saa jäädä harhauttamaan. */
+    if(!koti && bookWrap) bookWrap.hidden = true;
+  }
+  tabKoti.addEventListener('click', ()=>pickPath(true));
+  tabYhtio.addEventListener('click', ()=>pickPath(false));
+
+  /* Kortin hinta tulee laskurin valinnasta. Ilman valintaa ei näytetä
+     summaa vaan ohjataan laskuriin — emme tee ilmaisia kartoituskäyntejä,
+     joten varaus ilman kohteita ei ole mahdollinen. */
+  function renderGatePrice(){
+    const p=document.getElementById('gPrice'), n=document.getElementById('gNet'),
+          m=document.getElementById('gMeta'), e=document.getElementById('gEdit');
+    if(!p) return;
+    const q = computePricing(state, extraState);
+    const fee = (avail.travelFeeCents||0)/100;
+    if(q.total<=0){
+      p.textContent='Valitse kohteet';
+      n.innerHTML='<a href="index.html#laskuri" style="color:var(--green);font-weight:700">Siirry hintalaskuriin</a>';
+      m.textContent='Näet kiinteän hinnan ennen varausta';
+      e.style.display='none';
+      return;
+    }
+    const total=q.total+fee;
+    p.textContent=`${total.toLocaleString('fi-FI')} €`;
+    n.textContent=`~${Math.round(total*NET_FACTOR).toLocaleString('fi-FI')} € kotitalousväh. jälkeen`;
+    const hrs=q.minutes/60;
+    const kesto = hrs<1 ? Math.round(q.minutes)+' min' : (Math.round(hrs*2)/2).toLocaleString('fi-FI')+' h';
+    m.textContent = `sis. ALV 25,5 % · ${kesto}` + (fee>0 ? ` · sis. matkalisä ${fee.toLocaleString('fi-FI')} €` : '');
+    e.style.display='';
+  }
+  window.__renderGatePrice = renderGatePrice;
+
+  gShow.addEventListener('click', async ()=>{
+    if(!/^\d{5}$/.test(avail.postal)){
+      renderAreaNote();
+      document.getElementById('fPostal').focus();
+      return;
+    }
+    gShow.disabled=true; const lbl=gShow.textContent; gShow.textContent='Haetaan…';
+    await loadAvailability();
+    gShow.disabled=false; gShow.textContent=lbl;
+    /* Aikoja ei näytetä jos alue ei ole palveltu — silloin kortissa on
+       yhteydenottolomake eikä kalenteria ole mitään syytä avata. */
+    if(avail.state==='ready' || avail.state==='none'){
+      bookWrap.hidden=false;
+      bookWrap.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  });
+
+  pickPath(true);
+}
+
 /* nouda laskurin valinta varaus-sivulla (jos tullaan laskurista) */
 if(document.getElementById('bServiceName') && !document.getElementById('cpLines')){
   try{ const saved=JSON.parse(sessionStorage.getItem('tk_booking')||'null');
@@ -607,6 +680,10 @@ if(document.getElementById('bServiceName') && !document.getElementById('cpLines'
     }
   }catch(_){}
   gateBookingOnCalculator();
+  /* Kortin hinta piirretään VASTA tässä: `state` on palautettu vasta nyt,
+     ja aiemmin kutsuttuna kortti näyttäisi "Valitse kohteet" vaikka valinta
+     olisi olemassa. */
+  if(window.__renderGatePrice) window.__renderGatePrice();
 }
 
 /* Vapaat ajat haetaan heti kun kalenteri on sivulla. Tämä on viimeisenä,
