@@ -33,7 +33,7 @@ export default async function LeadsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight">Liidit</h1>
+        <h1 className="text-[22px] font-extrabold tracking-tight text-text">Liidit</h1>
         <p className="text-sm text-muted">
           Yhteydenottopyynnöt palvelualueiden ulkopuolelta — kysyntä alueille joilla ei vielä toimita.
         </p>

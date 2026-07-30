@@ -18,7 +18,7 @@ export default async function StaffPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight">Työntekijät</h1>
+        <h1 className="text-[22px] font-extrabold tracking-tight text-text">Työntekijät</h1>
         <p className="text-sm text-muted">
           Kirjautuminen vaatii sekä Supabase Auth -tunnuksen että aktiivisen rivin täällä.
         </p>

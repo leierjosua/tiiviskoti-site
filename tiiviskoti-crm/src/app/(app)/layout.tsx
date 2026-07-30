@@ -14,6 +14,12 @@ const NAV = [
   { href: '/tyontekijat', label: 'Työntekijät', managerOnly: true },
 ];
 
+const ROLE_LABELS: Record<string, string> = {
+  owner: 'Omistaja',
+  admin: 'Toimisto',
+  installer: 'Asentaja',
+};
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const staff = await requireStaff();
   const isManager = staff.role !== 'installer';
@@ -24,15 +30,21 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         items={NAV.filter((i) => isManager || !i.managerOnly).map(({ href, label }) => ({ href, label }))}
         staffName={staff.fullName}
         staffEmail={staff.email}
+        staffRole={ROLE_LABELS[staff.role] ?? staff.role}
         logout={
           <form action={logout}>
-            <Button variant="ghost" type="submit" className="w-full justify-start px-0 text-xs">
+            <button
+              type="submit"
+              className="text-[11px] font-semibold text-nav-muted underline underline-offset-2 transition-colors hover:text-nav-text"
+            >
               Kirjaudu ulos
-            </Button>
+            </button>
           </form>
         }
       />
-      <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
+      <main className="min-w-0 flex-1 p-4 md:p-8">
+        <div className="mx-auto max-w-6xl">{children}</div>
+      </main>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default async function CalendarsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight">Työajat</h1>
+        <h1 className="text-[22px] font-extrabold tracking-tight text-text">Työajat</h1>
         <p className="text-sm text-muted">
           Kalenteri määrää, milloin asentajalle voi varata ajan. Ilman työaikoja vapaita aikoja ei synny.
         </p>

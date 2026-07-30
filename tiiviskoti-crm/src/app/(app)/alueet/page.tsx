@@ -36,7 +36,7 @@ export default async function AreasPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight">Palvelualueet</h1>
+        <h1 className="text-[22px] font-extrabold tracking-tight text-text">Palvelualueet</h1>
         <p className="text-sm text-muted">
           Asiakas syöttää postinumeron, ja siitä ratkeaa kenen kalenterista ajat näytetään.
           Postinumero joka ei osu mihinkään alueeseen ei saa varata aikaa — hänestä tulee liidi.

@@ -49,7 +49,7 @@ export default async function TodayPage() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight">
+        <h1 className="text-[22px] font-extrabold tracking-tight text-text">
           {onlyMine ? 'Omat työt' : 'Tänään ja seuraava viikko'}
         </h1>
         <p className="text-sm text-muted">{jobs.length} työtä kahdeksan päivän sisällä</p>

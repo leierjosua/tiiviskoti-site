@@ -16,12 +16,14 @@ function mondayOf(dateKey: string) {
   return addDays(dateKey, -(isoWeekday(dateKey) - 1));
 }
 
-// Asentajien erotteluun: kalenteri saa värin järjestysnumeronsa mukaan.
+/* Asentajien erotteluun: kalenteri saa värin järjestysnumeronsa mukaan.
+   Vaalealla pinnalla tarvitaan kylläisempi täyttö ja vasen reunaviiva —
+   pelkkä 15 %:n sävy katoaa valkoista vasten. */
 const COLORS = [
-  'border-accent/60 bg-accent/15 text-accent',
-  'border-info/60 bg-info/15 text-info',
-  'border-warn/60 bg-warn/15 text-warn',
-  'border-danger/60 bg-danger/15 text-danger',
+  'border-l-accent bg-accent-dim text-accent',
+  'border-l-info bg-info/10 text-info',
+  'border-l-warn bg-warn/10 text-warn',
+  'border-l-danger bg-danger/10 text-danger',
 ];
 
 export default async function WeekPage({
@@ -48,7 +50,7 @@ export default async function WeekPage({
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Kalenteri</h1>
+          <h1 className="text-[22px] font-extrabold tracking-tight text-text">Kalenteri</h1>
           <p className="text-sm text-muted tabular">
             {formatDateKey(monday)} – {formatDateKey(addDays(monday, 6))} · {active.length} työtä
           </p>
@@ -73,7 +75,7 @@ export default async function WeekPage({
         <div className="flex flex-wrap gap-3 text-xs">
           {calendars.map((cal) => (
             <span key={cal.id} className="flex items-center gap-1.5 text-muted">
-              <span className={`h-2.5 w-2.5 rounded-sm border ${colorOf.get(cal.id)}`} />
+              <span className={`h-2.5 w-2.5 rounded-sm border-l-2 ${colorOf.get(cal.id)}`} />
               {cal.staff_name}
             </span>
           ))}
@@ -128,8 +130,8 @@ export default async function WeekPage({
                           key={job.id}
                           href={`/tyot/${job.id}`}
                           style={{ top, height }}
-                          className={`absolute inset-x-1 overflow-hidden rounded border px-1.5 py-1
-                                      text-[11px] leading-tight hover:brightness-125
+                          className={`absolute inset-x-1 overflow-hidden rounded-md border border-line border-l-[3px] px-1.5 py-1
+                                      text-[11px] leading-tight shadow-sm transition-shadow hover:shadow-md
                                       ${colorOf.get(job.calendar_id) ?? COLORS[0]}`}
                         >
                           <div className="tabular font-medium">{timeOf(job.starts_at)}</div>

@@ -30,7 +30,7 @@ export default async function JobsPage({
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Työt</h1>
+          <h1 className="text-[22px] font-extrabold tracking-tight text-text">Työt</h1>
           <p className="text-sm text-muted">{ordered.length} työtä</p>
         </div>
         <Link

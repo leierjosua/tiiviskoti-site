@@ -43,7 +43,7 @@ export default async function CustomersPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight">Asiakkaat</h1>
+        <h1 className="text-[22px] font-extrabold tracking-tight text-text">Asiakkaat</h1>
         <p className="text-sm text-muted">
           {q ? `${customers.length} osumaa haulla “${q}”` : `${customers.length} asiakasta`}
         </p>

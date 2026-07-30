@@ -1,40 +1,67 @@
 @import 'tailwindcss';
 
 /* =========================================================
-   TiivisKoti CRM — ulkoasun perusta.
+   TiivisKoti CRM — ilme.
 
-   Tumma, tiivis työkalunäkymä: tämä on sisäinen ohjaamo, ei myyntisivu.
-   Rivit ovat matalia ja tiedon tiheys korkea, koska näkymiä katsotaan
-   koko työpäivä. Aksenttivärinä brändin vihreä kirkastettuna niin, että
-   se erottuu tummalta pinnalta.
+   Tumma syvänvihreä sivupalkki, vaalea työtila. Brändi näkyy heti
+   sivupalkissa, mutta taulukot ja lomakkeet ovat vaalealla pinnalla —
+   niitä katsotaan koko työpäivä.
+
+   Värit ovat SAMAT kuin tiiviskoti.fi:llä (index.html :root), jotta
+   paneli ja sivusto ovat tunnistettavasti sama brändi:
+     vihreä  #217A4E   tummin #183A28   syvä #163A28
+     tausta  #F6F7F3   kortti #FFFFFF   pehmeä vihreä #E4F0E9
+     amber   #E0A63A   viivat #E4E8E0 / #D2D9CE
+
+   HUOM tokenien nimistä: `ink-900…600` ovat historiallisia (paneli oli
+   ensin tumma). Ne tarkoittavat nyt pintojen syvyyttä vaalealla:
+   900 = sivun tausta, 800 = kortti, 700 = hover, 600 = korostettu pinta.
+   Nimiä ei muutettu, koska ne ovat käytössä kaikilla sivuilla ja
+   uudelleennimeäminen olisi pelkkää kohinaa ilman hyötyä.
    ========================================================= */
 
 @theme {
-  --color-ink-900: #090d0c;
-  --color-ink-800: #0e1413;
-  --color-ink-700: #141c1a;
-  --color-ink-600: #1b2523;
-  --color-line: #26332f;
-  --color-line-soft: #1d2624;
+  /* Pinnat, vaaleasta syvempään */
+  --color-ink-900: #F6F7F3;   /* sivun tausta */
+  --color-ink-800: #FFFFFF;   /* kortti */
+  --color-ink-700: #F0F3EE;   /* hover */
+  --color-ink-600: #E4F0E9;   /* korostettu pinta, valittu tila */
+  --color-line: #E4E8E0;
+  --color-line-soft: #EDF0EA;
 
-  --color-text: #e6edea;
-  --color-muted: #8c9c96;
-  --color-faint: #5f6d68;
+  /* Teksti */
+  --color-text: #183A28;
+  --color-muted: #4A544D;
+  --color-faint: #7B857D;
 
-  --color-accent: #35c98d;
-  --color-accent-ink: #052015;
-  --color-accent-dim: #1d6b4c;
+  /* Brändi */
+  --color-accent: #217A4E;
+  --color-accent-ink: #FFFFFF;   /* teksti vihreän päällä */
+  --color-accent-dim: #E4F0E9;
 
-  --color-warn: #e0a44e;
-  --color-danger: #e4675f;
-  --color-info: #5aa9e6;
+  /* Sivupalkki — oma tumma paletti */
+  --color-nav: #163A28;
+  --color-nav-deep: #102C1E;
+  --color-nav-line: #24503A;
+  --color-nav-text: #EAF2EC;
+  --color-nav-muted: #A8C0B0;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Tilat */
+  --color-warn: #B7791F;
+  --color-danger: #C0483D;
+  --color-info: #2A6F97;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+
+  /* Sama pyöristys ja pehmeä vihreään taittuva varjo kuin sivustolla */
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgba(24, 58, 40, .04), 0 14px 32px -22px rgba(24, 58, 40, .28);
+  --shadow-nav: 0 20px 40px -30px rgba(16, 44, 30, .6);
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -42,6 +69,7 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Numerot ja kellonajat tasalevyisinä, jotta taulukon sarakkeet eivät
@@ -52,7 +80,7 @@ body {
 
 ::selection {
   background: var(--color-accent-dim);
-  color: #fff;
+  color: var(--color-text);
 }
 
 :focus-visible {
@@ -60,9 +88,14 @@ body {
   outline-offset: 2px;
 }
 
-/* Kapea, tumma vierityspalkki — täysleveä vaalea palkki rikkoo ohjaamon
-   tunnelman Windowsissa. */
+/* Kapea vierityspalkki: Windowsin täysleveä vaalea palkki rikkoo asettelun. */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-line) transparent;
+  scrollbar-color: var(--color-line2, #D2D9CE) transparent;
+}
+
+/* Sivupalkin sisällä käytetään omaa palettia, joten vierityspalkkikin
+   tummenee — muuten palkkiin jää vaalea raita. */
+.nav-surface {
+  scrollbar-color: var(--color-nav-line) transparent;
 }
