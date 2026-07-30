@@ -154,10 +154,17 @@ function render(){
      Varaussivulla ei ole laskurin DOMia, joten `state` on siellä nollilla —
      ilman tätä lomake lähettäisi tyhjän valinnan ja jokainen varaus
      tallentuisi 0 €:na (näin kävi kertaalleen oikeasti). */
-  try{ sessionStorage.setItem('tk_booking', JSON.stringify({
-    total: booking.total, count: booking.count, serviceLabel: booking.serviceLabel,
-    counts: {...state}, extras: {...extraState},
-  })); }catch(_){}
+  /* Vain LASKURISIVU kirjoittaa valinnan talteen. Muilla sivuilla `state` on
+     parhaimmillaan sama kuin tallennettu ja pahimmillaan tyhjä — ja tyhjän
+     kirjoittaminen pyyhki asiakkaan valinnan. Tämä havaittiin kun varaus
+     jaettiin kahdelle sivulle: aloituskortti tallensi nollat päälle ja hinta
+     katosi. Yksi kirjoittaja, monta lukijaa. */
+  if(typesEl){
+    try{ sessionStorage.setItem('tk_booking', JSON.stringify({
+      total: booking.total, count: booking.count, serviceLabel: booking.serviceLabel,
+      counts: {...state}, extras: {...extraState},
+    })); }catch(_){}
+  }
   syncBookingSummary();
 
   if(!document.getElementById('cpLines')) return;
@@ -246,8 +253,11 @@ function bookingMinutes(){
 }
 
 async function loadAvailability(){
-  const wrap = document.getElementById('gridDays');
-  if(!wrap) return;                       // ei kalenteria tällä sivulla
+  /* Ehtona on aluehuomio TAI kalenteri — ei pelkkä kalenteri. Aloituskortin
+     sivulla (varaa.html) ei ole kalenteria mutta alue on silti tarkistettava,
+     jotta asiakas näkee palvellaanko häntä ennen kuin hän siirtyy eteenpäin.
+     Aiemmin tämä poistui heti eikä aluetarkistus ajanut lainkaan. */
+  if(!document.getElementById('areaNote') && !document.getElementById('gridDays')) return;
 
   /* Ilman kelvollista postinumeroa ei haeta mitään eikä näytetä aikoja. */
   if(!/^\d{5}$/.test(avail.postal)){
@@ -489,15 +499,18 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     err.textContent=`Emme vielä palvele postinumerossa ${avail.postal}. Jätä yhteystietosi yltä, niin otamme yhteyttä.`;
     err.style.display='block'; return;
   }
-  if(!/^\d{5}$/.test(avail.postal)){
-    err.textContent='Syötä kohteen postinumero kalenterin yläpuolelle.'; err.style.display='block';
-    if(fPostalEl) fPostalEl.focus();
+  /* Postinumero luetaan `avail.postal`ista eikä lomakkeen kentästä: kenttä on
+     aloituskortissa varaa.html:ssä, ja tällä sivulla numero on tullut
+     kyselyparametrina. Aiemmin tämä luki suoraan #fPostal-elementtiä, joka
+     ei ole tällä sivulla olemassa lainkaan. */
+  const postal = avail.postal;
+  if(!/^\d{5}$/.test(postal)){
+    err.innerHTML='Postinumero puuttuu. <a href="varaa.html" style="text-decoration:underline;font-weight:700">Aloita alusta</a>.';
+    err.style.display='block';
     return;
   }
   const slot = selectedSlot();
   if(!slot){ err.textContent='Valitse ensin vapaa päivä ja aika kalenterista.'; err.style.display='block'; return; }
-  const postal=document.getElementById('fPostal').value.replace(/\D/g,'');
-  if(postal.length!==5){ err.textContent='Tarkista postinumero (5 numeroa).'; err.style.display='block'; return; }
 
   const submitBtn=document.getElementById('bSubmit');
   const btnLabel=submitBtn.textContent;
@@ -654,14 +667,17 @@ if(gateEl){
       document.getElementById('fPostal').focus();
       return;
     }
-    gShow.disabled=true; const lbl=gShow.textContent; gShow.textContent='Haetaan…';
+    gShow.disabled=true; const lbl=gShow.textContent; gShow.textContent='Tarkistetaan…';
+    /* Alue tarkistetaan ENNEN siirtymistä: jos postinumeroa ei palvella, on
+       parempi näyttää yhteydenottolomake tässä kuin viedä asiakas tyhjälle
+       kalenterisivulle. */
     await loadAvailability();
     gShow.disabled=false; gShow.textContent=lbl;
-    /* Aikoja ei näytetä jos alue ei ole palveltu — silloin kortissa on
-       yhteydenottolomake eikä kalenteria ole mitään syytä avata. */
+
     if(avail.state==='ready' || avail.state==='none'){
-      bookWrap.hidden=false;
-      bookWrap.scrollIntoView({behavior:'smooth', block:'start'});
+      /* Kalenteri ja lomake ovat omalla sivullaan. Postinumero kuljetetaan
+         kyselyparametrina, jottei sitä tarvitse syöttää uudelleen. */
+      location.href = `ajanvaraus.html?pn=${encodeURIComponent(avail.postal)}`;
     }
   });
 
@@ -669,7 +685,12 @@ if(gateEl){
 }
 
 /* nouda laskurin valinta varaus-sivulla (jos tullaan laskurista) */
-if(document.getElementById('bServiceName') && !document.getElementById('cpLines')){
+/* Ehto on "sivulla EI ole elävää laskuria" — ei "sivulla on varauslomake".
+   Valinta on palautettava sekä aloituskortille (varaa.html, näyttää hinnan)
+   että ajanvaraussivulle (ajanvaraus.html, lähettää varauksen), ja kummallakin
+   on eri elementit. Aiemmin ehto oli sidottu lomakkeeseen, joten kortti jäi
+   ilman hintaa kun sivut jaettiin. */
+if(!document.getElementById('calcTypes')){
   try{ const saved=JSON.parse(sessionStorage.getItem('tk_booking')||'null');
     if(saved && saved.total>0){
       booking.total=saved.total; booking.count=saved.count; booking.serviceLabel=saved.serviceLabel;
@@ -684,6 +705,19 @@ if(document.getElementById('bServiceName') && !document.getElementById('cpLines'
      ja aiemmin kutsuttuna kortti näyttäisi "Valitse kohteet" vaikka valinta
      olisi olemassa. */
   if(window.__renderGatePrice) window.__renderGatePrice();
+}
+
+/* Ajanvaraussivu (ajanvaraus.html) saa postinumeron kyselyparametrina
+   aloituskortista. Ilman sitä sivulla ei ole mitään näytettävää, joten
+   asiakas ohjataan takaisin alkuun sen sijaan että hän näkisi tyhjän
+   kalenterin ja arvailisi mikä meni vikaan. */
+if(document.getElementById('gridDays') && !document.getElementById('gate')){
+  const pn = new URLSearchParams(location.search).get('pn') || '';
+  if(/^\d{5}$/.test(pn)){
+    avail.postal = pn;
+  } else {
+    location.replace('varaa.html');
+  }
 }
 
 /* Vapaat ajat haetaan heti kun kalenteri on sivulla. Tämä on viimeisenä,

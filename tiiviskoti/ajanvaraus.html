@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Varaa aika — TiivisKoti | Ovien ja ikkunoiden tiivistys</title>
-<meta name="description" content="Varaa aika ovien ja ikkunoiden tiivistykselle suoraan verkosta. Näet vapaat ajat reaaliajassa, valitset ajan ja saat vahvistuksen sähköpostiin." />
+<title>Valitse aika — TiivisKoti | Ovien ja ikkunoiden tiivistys</title>
+<meta name="description" content="Valitse vapaa aika ovien ja ikkunoiden tiivistykselle ja täytä yhteystiedot. Vahvistus sähköpostiin heti." />
 <meta name="theme-color" content="#F6F7F3" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -160,6 +160,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .pill{display:inline-flex;align-items:center;gap:8px;background:var(--green-soft);color:var(--green);
   font-weight:700;font-size:13.5px;padding:7px 15px;border-radius:999px;margin-bottom:14px}
 .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.backlink{display:inline-block;color:var(--green);font-weight:700;font-size:14.5px;margin-bottom:12px}
 .gate{max-width:520px;margin:26px auto 0;background:var(--card);border:1px solid var(--line);
   border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh)}
 .gate-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
@@ -383,92 +384,53 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <button class="burger" id="burger" aria-label="Valikko"><span></span><span></span><span></span></button>
 </div></nav>
 
-<!-- VARAA TIIVISTYS — vaihe 1: polku ja postinumero.
-     Kalenteri ja lomake ovat omalla sivullaan (ajanvaraus.html), koska
-     kortti ja kalenteri samassa näkymässä oli sekava. -->
+<!-- VALITSE AIKA — vaihe 2. Aloituskortti (polku + postinumero) on
+     varaa.html:ssä. Ne on tarkoituksella eri sivuilla: kortti ja kalenteri
+     samassa näkymässä oli sekava, koska kalenteri on iso ja vaatii oman
+     tilansa. Postinumero tulee tänne kyselyparametrina (?pn=). -->
 <section class="sec" id="varaa" style="padding-top:clamp(40px,5vw,72px)"><div class="wrap">
   <div class="center rv">
-    <div class="pill"><span class="dot"></span>Kiinteä hinta — ei piilokustannuksia</div>
-    <h2 class="title">Varaa tiivistys</h2>
-  </div>
-  <div class="gate rv" id="gate">
-    <div class="gate-tabs" role="tablist">
-      <button type="button" class="gate-tab on" id="tabKoti" role="tab" aria-selected="true">
-        <b>Yksi koti</b>
-      </button>
-      <button type="button" class="gate-tab" id="tabYhtio" role="tab" aria-selected="false">
-        <b>Naapurit / taloyhtiö</b><span>sopimushinta</span>
-      </button>
-    </div>
-
-    <!-- Polku 1: yksittäinen koti -->
-    <div id="gateKoti">
-      <div class="gate-top">
-        <div>
-          <div class="gate-price" id="gPrice">—</div>
-          <div class="gate-net" id="gNet"></div>
-          <div class="gate-meta" id="gMeta">sis. ALV 25,5 %</div>
-        </div>
-        <div class="gate-stars">
-          <span class="st">★★★★★</span><b>4,9</b><span class="n">300+ arviota</span>
-        </div>
-      </div>
-
-      <a class="gate-edit" href="index.html#laskuri" id="gEdit">Muokkaa valintaa</a>
-
-      <!-- Postinumero on varauksen ainoa pakollinen ensiaskel: ilman sitä ei
-           tiedetä kenen alueella kohde on eikä aikoja voi näyttää. Siksi se
-           on oma korostettu lohkonsa eikä yksi rivi muun tekstin joukossa. -->
-      <div class="gate-field">
-        <label for="fPostal">
-          <span class="gate-step">1</span>
-          Missä kohde on?
-        </label>
-        <span class="gate-hint">
-          Syötä <b>kohteen postinumero</b> — näytämme vain ne ajat, jotka ovat
-          vapaana sinun alueellasi.
-        </span>
-        <input class="bk-input gate-postal" id="fPostal" inputmode="numeric" maxlength="5" required
-               placeholder="00100" autocomplete="postal-code" aria-describedby="areaNote" />
-      </div>
-
-      <div class="area-note" id="areaNote"></div>
-
-      <button type="button" class="btn btn-p gate-cta" id="gShow">Näytä vapaat ajat</button>
-
-      <div class="gate-ticks">
-        <span>✓ Kiinteä hinta</span><span>✓ Maksu työn jälkeen</span>
-      </div>
-
-      <details class="gate-more">
-        <summary>Mitä sisältää?</summary>
-        <p>Vanhojen tiivisteiden poisto, pintojen puhdistus, uudet EPDM- tai
-        silikonitiivisteet sekä oven käynnin säätö niin että ovi painuu tasaisesti
-        tiivisteitä vasten. Ulko-oviin kuuluu myös kynnyskumi. Lämpökamerakartoitus
-        veloituksetta. Hinta tarkistetaan paikan päällä ennen työn aloitusta.</p>
-      </details>
-    </div>
-
-    <!-- Polku 2: taloyhtiö. Ei kalenterivarausta: taloyhtiön hinnoittelu
-         vaatii kartoituskäynnin, ja se lupaus on taloyhtiösivulla. -->
-    <div id="gateYhtio" hidden>
-      <p class="gate-lead">
-        Rappukäytävät ja yhteistilat kerralla kuntoon <b>sopimushinnalla</b>.
-        Mitä useampi ovi, sitä edullisempi kappalehinta.
-      </p>
-      <div class="gate-ticks col">
-        <span>✓ Veloitukseton kartoituskäynti ja lämpökamerakuvaus</span>
-        <span>✓ Kirjallinen tarjous kartoituksen jälkeen</span>
-        <span>✓ Työ tehdään asukkaita häiritsemättä</span>
-      </div>
-      <a class="btn btn-p gate-cta" href="taloyhtio.html">Pyydä tarjous taloyhtiölle</a>
-      <p class="gate-note">
-        Taloyhtiölle ei varata aikaa verkosta, koska hinta muodostuu kohteen
-        laajuudesta. Kartoitus on maksuton eikä sido mihinkään.
-      </p>
-    </div>
+    <a href="varaa.html" class="backlink">← Muuta postinumeroa tai kohdetta</a>
+    <h2 class="title">Valitse vapaa aika</h2>
+    <p class="sub" id="areaLine">Näytämme vain ne ajat, jotka ovat vapaana alueellasi.</p>
   </div>
 
+  <div class="area-note" id="areaNote" style="max-width:520px;margin:18px auto 0"></div>
+  <div class="book-wrap rv" id="bookWrap">
+    <div class="bcal">
+      <div class="bcal-head">
+        <button class="mnav" id="mPrev" aria-label="Edellinen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="mname" id="mName">—</div>
+        <button class="mnav" id="mNext" aria-label="Seuraava"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="dow"><span>Ma</span><span>Ti</span><span>Ke</span><span>To</span><span>Pe</span><span>La</span><span>Su</span></div>
+      <div class="grid-days" id="gridDays"></div>
+      <div class="slots-wrap"><div class="slots-title" id="slotsTitle">Valitse päivä nähdäksesi vapaat ajat</div><div class="slots" id="slots"></div></div>
+    </div>
+    <aside class="bside">
+      <div id="bookForm">
+        <h3>Varauksesi</h3><div class="bsub">Vahvistamme sähköpostitse — ei maksua nyt.</div>
+        <div class="bsum"><span>Palvelu</span><br><b id="bServiceName">Valitse kohteet laskurista</b><span class="price" id="bPrice">Kiinteä hinta laskurista</span>
+          <div class="when" id="bWhen" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="bWhenText"></span></div></div>
+        <form id="bForm">
+          <div class="bk-field"><label>Nimi</label><input class="bk-input" id="fName" required placeholder="Matti Meikäläinen" /></div>
+          <div class="bk-row"><div class="bk-field"><label>Sähköposti</label><input class="bk-input" id="fEmail" type="email" required placeholder="matti@esimerkki.fi" /></div><div class="bk-field"><label>Puhelin</label><input class="bk-input" id="fPhone" required placeholder="045 123 4567" /></div></div>
+          <!-- Postinumero on siirretty kalenterin yläpuolelle (palvelualueen
+               tarkistus), joten tässä on enää katuosoite. -->
+          <div class="bk-field"><label>Osoite</label><input class="bk-input" id="fAddr" required placeholder="Katuosoite" /></div>
+          <div class="bk-field"><label>Lisätiedot (valinnainen)</label><input class="bk-input" id="fNotes" placeholder="Esim. kerros tai ovikoodi" /></div>
+          <div class="bk-err" id="bErr" style="display:none"></div>
+          <button type="submit" class="btn btn-p btn-lg" style="width:100%;margin-top:6px" id="bSubmit">Vahvista varaus</button>
+          <div class="bk-trust"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/></svg>Varaamalla hyväksyt <a href="kayttoehdot.html" style="text-decoration:underline;text-underline-offset:2px">käyttöehdot</a> ja pyydät, että työ tehdään valitsemanasi ajankohtana. Voit peruuttaa tai siirtää maksutta milloin tahansa. · <a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:2px">Tietosuoja</a></div>
+        </form>
+      </div>
+      <div class="book-done" id="bookDone" style="display:none">
+        <div class="ok"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Varaus vastaanotettu</h3><div class="refno" id="bRef">TK-000000</div><p class="bsub" id="bDoneText" style="margin-top:8px"></p>
+        <button class="btn btn-o" style="margin-top:16px" id="bReset">Tee uusi varaus</button>
+      </div>
+    </aside>
+  </div>
 </div></section>
 
 <!-- FOOTER -->
