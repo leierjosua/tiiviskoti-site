@@ -51,15 +51,26 @@ export async function currentStaff(): Promise<Staff | null> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.email) return null;
 
-  const rows = await sql<{ id: string; email: string; full_name: string; role: Staff['role'] }[]>`
-    update tk.staff
-       set user_id = ${user.id}
+  /* Luku ensin, kirjoitus vain kun se on tarpeen.
+     Tämä oli aiemmin pelkkä UPDATE … RETURNING, joten JOKA sivulataus teki
+     kirjoituksen kantaan. Kirjoitus on tarpeen vain kertaalleen, kun kutsuttu
+     henkilö kirjautuu ensimmäisen kerran ja `user_id` sidotaan riviin. */
+  const rows = await sql<{
+    id: string; email: string; full_name: string; role: Staff['role']; user_id: string | null;
+  }[]>`
+    select id, email, full_name, role, user_id
+      from tk.staff
      where active
        and (user_id = ${user.id} or (user_id is null and lower(email) = lower(${user.email})))
-    returning id, email, full_name, role
+     limit 1
   `;
   const row = rows[0];
   if (!row) return null;
+
+  if (row.user_id === null) {
+    await sql`update tk.staff set user_id = ${user.id} where id = ${row.id}`;
+  }
+
   return { id: row.id, email: row.email, fullName: row.full_name, role: row.role };
 }
 

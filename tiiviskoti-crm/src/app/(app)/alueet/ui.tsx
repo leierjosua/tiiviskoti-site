@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { createArea, deleteArea, updateArea, type ActionState } from './actions';
 import { Button, ErrorNote, Field, Input } from '@/components/ui';
+import { SubmitButton } from '@/components/submit';
 
 function Note({ state }: { state: ActionState }) {
   return (
@@ -89,12 +90,12 @@ export function DeleteArea({ id, name, hasJobs }: { id: string; name: string; ha
   return (
     <form action={deleteArea} className="inline">
       <input type="hidden" name="id" value={id} />
-      <Button variant="ghost" type="submit" className="px-2 py-1 text-xs"
+      <SubmitButton variant="ghost" className="px-2 py-1 text-xs" pendingLabel="…"
               title={hasJobs
                 ? `${name}: alueella on töitä, joten se vain poistetaan käytöstä`
                 : `Poista ${name}`}>
         {hasJobs ? 'Poista käytöstä' : 'Poista'}
-      </Button>
+      </SubmitButton>
     </form>
   );
 }

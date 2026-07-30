@@ -7,6 +7,7 @@ import {
 } from './actions';
 import { setCalendarAreas } from '../alueet/actions';
 import { Button, ErrorNote, Field, Input, Select } from '@/components/ui';
+import { SubmitButton } from '@/components/submit';
 import { weekdayShort } from '@/lib/time';
 
 function Note({ state }: { state: ActionState }) {
@@ -185,7 +186,7 @@ export function DeleteRow({ id, calendarId, kind }: {
     <form action={kind === 'hours' ? deleteHours : deleteException} className="inline">
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="calendarId" value={calendarId} />
-      <Button variant="ghost" type="submit" className="px-2 py-0.5 text-xs">Poista</Button>
+      <SubmitButton variant="ghost" className="px-2 py-0.5 text-xs" pendingLabel="…">Poista</SubmitButton>
     </form>
   );
 }

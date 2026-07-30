@@ -26,12 +26,15 @@ export default async function CalendarDetailPage({ params }: { params: Promise<{
   });
   const previewSlots = preview?.slots.slice(0, 12) ?? [];
 
-  const areas = await sql<{ id: string; name: string; travel_fee_cents: number }[]>`
-    select id, name, travel_fee_cents from tk.areas where active order by name
-  `;
-  const selectedAreas = await sql<{ area_id: string }[]>`
-    select area_id from tk.calendar_areas where calendar_id = ${id}
-  `;
+  // Rinnakkain: kaksi riippumatonta kyselyä.
+  const [areas, selectedAreas] = await Promise.all([
+    sql<{ id: string; name: string; travel_fee_cents: number }[]>`
+      select id, name, travel_fee_cents from tk.areas where active order by name
+    `,
+    sql<{ area_id: string }[]>`
+      select area_id from tk.calendar_areas where calendar_id = ${id}
+    `,
+  ]);
 
   return (
     <div className="space-y-6">

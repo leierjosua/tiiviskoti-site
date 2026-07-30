@@ -30,18 +30,18 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     (job.ends_at.getTime() - job.starts_at.getTime()) / 60_000,
   );
 
-  const lines = await sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
-    select name, quantity, unit_price_cents from tk.job_lines
-     where job_id = ${id} order by sort_order
-  `;
+  // Rivit ja viestiloki ovat toisistaan riippumattomia — haetaan rinnakkain.
+  const [lines, mails] = await Promise.all([
+    sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
+      select name, quantity, unit_price_cents from tk.job_lines
+       where job_id = ${id} order by sort_order
+    `,
+    sql<{ kind: string; to_email: string; sent_at: Date | null; error: string | null }[]>`
+      select kind::text as kind, to_email, sent_at, error from tk.mail_log
+       where job_id = ${id} order by created_at
+    `,
+  ]);
   const lineSumCents = lines.reduce((s, l) => s + l.quantity * l.unit_price_cents, 0);
-
-  const mails = await sql<{
-    kind: string; to_email: string; sent_at: Date | null; error: string | null;
-  }[]>`
-    select kind::text as kind, to_email, sent_at, error from tk.mail_log
-     where job_id = ${id} order by created_at
-  `;
 
   return (
     <div className="space-y-6">

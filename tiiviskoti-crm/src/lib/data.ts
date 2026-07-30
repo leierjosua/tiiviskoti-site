@@ -168,7 +168,13 @@ export async function availability(opts: {
   areaId?: string;
 }): Promise<CalendarAvailability[]> {
   const now = opts.now ?? new Date();
-  await purgeExpiredHolds();
+
+  /* Vanhentuneiden holdien siivous ei odota tässä: se on pelkkää siivousta.
+     Oikeellisuus ei ole sen varassa, koska alla oleva varattujen kysely
+     sulkee vanhentuneet holdit pois joka tapauksessa. Odottaminen lisäisi
+     vain yhden kanta-edestakaisen matkan jokaiseen hakuun. */
+  void purgeExpiredHolds().catch((e) =>
+    console.error('availability: holdien siivous epäonnistui', e));
 
   const calendars = await sql<CalendarRow[]>`
     select c.id, c.staff_id, c.name, c.slot_minutes, c.lead_time_hours,
@@ -187,31 +193,36 @@ export async function availability(opts: {
 
   const ids = calendars.map((c) => c.id);
 
-  const hourRows = await sql<{ calendar_id: string; weekday: number; start_time: string; end_time: string }[]>`
-    select calendar_id, weekday, to_char(start_time, 'HH24:MI') as start_time,
-           to_char(end_time, 'HH24:MI') as end_time
-      from tk.calendar_hours
-     where calendar_id in ${sql(ids)}
-  `;
-
-  const exceptionRows = await sql<{
-    calendar_id: string; date: string; kind: 'closed' | 'open';
-    start_time: string | null; end_time: string | null;
-  }[]>`
-    select calendar_id, to_char(date, 'YYYY-MM-DD') as date, kind,
-           to_char(start_time, 'HH24:MI') as start_time,
-           to_char(end_time, 'HH24:MI') as end_time
-      from tk.calendar_exceptions
-     where calendar_id in ${sql(ids)} and date >= current_date - 1
-  `;
-
-  const busyRows = await sql<{ calendar_id: string; starts_at: Date; ends_at: Date }[]>`
-    select calendar_id, starts_at, ends_at
-      from tk.jobs
-     where calendar_id in ${sql(ids)}
-       and status <> 'cancelled'
-       and ends_at > now()
-  `;
+  /* Kolme riippumatonta kyselyä rinnakkain. Peräkkäin ajettuina ne olivat
+     kolme erillistä kanta-edestakaista matkaa; nyt ne menevät yhtä aikaa. */
+  const [hourRows, exceptionRows, busyRows] = await Promise.all([
+    sql<{ calendar_id: string; weekday: number; start_time: string; end_time: string }[]>`
+      select calendar_id, weekday, to_char(start_time, 'HH24:MI') as start_time,
+             to_char(end_time, 'HH24:MI') as end_time
+        from tk.calendar_hours
+       where calendar_id in ${sql(ids)}
+    `,
+    sql<{
+      calendar_id: string; date: string; kind: 'closed' | 'open';
+      start_time: string | null; end_time: string | null;
+    }[]>`
+      select calendar_id, to_char(date, 'YYYY-MM-DD') as date, kind,
+             to_char(start_time, 'HH24:MI') as start_time,
+             to_char(end_time, 'HH24:MI') as end_time
+        from tk.calendar_exceptions
+       where calendar_id in ${sql(ids)} and date >= current_date - 1
+    `,
+    /* Vanhentunut hold ei varaa aikaa, vaikka siivous ei olisi vielä ehtinyt
+       poistaa riviä — siksi ehto on tässä eikä siivouksen varassa. */
+    sql<{ calendar_id: string; starts_at: Date; ends_at: Date }[]>`
+      select calendar_id, starts_at, ends_at
+        from tk.jobs
+       where calendar_id in ${sql(ids)}
+         and status <> 'cancelled'
+         and ends_at > now()
+         and not (status = 'hold' and hold_expires_at < now())
+    `,
+  ]);
 
   return calendars.map((calendar) => {
     const hours: WeeklyHour[] = hourRows

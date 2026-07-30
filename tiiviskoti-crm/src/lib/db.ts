@@ -24,7 +24,13 @@ export const sql: postgres.Sql =
   postgres(url, {
     // Poolerin transaktiotila ei tue valmisteltuja kyselyitä.
     prepare: false,
-    max: process.env.NODE_ENV === 'production' ? 1 : 3,
+    /* Sivu tekee useita kyselyitä. Aiempi `max: 1` tuotannossa pakotti ne
+       jonoon yhdelle yhteydelle, eli Promise.all ei rinnakkaistanut mitään.
+       Supabasen pooler on transaktiotilassa, joten useampi yhteys per
+       instanssi on turvallista — se kierrättää ne omassa poolissaan. */
+    max: 5,
+    /* Serverless-instanssi voi jäädä lämpimänä pitkäksi aikaa. Lyhyt
+       idle_timeout vapauttaa yhteydet poolerille käyttämättömänä. */
     idle_timeout: 20,
     connect_timeout: 15,
     ssl: 'require',

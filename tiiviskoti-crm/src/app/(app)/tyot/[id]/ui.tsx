@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import { deleteJob, rescheduleJob, setJobStatus, updateJob, type ActionState } from '../actions';
 import { Button, ErrorNote, Field, Input, Textarea, cx } from '@/components/ui';
+import { SubmitButton } from '@/components/submit';
 import { dateKeyOf, timeOf } from '@/lib/time';
 
 /** 'YYYY-MM-DDTHH:MM' Suomen aikaa — datetime-local odottaa juuri tätä. */
@@ -139,7 +140,7 @@ export function DeleteJob({ id, status }: { id: string; status: string }) {
   return (
     <form action={deleteJob}>
       <input type="hidden" name="id" value={id} />
-      <Button variant="danger" type="submit" className="text-xs">Poista työ pysyvästi</Button>
+      <SubmitButton variant="danger" className="text-xs" pendingLabel="Poistetaan…">Poista työ pysyvästi</SubmitButton>
     </form>
   );
 }
@@ -150,7 +151,7 @@ export function MarkDone({ id }: { id: string }) {
     <form action={setJobStatus}>
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="status" value="done" />
-      <Button type="submit" variant="outline" className="text-sm">Merkitse tehdyksi</Button>
+      <SubmitButton variant="outline" className="text-sm" pendingLabel="Merkitään…">Merkitse tehdyksi</SubmitButton>
     </form>
   );
 }
@@ -169,14 +170,13 @@ export function StatusButtons({ id, status }: { id: string; status: string }) {
         <form key={option.value} action={setJobStatus}>
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="status" value={option.value} />
-          <Button
-            type="submit"
+          <SubmitButton
             variant={option.value === 'cancelled' ? 'danger' : 'outline'}
             disabled={status === option.value}
             className={cx('text-xs', status === option.value && 'border-accent text-accent')}
           >
             {option.label}
-          </Button>
+          </SubmitButton>
         </form>
       ))}
     </div>

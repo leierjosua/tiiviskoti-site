@@ -33,6 +33,31 @@ Aika tallennetaan aina UTC:nä (`timestamptz`). Suomen aikaa käytetään vain
 kahdessa paikassa: kun viikkoaikataulun kellonaika muutetaan hetkeksi, ja
 kun hetki näytetään. Molemmat ovat `src/lib/time.ts`:ssä.
 
+## Suorituskyky — miksi `regions: ["lhr1"]`
+
+`vercel.json` lukitsee funktiot **Lontooseen**, koska Supabase-projekti on
+`eu-west-2` (Lontoo). Ilman tätä Vercel ajoi ne `iad1`:ssä (Washington), ja
+jokainen kanta­kysely ylitti Atlantin: yhden sivun 3–5 kyselyä tarkoitti
+1,1 sekunnin vasteaikaa. Alueen vaihdon jälkeen sama kutsu on ~0,3 s.
+
+**Jos Supabase-projekti siirretään toiseen alueeseen, tämä on muutettava
+samalla.** `vercel.json` ei tue kommentteja, siksi perustelu on tässä.
+
+Muut suorituskykyä koskevat valinnat:
+
+- `lib/db.ts` `max: 5` — aiempi `max: 1` tuotannossa pakotti kaikki kyselyt
+  jonoon yhdelle yhteydelle, joten `Promise.all` ei rinnakkaistanut mitään.
+- `lib/session.ts` lukee `tk.staff`-rivin SELECTillä ja kirjoittaa vain kun
+  `user_id` on vielä sitomatta. Aiemmin joka sivulataus teki UPDATEn.
+- Riippumattomat kyselyt ajetaan `Promise.all`illa (saatavuus, työn sivu,
+  kalenterin sivu).
+- `app/(app)/loading.tsx` antaa navigoinnille välittömän palautteen. Ilman
+  sitä linkin painaminen ei näytä mitään ennen kuin palvelin vastaa, ja
+  käyttäjä painaa uudelleen.
+- `components/submit.tsx` — Server Action -napit näyttävät lataustilan
+  `useFormStatus`illa ja estyvät sen ajaksi, joten samaa toimintoa ei
+  vahingossa tehdä kahdesti.
+
 ## Kehitys
 
 ```bash

@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { addStaff, setStaffActive, type ActionState } from './actions';
 import { Button, ErrorNote, Field, Input, Select } from '@/components/ui';
+import { SubmitButton } from '@/components/submit';
 
 export function AddStaffForm() {
   const [state, action, pending] = useActionState<ActionState, FormData>(addStaff, {});
@@ -45,9 +46,9 @@ export function ToggleActive({ id, active }: { id: string; active: boolean }) {
     <form action={setStaffActive} className="inline">
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="active" value={active ? 'false' : 'true'} />
-      <Button variant="ghost" type="submit" className="px-2 py-1 text-xs">
+      <SubmitButton variant="ghost" className="px-2 py-1 text-xs" pendingLabel="…">
         {active ? 'Poista käytöstä' : 'Palauta käyttöön'}
-      </Button>
+      </SubmitButton>
     </form>
   );
 }
