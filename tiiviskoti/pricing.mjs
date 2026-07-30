@@ -16,10 +16,13 @@
    Varauksen rahasumma tulee aina täältä.
    ========================================================= */
 
-/* Aloitusmaksu: matkat, kartoitus ja lämpökamerakuvaus. Lisätään aina
-   valittujen kohteiden päälle — ei siis minimiveloitus. */
-export const BASE_PRICE = 99;
-export const BASE_PRICE_NAME = 'Aloitusmaksu';
+/* Minimiveloitus: pienin summa, jolla lähdemme käynnille. Kattaa matkat,
+   kartoituksen ja lämpökamerakuvauksen. EI lisätä valittujen kohteiden
+   päälle — hinta on kohteiden summa, kuitenkin vähintään tämä. Niin kauan
+   kuin kohteita on vähän, hinta pysyy 149 €:ssa ja lähtee nousemaan vasta
+   kun kohteiden summa ylittää sen. */
+export const MIN_PRICE = 149;
+export const MIN_PRICE_NAME = `Pienen käynnin lisä (min. ${MIN_PRICE} €)`;
 
 /* Ikkunoiden määräporrastus. Koko ikkunamäärä hinnoitellaan sen portaan
    yksikköhinnalla, johon kokonaismäärä osuu — ei liukuvasti portaittain.
@@ -98,11 +101,17 @@ export function extraQtyFor(extra, counts, totalItems) {
  *                          oliosta avaimella `extra_<id>`, esim. {extra_kahva: 2}.
  * @param {Object} extras   valitut lisätyöt, esim. {sauma: true, helat: false}.
  *                          'kpl'-tyyppinen lisätyö on päällä kun sen määrä > 0.
- * @returns {{lines: Array, subtotal: number, total: number, count: number, minutes: number}}
- *          `lines` sisältää aloitusmaksun ensimmäisenä rivinä, joten rivien
- *          summa on aina täsmälleen `total`.
+ * @param {Object} [opts]   `travelFee` = palvelualueen matkalisä euroina.
+ *                          Se EI ole tämän moduulin tiedossa vaan tulee CRM:n
+ *                          `tk.areas`-taulusta postinumeron perusteella, koska
+ *                          alueet muuttuvat ilman koodimuutosta.
+ * @returns {{lines: Array, subtotal: number, work: number, travelFee: number,
+ *            total: number, count: number, minutes: number}}
+ *          `work` = työn hinta minimiveloitus mukaan lukien, `total` = work +
+ *          matkalisä. Rivien summa on aina täsmälleen `total`.
  */
-export function computePricing(counts = {}, extras = {}) {
+export function computePricing(counts = {}, extras = {}, opts = {}) {
+  const travelFee = Math.max(0, Number(opts.travelFee) || 0);
   const c = counts || {};
   const x = extras || {};
   const totalItems = TYPES.reduce((s, t) => s + int(c[t.id]), 0);
@@ -132,13 +141,28 @@ export function computePricing(counts = {}, extras = {}) {
     lines.push({ kind: 'extra', id: e.id, name: e.name, qty, unit: e.price, unitName: e.unit || 'kpl', sum, min: e.min || 0, note: e.note });
   }
 
-  /* Ei valintoja → ei hintaa. Aloitusmaksua ei veloiteta yksinään, koska
+  /* Ei valintoja → ei hintaa. Minimiveloitusta ei peritä yksinään, koska
      emme tee ilmaisia eikä pelkkiä kartoituskäyntejä. */
   if (subtotal <= 0) {
-    return { lines: [], subtotal: 0, total: 0, count: 0, minutes: 0 };
+    return { lines: [], subtotal: 0, work: 0, travelFee: 0, total: 0, count: 0, minutes: 0 };
   }
 
-  lines.unshift({ kind: 'base', id: 'base', name: BASE_PRICE_NAME, qty: 1, unit: BASE_PRICE, sum: BASE_PRICE, min: 0 });
+  /* Minimiveloitus. Erotus kirjataan omaksi rivikseen eikä pyöristämällä
+     kohderivejä ylös, jotta rivien summa on aina täsmälleen `total`
+     (create-booking hylkää varauksen jos ne eivät täsmää) ja asiakas näkee
+     kohteiden oikeat listahinnat. */
+  const work = Math.max(subtotal, MIN_PRICE);
+  if (work > subtotal) {
+    const diff = work - subtotal;
+    lines.push({ kind: 'min', id: 'min', name: MIN_PRICE_NAME, qty: 1, unit: diff, sum: diff, min: 0 });
+  }
 
-  return { lines, subtotal, total: BASE_PRICE + subtotal, count: totalItems, minutes };
+  /* Matkalisä minimiveloituksen PÄÄLLE, ei sen sisään: minimi kattaa jo
+     tavanomaisen matkan, ja kaukaisen alueen lisä on siitä erillinen. Siksi
+     150 €:n työ Uusimaan ulkopuolella on 149 € + lisä eikä pelkkä 149 €. */
+  if (travelFee > 0) {
+    lines.push({ kind: 'travel', id: 'travel', name: 'Matkalisä', qty: 1, unit: travelFee, sum: travelFee, min: 0 });
+  }
+
+  return { lines, subtotal, work, travelFee, total: work + travelFee, count: totalItems, minutes };
 }

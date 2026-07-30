@@ -1,0 +1,68 @@
+@import 'tailwindcss';
+
+/* =========================================================
+   TiivisKoti CRM — ulkoasun perusta.
+
+   Tumma, tiivis työkalunäkymä: tämä on sisäinen ohjaamo, ei myyntisivu.
+   Rivit ovat matalia ja tiedon tiheys korkea, koska näkymiä katsotaan
+   koko työpäivä. Aksenttivärinä brändin vihreä kirkastettuna niin, että
+   se erottuu tummalta pinnalta.
+   ========================================================= */
+
+@theme {
+  --color-ink-900: #090d0c;
+  --color-ink-800: #0e1413;
+  --color-ink-700: #141c1a;
+  --color-ink-600: #1b2523;
+  --color-line: #26332f;
+  --color-line-soft: #1d2624;
+
+  --color-text: #e6edea;
+  --color-muted: #8c9c96;
+  --color-faint: #5f6d68;
+
+  --color-accent: #35c98d;
+  --color-accent-ink: #052015;
+  --color-accent-dim: #1d6b4c;
+
+  --color-warn: #e0a44e;
+  --color-danger: #e4675f;
+  --color-info: #5aa9e6;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-ink-900);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Numerot ja kellonajat tasalevyisinä, jotta taulukon sarakkeet eivät
+   nytkähtele arvon vaihtuessa. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--color-accent-dim);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Kapea, tumma vierityspalkki — täysleveä vaalea palkki rikkoo ohjaamon
+   tunnelman Windowsissa. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}

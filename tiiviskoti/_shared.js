@@ -8,7 +8,7 @@
    api/create-booking.mjs käyttää. Näin laskurin näyttämä ja veloitettava
    hinta lasketaan samasta koodista eivätkä voi erota toisistaan.
    ========================================================= */
-import { TYPES, EXTRAS, BASE_PRICE, NET_FACTOR, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
+import { TYPES, EXTRAS, NET_FACTOR, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
 
 const ico = {
   ulko:'<svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3" width="12" height="18" rx="1.5" stroke="currentColor" stroke-width="1.8"/><circle cx="14.5" cy="12" r="1.2" fill="currentColor"/></svg>',
@@ -23,7 +23,7 @@ const ico = {
 const TIER_HINT = 'Mitä useampi ikkuna, sitä halvempi: 5+ 85 € · 10+ 75 € · 20+ 65 €';
 
 const FAQ = [
-  ['Paljonko tiivistys maksaa?','Varauksen aloitusmaksu on 99 € (sis. matkat, kartoituksen ja lämpökamerakuvauksen), ja sen päälle lisätään valitsemasi kohteet kiinteillä hinnoilla. Ikkuna maksaa 95 € kappaleelta, ja hinta laskee määrän mukaan: 5–9 ikkunaa 85 €, 10–19 ikkunaa 75 € ja 20 ikkunasta ylöspäin 65 € kappaleelta. Ulko- ja parvekeovi on 119 €, terassin liuku- tai pariovi 149 €. Esimerkiksi kuusi ikkunaa on 99 € + 6 × 85 € = 609 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
+  ['Paljonko tiivistys maksaa?','Pienin veloitus on 149 €, joka kattaa käynnin, matkat, kartoituksen ja lämpökamerakuvauksen. Sen jälkeen hinta muodostuu valitsemistasi kohteista kiinteillä hinnoilla. Ikkuna maksaa 95 € kappaleelta, ja hinta laskee määrän mukaan: 5–9 ikkunaa 85 €, 10–19 ikkunaa 75 € ja 20 ikkunasta ylöspäin 65 € kappaleelta. Ulko- ja parvekeovi on 119 €, terassin liuku- tai pariovi 149 €. Esimerkiksi yksi ikkuna on 149 € (minimiveloitus) ja kuusi ikkunaa 6 × 85 € = 510 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
   ['Miksi ovi on halvempi kun tilaan samalla muutakin?','Suurin yksittäinen kustannus pienessä työssä on matka ja työpisteen pystytys. Kun asentaja on jo paikalla, seuraava kohde maksaa vähemmän: ulko- ja parvekeovi 119 € → 99 € ja väli- tai huoneovi 89 € → 59 €, kun samaan käyntiin kuuluu vähintään yksi muu ovi tai ikkuna. Laskuri huomioi tämän automaattisesti.'],
   ['Mitä tiivisteiden vaihtoon sisältyy?','Vanhojen tiivisteiden poisto, pintojen puhdistus, uudet laadukkaat EPDM- tai silikonitiivisteet sekä oven käynnin säätö niin, että ovi painuu tasaisesti tiivisteitä vasten. Ulko-oviin kuuluu myös kynnyskumi.'],
   ['Kannattaako vetävä ovi tiivistää vai vaihtaa?','Jos ovilehti ja karmi ovat suorassa ja ovi toimii, pelkkä tiivisteiden uusiminen riittää lähes aina — se maksaa murto-osan uuden oven (2 200–4 900 €) hinnasta ja poistaa vedon. Arvioimme kunnon paikan päällä ja kerromme rehellisesti.'],
@@ -194,21 +194,107 @@ if(faqEl){
   });
 }
 
-/* ---------- kalenterivaraus ---------- */
-const WORK_SLOTS = ['08:00','10:00','12:00','14:00'];
-const booked = {};
+/* ---------- kalenterivaraus ----------
+
+   Vapaat ajat tulevat CRM:n rajapinnasta, joka laskee ne asentajien
+   työajoista, poikkeuspäivistä ja jo varatuista töistä.
+
+   Aiemmin tämä arpoi "varatut" ajat päivämäärän hajautusarvosta, eli sivu
+   näytti asiakkaalle saatavuutta jolla ei ollut mitään tekemistä sen
+   kanssa oliko kalenterissa tilaa. Älä palauta arvontaa: jos rajapinta ei
+   vastaa, näytetään puhelinnumero eikä keksittyjä aikoja. */
+const CRM_BASE = 'https://tiiviskoti-crm.vercel.app';
 const MONTHS = ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu','heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu'];
-function seededTaken(key){ let h=0; for(let i=0;i<key.length;i++){ h=(h*31 + key.charCodeAt(i))>>>0; }
-  const set=new Set(); WORK_SLOTS.forEach((s,i)=>{ if(((h>>(i*3)) & 7) < 4) set.add(s); }); return set; }
-function takenFor(key){ if(!booked[key]) booked[key]=seededTaken(key); return booked[key]; }
 function pad(n){return String(n).padStart(2,'0');}
 function keyOf(d){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}
 const today = new Date(); today.setHours(0,0,0,0);
-const minBook = new Date(today); minBook.setDate(minBook.getDate()+1);
 const maxBook = new Date(today); maxBook.setDate(maxBook.getDate()+70);
 let viewY = today.getFullYear(), viewM = today.getMonth(), selDay = null, selSlot = null;
-function freeSlots(d){ const dow=d.getDay(); if(dow===0) return []; if(d<minBook||d>maxBook) return [];
-  const set=takenFor(keyOf(d)); let slots=WORK_SLOTS.filter(s=>!set.has(s)); if(dow===6) slots=slots.slice(0,2); return slots; }
+
+/* slotsByDay: 'YYYY-MM-DD' → [{time:'08:00', startsAt:ISO, calendarId}]
+
+   avail.state:
+     'postal'   = postinumeroa ei ole vielä annettu (aloitustila)
+     'loading'  = haetaan
+     'ready'    = aikoja on
+     'none'     = alue palvellaan mutta kalenteri on täynnä
+     'unserved' = postinumero ei kuulu mihinkään palvelualueeseen
+     'error'    = rajapinta ei vastannut
+
+   Postinumero on pakko tietää ENNEN aikoja: vapaat ajat riippuvat siitä
+   kenen alueella kohde on. Ilman sitä näytettäisiin aikoja asentajilta jotka
+   eivät tule paikalle — sama valheellinen kalenteri eri muodossa. */
+const avail = { state:'postal', slotsByDay:new Map(), minutes:0, postal:'', area:null, travelFeeCents:0 };
+
+/* Ajat näytetään AINA Suomen aikaa, ei selaimen aikavyöhykkeellä. Rajapinta
+   palauttaa UTC:tä, ja `new Date(iso).getHours()` antaisi ulkomailla olevalle
+   asiakkaalle väärän kellonajan — klo 8 työ näkyisi Espanjassa klo 7. */
+const FI_TIME = new Intl.DateTimeFormat('fi-FI', {
+  timeZone:'Europe/Helsinki', hour:'2-digit', minute:'2-digit', hour12:false,
+});
+const FI_DATE = new Intl.DateTimeFormat('sv-SE', {   // sv-SE antaa 'YYYY-MM-DD'
+  timeZone:'Europe/Helsinki', year:'numeric', month:'2-digit', day:'2-digit',
+});
+const fiTime = (d)=>FI_TIME.format(d).replace('.',':');
+const fiDateKey = (d)=>FI_DATE.format(d);
+
+/** Kalenterivarauksen kesto: sama arvio kuin laskurin "arvioitu kesto".
+ *  Vähintään 30 min, ettei rajapinnalta pyydetä nollan mittaista aikaa. */
+function bookingMinutes(){
+  try{ const m = computePricing(state, extraState).minutes; if(m>0) return Math.max(30, m); }catch(_){}
+  return 120;
+}
+
+async function loadAvailability(){
+  const wrap = document.getElementById('gridDays');
+  if(!wrap) return;                       // ei kalenteria tällä sivulla
+
+  /* Ilman kelvollista postinumeroa ei haeta mitään eikä näytetä aikoja. */
+  if(!/^\d{5}$/.test(avail.postal)){
+    avail.state='postal'; avail.slotsByDay=new Map(); avail.area=null; avail.travelFeeCents=0;
+    selDay=null; selSlot=null; renderCal(); renderSlots(); renderAreaNote(); syncBookingSummary();
+    return;
+  }
+
+  avail.state='loading'; renderCal(); renderSlots(); renderAreaNote();
+  const minutes = bookingMinutes();
+  avail.minutes = minutes;
+  try{
+    const r = await fetch(`${CRM_BASE}/api/public/availability?postal=${avail.postal}&days=70&minutes=${minutes}`);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+
+    if(data.served === false){
+      avail.state='unserved'; avail.slotsByDay=new Map(); avail.area=null; avail.travelFeeCents=0;
+      selDay=null; selSlot=null; renderCal(); renderSlots(); renderAreaNote(); syncBookingSummary();
+      return;
+    }
+
+    avail.area = data.area ? data.area.name : null;
+    avail.travelFeeCents = data.area ? (data.area.travelFeeCents||0) : 0;
+    const map = new Map();
+    (data.slots||[]).forEach(s=>{
+      const d = new Date(s.startsAt);
+      const key = fiDateKey(d);
+      if(!map.has(key)) map.set(key, []);
+      map.get(key).push({ time:fiTime(d), startsAt:s.startsAt, calendarId:s.calendarId });
+    });
+    avail.slotsByDay = map;
+    avail.state = map.size ? 'ready' : 'none';
+  }catch(_){
+    avail.state = 'error';
+  }
+  renderAreaNote();
+  /* Valittu aika voi kadota päivityksessä (kesto muuttui tai joku ehti
+     varata sen), joten valinta nollataan jos se ei enää ole tarjolla. */
+  if(selDay && selSlot && !freeSlots(selDay).some(s=>s.time===selSlot)){ selSlot=null; }
+  renderCal(); renderSlots(); syncBookingSummary();
+}
+
+function freeSlots(d){
+  if(d<today || d>maxBook) return [];
+  return avail.slotsByDay.get(keyOf(d)) || [];
+}
 function renderCal(){
   const grid = document.getElementById('gridDays'); if(!grid) return;
   document.getElementById('mName').textContent = `${MONTHS[viewM]} ${viewY}`;
@@ -220,7 +306,9 @@ function renderCal(){
     const d = new Date(viewY, viewM, dn); d.setHours(0,0,0,0);
     const el = document.createElement('button'); el.type='button'; el.textContent = dn;
     const isToday = d.getTime()===today.getTime(); if(isToday) el.classList.add('today');
-    if(d<minBook||d>maxBook||d.getDay()===0){ el.className='day off'+(isToday?' today':''); el.disabled=true; grid.appendChild(el); continue; }
+    /* Viikonpäiviä ei enää suodateta täällä: työajat tulevat asentajien
+       kalentereista, joten lauantai voi olla auki ja tiistai kiinni. */
+    if(d<today||d>maxBook){ el.className='day off'+(isToday?' today':''); el.disabled=true; grid.appendChild(el); continue; }
     const free = freeSlots(d);
     if(free.length===0){ el.className='day full'+(isToday?' today':''); el.disabled=true; }
     else { el.className='day free'+(isToday?' today':''); const dot=document.createElement('span'); dot.className='dot'; el.appendChild(dot);
@@ -230,16 +318,118 @@ function renderCal(){
   }
   document.getElementById('mPrev').disabled = (viewY===today.getFullYear() && viewM===today.getMonth());
 }
+/* Palvelualueen tila kalenterin yläpuolella: kerrotaan palvellaanko
+   postinumerossa, ja jos ei, tarjotaan yhteydenottolomake. */
+function renderAreaNote(){
+  const box = document.getElementById('areaNote'); if(!box) return;
+  const s = avail.state;
+
+  if(s==='postal'){
+    box.className='area-note';
+    box.innerHTML='<b>Syötä postinumero</b><span>Näytämme vapaat ajat sen asentajan kalenterista, joka palvelee aluettasi.</span>';
+    return;
+  }
+  if(s==='loading'){
+    box.className='area-note';
+    box.innerHTML='<b>Tarkistetaan aluetta…</b>';
+    return;
+  }
+  if(s==='unserved'){
+    box.className='area-note bad';
+    box.innerHTML=
+      `<b>Emme vielä palvele postinumerossa ${avail.postal}</b>`+
+      '<span>Jätä yhteystietosi, niin otamme yhteyttä kun laajennumme alueellesi — tai soita '+
+      '<a href="tel:+358458755996">045 875 5996</a>.</span>'+
+      '<div id="leadWrap" style="margin-top:12px"></div>';
+    renderLeadForm();
+    return;
+  }
+  if(s==='error'){
+    box.className='area-note bad';
+    box.innerHTML='<b>Alueen tarkistus ei onnistunut</b><span>Soita <a href="tel:+358458755996">045 875 5996</a>, niin sovitaan aika puhelimessa.</span>';
+    return;
+  }
+
+  const fee = avail.travelFeeCents;
+  box.className='area-note ok';
+  box.innerHTML =
+    `<b>Palvelemme postinumerossa ${avail.postal}${avail.area?` · ${avail.area}`:''}</b>`+
+    (fee>0
+      ? `<span>Alueelle lisätään matkalisä <b>${(fee/100).toLocaleString('fi-FI')} €</b>, joka näkyy hinnassa alla.</span>`
+      : '<span>Ei matkalisää tälle alueelle.</span>');
+}
+
+/* Yhteydenottolomake palvelualueen ulkopuolelta. Rakennetaan JS:llä, koska
+   se näkyy vain harvoin — turha viedä tilaa HTML:stä joka latauksella. */
+function renderLeadForm(){
+  const wrap = document.getElementById('leadWrap'); if(!wrap) return;
+  wrap.innerHTML =
+    '<div class="lead-f">'+
+    '<input id="ldName" type="text" placeholder="Nimi" autocomplete="name">'+
+    '<input id="ldPhone" type="tel" placeholder="Puhelin" autocomplete="tel">'+
+    '<input id="ldEmail" type="email" placeholder="Sähköposti (vapaaehtoinen)" autocomplete="email">'+
+    '<button type="button" id="ldSend" class="btn btn-p">Ota yhteyttä minuun</button>'+
+    '<div id="ldMsg" class="lead-msg"></div>'+
+    '</div>';
+  const btn = document.getElementById('ldSend');
+  btn.addEventListener('click', async ()=>{
+    const msg = document.getElementById('ldMsg');
+    const name = document.getElementById('ldName').value.trim();
+    const phone = document.getElementById('ldPhone').value.trim();
+    const email = document.getElementById('ldEmail').value.trim();
+    if(!name || !phone){ msg.textContent='Anna vähintään nimi ja puhelinnumero.'; msg.className='lead-msg bad'; return; }
+    btn.disabled=true; msg.textContent='Lähetetään…'; msg.className='lead-msg';
+    try{
+      const r = await fetch(`${CRM_BASE}/api/public/lead`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ name, phone, email, postal:avail.postal }),
+      });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      msg.textContent='Kiitos! Otamme yhteyttä kun palvelemme alueellasi.';
+      msg.className='lead-msg ok';
+      document.querySelector('.lead-f').querySelectorAll('input,button').forEach(el=>el.disabled=true);
+    }catch(_){
+      msg.textContent='Lähetys ei onnistunut. Soita 045 875 5996.';
+      msg.className='lead-msg bad';
+      btn.disabled=false;
+    }
+  });
+}
+
 function renderSlots(){
   const wrap=document.getElementById('slots'); if(!wrap) return;
   const title=document.getElementById('slotsTitle'); wrap.innerHTML='';
+
+  /* Saatavuuden tila kerrotaan suoraan. Erityisesti virhetilanteessa EI
+     näytetä aikoja, koska väärä lupaus on pahempi kuin puuttuva kalenteri. */
+  if(avail.state==='postal'){ title.textContent='Syötä ensin postinumero'; return; }
+  if(avail.state==='unserved'){ title.textContent='Alue ei ole palvelualueellamme'; return; }
+  if(avail.state==='loading'){ title.textContent='Haetaan vapaita aikoja…'; return; }
+  if(avail.state==='error'){
+    title.textContent='Vapaita aikoja ei juuri nyt saada haettua';
+    wrap.innerHTML='<div class="slots-empty">Soita <a href="tel:+358458755996" style="font-weight:700;text-decoration:underline">045 875 5996</a>, niin sovitaan aika puhelimessa.</div>';
+    return;
+  }
+  if(avail.state==='none'){
+    title.textContent='Ei vapaita aikoja';
+    wrap.innerHTML='<div class="slots-empty">Kalenteri on täynnä. Soita <a href="tel:+358458755996" style="font-weight:700;text-decoration:underline">045 875 5996</a>, niin etsitään aika.</div>';
+    return;
+  }
+
   if(!selDay){ title.textContent='Valitse päivä nähdäksesi vapaat ajat'; return; }
   const free=freeSlots(selDay);
   const wd=['sunnuntai','maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai'][selDay.getDay()];
   title.textContent = `Vapaat ajat — ${wd} ${selDay.getDate()}.${selDay.getMonth()+1}.`;
   if(free.length===0){ wrap.innerHTML='<div class="slots-empty">Ei vapaita aikoja tänä päivänä. Valitse toinen päivä.</div>'; return; }
-  free.forEach(s=>{ const b=document.createElement('button'); b.type='button'; b.className='slot'+(selSlot===s?' sel':''); b.textContent=s;
-    b.addEventListener('click',()=>{ selSlot=s; renderSlots(); syncBookingSummary(); }); wrap.appendChild(b); });
+  free.forEach(s=>{ const b=document.createElement('button'); b.type='button'; b.className='slot'+(selSlot===s.time?' sel':''); b.textContent=s.time;
+    b.addEventListener('click',()=>{ selSlot=s.time; renderSlots(); syncBookingSummary(); }); wrap.appendChild(b); });
+}
+
+/** Valittuna oleva aika täysine tietoineen (ISO-alku ja kalenteri), jotta
+ *  varaus osuu täsmälleen siihen slottiin jonka asiakas näki. */
+function selectedSlot(){
+  if(!selDay || !selSlot) return null;
+  return freeSlots(selDay).find(s=>s.time===selSlot) || null;
 }
 const mPrevBtn=document.getElementById('mPrev'), mNextBtn=document.getElementById('mNext');
 if(mPrevBtn) mPrevBtn.addEventListener('click',()=>{ if(viewM===0){viewM=11;viewY--;}else viewM--; renderCal(); });
@@ -248,8 +438,16 @@ function syncBookingSummary(){
   const nameEl=document.getElementById('bServiceName'); if(!nameEl) return;
   nameEl.textContent = booking.serviceLabel;
   const priceEl = document.getElementById('bPrice');
-  if(booking.total>0){ const net = Math.round(booking.total*NET_FACTOR);
-    priceEl.innerHTML = `${booking.total.toLocaleString('fi-FI')} € <span style="font-size:13px;opacity:.75;font-weight:600">· vähennyksen jälk. n. ${net.toLocaleString('fi-FI')} €</span>`;
+  if(booking.total>0){
+    /* Matkalisä tulee palvelualueesta, joten se voidaan näyttää vasta kun
+       postinumero on tiedossa. Näytetty summa on sama jonka CRM veloittaa:
+       työ + alueen lisä. */
+    const fee = (avail.travelFeeCents||0)/100;
+    const shown = booking.total + fee;
+    const net = Math.round(shown*NET_FACTOR);
+    priceEl.innerHTML = `${shown.toLocaleString('fi-FI')} € `
+      + (fee>0 ? `<span style="font-size:13px;opacity:.75;font-weight:600">· sis. matkalisä ${fee.toLocaleString('fi-FI')} €</span> ` : '')
+      + `<span style="font-size:13px;opacity:.75;font-weight:600">· vähennyksen jälk. n. ${net.toLocaleString('fi-FI')} €</span>`;
   } else { priceEl.textContent = 'Valitse kohteet hintalaskurista nähdäksesi hinnan'; }
   const whenEl=document.getElementById('bWhen'), whenTxt=document.getElementById('bWhenText'); whenEl.style.display='flex';
   if(selDay && selSlot){ const wd=['su','ma','ti','ke','to','pe','la'][selDay.getDay()];
@@ -285,7 +483,17 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     err.innerHTML='Valitse ensin ovet tai ikkunat hintalaskurista. <a href="index.html#laskuri" style="text-decoration:underline;font-weight:700">Siirry laskuriin</a>';
     err.style.display='block'; return;
   }
-  if(!selDay || !selSlot){ err.textContent='Valitse ensin vapaa päivä ja aika kalenterista.'; err.style.display='block'; return; }
+  if(avail.state==='unserved'){
+    err.textContent=`Emme vielä palvele postinumerossa ${avail.postal}. Jätä yhteystietosi yltä, niin otamme yhteyttä.`;
+    err.style.display='block'; return;
+  }
+  if(!/^\d{5}$/.test(avail.postal)){
+    err.textContent='Syötä kohteen postinumero kalenterin yläpuolelle.'; err.style.display='block';
+    if(fPostalEl) fPostalEl.focus();
+    return;
+  }
+  const slot = selectedSlot();
+  if(!slot){ err.textContent='Valitse ensin vapaa päivä ja aika kalenterista.'; err.style.display='block'; return; }
   const postal=document.getElementById('fPostal').value.replace(/\D/g,'');
   if(postal.length!==5){ err.textContent='Tarkista postinumero (5 numeroa).'; err.style.display='block'; return; }
 
@@ -300,8 +508,10 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     address: document.getElementById('fAddr').value.trim(),
     postal,
     notes: document.getElementById('fNotes').value.trim(),
-    date: keyOf(selDay),
-    slot: selSlot,
+    /* Täsmällinen alkuhetki ja kalenteri siitä slotista jonka asiakas näki.
+       Palvelin varaa ajan näillä ja ratkaisee alueen postinumerosta. */
+    startsAt: slot.startsAt,
+    calendarId: slot.calendarId,
     /* Lähetetään raaka valinta, ei hintoja: palvelin laskee summan samasta
        pricing.mjs:stä eikä luota clientin lukuihin. */
     counts: {...state},
@@ -316,6 +526,19 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     if(!r.ok || !data.ok){
       if(data && data.error==='no_items'){
         err.innerHTML='Varaus vaatii vähintään yhden oven tai ikkunan. <a href="index.html#laskuri" style="text-decoration:underline;font-weight:700">Valitse kohteet laskurista</a>';
+      } else if(data && data.error==='slot_taken'){
+        /* Joku ehti varata saman ajan. Haetaan vapaat ajat uudelleen, jotta
+           asiakas näkee heti mitä on jäljellä eikä yritä samaa aikaa toiste. */
+        err.textContent='Valitettavasti tämä aika ehdittiin juuri varata. Valitse toinen aika kalenterista.';
+        loadAvailability();
+      } else if(data && data.error==='area_not_served'){
+        err.textContent=`Emme vielä palvele postinumerossa ${data.postal||postal}. Jätä yhteystietosi kalenterin yläpuolelta.`;
+        loadAvailability();
+      } else if(data && data.error==='calendar_area_mismatch'){
+        /* Postinumero on vaihtunut valinnan jälkeen niin, että aika kuuluu
+           toiselle alueelle. Haetaan ajat uudelleen oikealle alueelle. */
+        err.textContent='Postinumero ja valittu aika eivät täsmää. Valitse aika uudelleen.';
+        loadAvailability();
       } else {
         err.textContent = data && data.error==='validation'
           ? 'Tarkista lomakkeen tiedot ja yritä uudelleen.'
@@ -326,8 +549,6 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
       return;
     }
 
-    // onnistui: merkitse slotti varatuksi, näytä kuittaus
-    takenFor(keyOf(selDay)).add(selSlot);
     const name = payload.name.split(' ')[0] || 'hei';
     const wd=['su','ma','ti','ke','to','pe','la'][selDay.getDay()];
     const when = `${wd} ${selDay.getDate()}.${selDay.getMonth()+1}. klo ${selSlot}`;
@@ -338,7 +559,9 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     const priceTxt = ` Kohde: ${booking.count} kohdetta · ${totalEur.toLocaleString('fi-FI')} €.`;
     document.getElementById('bDoneText').textContent = `Kiitos, ${name}! Olemme sinuun yhteydessä ja vahvistamme ajan osoitteeseen ${payload.email}. Aika: ${when}.${priceTxt}`;
     try{ sessionStorage.removeItem('tk_booking'); }catch(_){}
-    selSlot=null; renderCal(); renderSlots();
+    /* Varattu aika katoaa vapaista vasta kun se haetaan uudelleen — nyt
+       kalenteri kertoo totuuden eikä sitä voi merkitä paikallisesti. */
+    selSlot=null; loadAvailability();
     submitBtn.disabled=false; submitBtn.textContent=btnLabel;
   }catch(ex){
     err.textContent='Yhteysvirhe. Tarkista verkkoyhteys ja yritä uudelleen, tai soita 045 875 5996.';
@@ -353,8 +576,24 @@ if(bResetEl) bResetEl.addEventListener('click',()=>{
   document.getElementById('bForm').reset();
   selDay=null; selSlot=null; renderCal(); renderSlots(); syncBookingSummary();
 });
+/* Postinumero ohjaa koko kalenteria: kun se on täydet 5 numeroa, haetaan
+   alue ja sen vapaat ajat. Haku viivästetään hieman, jottei jokainen
+   näppäinpainallus lähetä pyyntöä. */
 const fPostalEl=document.getElementById('fPostal');
-if(fPostalEl) fPostalEl.addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,5); });
+if(fPostalEl){
+  let postalTimer=null;
+  fPostalEl.addEventListener('input',e=>{
+    e.target.value=e.target.value.replace(/\D/g,'').slice(0,5);
+    const v=e.target.value;
+    if(v===avail.postal) return;
+    avail.postal=v;
+    clearTimeout(postalTimer);
+    /* Keskeneräinen postinumero nollaa kalenterin heti — muuten edellisen
+       alueen ajat jäisivät näkyviin väärälle postinumerolle. */
+    if(v.length<5){ loadAvailability(); return; }
+    postalTimer=setTimeout(()=>loadAvailability(), 250);
+  });
+}
 
 /* nouda laskurin valinta varaus-sivulla (jos tullaan laskurista) */
 if(document.getElementById('bServiceName') && !document.getElementById('cpLines')){
@@ -369,6 +608,11 @@ if(document.getElementById('bServiceName') && !document.getElementById('cpLines'
   }catch(_){}
   gateBookingOnCalculator();
 }
+
+/* Vapaat ajat haetaan heti kun kalenteri on sivulla. Tämä on viimeisenä,
+   jotta `state`/`extraState` on jo palautettu sessionStorageesta ja pyyntö
+   lähtee oikealla kestolla. */
+if(document.getElementById('gridDays')) loadAvailability();
 
 /* ---------- nav / burger / reveal ---------- */
 const nav=document.getElementById('nav'), nl=document.getElementById('nlinks');

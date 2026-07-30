@@ -5,7 +5,7 @@
 //   - peruutus/siirto ja takuun pituus: käyttäjän vastaus 2026-07-26
 //   - takuun rajoitukset: adminin tarjous-PDF (OfferPdfContent.tsx s. 4), jotta
 //     verkkosivu ja sopimuspaperi eivät sano eri asiaa
-//   - hinnat: _shared.js BASE_PRICE + TYPES + EXTRAS
+//   - hinnat: pricing.mjs MIN_PRICE + WINDOW_TIERS + TYPES + EXTRAS
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const DIR = 'C:/Users/josua/projects/loppusiivous-main-new/tiiviskoti';
@@ -79,19 +79,30 @@ const body = `
       postinumerossa.</p>
 
     <h2>3. Hinnat</h2>
-    <p>Varauksen <b>aloitusmaksu on 99 €</b>, ja sen päälle lisätään valitsemasi kohteet kiinteillä
-      hinnoilla:</p>
+    <p>Hinta muodostuu valitsemistasi kohteista kiinteillä hinnoilla:</p>
     <dl class="kv">
-      <div><dt>Ulko-ovi</dt><dd>89 € / kpl</dd></div>
-      <div><dt>Parvekeovi</dt><dd>79 € / kpl</dd></div>
-      <div><dt>Terassi- / liukuovi</dt><dd>109 € / kpl</dd></div>
-      <div><dt>Väli- / huoneovi</dt><dd>49 € / kpl</dd></div>
-      <div><dt>Ikkuna</dt><dd>39 € / kpl</dd></div>
+      <div><dt>Ikkuna, 1–4 kpl</dt><dd>95 € / kpl</dd></div>
+      <div><dt>Ikkuna, 5–9 kpl</dt><dd>85 € / kpl</dd></div>
+      <div><dt>Ikkuna, 10–19 kpl</dt><dd>75 € / kpl</dd></div>
+      <div><dt>Ikkuna, 20 kpl tai enemmän</dt><dd>65 € / kpl</dd></div>
+      <div><dt>Ulko-ovi tai parvekeovi</dt><dd>119 € / kpl</dd></div>
+      <div><dt>Terassin liuku- tai pariovi</dt><dd>149 € / kpl</dd></div>
+      <div><dt>Väli- / huoneovi</dt><dd>89 € / kpl</dd></div>
       <div><dt>Pelkkä kynnyskumi</dt><dd>45 € / kpl</dd></div>
-      <div><dt>Vanhan liiman poisto (lisäpalvelu)</dt><dd>15 €</dd></div>
     </dl>
-    <p style="margin-top:18px">Hinnat sisältävät arvonlisäveron 25,5 %. Näet kokonaishinnan
-      hintalaskurista ennen varausta.</p>
+    <p style="margin-top:18px"><b>Minimiveloitus on 149 €</b> käynniltä. Se kattaa käynnin, matkat,
+      kohteen kartoituksen ja lämpökamerakuvauksen. Jos valittujen kohteiden ja lisätöiden summa jää
+      alle 149 €:n, erotus veloitetaan omana rivinään ja varauksen hinnaksi tulee 149 €. Kun summa
+      ylittää 149 €, veloitamme vain kohteiden mukaisen hinnan.</p>
+    <p><b>Saman käynnin hinta.</b> Kun samaan käyntiin kuuluu vähintään kaksi
+      kohdetta, ulko- ja parvekeoven hinta on 99 € / kpl ja väli- tai huoneoven 59 € / kpl.
+      Ikkunoiden yksikköhinta määräytyy saman käynnin ikkunamäärän mukaan yllä olevan
+      porrastuksen mukaisesti.</p>
+    <p><b>Lisätyöt</b> veloitetaan erikseen vain, jos ne on tilattu: karmin ja seinän välin
+      akryylisaumaus 19 € / aukko, helojen ja käyntivälyksen säätö 15 € / ikkuna, kahvan vaihto
+      29 € / kpl sekä vaihdettavan kahvan hinta, ja vanhan liiman poisto 15 €.</p>
+    <p>Hinnat sisältävät arvonlisäveron 25,5 %. Näet kokonaishinnan hintalaskurista ennen
+      varausta.</p>
     <p><b>Hinta tarkistetaan paikan päällä.</b> Jos työn laajuus poikkeaa varauksessa ilmoitetusta —
       esimerkiksi ovia on eri määrä tai ovi vaatii työtä, joka ei kuulu tiivistevaihtoon — sovimme
       uudesta hinnasta kanssasi ennen työn aloittamista. Emme tee veloitettavaa lisätyötä ilman
