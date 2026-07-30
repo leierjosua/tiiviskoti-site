@@ -66,7 +66,37 @@ export default async function JobsPage({
         {ordered.length === 0 ? (
           <Empty>Ei töitä tällä jaksolla.</Empty>
         ) : (
-          <table className="w-full min-w-[640px] text-sm">
+          <>
+            {/* Puhelin: korttilista. Taulukko oli 640 px leveä ja vaati
+                vaakavierityksen, jolloin asiakas ja osoite jäivät piiloon. */}
+            <ul className="divide-y divide-line-soft md:hidden">
+              {ordered.map((job) => (
+                <li key={job.id}>
+                  <Link href={`/tyot/${job.id}`} className="block px-4 py-3 hover:bg-ink-700">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm font-bold tabular">
+                        {formatDateKey(dateKeyOf(job.starts_at))}
+                      </span>
+                      <span className="text-sm tabular text-muted">
+                        {timeOf(job.starts_at)}–{timeOf(job.ends_at)}
+                      </span>
+                      <span className="ml-auto"><StatusBadge status={job.status} /></span>
+                    </div>
+                    <p className="mt-1 text-sm font-semibold">{job.customer_name ?? job.title}</p>
+                    <p className="truncate text-xs text-muted">
+                      {[job.address, job.postal_code, job.city].filter(Boolean).join(', ') || '—'}
+                    </p>
+                    <div className="mt-1 flex items-baseline gap-2 text-xs text-faint">
+                      <span className="tabular">{job.job_number}</span>
+                      <span>·</span>
+                      <span className="truncate">{job.staff_name}</span>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <table className="hidden w-full min-w-[640px] text-sm md:table">
             <thead>
               <tr className="border-b border-line text-left text-xs text-faint">
                 <th className="px-4 py-2 font-medium">Numero</th>
@@ -102,6 +132,7 @@ export default async function JobsPage({
               ))}
             </tbody>
           </table>
+          </>
         )}
       </Card>
     </div>

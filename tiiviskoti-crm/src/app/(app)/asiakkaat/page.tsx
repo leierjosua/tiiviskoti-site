@@ -62,7 +62,28 @@ export default async function CustomersPage({
         {customers.length === 0 ? (
           <Empty>{q ? 'Ei osumia.' : 'Ei asiakkaita vielä.'}</Empty>
         ) : (
-          <table className="w-full min-w-[640px] text-sm">
+          <>
+          {/* Puhelin: korttilista, koska taulukon 640 px leikkasi osoitteen. */}
+          <ul className="divide-y divide-line-soft md:hidden">
+            {customers.map((c) => (
+              <li key={c.id}>
+                <Link href={`/asiakkaat/${c.id}`} className="block px-4 py-3 hover:bg-ink-700">
+                  <div className="flex items-baseline gap-2">
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold">{c.full_name}</span>
+                    <span className="shrink-0 text-xs tabular text-faint">
+                      {c.jobs} työtä · {(c.total_cents / 100).toLocaleString('fi-FI')} €
+                    </span>
+                  </div>
+                  {c.phone && <p className="text-sm tabular text-muted">{c.phone}</p>}
+                  <p className="truncate text-xs text-faint">
+                    {[c.address, c.postal_code, c.city].filter(Boolean).join(', ') || '—'}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <table className="hidden w-full min-w-[640px] text-sm md:table">
             <thead>
               <tr className="border-b border-line text-left text-xs text-faint">
                 <th className="px-4 py-2 font-medium">Nimi</th>
@@ -101,6 +122,7 @@ export default async function CustomersPage({
               ))}
             </tbody>
           </table>
+          </>
         )}
       </Card>
     </div>

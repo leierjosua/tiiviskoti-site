@@ -73,16 +73,61 @@ export default async function WeekPage({
 
       {calendars.length > 0 && (
         <div className="flex flex-wrap gap-3 text-xs">
-          {calendars.map((cal) => (
-            <span key={cal.id} className="flex items-center gap-1.5 text-muted">
-              <span className={`h-2.5 w-2.5 rounded-sm border-l-2 ${colorOf.get(cal.id)}`} />
-              {cal.staff_name}
-            </span>
-          ))}
+          {calendars.map((cal) => {
+            /* Jos henkilöllä on useampi kalenteri, pelkkä nimi näkyisi
+               selitteessä kahdesti identtisenä — silloin näytetään myös
+               kalenterin nimi. */
+            const sameName = calendars.filter((c) => c.staff_name === cal.staff_name).length > 1;
+            return (
+              <span key={cal.id} className="flex items-center gap-1.5 text-muted">
+                <span className={`h-2.5 w-2.5 rounded-sm border-l-2 ${colorOf.get(cal.id)}`} />
+                {cal.staff_name}
+                {sameName && <span className="text-faint">· {cal.name}</span>}
+              </span>
+            );
+          })}
         </div>
       )}
 
-      <Card className="overflow-x-auto">
+      {/* Puhelin: päiväkohtainen lista. Viikkoruudukko on 900 px leveä, joten
+          390 px:n ruudulla siitä näkyi vain kaksi päivää kerrallaan — koko
+          viikkonäkymän tarkoitus katosi. */}
+      <div className="space-y-3 md:hidden">
+        {days.map((day) => {
+          const dayJobs = active.filter((j) => dateKeyOf(j.starts_at) === day);
+          return (
+            <Card key={day}>
+              <div className="flex items-baseline gap-2 border-b border-line-soft px-4 py-2.5">
+                <span className={`text-sm font-bold ${day === today ? 'text-accent' : 'text-text'}`}>
+                  {weekdayShort(isoWeekday(day))}
+                </span>
+                <span className="text-xs text-faint tabular">{formatDateKey(day)}</span>
+                <span className="ml-auto text-xs text-faint">
+                  {dayJobs.length === 0 ? '—' : `${dayJobs.length} työtä`}
+                </span>
+              </div>
+              {dayJobs.length > 0 && (
+                <ul className="divide-y divide-line-soft">
+                  {dayJobs.map((job) => (
+                    <li key={job.id}>
+                      <Link href={`/tyot/${job.id}`}
+                            className="flex items-baseline gap-3 px-4 py-2.5 text-sm hover:bg-ink-700">
+                        <span className="tabular font-semibold">{timeOf(job.starts_at)}</span>
+                        <span className="min-w-0 flex-1 truncate">
+                          {job.customer_name ?? job.title}
+                        </span>
+                        <span className="shrink-0 text-xs text-faint">{job.staff_name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+
+      <Card className="hidden overflow-x-auto md:block">
         {calendars.length === 0 ? (
           <Empty>Ei aktiivisia kalentereita.</Empty>
         ) : (

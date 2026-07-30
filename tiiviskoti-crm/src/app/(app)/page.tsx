@@ -123,7 +123,9 @@ export default async function TodayPage() {
 
       {s && (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {/* Kaksi saraketta jo puhelimessa: yksi allekkain vei neljä ruutua
+              pystysuunnassa, eikä päivän keikkoja nähnyt vierittämättä. */}
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <Metric
               label="Myynti tänään"
               value={eur(s.myynti_tanaan)}
@@ -221,7 +223,24 @@ export default async function TodayPage() {
               Kalenteri →
             </Link>}
           />
-          <table className="w-full min-w-[560px] text-sm">
+          {/* Puhelin: sama tieto listana. Taulukko leikkasi osoitteen. */}
+          <ul className="divide-y divide-line-soft md:hidden">
+            {laterJobs.map((job) => (
+              <li key={job.id}>
+                <Link href={`/tyot/${job.id}`}
+                      className="flex items-baseline gap-2 px-4 py-2.5 text-sm hover:bg-ink-700">
+                  <span className="shrink-0 tabular font-semibold">
+                    {formatDateKey(dateKeyOf(job.starts_at)).slice(0, -5)}
+                  </span>
+                  <span className="shrink-0 tabular text-muted">{timeOf(job.starts_at)}</span>
+                  <span className="min-w-0 flex-1 truncate">{job.customer_name ?? job.title}</span>
+                  <span className="shrink-0 text-xs tabular text-faint">{eur(job.price_cents)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <table className="hidden w-full min-w-[560px] text-sm md:table">
             <tbody className="divide-y divide-line-soft">
               {laterJobs.map((job) => (
                 <tr key={job.id} className="hover:bg-ink-700">

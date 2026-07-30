@@ -31,11 +31,11 @@ export default async function CalendarsPage() {
                 <li key={cal.id}>
                   <Link
                     href={`/kalenterit/${cal.id}`}
-                    className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-ink-700"
+                    className="flex flex-col gap-1 px-4 py-3 text-sm hover:bg-ink-700 sm:flex-row sm:items-center sm:gap-3"
                   >
-                    <span className="w-44 shrink-0 truncate font-medium">{cal.name}</span>
-                    <span className="w-40 shrink-0 truncate text-muted">{cal.staff_name}</span>
-                    <span className="flex-1 text-xs text-faint tabular">
+                    <span className="truncate font-semibold sm:w-44 sm:shrink-0">{cal.name}</span>
+                    <span className="truncate text-muted sm:w-40 sm:shrink-0">{cal.staff_name}</span>
+                    <span className="text-xs text-faint tabular sm:flex-1">
                       {cal.slot_minutes} min välein · aikaisintaan {cal.lead_time_hours} h päästä ·{' '}
                       {cal.horizon_days} vrk eteenpäin
                     </span>
