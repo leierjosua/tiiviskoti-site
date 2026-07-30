@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { requireStaff } from '@/lib/session';
-import { addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, weekdayName } from '@/lib/time';
-import { Card, Empty, StatusBadge } from '@/components/ui';
+import { addDays, dateKeyOf, formatDateKey, helsinkiDateTime, timeOf } from '@/lib/time';
+import { Card, CardHeader, Empty, StatusBadge } from '@/components/ui';
 import { MarkDone } from './tyot/[id]/ui';
 
 export const dynamic = 'force-dynamic';
@@ -14,32 +14,88 @@ type DayJob = {
   staff_name: string; customer_name: string | null; customer_phone: string | null;
 };
 
+const eur = (cents: number) => (cents / 100).toLocaleString('fi-FI', { maximumFractionDigits: 0 }) + ' €';
+
+/* Tunnusluku. Vertailuluku alle kertoo mihin lukua verrataan — pelkkä
+   numero ilman mittakaavaa ei kerro onko päivä hyvä vai huono. */
+function Metric({ label, value, sub, tone = 'plain' }: {
+  label: string; value: string; sub?: string; tone?: 'plain' | 'accent';
+}) {
+  return (
+    <Card className="p-4">
+      <p className="text-[11px] font-bold tracking-wide text-faint uppercase">{label}</p>
+      <p className={`mt-1.5 text-[26px] leading-none font-extrabold tabular ${
+        tone === 'accent' ? 'text-accent' : 'text-text'
+      }`}>
+        {value}
+      </p>
+      {sub && <p className="mt-1.5 text-xs text-muted">{sub}</p>}
+    </Card>
+  );
+}
+
 export default async function TodayPage() {
   const staff = await requireStaff();
+
   const today = dateKeyOf(new Date());
-  const from = helsinkiDateTime(today, '00:00');
-  const to = helsinkiDateTime(addDays(today, 8), '00:00');
+  const dayStart = helsinkiDateTime(today, '00:00');
+  const dayEnd = helsinkiDateTime(addDays(today, 1), '00:00');
+  const monthAgo = helsinkiDateTime(addDays(today, -30), '00:00');
+  const weekAhead = helsinkiDateTime(addDays(today, 8), '00:00');
 
   /* Asentaja näkee vain omat työnsä — päivänäkymä on hänelle työlista, ei
-     koko yrityksen tilannekuva. Toimisto ja omistaja näkevät kaikki. */
+     yrityksen tilannekuva. Tunnusluvut ovat siksi vain toimistolle. */
   const onlyMine = staff.role === 'installer';
 
-  const jobs = await sql<DayJob[]>`
-    select j.id, j.job_number, j.starts_at, j.ends_at, j.status::text as status, j.title,
-           j.address, j.postal_code, j.city, j.price_cents, j.notes,
-           s.full_name as staff_name, cu.full_name as customer_name, cu.phone as customer_phone
+  const [jobs, stats] = await Promise.all([
+    sql<DayJob[]>`
+      select j.id, j.job_number, j.starts_at, j.ends_at, j.status::text as status, j.title,
+             j.address, j.postal_code, j.city, j.price_cents, j.notes,
+             s.full_name as staff_name, cu.full_name as customer_name, cu.phone as customer_phone
+        from tk.jobs j
+        join tk.calendars c on c.id = j.calendar_id
+        join tk.staff s on s.id = c.staff_id
+        left join tk.customers cu on cu.id = j.customer_id
+       where j.starts_at >= ${dayStart.toISOString()} and j.starts_at < ${weekAhead.toISOString()}
+         and j.status <> 'cancelled'
+         ${onlyMine ? sql`and s.id = ${staff.id}` : sql``}
+       order by j.starts_at
+    `,
+    /* Kaikki tunnusluvut yhdellä kyselyllä: erilliset kyselyt olisivat neljä
+       kanta-edestakaista matkaa siinä missä tässä riittää yksi. */
+    onlyMine ? Promise.resolve([]) : sql<{
+      myynti_tanaan: number; keikat_tanaan: number;
+      uudet_varaukset: number; uudet_arvo: number;
+      kpl_30pv: number; myynti_30pv: number;
+      tulevat: number; liidit_uudet: number;
+    }[]>`
+      select
+        -- Myynti tänään = tänään TEHTÄVÄT työt (kalenterin mukaan)
+        coalesce(sum(case when j.starts_at >= ${dayStart.toISOString()}
+                           and j.starts_at <  ${dayEnd.toISOString()}
+                          then j.price_cents end), 0)::int          as myynti_tanaan,
+        count(*) filter (where j.starts_at >= ${dayStart.toISOString()}
+                           and j.starts_at <  ${dayEnd.toISOString()})::int as keikat_tanaan,
+        -- Uudet varaukset = tänään SAAPUNEET (luontihetki)
+        count(*) filter (where j.created_at >= ${dayStart.toISOString()})::int as uudet_varaukset,
+        coalesce(sum(case when j.created_at >= ${dayStart.toISOString()}
+                          then j.price_cents end), 0)::int          as uudet_arvo,
+        -- Viimeiset 30 päivää: tehtävät työt, ei saapuneet
+        count(*) filter (where j.starts_at >= ${monthAgo.toISOString()}
+                           and j.starts_at <  ${dayEnd.toISOString()})::int  as kpl_30pv,
+        coalesce(sum(case when j.starts_at >= ${monthAgo.toISOString()}
+                           and j.starts_at <  ${dayEnd.toISOString()}
+                          then j.price_cents end), 0)::int          as myynti_30pv,
+        count(*) filter (where j.starts_at >= ${dayEnd.toISOString()})::int   as tulevat,
+        (select count(*)::int from tk.leads where status = 'new')             as liidit_uudet
       from tk.jobs j
-      join tk.calendars c on c.id = j.calendar_id
-      join tk.staff s on s.id = c.staff_id
-      left join tk.customers cu on cu.id = j.customer_id
-     where j.starts_at >= ${from.toISOString()} and j.starts_at < ${to.toISOString()}
-       and j.status <> 'cancelled'
-       ${onlyMine ? sql`and s.id = ${staff.id}` : sql``}
-     order by j.starts_at
-  `;
+      where j.status <> 'cancelled'
+    `,
+  ]);
 
-  const days = Array.from({ length: 8 }, (_, i) => addDays(today, i));
-  const byDay = new Map(days.map((d) => [d, jobs.filter((j) => dateKeyOf(j.starts_at) === d)]));
+  const s = stats[0];
+  const todayJobs = jobs.filter((j) => dateKeyOf(j.starts_at) === today);
+  const laterJobs = jobs.filter((j) => dateKeyOf(j.starts_at) !== today);
 
   const mapUrl = (j: DayJob) =>
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -47,81 +103,150 @@ export default async function TodayPage() {
     )}`;
 
   return (
-    <div className="space-y-5">
-      <header>
-        <h1 className="text-[22px] font-extrabold tracking-tight text-text">
-          {onlyMine ? 'Omat työt' : 'Tänään ja seuraava viikko'}
-        </h1>
-        <p className="text-sm text-muted">{jobs.length} työtä kahdeksan päivän sisällä</p>
+    <div className="space-y-6">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-extrabold tracking-tight text-text">
+            {onlyMine ? 'Omat työt' : 'Yhteenveto'}
+          </h1>
+          <p className="mt-0.5 text-sm text-muted">
+            {formatDateKey(today)} · {todayJobs.length} keikkaa tänään
+          </p>
+        </div>
+        {!onlyMine && (
+          <Link href="/tyot/uusi"
+                className="rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-accent-ink hover:bg-[#1A6340]">
+            Uusi työ
+          </Link>
+        )}
       </header>
 
-      {days.map((day) => {
-        const dayJobs = byDay.get(day) ?? [];
-        if (dayJobs.length === 0 && day !== today) return null;
+      {s && (
+        <>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Metric
+              label="Myynti tänään"
+              value={eur(s.myynti_tanaan)}
+              tone="accent"
+              sub={`${s.keikat_tanaan} keikkaa kalenterissa`}
+            />
+            <Metric
+              label="Uudet varaukset"
+              value={String(s.uudet_varaukset)}
+              sub={s.uudet_varaukset > 0 ? `arvo ${eur(s.uudet_arvo)}` : 'tänään saapuneet'}
+            />
+            <Metric
+              label="Varaukset 30 pv"
+              value={String(s.kpl_30pv)}
+              sub={`myynti ${eur(s.myynti_30pv)}`}
+            />
+            <Metric
+              label="Keikat tänään"
+              value={String(s.keikat_tanaan)}
+              sub={`${s.tulevat} tulevaa varausta`}
+            />
+          </div>
 
-        return (
-          <section key={day} className="space-y-2">
-            <div className="flex items-baseline gap-2">
-              <h2 className="text-sm font-semibold">
-                {day === today ? 'Tänään' : weekdayName(isoWeekday(day))}
-              </h2>
-              <span className="text-xs text-faint tabular">{formatDateKey(day)}</span>
-            </div>
+          {s.liidit_uudet > 0 && (
+            <Link href="/liidit"
+                  className="block rounded-lg border border-warn/35 bg-warn/10 px-4 py-3 text-sm text-warn hover:bg-warn/15">
+              <b>{s.liidit_uudet} uutta liidiä</b> palvelualueiden ulkopuolelta odottaa käsittelyä →
+            </Link>
+          )}
+        </>
+      )}
 
-            {dayJobs.length === 0 ? (
-              <Card><Empty>Ei töitä.</Empty></Card>
-            ) : (
-              dayJobs.map((job) => (
-                <Card key={job.id} className="p-4">
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-lg font-semibold tabular">
-                      {timeOf(job.starts_at)}–{timeOf(job.ends_at)}
-                    </span>
-                    <StatusBadge status={job.status} />
-                    <Link href={`/tyot/${job.id}`}
-                          className="ml-auto text-xs text-accent hover:underline tabular">
-                      {job.job_number} →
+      {/* Tänään tehtävät keikat: sama korttimuoto kuin ennen, koska se toimii
+          puhelimessa. Reitti ja soitto ovat päivän tärkeimmät napit. */}
+      <section className="space-y-2">
+        <h2 className="text-sm font-bold tracking-wide text-text uppercase">Keikat tänään</h2>
+        {todayJobs.length === 0 ? (
+          <Card><Empty>Ei keikkoja tänään.</Empty></Card>
+        ) : (
+          todayJobs.map((job) => (
+            <Card key={job.id} className="p-4">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="text-lg font-bold tabular">
+                  {timeOf(job.starts_at)}–{timeOf(job.ends_at)}
+                </span>
+                <StatusBadge status={job.status} />
+                <Link href={`/tyot/${job.id}`}
+                      className="ml-auto text-xs font-semibold text-accent hover:underline tabular">
+                  {job.job_number} →
+                </Link>
+              </div>
+
+              <p className="mt-2 text-base font-semibold">{job.customer_name ?? job.title}</p>
+              <p className="text-sm text-muted">
+                {[job.address, job.postal_code, job.city].filter(Boolean).join(', ') || 'Ei osoitetta'}
+              </p>
+              {!onlyMine && <p className="mt-1 text-xs text-faint">{job.staff_name}</p>}
+
+              {job.notes && (
+                <p className="mt-2 rounded-lg border border-warn/30 bg-warn/10 px-3 py-2 text-sm text-warn">
+                  {job.notes}
+                </p>
+              )}
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {job.address && (
+                  <a href={mapUrl(job)} target="_blank" rel="noreferrer"
+                     className="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-ink">
+                    Reitti
+                  </a>
+                )}
+                {job.customer_phone && (
+                  <a href={`tel:${job.customer_phone.replace(/\s/g, '')}`}
+                     className="rounded-lg border border-line px-3 py-2 text-sm font-medium">
+                    Soita {job.customer_phone}
+                  </a>
+                )}
+                <span className="ml-auto text-sm font-semibold tabular text-muted">
+                  {eur(job.price_cents)}
+                </span>
+                {job.status !== 'done' && <MarkDone id={job.id} />}
+              </div>
+            </Card>
+          ))
+        )}
+      </section>
+
+      {/* Seuraavat päivät tiiviinä listana: tänään on tärkeä, loppuviikko
+          riittää yhtenä silmäyksenä. */}
+      {laterJobs.length > 0 && (
+        <Card className="overflow-x-auto">
+          <CardHeader
+            title="Seuraavat 7 päivää"
+            action={<Link href="/kalenteri" className="text-xs font-semibold text-accent hover:underline">
+              Kalenteri →
+            </Link>}
+          />
+          <table className="w-full min-w-[560px] text-sm">
+            <tbody className="divide-y divide-line-soft">
+              {laterJobs.map((job) => (
+                <tr key={job.id} className="hover:bg-ink-700">
+                  <td className="px-4 py-2.5 text-muted tabular whitespace-nowrap">
+                    {formatDateKey(dateKeyOf(job.starts_at))}
+                  </td>
+                  <td className="px-4 py-2.5 tabular whitespace-nowrap">{timeOf(job.starts_at)}</td>
+                  <td className="px-4 py-2.5">
+                    <Link href={`/tyot/${job.id}`} className="hover:text-accent">
+                      {job.customer_name ?? job.title}
                     </Link>
-                  </div>
-
-                  <p className="mt-2 text-base font-medium">{job.customer_name ?? job.title}</p>
-                  <p className="text-sm text-muted">
-                    {[job.address, job.postal_code, job.city].filter(Boolean).join(', ') || 'Ei osoitetta'}
-                  </p>
-                  {!onlyMine && <p className="mt-1 text-xs text-faint">{job.staff_name}</p>}
-
-                  {job.notes && (
-                    <p className="mt-2 rounded-md border border-warn/30 bg-warn/10 px-3 py-2 text-sm text-warn">
-                      {job.notes}
-                    </p>
-                  )}
-
-                  {/* Puhelimessa nämä ovat päivän tärkeimmät napit: reitti,
-                      soitto asiakkaalle ja työn kvittaus tehdyksi. */}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {job.address && (
-                      <a href={mapUrl(job)} target="_blank" rel="noreferrer"
-                         className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-ink">
-                        Reitti
-                      </a>
-                    )}
-                    {job.customer_phone && (
-                      <a href={`tel:${job.customer_phone.replace(/\s/g, '')}`}
-                         className="rounded-md border border-line px-3 py-2 text-sm">
-                        Soita {job.customer_phone}
-                      </a>
-                    )}
-                    <span className="ml-auto self-center text-sm tabular text-muted">
-                      {(job.price_cents / 100).toLocaleString('fi-FI')} €
-                    </span>
-                    {job.status !== 'done' && <MarkDone id={job.id} />}
-                  </div>
-                </Card>
-              ))
-            )}
-          </section>
-        );
-      })}
+                  </td>
+                  <td className="max-w-[220px] truncate px-4 py-2.5 text-muted">
+                    {[job.address, job.postal_code].filter(Boolean).join(', ') || '—'}
+                  </td>
+                  {!onlyMine && <td className="px-4 py-2.5 text-xs text-faint">{job.staff_name}</td>}
+                  <td className="px-4 py-2.5 text-right tabular whitespace-nowrap">
+                    {eur(job.price_cents)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
     </div>
   );
 }
