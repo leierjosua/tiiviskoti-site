@@ -1,0 +1,27 @@
+<!-- TiivisKoti — logo nimellä, VALKOINEN. Tummalle pinnalle.
+
+     HUOM PAINOA VARTEN: nimi on tässä <text>-elementtinä, ei polkuina. Jos
+     painotalossa ei ole Manrope-fonttia, se korvautuu väärällä fontilla.
+     Vaihtoehdot:
+       1. Pyydä painajaa muuntamaan teksti poluiksi ("convert text to
+          outlines") — tämä on heille rutiinia.
+       2. Käytä `logo-merkki-valkoinen.svg`:tä, joka on pelkkää geometriaa
+          eikä voi rikkoutua.
+       3. Käytä valmiiksi renderöityä `logo-valkoinen-4000.png`:tä, jossa
+          fontti on jo piirretty kuvaksi.
+
+     Manrope on ilmainen (Google Fonts), joten painaja voi myös asentaa sen.
+     Sivusto käyttää samaa fonttia. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 100" width="470" height="100">
+  <title>TiivisKoti</title>
+
+  <g fill="none" stroke="#FFFFFF" stroke-width="7">
+    <rect x="3.5" y="3.5" width="93" height="93" rx="22" />
+    <rect x="31" y="22" width="38" height="56" rx="3" stroke-width="6" />
+  </g>
+  <rect x="35" y="22" width="5" height="56" fill="#FFFFFF" />
+
+  <text x="122" y="69" fill="#FFFFFF"
+        font-family="Manrope, 'Segoe UI', Arial, sans-serif"
+        font-size="55" font-weight="800" letter-spacing="-2">TiivisKoti</text>
+</svg>
