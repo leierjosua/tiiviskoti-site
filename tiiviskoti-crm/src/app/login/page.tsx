@@ -16,7 +16,7 @@ export default function LoginPage() {
           ja vuotaisi muuten vaalealle puolelle. */}
       <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-nav p-10 lg:flex">
         <div className="flex items-center gap-2.5">
-          <BrandMark className="text-nav-text" size={24} />
+          <BrandMark size={28} tone="dark" />
           <span className="text-base font-extrabold tracking-tight text-nav-text">
             Tiivis<span className="text-nav-muted">Koti</span>
           </span>
@@ -46,7 +46,7 @@ export default function LoginPage() {
         <form action={action} className="w-full max-w-[360px] space-y-5">
           <div className="lg:hidden">
             <div className="flex items-center gap-2.5">
-              <BrandMark className="text-accent" size={24} />
+              <BrandMark size={28} tone="light" />
               <span className="text-base font-extrabold tracking-tight text-text">
                 Tiivis<span className="text-accent">Koti</span>
               </span>

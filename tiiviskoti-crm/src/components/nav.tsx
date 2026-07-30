@@ -63,7 +63,7 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout }: {
     <>
       {/* Puhelin: yläpalkki */}
       <header className="nav-surface sticky top-0 z-30 flex items-center gap-2.5 bg-nav px-4 py-3 md:hidden">
-        <BrandMark className="text-nav-text" size={20} />
+        <BrandMark size={22} />
         <span className="flex-1"><BrandWord /></span>
         <button
           type="button"
@@ -86,7 +86,7 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout }: {
       {/* Työpöytä: sivupalkki */}
       <aside className="nav-surface hidden w-56 shrink-0 flex-col bg-nav shadow-(--shadow-nav) md:flex">
         <div className="flex items-center gap-2.5 px-4 py-5">
-          <BrandMark className="text-nav-text" size={22} />
+          <BrandMark size={26} />
           <BrandWord />
         </div>
 
