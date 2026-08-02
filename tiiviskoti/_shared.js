@@ -183,6 +183,7 @@ function render(){
   document.getElementById('cpTime').textContent = q.total===0?'0 h':(hrs<1?Math.round(q.minutes)+' min':(Math.round(hrs*2)/2).toLocaleString('fi-FI')+' h');
   const btn=document.getElementById('cpBtn'), active = q.total>0;
   btn.style.pointerEvents=active?'auto':'none'; btn.style.opacity=active?'1':'.5';
+  if('disabled' in btn) btn.disabled=!active;
 }
 
 /* ---------- FAQ ---------- */
@@ -325,7 +326,7 @@ function renderCal(){
     if(free.length===0){ el.className='day full'+(isToday?' today':''); el.disabled=true; }
     else { el.className='day free'+(isToday?' today':''); const dot=document.createElement('span'); dot.className='dot'; el.appendChild(dot);
       if(selDay && keyOf(selDay)===keyOf(d)) el.classList.add('sel');
-      el.addEventListener('click',()=>{ selDay=d; selSlot=null; renderCal(); renderSlots(); }); }
+      el.addEventListener('click',()=>{ selDay=d; selSlot=null; renderCal(); renderSlots(); syncBookingSummary(); }); }
     grid.appendChild(el);
   }
   document.getElementById('mPrev').disabled = (viewY===today.getFullYear() && viewM===today.getMonth());
@@ -446,7 +447,144 @@ function selectedSlot(){
 const mPrevBtn=document.getElementById('mPrev'), mNextBtn=document.getElementById('mNext');
 if(mPrevBtn) mPrevBtn.addEventListener('click',()=>{ if(viewM===0){viewM=11;viewY--;}else viewM--; renderCal(); });
 if(mNextBtn) mNextBtn.addEventListener('click',()=>{ if(viewM===11){viewM=0;viewY++;}else viewM++; renderCal(); });
+/* ---------- VAIHENÄKYMÄ ----------
+   Kalenteri, yhteystiedot ja kuittaus ovat saman kortin vaiheita. Sivu ei
+   vaihdu missään kohtaa: vain kortin sisältö ristihäivytetään paikallaan ja
+   kortin korkeus animoidaan uuteen mittaan, jottei alla oleva sisältö nytkähdä.
+   Näkymän vaihtaminen ei nollaa mitään tilaa — takaisin pääsee aina. */
+const stepCard = document.getElementById('stepCard');
+/* Vaiheet luetaan DOM:ista, jolloin sama moottori ajaa etusivun täyden polun
+   (laskuri → postinumero → aika → tiedot → valmis) ja ajanvaraus.html:n
+   lyhyemmän polun ilman erillistä koodia. Kukin vaihe kertoo itse otsikkonsa,
+   paluulinkkinsä ja tarvitseeko se leveän kortin. */
+const stepNodes = stepCard ? [...stepCard.children].filter(n=>n.hasAttribute('data-step')) : [];
+const stepIdx = name => stepNodes.findIndex(n=>n.dataset.step===name);
+let curIdx = Math.max(0, stepNodes.findIndex(n=>!n.hidden));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if(stepCard){
+  const dots=document.getElementById('stepDots');
+  if(dots && !dots.children.length){
+    stepNodes.forEach(()=>dots.appendChild(document.createElement('i')));
+  }
+}
+
+function paintStepChrome(){
+  if(!stepNodes.length) return;
+  const cur=stepNodes[curIdx];
+  const back=document.getElementById('stepBack'), tag=document.getElementById('stepTag');
+  const dots=document.getElementById('stepDots');
+  const head=stepCard.closest('section');
+  const title=head && head.querySelector('h2.title');
+  const sub=head && head.querySelector('.step-sub');
+  const kicker=head && head.querySelector('.kicker');
+
+  if(back){
+    const label=cur.dataset.back;
+    back.hidden=!label;
+    const span=back.querySelector('span'); if(span && label) span.textContent=label;
+  }
+  if(tag) tag.textContent = cur.dataset.tag || '';
+  if(dots) [...dots.children].forEach((d,i)=>{
+    d.className = i===curIdx ? 'on' : (i<curIdx ? 'done' : '');
+  });
+  if(title && cur.dataset.title) title.textContent = cur.dataset.title;
+  if(kicker && cur.dataset.kicker) kicker.textContent = cur.dataset.kicker;
+  if(sub){
+    if(cur.dataset.sub){ sub.textContent=cur.dataset.sub; sub.style.display=''; }
+    else sub.style.display='none';
+  }
+  /* Osion oma paluulinkki (ajanvaraus.html: "muuta postinumeroa") kuuluu vain
+     ensimmäiseen vaiheeseen — myöhemmin kortin oma Takaisin hoitaa paluun. */
+  const bl=head && head.querySelector('.backlink');
+  if(bl) bl.style.display = curIdx===0 ? '' : 'none';
+  stepCard.classList.toggle('wide', cur.dataset.wide==='1');
+}
+
+/* Vaihto: vanha näkymä häivytetään nopeasti pois, uusi tilalle, ja kortin
+   mitat animoidaan uusiin. Leveys animoidaan koska laskuri tarvitsee kaksi
+   saraketta ja loput vaiheet ovat kapeita — ilman sitä kortti hyppäisi. */
+function goStepIdx(next, opts){
+  if(!stepNodes.length || next<0 || next>=stepNodes.length || next===curIdx) return;
+  const from=stepNodes[curIdx], to=stepNodes[next];
+  const swap=()=>{
+    from.hidden=true; to.hidden=false; curIdx=next; paintStepChrome();
+    /* Kortin yläreuna samaan kohtaan kuin mistä lähdettiin, jotta näkymä
+       todella vaihtuu "samassa paikassa" eikä hyppää sivun toiseen kohtaan. */
+    if(!(opts&&opts.noScroll)){
+      const y=stepCard.getBoundingClientRect().top+window.scrollY-96;
+      window.scrollTo({top:Math.max(0,y), behavior: reduceMotion ? 'auto' : 'smooth'});
+    }
+    /* Kohdistus vain isolla ruudulla: puhelimessa se avaisi näppäimistön heti
+       ja peittäisi juuri vaihtuneen näkymän. */
+    const focusId=to.dataset.focus;
+    if(focusId && innerWidth>620){
+      const f=document.getElementById(focusId);
+      if(f) setTimeout(()=>f.focus({preventScroll:true}),240);
+    }
+  };
+  if(reduceMotion || !stepCard.animate){ swap(); return; }
+  const r0=stepCard.getBoundingClientRect();
+  stepCard.classList.add('leaving');
+  setTimeout(()=>{
+    stepCard.classList.remove('leaving');
+    swap();
+    const r1=stepCard.getBoundingClientRect();
+    const frames=[{},{}];
+    if(Math.abs(r1.height-r0.height)>2){ frames[0].height=r0.height+'px'; frames[1].height=r1.height+'px'; }
+    if(Math.abs(r1.width-r0.width)>2){ frames[0].maxWidth=r0.width+'px'; frames[1].maxWidth=r1.width+'px'; }
+    if(Object.keys(frames[0]).length){
+      stepCard.animate(frames,{duration:300, easing:'cubic-bezier(.2,.6,.3,1)'});
+    }
+  },130);
+}
+/* Nimellä siirtyminen — kutsupaikat lukevat paremmin kuin indeksit. */
+function goStep(name, opts){ goStepIdx(stepIdx(name), opts); }
+
+function syncRecap(){
+  const w=document.getElementById('bRecapWhen'); if(!w) return;
+  const s=document.getElementById('bRecapSvc');
+  if(selDay && selSlot){
+    const wd=['sunnuntai','maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai'][selDay.getDay()];
+    w.textContent = `${wd} ${selDay.getDate()}.${selDay.getMonth()+1}. klo ${selSlot}`;
+  } else { w.textContent='Aikaa ei valittu'; }
+  if(s) s.textContent = booking.serviceLabel || '';
+}
+
+/* Jatka-nappi aukeaa vasta kun aika on valittu — muuten lomakkeelle pääsisi
+   ilman ajankohtaa ja vahvistus kaatuisi vasta lähetyksessä. */
+function syncToDetails(){
+  const b=document.getElementById('toDetails'); if(!b) return;
+  const ok = !!(selDay && selSlot);
+  b.disabled=!ok;
+  b.style.opacity = ok ? '' : '.5';
+  b.style.cursor = ok ? '' : 'not-allowed';
+  b.textContent = ok ? 'Jatka yhteystietoihin' : 'Valitse ensin aika';
+}
+
+/* Laskurin CTA vie postinumerovaiheeseen samalla kortilla. Vanhoilla sivuilla
+   cpBtn on linkki varaa.html:ään, jolloin tätä ei ole. */
+const cpBtnEl=document.getElementById('cpBtn');
+if(cpBtnEl && cpBtnEl.tagName==='BUTTON'){
+  cpBtnEl.addEventListener('click',()=>{
+    if(!(booking.count>0 && booking.total>0)) return;
+    if(window.__renderGatePrice) window.__renderGatePrice();
+    goStep('postal');
+  });
+}
+
+const toDetailsBtn=document.getElementById('toDetails');
+if(toDetailsBtn) toDetailsBtn.addEventListener('click',()=>{
+  if(!(selDay && selSlot)) return;
+  syncRecap(); goStep('form');
+});
+const stepBackBtn=document.getElementById('stepBack');
+if(stepBackBtn) stepBackBtn.addEventListener('click',()=>goStepIdx(curIdx-1));
+const recapChangeBtn=document.getElementById('bRecapChange');
+if(recapChangeBtn) recapChangeBtn.addEventListener('click',()=>goStep('cal'));
+
 function syncBookingSummary(){
+  syncToDetails(); syncRecap();
   const nameEl=document.getElementById('bServiceName'); if(!nameEl) return;
   nameEl.textContent = booking.serviceLabel;
   const priceEl = document.getElementById('bPrice');
@@ -567,8 +705,7 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     const name = payload.name.split(' ')[0] || 'hei';
     const wd=['su','ma','ti','ke','to','pe','la'][selDay.getDay()];
     const when = `${wd} ${selDay.getDate()}.${selDay.getMonth()+1}. klo ${selSlot}`;
-    document.getElementById('bookForm').style.display='none';
-    document.getElementById('bookDone').style.display='block';
+    goStep('done');
     document.getElementById('bRef').textContent=data.ref;
     const totalEur=(data.total_cents||0)/100;
     const priceTxt = ` Kohde: ${booking.count} kohdetta · ${totalEur.toLocaleString('fi-FI')} €.`;
@@ -586,10 +723,9 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
 });
 const bResetEl=document.getElementById('bReset');
 if(bResetEl) bResetEl.addEventListener('click',()=>{
-  document.getElementById('bookDone').style.display='none';
-  document.getElementById('bookForm').style.display='block';
   document.getElementById('bForm').reset();
   selDay=null; selSlot=null; renderCal(); renderSlots(); syncBookingSummary();
+  goStep('cal');
 });
 /* Postinumero ohjaa koko kalenteria: kun se on täydet 5 numeroa, haetaan
    alue ja sen vapaat ajat. Haku viivästetään hieman, jottei jokainen
@@ -617,8 +753,9 @@ if(fPostalEl){
 
    Taloyhtiö ei varaa aikaa verkosta — sen hinta muodostuu kartoituksessa —
    joten se polku ohjaa taloyhtiösivulle. */
-const gateEl = document.getElementById('gate');
-if(gateEl){
+/* Ehto on polkuvalitsimessa eikä kortin id:ssä: etusivulla sama lohko on yksi
+   vaihe isommassa kortissa, varaa.html:ssä oma .gate-korttinsa. */
+if(document.getElementById('tabKoti')){
   const tabKoti=document.getElementById('tabKoti'), tabYhtio=document.getElementById('tabYhtio');
   const paneKoti=document.getElementById('gateKoti'), paneYhtio=document.getElementById('gateYhtio');
   const bookWrap=document.getElementById('bookWrap');
@@ -675,11 +812,19 @@ if(gateEl){
     gShow.disabled=false; gShow.textContent=lbl;
 
     if(avail.state==='ready' || avail.state==='none'){
-      /* Kalenteri ja lomake ovat omalla sivullaan. Postinumero kuljetetaan
-         kyselyparametrina, jottei sitä tarvitse syöttää uudelleen. */
-      location.href = `ajanvaraus.html?pn=${encodeURIComponent(avail.postal)}`;
+      /* Etusivulla kalenteri on saman kortin seuraava vaihe. Vanhoilla
+         sivuilla (varaa.html) se on erillinen sivu, jolloin postinumero
+         kuljetetaan kyselyparametrina ettei sitä tarvitse syöttää uudelleen. */
+      if(stepIdx('cal')>=0) goStep('cal');
+      else location.href = `ajanvaraus.html?pn=${encodeURIComponent(avail.postal)}`;
     }
   });
+
+  /* "Muokkaa valintaa" palaa laskuriin — etusivulla vaiheena, muualla linkkinä. */
+  const gEditBtn=document.getElementById('gEdit');
+  if(gEditBtn && gEditBtn.tagName==='BUTTON'){
+    gEditBtn.addEventListener('click',()=>goStep('calc'));
+  }
 
   pickPath(true);
 }
@@ -711,7 +856,10 @@ if(!document.getElementById('calcTypes')){
    aloituskortista. Ilman sitä sivulla ei ole mitään näytettävää, joten
    asiakas ohjataan takaisin alkuun sen sijaan että hän näkisi tyhjän
    kalenterin ja arvailisi mikä meni vikaan. */
-if(document.getElementById('gridDays') && !document.getElementById('gate')){
+/* Ehto on postinumerokentän puuttuminen: etusivulla kalenteri ja postinumero
+   ovat saman kortin vaiheita, joten sieltä ei ole mihinkään ohjattavaa. Vain
+   ajanvaraus.html on se sivu jolla kalenteri on ilman omaa postinumerovaihetta. */
+if(document.getElementById('gridDays') && !document.getElementById('fPostal')){
   const pn = new URLSearchParams(location.search).get('pn') || '';
   if(/^\d{5}$/.test(pn)){
     avail.postal = pn;
@@ -741,3 +889,4 @@ if('IntersectionObserver' in window){
 setTimeout(()=>rvEls.forEach(el=>{ if(el.getBoundingClientRect().top<innerHeight) el.classList.add('in'); }),1000);
 const yrEl=document.getElementById('yr'); if(yrEl) yrEl.textContent=new Date().getFullYear();
 render(); renderCal(); renderSlots(); syncBookingSummary();
+if(document.getElementById('stepCard')) paintStepChrome();
