@@ -257,8 +257,12 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .mf-bot{display:flex;justify-content:space-between;padding-top:22px;font-size:13px;color:#7a9384;flex-wrap:wrap;gap:8px}
 .mf-bot a:hover{color:var(--green-l)}
 
-/* mobile sticky cta */
-.mcta{position:fixed;left:0;right:0;bottom:0;z-index:85;display:none;gap:10px;padding:11px 14px;background:var(--bg);border-top:1px solid var(--line2)}
+/* mobile sticky cta — EI näkyvissä koko ajan.
+   Palkki nousee esiin vasta kun ruudulla ei ole omaa CTA:ta (hero, tarjous,
+   footer). Aiemmin se roikkui pohjalla joka hetki: se peitti sisältöä ja
+   toisti napin, joka oli jo näkyvissä. Näyttölogiikka on _shared.js:ssä. */
+.mcta{position:fixed;left:0;right:0;bottom:0;z-index:85;display:none;gap:10px;padding:11px 14px calc(11px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line2);visibility:hidden;transform:translateY(115%);transition:transform .28s cubic-bezier(.4,0,.2,1),visibility 0s .28s}
+.mcta.show{visibility:visible;transform:none;transition:transform .28s cubic-bezier(.4,0,.2,1)}
 .mcta .btn{flex:1;padding:14px}.mcta .btn.tel{flex:0 0 auto}
 
 @media(max-width:960px){
@@ -284,7 +288,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
      Kahden palstan ruudukossa "4,9/5 · 300+ arviota" katkesi kolmelle riville. */
   .mf-grid{grid-template-columns:1fr 1fr;gap:26px}
   .mf-brand{grid-column:1/-1}
-  .mcta{display:flex}body{padding-bottom:76px}
+  /* Ei body-täytettä: palkki on piilossa footerin kohdalla, joten varattu
+     76px jäi vain tyhjäksi kaistaleeksi sivun loppuun. */
+  .mcta{display:flex}
 }
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
 
@@ -570,5 +576,6 @@ if('IntersectionObserver' in window){
 } else { rvEls.forEach(el=>el.classList.add('in')); }
 setTimeout(()=>rvEls.forEach(el=>{ if(el.getBoundingClientRect().top<innerHeight) el.classList.add('in'); }),1000);
 </script>
+<script type="module" src="_mcta.js"></script>
 </body>
 </html>
