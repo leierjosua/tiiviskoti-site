@@ -303,6 +303,10 @@ async function loadAvailability(){
   renderCal(); renderSlots(); syncBookingSummary();
   /* Alue voi tuoda matkalisän, joka muuttaa kortissa näkyvää summaa. */
   if(window.__renderGatePrice) window.__renderGatePrice();
+  /* Matkalisä muuttaa summaa, ja koodilla voi olla alaraja — sama koodi voi
+     siis kelvata tai olla kelpaamatta alueen vaihtuessa. Tarkistetaan
+     uudelleen, jottei näytetty alennus jää vanhan summan mukaiseksi. */
+  if(discount.state==='ok' || discount.state==='bad') checkDiscount();
 }
 
 function freeSlots(d){
@@ -584,6 +588,98 @@ if(stepBackBtn) stepBackBtn.addEventListener('click',()=>goStepIdx(curIdx-1));
 const recapChangeBtn=document.getElementById('bRecapChange');
 if(recapChangeBtn) recapChangeBtn.addEventListener('click',()=>goStep('cal'));
 
+/* ---------- alennuskoodi ----------
+
+   Koodi tarkistetaan palvelimelta (`/api/check-discount` → CRM), koska
+   koodit ja niiden arvot elävät kannassa. Selain ei tiedä eikä saa tietää
+   mitään koodin arvosta: se lähettää kirjoitetun koodin ja näyttää sen
+   summan jonka palvelin palauttaa.
+
+   TÄMÄ ON VAIN NÄYTTÖÄ. Veloitettava alennus lasketaan uudelleen varauksen
+   yhteydessä samasta funktiosta, joten tässä näytetty ja lopulta veloitettu
+   summa eivät voi erota — paitsi jos koodi ehtii kulua välissä loppuun,
+   jolloin varaus hylätään selvällä virheellä eikä hiljaa täydellä hinnalla. */
+const discount = { code:'', cents:0, state:'idle' };  // idle | checking | ok | bad
+let discountSeq = 0, discountTimer = null;
+
+/** Summa jolle alennus lasketaan: työ + alueen matkalisä. */
+function subtotalCents(){
+  return Math.round((booking.total + (avail.travelFeeCents||0)/100) * 100);
+}
+
+function renderDiscountNote(msg, kind){
+  const el = document.getElementById('fCodeNote'); if(!el) return;
+  el.textContent = msg || '';
+  el.style.display = msg ? 'block' : 'none';
+  el.style.color = kind==='ok' ? 'var(--green)' : (kind==='bad' ? '#B4453A' : 'var(--mute)');
+}
+
+async function checkDiscount(){
+  const input = document.getElementById('fCode'); if(!input) return;
+  const raw = input.value.trim();
+  const seq = ++discountSeq;   // vanhentunut vastaus ei saa ylikirjoittaa uutta
+
+  if(!raw){
+    discount.code=''; discount.cents=0; discount.state='idle';
+    renderDiscountNote('', ''); syncBookingSummary(); return;
+  }
+  /* Ilman kohdevalintaa alarajan tarkistus ei kerro mitään järkevää, joten
+     odotetaan että laskurista on tullut summa. */
+  if(booking.total<=0){
+    discount.state='idle'; discount.cents=0;
+    renderDiscountNote('Valitse ensin kohteet laskurista.', ''); return;
+  }
+
+  discount.state='checking';
+  renderDiscountNote('Tarkistetaan…', '');
+  try{
+    const emailEl = document.getElementById('fEmail');
+    const r = await fetch('/api/check-discount',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        code: raw,
+        subtotalCents: subtotalCents(),
+        email: emailEl ? emailEl.value.trim() : undefined,
+      }),
+    });
+    if(seq !== discountSeq) return;
+    const data = await r.json().catch(()=>({}));
+    if(seq !== discountSeq) return;
+
+    if(r.ok && data.ok){
+      discount.code = data.code; discount.cents = data.amountCents||0; discount.state='ok';
+      renderDiscountNote(`Koodi ${data.code}: −${(discount.cents/100).toLocaleString('fi-FI')} €`, 'ok');
+    } else {
+      discount.code=''; discount.cents=0; discount.state='bad';
+      renderDiscountNote(
+        data && data.message ? data.message
+          : 'Koodin tarkistus ei onnistunut. Voit varata ilman koodia.',
+        'bad');
+    }
+  }catch(_){
+    if(seq !== discountSeq) return;
+    /* Verkkovirhe ei saa estää varaamista: koodi jää pois, ja jos se olisi
+       ollut kelvollinen, sen voi hyvittää jälkikäteen. */
+    discount.code=''; discount.cents=0; discount.state='bad';
+    renderDiscountNote('Koodia ei saatu tarkistettua. Voit varata ilman koodia.', 'bad');
+  }
+  syncBookingSummary();
+}
+
+const fCodeEl = document.getElementById('fCode');
+if(fCodeEl){
+  fCodeEl.addEventListener('input',()=>{
+    /* Koodi kirjoitetaan mainoksesta käsin, joten kirjoitusasu vaihtelee.
+       Näytetään se isoin kirjaimin heti — palvelin normalisoi saman. */
+    const pos = fCodeEl.selectionStart;
+    fCodeEl.value = fCodeEl.value.toUpperCase();
+    if(pos!==null) try{ fCodeEl.setSelectionRange(pos,pos); }catch(_){}
+    clearTimeout(discountTimer);
+    discountTimer = setTimeout(checkDiscount, 500);
+  });
+  fCodeEl.addEventListener('blur',()=>{ clearTimeout(discountTimer); checkDiscount(); });
+}
+
 function syncBookingSummary(){
   syncToDetails(); syncRecap();
   const nameEl=document.getElementById('bServiceName'); if(!nameEl) return;
@@ -592,12 +688,14 @@ function syncBookingSummary(){
   if(booking.total>0){
     /* Matkalisä tulee palvelualueesta, joten se voidaan näyttää vasta kun
        postinumero on tiedossa. Näytetty summa on sama jonka CRM veloittaa:
-       työ + alueen lisä. */
+       työ + alueen lisä − mahdollinen alennuskoodi. */
     const fee = (avail.travelFeeCents||0)/100;
-    const shown = booking.total + fee;
+    const ale = discount.state==='ok' ? discount.cents/100 : 0;
+    const shown = Math.max(0, booking.total + fee - ale);
     const net = Math.round(shown*NET_FACTOR);
     priceEl.innerHTML = `${shown.toLocaleString('fi-FI')} € `
       + (fee>0 ? `<span style="font-size:13px;opacity:.75;font-weight:600">· sis. matkalisä ${fee.toLocaleString('fi-FI')} €</span> ` : '')
+      + (ale>0 ? `<span style="font-size:13px;opacity:.75;font-weight:600">· koodi ${discount.code} −${ale.toLocaleString('fi-FI')} €</span> ` : '')
       + `<span style="font-size:13px;opacity:.75;font-weight:600">· vähennyksen jälk. n. ${net.toLocaleString('fi-FI')} €</span>`;
   } else { priceEl.textContent = 'Valitse kohteet hintalaskurista nähdäksesi hinnan'; }
   const whenEl=document.getElementById('bWhen'), whenTxt=document.getElementById('bWhenText'); whenEl.style.display='flex';
@@ -670,6 +768,10 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
        pricing.mjs:stä eikä luota clientin lukuihin. */
     counts: {...state},
     extras: {...extraState},
+    /* Vain koodi, ei sen arvoa: palvelin laskee vähennyksen omasta
+       taulustaan. Lähetetään vain jos koodi todella kelpasi tarkistuksessa,
+       jottei kelvoton koodi kaada varausta turhaan. */
+    discountCode: discount.state==='ok' ? discount.code : undefined,
   };
 
   try{
@@ -688,6 +790,22 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
       } else if(data && data.error==='area_not_served'){
         err.textContent=`Emme vielä palvele postinumerossa ${data.postal||postal}. Jätä yhteystietosi kalenterin yläpuolelta.`;
         loadAvailability();
+      } else if(data && data.error==='discount_invalid'){
+        /* Koodi ehti kulua loppuun tai vanhentua lomakkeen täytön aikana.
+           Aika on yhä vapaa — varaus peruuntui kokonaan — joten koodi
+           nollataan ja asiakas voi lähettää saman lomakkeen uudelleen. */
+        const why = {
+          expired:'Koodin voimassaolo on päättynyt.',
+          exhausted:'Koodi ehti juuri tulla käytetyksi loppuun.',
+          already_used:'Koodi on jo käytetty tällä sähköpostilla.',
+          inactive:'Koodi ei ole enää käytössä.',
+          not_started:'Koodi ei ole vielä voimassa.',
+          below_min:'Tilaus jää koodin alarajan alle.',
+        }[data.reason] || 'Koodia ei voitu käyttää.';
+        discount.code=''; discount.cents=0; discount.state='bad';
+        renderDiscountNote(why, 'bad');
+        syncBookingSummary();
+        err.textContent = `${why} Varausta ei tehty. Lähetä uudelleen — hinta on ilman koodia.`;
       } else if(data && data.error==='calendar_area_mismatch'){
         /* Postinumero on vaihtunut valinnan jälkeen niin, että aika kuuluu
            toiselle alueelle. Haetaan ajat uudelleen oikealle alueelle. */
@@ -709,7 +827,11 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     goStep('done');
     document.getElementById('bRef').textContent=data.ref;
     const totalEur=(data.total_cents||0)/100;
-    const priceTxt = ` Kohde: ${booking.count} kohdetta · ${totalEur.toLocaleString('fi-FI')} €.`;
+    /* Toteutunut alennus tulee palvelimelta eikä paikallisesta tilasta:
+       se on sama luku joka on vahvistuspostissa ja laskulla. */
+    const aleEur=(data.discount_cents||0)/100;
+    const priceTxt = ` Kohde: ${booking.count} kohdetta · ${totalEur.toLocaleString('fi-FI')} €`
+      + (aleEur>0 ? ` (koodi ${data.discount_code} −${aleEur.toLocaleString('fi-FI')} €)` : '') + '.';
     document.getElementById('bDoneText').textContent = `Kiitos, ${name}! Olemme sinuun yhteydessä ja vahvistamme ajan osoitteeseen ${payload.email}. Aika: ${when}.${priceTxt}`;
     try{ sessionStorage.removeItem('tk_booking'); }catch(_){}
     /* Varattu aika katoaa vapaista vasta kun se haetaan uudelleen — nyt

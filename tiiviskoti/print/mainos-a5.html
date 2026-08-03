@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>TiivisKoti — postilaatikkomainos A5</title>
+<!--
+  POSTILAATIKKOMAINOS · A5 (148 × 210 mm), kaksi kappaletta A4-vaakalle.
+
+  TULOSTUS
+    Avaa selaimessa → Tulosta (Ctrl+P) → Kohde: Tallenna PDF
+    Koko: A4 · Suunta: Vaaka · Marginaalit: Ei mitään · Taustagrafiikka: PÄÄLLE
+    Leikkaa arkki keskeltä pystysuunnassa → kaksi A5-mainosta.
+    Painotaloon: sama PDF, mainitse "A5, 4/0, leikattu" — tai pyydä 3 mm bleed,
+    jolloin kasvata .flyer-korkeus/leveys ja lisää leikkuuvarat painon ohjeen mukaan.
+
+  MUOKKAUS — nämä kolme riviä ovat ne joita todennäköisesti muutat:
+    Alennuksen määrä ja koodi .... etsi "ALE-KOODI"
+    Kampanjan päättymispäivä .... etsi "ALE-VOIMASSA"
+    Hinnat ....................... etsi "HINNAT" (lähde: ../pricing.mjs)
+
+  Kaikki väitteet on otettu index.html:stä, jotta mainos ja sivusto lupaavat saman.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7F3; --card:#FFFFFF; --sand:#EDF1EA;
+  --ink:#183A28; --text:#4A544D; --mute:#7B857D;
+  --green:#217A4E; --green-l:#2E9E63; --deep:#163A28;
+  --line:#E4E8E0; --amber:#E0A63A;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Manrope',system-ui,sans-serif;color:var(--text);background:#8E958C}
+img,svg{display:block;max-width:100%}
+strong{font-weight:800;color:inherit}
+
+/* ---------- arkki: A4 vaaka = kaksi A5-mainosta vierekkäin ---------- */
+@page{size:A4 landscape;margin:0}
+.sheet{width:297mm;height:210mm;display:flex;background:#fff}
+.flyer{width:148.5mm;height:210mm;overflow:hidden;position:relative;
+       background:var(--bg);display:flex;flex-direction:column}
+/* Leikkuuviiva arkin keskellä — ei tulostu (screen only). */
+.sheet::after{content:"";position:absolute;left:50%;top:0;bottom:0;
+  border-left:1px dashed rgba(24,58,40,.35)}
+.sheet{position:relative}
+
+/* ---------- 1 · yläbanneri ---------- */
+.top{background:var(--deep);color:#fff;padding:7mm 8mm 7mm}
+.top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5mm}
+.logo{display:flex;align-items:center;gap:2.4mm}
+.logo .mark{width:8mm;height:8mm;border-radius:2mm}
+.logo .word{font-size:5.4mm;font-weight:800;letter-spacing:-.02em;line-height:1}
+.logo .word .b{color:var(--green-l)}
+.badge{display:flex;align-items:center;gap:1.6mm;background:rgba(255,255,255,.12);
+  border:.3mm solid rgba(255,255,255,.22);border-radius:99px;padding:1.5mm 3mm;
+  font-size:2.6mm;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.badge svg{width:3.4mm;height:3.4mm}
+.top h1{font-size:7.8mm;font-weight:800;line-height:1.06;letter-spacing:-.03em;color:#fff}
+.top h1 .hl{color:#8FD9B0}
+.top p{margin-top:2.8mm;font-size:3.2mm;line-height:1.4;color:#C9DBD0;max-width:38ch}
+
+/* ---------- 2 · kolme lukua ---------- */
+.stats{display:flex;gap:2.4mm;padding:0 8mm;margin-top:-5mm}
+.stat{flex:1;background:var(--card);border-radius:3mm;padding:3.2mm 2.4mm;text-align:center;
+  box-shadow:0 1mm 3mm rgba(24,58,40,.10)}
+.stat b{display:block;font-size:6.6mm;font-weight:800;color:var(--green);
+  letter-spacing:-.03em;line-height:1}
+.stat span{display:block;margin-top:1.4mm;font-size:2.5mm;line-height:1.3;color:var(--mute)}
+
+/* ---------- 3 · kuvat ---------- */
+.shots{display:flex;gap:2.4mm;padding:0 8mm;margin-top:5mm}
+.shot{flex:1;position:relative;border-radius:3mm;overflow:hidden;height:24mm;background:var(--sand)}
+.shot img{width:100%;height:100%;object-fit:cover}
+.shot span{position:absolute;left:2.5mm;top:2.5mm;background:rgba(22,58,40,.82);color:#fff;
+  font-size:2.4mm;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:1.2mm 2.4mm;border-radius:1.5mm}
+.caption{padding:0 8mm;margin-top:2.2mm;font-size:2.7mm;color:var(--mute);text-align:center}
+
+/* ---------- 4 · mitä käynnillä tehdään ---------- */
+.list{padding:3.5mm 8mm 0;display:flex;flex-direction:column;gap:2.2mm}
+.li{display:flex;align-items:flex-start;gap:2.4mm;font-size:3.1mm;line-height:1.3;color:var(--ink)}
+.li .tick{flex:none;width:4.2mm;height:4.2mm;border-radius:99px;background:var(--green);
+  display:flex;align-items:center;justify-content:center;margin-top:.2mm}
+.li .tick svg{width:2.8mm;height:2.8mm}
+
+/* ---------- 5 · hinta + koodi ---------- */
+.foot{margin-top:auto;padding:0 8mm 3.5mm;display:flex;gap:2.4mm;align-items:stretch}
+.price{flex:1.32;background:var(--green);color:#fff;border-radius:3.5mm;padding:3.4mm 4.2mm}
+.price .eyebrow{font-size:2.4mm;font-weight:800;letter-spacing:.11em;text-transform:uppercase;
+  color:rgba(255,255,255,.72)}
+.price .big{display:flex;align-items:baseline;gap:2mm;margin-top:1.2mm}
+.price .big b{font-size:10mm;font-weight:800;letter-spacing:-.04em;line-height:.9}
+.price .big i{font-style:normal;font-size:3.2mm;font-weight:700;color:rgba(255,255,255,.8)}
+.price .net{margin-top:1.6mm;font-size:2.8mm;color:rgba(255,255,255,.88)}
+.price .net b{color:#fff}
+.price .rule{height:.3mm;background:rgba(255,255,255,.22);margin:2.2mm 0 1.8mm}
+.price .also{font-size:2.7mm;line-height:1.4;color:rgba(255,255,255,.88)}
+.price .dom{margin-top:2mm;font-size:4.6mm;font-weight:800;letter-spacing:-.02em}
+.price .tel{margin-top:.8mm;font-size:2.7mm;color:rgba(255,255,255,.8)}
+
+.code{flex:1;background:var(--card);border:.4mm solid var(--line);border-radius:3.5mm;
+  padding:3.4mm 2.6mm;text-align:center;display:flex;flex-direction:column;align-items:center}
+.code .off{display:flex;align-items:center;gap:1.5mm;font-size:2.5mm;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--green)}
+.code .off svg{width:3.2mm;height:3.2mm}
+.code .kw{margin-top:1.2mm;font-size:6.6mm;font-weight:800;letter-spacing:-.02em;color:var(--ink);line-height:1}
+.code .qr{width:21mm;height:21mm;margin:2.4mm 0 1.6mm}
+.code .scan{font-size:2.4mm;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+
+/* ---------- 6 · pikkuteksti ---------- */
+.fine{padding:0 8mm 3.5mm;font-size:2.2mm;line-height:1.4;color:var(--mute);text-align:center}
+
+/* ---------- ruudulla: esikatselu ---------- */
+@media screen{
+  body{padding:24px;display:flex;justify-content:center}
+  .sheet{box-shadow:0 10px 50px rgba(0,0,0,.35)}
+}
+@media print{
+  body{background:#fff;padding:0}
+  .sheet::after{display:none}
+  .sheet{box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <!-- ============ MAINOS ============ -->
+  <article class="flyer">
+
+    <div class="top">
+      <div class="top-row">
+        <div class="logo">
+          <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+            <rect width="100" height="100" rx="22" fill="#217A4E"/>
+            <rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/>
+            <rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/>
+          </svg>
+          <span class="word">Tiivis<span class="b">Koti</span></span>
+        </div>
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          2 v takuu · vastuuvakuutettu
+        </div>
+      </div>
+      <h1>Vetääkö ikkunoista<br>ja ovista? <span class="hl">Korjataan<br>se yhdellä käynnillä.</span></h1>
+      <p>Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan — koko Uudellamaalla.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b>10–15 %</b><span>arvioitu säästö lämmitys&shy;kuluissa</span></div>
+      <div class="stat"><b>−40 %</b><span>kotitalous&shy;vähennys työn osuudesta</span></div>
+      <div class="stat"><b>0 €</b><span>lämpökamera&shy;kartoitus käynnillä</span></div>
+    </div>
+
+    <div class="shots">
+      <div class="shot"><span>Ikkunat</span><img src="../img/ikkunat.jpg" alt="Ikkunan tiivistys"></div>
+      <div class="shot"><span>Ovet</span><img src="../img/ulko-ovet.jpg" alt="Ulko-oven tiivistys"></div>
+    </div>
+    <p class="caption">Kuvaamme kohteen lämpökameralla ennen työtä — näet itse mistä vetää.</p>
+
+    <div class="list">
+      <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Karmi- ja puitetiivisteet uusiksi, ovissa myös kynnyskumi</div>
+      <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Oven käynnin ja helojen säätö samalla käynnillä</div>
+      <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Kiinteä hinta ennen työn alkua — ei yllätyslaskuja</div>
+      <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Varaat ajan verkosta alle minuutissa, myös taloyhtiöille</div>
+    </div>
+
+    <div class="foot">
+      <!-- HINNAT · lähde ../pricing.mjs: ikkuna 95 €, ulko-ovi 119 €, min. 149 € -->
+      <div class="price">
+        <div class="eyebrow">Ikkunan tiivistys · kiinteä hinta</div>
+        <div class="big"><b>95 €</b><i>/ ikkuna</i></div>
+        <div class="net">Kotitalousvähennyksen jälkeen <b>68 €</b></div>
+        <div class="rule"></div>
+        <div class="also">Ulko-ovi 119 € · parvekeovi 119 €<br>Pienin veloitus 149 € / käynti</div>
+        <div class="dom">tiiviskoti.fi</div>
+        <div class="tel">045 875 5996 · info@tiiviskoti.fi</div>
+      </div>
+
+      <div class="code">
+        <!-- ALE-KOODI: muuta summa ja sana molemmista kohdista -->
+        <div class="off">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12V5a2 2 0 012-2h7l9 9-9 9-9-9z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/></svg>
+          −20 € koodilla
+        </div>
+        <div class="kw">NAAPURI</div>
+        <!-- QR osoittaa osoitteeseen https://tiiviskoti.fi/varaa.html — .html on
+             tarkoituksella mukana, koska vercel.json:ssa ei ole cleanUrls:ää ja
+             pelkkä /varaa vastaa 404. Uusi koodi:
+             npx qrcode -t svg -w 512 -m 0 -o qr-varaa.svg "https://..." -->
+        <img class="qr" src="qr-varaa.svg" alt="QR-koodi ajanvaraukseen">
+        <div class="scan">Skannaa &amp; varaa</div>
+      </div>
+    </div>
+
+    <!-- ALE-VOIMASSA: päivitä päivämäärä kampanjan mukaan -->
+    <p class="fine">Syötä koodi NAAPURI varauslomakkeen Alennuskoodi-kenttään · yksi koodi / talous · voimassa 30.9.2026 asti ·
+      hinnat sis. alv 25,5 % · lopullinen hinta vahvistetaan mittauksessa · TiivisKoti Oy, Y-tunnus 3414418-4</p>
+
+  </article>
+
+  <!-- ============ SAMA MAINOS TOISEEN PUOLIKKAASEEN ============
+       Sisältö kopioidaan JS:llä, jotta tekstiä ei tarvitse ylläpitää kahdessa
+       paikassa. Tulostuksessa JS on jo ajettu, joten kopio on mukana PDF:ssä. -->
+  <article class="flyer" id="copy"></article>
+
+</div>
+
+<script>
+  document.getElementById('copy').innerHTML =
+    document.querySelector('.flyer').innerHTML;
+</script>
+</body>
+</html>

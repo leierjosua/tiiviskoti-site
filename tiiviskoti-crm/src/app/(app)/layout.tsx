@@ -11,6 +11,7 @@ const NAV = [
   { href: '/kalenterit', label: 'Työajat', managerOnly: true },
   { href: '/alueet', label: 'Palvelualueet', managerOnly: true },
   { href: '/liidit', label: 'Liidit', managerOnly: true },
+  { href: '/alekoodit', label: 'Alennuskoodit', managerOnly: true },
   { href: '/tyontekijat', label: 'Työntekijät', managerOnly: true },
 ];
 

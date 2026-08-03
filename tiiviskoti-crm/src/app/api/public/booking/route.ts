@@ -3,6 +3,7 @@ import { isSlotTaken, sql } from '@/lib/db';
 import { areaForPostal, purgeExpiredHolds } from '@/lib/data';
 import { deliverBooking, saveJobLines } from '@/lib/deliver';
 import { removeCalendarEventForJob } from '@/lib/deliver';
+import { normalizeCode, resolveDiscount, type DiscountError } from '@/lib/discounts';
 
 /* =========================================================
    Varauksen kirjaus — SISÄINEN rajapinta.
@@ -55,7 +56,25 @@ const schema = z.object({
     note: z.string().max(60).optional(),
   })).max(50).optional(),
   netCents: z.number().int().min(0).optional(),
+  /* Asiakkaan kirjoittama alennuskoodi. Vain koodi, ei sen arvoa: vähennys
+     lasketaan täällä `tk.discount_codes`-taulusta, jottei sitä voi syöttää
+     pyynnössä. Sama sääntö kuin matkalisällä. */
+  discountCode: z.string().max(40).optional(),
 });
+
+/* Kelpaamaton alennuskoodi keskeyttää varauksen. Vaihtoehto olisi kirjata
+   varaus täydellä hinnalla, mutta silloin asiakas maksaisi hiljaisesti
+   enemmän kuin lomakkeella luki. Sivusto tarkistaa koodin jo ennen
+   lähetystä, joten tänne asti päässyt virhe on joko kilpajuoksu (viimeinen
+   käyttökerta ehdittiin viedä) tai käsin muokattu pyyntö — kumpikin
+   ansaitsee selvän virheen eikä hiljaista hinnankorotusta.
+
+   Heitetään transaktion sisältä, jotta koko varaus peruuntuu. */
+class DiscountRejected extends Error {
+  constructor(public reason: DiscountError) {
+    super(`discount_${reason}`);
+  }
+}
 
 /** Vakioaikainen vertailu, jottei salaisuutta voi haarukoida vasteajasta. */
 function secretOk(request: Request): boolean {
@@ -116,7 +135,11 @@ export async function POST(request: Request) {
   }
 
   const travelFeeCents = area.travelFeeCents;
-  const totalCents = d.workCents + travelFeeCents;
+  /* Veloitus ennen alennusta. Alennus lasketaan tästä, eli se koskee myös
+     matkalisää — asiakkaalle luvattu "−20 €" on −20 € loppusummasta, ei
+     työn osuudesta. */
+  const subtotalCents = d.workCents + travelFeeCents;
+  const wantedCode = normalizeCode(d.discountCode);
 
   try {
     const created = await sql.begin(async (tx) => {
@@ -143,6 +166,28 @@ export async function POST(request: Request) {
         customerId = row.id;
       }
 
+      /* Alennus ratkaistaan vasta kun asiakas on tiedossa, koska koodilla voi
+         olla asiakaskohtainen käyttöraja. `forUpdate` lukitsee koodirivin:
+         ilman sitä kaksi yhtaikaista varausta voisi kumpikin lukea saman
+         "yksi käyttö jäljellä" ja käyttää sen. */
+      let discountCents = 0;
+      let discountId: string | null = null;
+      let discountCode: string | null = null;
+      if (wantedCode) {
+        const res = await resolveDiscount({
+          code: wantedCode,
+          subtotalCents,
+          customerId,
+          db: tx,
+          forUpdate: true,
+        });
+        if (!res.ok) throw new DiscountRejected(res.error);
+        discountCents = res.discount.amountCents;
+        discountId = res.discount.id;
+        discountCode = res.discount.code;
+      }
+      const totalCents = subtotalCents - discountCents;
+
       const [job] = await tx<{ id: string; job_number: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status, title,
                              address, postal_code, city, price_cents, notes, source)
@@ -151,8 +196,23 @@ export async function POST(request: Request) {
                 ${totalCents}, ${d.notes ?? null}, 'web')
         returning id, job_number
       `;
-      return job;
-    }) as unknown as { id: string; job_number: string };
+
+      /* Käyttökerta samassa transaktiossa työn kanssa: peruuntunut varaus ei
+         saa kuluttaa koodia, eikä käytetty koodi jäädä kirjaamatta. */
+      if (discountId) {
+        await tx`
+          insert into tk.discount_redemptions (code_id, job_id, customer_id, amount_cents)
+          values (${discountId}, ${job.id}, ${customerId}, ${discountCents})
+        `;
+      }
+
+      return { ...job, discountCents, discountCode, totalCents };
+    }) as unknown as {
+      id: string; job_number: string;
+      discountCents: number; discountCode: string | null; totalCents: number;
+    };
+
+    const totalCents = created.totalCents;
 
     // --- jälkitoimet: rivit, vahvistusposti, kalenteritapahtuma ---
     // Aika on nyt varattu ja työ kannassa. Mikään tästä eteenpäin ei saa
@@ -169,6 +229,18 @@ export async function POST(request: Request) {
         qty: 1,
         unit: travelFeeCents / 100,
         sum: travelFeeCents / 100,
+        unitName: 'kerta',
+      });
+    }
+    /* Alennus omana negatiivisena rivinään viimeisenä, jotta vahvistuspostin
+       ja työmääräimen erittelystä näkee sekä listahinnan että vähennyksen —
+       ei vain pienempää loppusummaa. */
+    if (created.discountCents > 0) {
+      lines.push({
+        name: `Alennuskoodi ${created.discountCode}`,
+        qty: 1,
+        unit: -created.discountCents / 100,
+        sum: -created.discountCents / 100,
         unitName: 'kerta',
       });
     }
@@ -211,6 +283,9 @@ export async function POST(request: Request) {
       jobNumber: created.job_number,
       totalCents,
       travelFeeCents,
+      subtotalCents,
+      discountCents: created.discountCents,
+      discountCode: created.discountCode,
       area: area.name,
       mailSent: delivery.mail.ok,
       workOrderSent: delivery.workOrder.ok,
@@ -223,6 +298,14 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     if (isSlotTaken(err)) return Response.json({ error: 'slot_taken' }, { status: 409 });
+    // Koodi ei kelvannut: varaus peruuntui kokonaan, joten aika on yhä vapaa.
+    // Sivusto näyttää syyn ja antaa lähettää uudelleen ilman koodia.
+    if (err instanceof DiscountRejected) {
+      return Response.json(
+        { error: 'discount_invalid', reason: err.reason, code: wantedCode },
+        { status: 409 },
+      );
+    }
     console.error('public/booking POST:', err);
     return Response.json({ error: 'server_error' }, { status: 500 });
   }

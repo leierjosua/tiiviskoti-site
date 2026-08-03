@@ -43,7 +43,12 @@ async function reserveCrmJob(payload) {
   // 409 tarkoittaa nyt useaa asiaa: aika varattu, postinumero palvelualueen
   // ulkopuolella, tai kalenteri ei palvele sitä aluetta. Ne on erotettava,
   // muuten asiakkaalle valitetaan varatusta ajasta kun kyse on alueesta.
-  if (r.status === 409) return { conflict: data.error || 'slot_taken', area: data.area, postal: data.postal };
+  // `reason` kuuluu 409:ään alennuskoodin takia: koodi voi kaatua monella
+  // eri tavalla (vanhentunut, loppuun käytetty, jo käytetty), ja asiakkaalle
+  // on kerrottava kumpi — muuten hän yrittää samaa koodia uudelleen.
+  if (r.status === 409) {
+    return { conflict: data.error || 'slot_taken', area: data.area, postal: data.postal, reason: data.reason };
+  }
   if (!r.ok) return { failed: true, status: r.status, error: data.error };
   return data;
 }
@@ -71,6 +76,13 @@ export default async function handler(req, res) {
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
     const { name, email, phone, address, postal, notes } = body;
+    /* Alennuskoodi välitetään sellaisenaan CRM:lle, joka laskee vähennyksen
+       omasta taulustaan. Tässä ei lasketa siitä mitään — sama sääntö kuin
+       matkalisällä: kampanjakohtaiset vähennykset elävät kannassa, eivät
+       `pricing.mjs`:ssä, jottei uusi kampanja vaadi julkaisua. */
+    const discountCode = typeof body.discountCode === 'string'
+      ? body.discountCode.slice(0, 40)
+      : undefined;
     const counts = (body.counts && typeof body.counts === 'object') ? body.counts : {};
     const extras = (body.extras && typeof body.extras === 'object') ? body.extras : {};
     // Täsmällinen alkuhetki ja kalenteri siitä slotista jonka asiakas näki.
@@ -132,6 +144,7 @@ export default async function handler(req, res) {
       address: String(address).trim(),
       postalCode: String(postal),
       notes: notes ? String(notes) : undefined,
+      discountCode,
       workCents,
       title: `Tiivistys: ${quote.count} kohdetta`,
       // Rivit sellaisenaan pricing.mjs:stä: CRM tallentaa ne työn riveiksi ja
@@ -147,6 +160,7 @@ export default async function handler(req, res) {
         error: reservation.conflict,
         area: reservation.area,
         postal: reservation.postal,
+        reason: reservation.reason,
       });
     }
     if (reservation.misconfigured) {
@@ -177,6 +191,11 @@ export default async function handler(req, res) {
       ref: reservation.jobNumber,
       booking_id: reservation.jobId,
       total_cents: reservation.totalCents ?? workCents,
+      // Toteutunut alennus, jotta kiitosnäkymä kertoo saman summan kuin
+      // vahvistusposti — myös silloin kun koodi antoi vähemmän kuin
+      // nimellisarvonsa (esim. tilaus pienempi kuin alennus).
+      discount_cents: reservation.discountCents ?? 0,
+      discount_code: reservation.discountCode ?? null,
     });
   } catch (e) {
     console.error('create-booking error:', e);
