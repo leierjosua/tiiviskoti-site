@@ -75,7 +75,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .hero{padding:clamp(30px,4vw,56px) 0 clamp(20px,3vw,32px)}
 .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(32px,5vw,60px);align-items:center}
 .hero .rating{display:inline-flex;align-items:center;gap:9px;font-size:14.5px;color:var(--text);margin-bottom:18px;font-weight:600}
-.hero .rating .st{color:var(--star);letter-spacing:1px}
+.hero .rating svg{color:var(--green);flex:0 0 auto}
 .hero h1{font-size:clamp(36px,5.2vw,60px);font-weight:800;line-height:1.03;letter-spacing:-.03em;color:var(--ink);text-wrap:balance}
 .hero h1 .a{color:var(--green)}
 .hero-sub{font-size:19px;color:var(--text);max-width:45ch;margin-top:20px}
@@ -197,14 +197,6 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .why{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(34px,5vw,64px);align-items:center}
 .why h2{font-size:clamp(28px,3.6vw,40px);letter-spacing:-.025em;color:var(--ink)}
 .why p{margin-top:18px;font-size:17px;color:var(--text);max-width:52ch}
-.grev{display:flex;align-items:center;gap:15px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 20px;margin-top:28px;box-shadow:var(--sh);transition:.2s var(--ease)}
-.grev:hover{border-color:var(--green);transform:translateY(-2px)}
-.grev-g{flex:0 0 auto;width:38px;height:38px}
-.grev-main{display:flex;flex-direction:column;gap:3px;min-width:0}
-.grev-score{display:flex;align-items:baseline;gap:11px}
-.grev-score b{font-size:clamp(30px,4vw,38px);font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.02em}
-.grev-stars{color:var(--star);font-size:19px;letter-spacing:2px;white-space:nowrap}
-.grev-sub{font-size:14px;color:var(--mute);font-weight:600}
 .why-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
 .wstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
 .wstat b{display:block;font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.1;white-space:nowrap}
@@ -245,7 +237,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .mf-brand .logo{color:#fff}.mf-brand .logo .d{color:#fff}
 .mf-brand p{max-width:32ch;margin-top:14px;font-size:14.5px;color:var(--dmute)}
 .mf-rate{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-size:14px;color:var(--dtext);font-weight:600}
-.mf-rate .st{color:var(--star)}
+.mf-rate svg{color:#2E9E63;flex:0 0 auto}
 .mf-col h4{color:#fff;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
 .mf-col a{display:block;color:var(--dmute);font-size:14.5px;margin-bottom:10px}.mf-col a:hover{color:var(--green-l)}
 .mf-cities{padding:26px 0;border-bottom:1px solid rgba(246,247,243,.14)}
@@ -285,7 +277,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .why-stats{grid-template-columns:1fr}
   .slots{grid-template-columns:repeat(3,1fr)}
   /* Footer puhelimessa: brandi omalle riville, linkkipalstat pareittain.
-     Kahden palstan ruudukossa "4,9/5 · 300+ arviota" katkesi kolmelle riville. */
+     Kahden palstan ruudukossa pitka luottamusrivi katkesi kolmelle riville. */
   .mf-grid{grid-template-columns:1fr 1fr;gap:26px}
   .mf-brand{grid-column:1/-1}
   /* Ei body-täytettä: palkki on piilossa footerin kohdalla, joten varattu
@@ -334,7 +326,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 <nav class="top" id="nav"><div class="wrap">
   <a href="index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
   <div class="nlinks" id="nlinks">
-    <a href="index.html#palvelut">Palvelut</a><a href="index.html#laskuri">Hinta</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="index.html#laskuri">Varaa aika</a><a href="index.html#arviot">Arviot</a>
+    <a href="index.html#palvelut">Palvelut</a><a href="index.html#laskuri">Hinta</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="index.html#laskuri">Varaa aika</a><a href="index.html#saasto">Säästö</a>
   </div>
   <a href="tel:+358458755996" class="ntel">045 875 5996</a>
   <a href="#tarjous" class="btn btn-p" style="padding:10px 20px">Pyydä tarjous</a>
@@ -344,7 +336,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 <!-- HERO -->
 <header class="hero"><div class="wrap hero-grid">
   <div>
-    <div class="rating"><span class="st">★★★★★</span> Luotettu kumppani taloyhtiöille Uudellamaalla</div>
+    <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Vastuuvakuutettu · 2 vuoden takuu työlle</div>
     <h1>Taloyhtiön ovet ja ikkunat<br>kuntoon <span class="a">kerralla.</span></h1>
     <p class="hero-sub">Tiivistämme rappukäytävät, yhteistilat ja ikkunat kiinteällä sopimushinnalla. Yksi kumppani ja selkeä tarjous hallitukselle.</p>
     <div class="hero-cta">
@@ -363,7 +355,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <div class="metrics rv">
     <div class="metric"><b><span class="a">1 sopimus</span></b><span>talon ovet ja ikkunat kerralla</span></div>
     <div class="metric"><b><span class="a">0 €</span></b><span>kartoituskäynti</span></div>
-    <div class="metric"><b><span class="a">4,9/5</span></b><span>300+ arvostelua</span></div>
+    <div class="metric"><b><span class="a">10–15 %</span></b><span>arvioitu pudotus lämmityskuluissa</span></div>
   </div>
 </section>
 
@@ -475,7 +467,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     <div class="mf-brand">
       <a href="index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
       <p>Ovien ja ikkunoiden tiivistevaihto koko Uudellamaalla. Veto loppuu, lämpö jää kotiin.</p>
-      <div class="mf-rate"><span class="st">★★★★★</span> 4,9/5 · 300+ arviota</div>
+      <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Vastuuvakuutettu · 2 vuoden takuu työlle</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="index.html#palvelut">Ovet</a><a href="index.html#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="index.html#laskuri">Hintalaskuri</a></div>
     <div class="mf-col"><h4>Taloyhtiöille</h4><a href="#edut">Miksi me</a><a href="#prosessi">Näin etenemme</a><a href="#ukk">UKK</a><a href="#tarjous">Pyydä tarjous</a></div>
