@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>TiivisKoti — Facebook-profiilikuva ja kansikuva</title>
+<!--
+  FACEBOOK-PROFIILI
+
+  RENDERÖINTI
+    node tiiviskoti/brand/ads/build-fb-profiili.mjs   (repon juuresta)
+    Vaatii dev-palvelimen: cd tiiviskoti && node _serve.mjs
+    Tuottaa: brand/fb-profiilikuva-1080.png, brand/fb-kansikuva-1640x856.png
+
+  PROFIILIKUVA · 1080 × 1080
+    Vain merkki, ei nimeä — Facebook rajaa kuvan ympyräksi ja näyttää sen
+    syötteessä n. 32 px kokoisena, jolloin teksti ei erotu. Sivun nimi näkyy
+    joka tapauksessa kuvan vieressä.
+    Merkki pidetään n. 55 % leveydestä, jotta ympyrärajaus ei leikkaa sitä.
+    Tausta on brändivihreä eikä tummin vihreä: 32 px koossa tummin vihreä
+    näyttää mustalta eikä erotu muista.
+
+  KANSIKUVA · 1640 × 856
+    Facebook näyttää työpöydällä koko kuvan, puhelimessa vain keskimmäiset
+    n. 75 % leveydestä. Siksi kaikki teksti on keskitetty .safe-alueelle.
+    Työpöydällä profiilikuva peittää vasemman alakulman, joten alalaita
+    pidetään tyhjänä.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#217A4E; --green-l:#2E9E63; --deep:#163A28; --bg:#F6F7F3;
+  --dtext:#D7E4DB; --amber:#E0A63A;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;
+  display:flex;flex-direction:column;gap:36px;padding:36px;align-items:flex-start}
+
+/* ---------- PROFIILIKUVA ---------- */
+#fb-profiili{width:1080px;height:1080px;background:var(--green);
+  display:flex;align-items:center;justify-content:center;flex:none}
+#fb-profiili svg{width:600px;height:600px;display:block}
+
+/* ympyrärajauksen apuviiva — ei renderöidy PNG:hen, vain esikatseluun */
+.guide{position:absolute;inset:0;border-radius:50%;
+  border:2px dashed rgba(255,255,255,.35);pointer-events:none}
+.wrapguide{position:relative;flex:none}
+
+/* ---------- KANSIKUVA ---------- */
+#fb-kansikuva{width:1640px;height:856px;position:relative;overflow:hidden;
+  background:var(--deep);flex:none;display:flex;align-items:center;justify-content:center}
+#fb-kansikuva .photo{position:absolute;inset:0;z-index:0}
+#fb-kansikuva .photo img{width:100%;height:100%;object-fit:cover;object-position:50% 38%}
+#fb-kansikuva .scrim{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(22,58,40,.86) 0%,rgba(22,58,40,.80) 45%,rgba(22,58,40,.93) 100%)}
+
+/* puhelimen näyttämä turva-alue: keskimmäiset 75 % */
+.safe{position:relative;z-index:2;width:75%;text-align:center;
+  display:flex;flex-direction:column;align-items:center;
+  padding-bottom:56px}   /* alalaita tyhjäksi profiilikuvan alle */
+
+.lockup{display:flex;align-items:center;gap:18px;margin-bottom:30px}
+.lockup svg{width:66px;height:66px;display:block}
+.lockup span{font-size:44px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.lockup span i{font-style:normal;color:var(--green-l)}
+
+#fb-kansikuva h1{font-size:82px;font-weight:800;color:#fff;line-height:1.04;
+  letter-spacing:-.03em;margin-bottom:22px}
+#fb-kansikuva .tag{font-size:30px;font-weight:500;color:var(--dtext);margin-bottom:26px}
+
+.facts{display:flex;align-items:center;gap:18px;margin-bottom:28px}
+.fact{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);
+  border-radius:99px;padding:12px 26px;font-size:26px;font-weight:700;color:#fff}
+.contactline{display:flex;align-items:center;gap:24px;font-size:34px;font-weight:800}
+.contactline .dom{color:#fff}
+.contactline .dot{color:rgba(255,255,255,.4)}
+.contactline .tel{color:#8FD3AC}
+</style>
+</head>
+<body>
+
+<!-- ============ PROFIILIKUVA 1080 × 1080 ============ -->
+<div class="wrapguide">
+  <div id="fb-profiili">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <rect x="14" y="14" width="72" height="72" rx="18" fill="none" stroke="#F6F7F3" stroke-width="6"/>
+      <rect x="34" y="30" width="32" height="40" rx="2.5" fill="none" stroke="#F6F7F3" stroke-width="5"/>
+      <rect x="37.5" y="30" width="3.4" height="40" fill="#F6F7F3"/>
+    </svg>
+  </div>
+  <div class="guide"></div>
+</div>
+
+<!-- ============ KANSIKUVA 1640 × 856 ============ -->
+<div id="fb-kansikuva">
+  <div class="photo"><img src="../../img/miksi-tyo.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="safe">
+    <div class="lockup">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
+      <span>Tiivis<i>Koti</i></span>
+    </div>
+    <h1>Vedoton koti. Lämpö sisällä.</h1>
+    <p class="tag">Ovien ja ikkunoiden tiivistevaihto · koko Uusimaa</p>
+    <div class="facts">
+      <span class="fact">95 € / ikkuna</span>
+      <span class="fact">119 € / ovi</span>
+      <span class="fact">2 v takuu</span>
+    </div>
+    <div class="contactline">
+      <span class="dom">tiiviskoti.fi</span>
+      <span class="dot">·</span>
+      <span class="tel">045 875 5996</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

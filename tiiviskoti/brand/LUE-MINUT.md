@@ -75,9 +75,19 @@ profiilikuvan ympyräksi ja näyttää sen syötteessä noin 32 px kokoisena —
 koossa teksti ei ole luettavissa, ja sivun nimi näkyy joka tapauksessa kuvan
 vieressä. Tunnistettavuus tulee merkistä.
 
+Tausta on brändivihreä (`#217A4E`) eikä tummin vihreä: 32 px koossa tummin
+vihreä näyttää käytännössä mustalta eikä erotu muista profiilikuvista.
+Merkki on n. 55 % leveydestä, jolloin ympyrärajaus ei koske siihen.
+
 **Kansikuvassa sisältö on keskellä.** Facebook näyttää kansikuvan
-työpöydällä kokonaan mutta rajaa puhelimessa reunoilta, joten teksti ja
-yhteystiedot on pidetty turvallisella keskialueella.
+työpöydällä kokonaan mutta rajaa puhelimessa reunoilta noin 75 %:iin, joten
+teksti ja yhteystiedot on pidetty turvallisella keskialueella. Alalaita on
+jätetty tyhjäksi, koska työpöydällä profiilikuva peittää vasemman alakulman.
+
+Molemmat syntyvät tiedostosta `ads/fb-profiili.html`:
+
+    cd tiiviskoti && node _serve.mjs          # dev-palvelin päälle
+    node tiiviskoti/brand/ads/build-fb-profiili.mjs   # repon juuresta
 
 ## Jos teet lisää grafiikkaa
 
