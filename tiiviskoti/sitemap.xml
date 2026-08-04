@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <url>
+    <loc>https://tiiviskoti.fi/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://tiiviskoti.fi/img/hero-entrance.jpg</image:loc>
+      <image:title>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://tiiviskoti.fi/img/ikkunat.jpg</image:loc>
+      <image:title>Ikkunoiden tiivistys — asentaja uusii karmitiivisteen</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://tiiviskoti.fi/img/ulko-ovet.jpg</image:loc>
+      <image:title>Ovien tiivistys — uusi tiiviste oven karmiin</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://tiiviskoti.fi/img/taloyhtiot.jpg</image:loc>
+      <image:title>Taloyhtiöiden ovien ja ikkunoiden tiivistys</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://tiiviskoti.fi/img/miksi-tyo.jpg</image:loc>
+      <image:title>TiivisKodin asentaja työssä</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://tiiviskoti.fi/taloyhtio.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://tiiviskoti.fi/img/taloyhtio-hero.jpg</image:loc>
+      <image:title>Taloyhtiön ovien ja ikkunoiden tiivistys sopimushinnalla</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://tiiviskoti.fi/varaa.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://tiiviskoti.fi/ajanvaraus.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://tiiviskoti.fi/tietosuoja.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+
+  <url>
+    <loc>https://tiiviskoti.fi/kayttoehdot.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+
+</urlset>
