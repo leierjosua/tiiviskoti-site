@@ -68,18 +68,20 @@ strong{font-weight:800;color:inherit}
   letter-spacing:-.03em;line-height:1}
 .stat span{display:block;margin-top:1.4mm;font-size:2.5mm;line-height:1.3;color:var(--mute)}
 
-/* ---------- 3 · kuvat ---------- */
-.shots{display:flex;gap:2.4mm;padding:0 8mm;margin-top:5mm}
-.shot{flex:1;position:relative;border-radius:3mm;overflow:hidden;height:24mm;background:var(--sand)}
+/* ---------- 3 · kuva + mitä käynnillä tehdään ----------
+   Yksi rauhallinen, lähes neliön muotoinen kuva listan rinnalla.
+   Kaksi matalaa kuvakaistaa näytti litistetyltä eikä kertonut mitään. */
+.midblock{display:flex;gap:4.5mm;padding:6mm 8mm 0;align-items:flex-start}
+.shot{flex:0 0 60mm;height:60mm;position:relative;border-radius:3mm;
+  overflow:hidden;background:var(--sand)}
 .shot img{width:100%;height:100%;object-fit:cover}
-.shot span{position:absolute;left:2.5mm;top:2.5mm;background:rgba(22,58,40,.82);color:#fff;
+.shot span{position:absolute;left:2.5mm;bottom:2.5mm;background:rgba(22,58,40,.82);color:#fff;
   font-size:2.4mm;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
   padding:1.2mm 2.4mm;border-radius:1.5mm}
-.caption{padding:0 8mm;margin-top:2.2mm;font-size:2.7mm;color:var(--mute);text-align:center}
 
 /* ---------- 4 · mitä käynnillä tehdään ---------- */
-.list{padding:3.5mm 8mm 0;display:flex;flex-direction:column;gap:2.2mm}
-.li{display:flex;align-items:flex-start;gap:2.4mm;font-size:3.1mm;line-height:1.3;color:var(--ink)}
+.list{flex:1;display:flex;flex-direction:column;gap:4.4mm;padding-top:1.5mm}
+.li{display:flex;align-items:flex-start;gap:2.4mm;font-size:3.2mm;line-height:1.34;color:var(--ink)}
 .li .tick{flex:none;width:4.2mm;height:4.2mm;border-radius:99px;background:var(--green);
   display:flex;align-items:center;justify-content:center;margin-top:.2mm}
 .li .tick svg{width:2.8mm;height:2.8mm}
@@ -155,17 +157,13 @@ strong{font-weight:800;color:inherit}
       <div class="stat"><b>0 €</b><span>lämpökamera&shy;kartoitus käynnillä</span></div>
     </div>
 
-    <div class="shots">
-      <div class="shot"><span>Ikkunat</span><img src="print-ikkunat.jpg" alt="Ikkunan tiivistys"></div>
-      <div class="shot"><span>Ovet</span><img src="print-ovet.jpg" alt="Ulko-oven tiivistys"></div>
-    </div>
-    <p class="caption">Kuvaamme kohteen lämpökameralla ennen työtä — näet itse mistä vetää.</p>
-
-    <div class="list">
-      <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Karmi- ja puitetiivisteet uusiksi, ovissa myös kynnyskumi</div>
-      <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Oven käynnin ja helojen säätö samalla käynnillä</div>
-      <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Kiinteä hinta ennen työn alkua — ei yllätyslaskuja</div>
-      <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Varaat ajan verkosta alle minuutissa, myös taloyhtiöille</div>
+    <div class="midblock">
+      <div class="shot"><span>Ovet ja ikkunat</span><img src="print-tyo.jpg" alt="Asentaja vaihtaa oven tiivisteen"></div>
+      <div class="list">
+        <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Karmi- ja puitetiivisteet uusiksi, ovissa myös kynnyskumi</div>
+        <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Oven käynnin ja helojen säätö samalla käynnillä</div>
+        <div class="li"><span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Kiinteä hinta ennen työn alkua — ei yllätyslaskuja</div>
+      </div>
     </div>
 
     <div class="foot">
