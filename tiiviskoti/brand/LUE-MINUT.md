@@ -43,13 +43,14 @@ tai asentamaan Manrope. Jos et halua ottaa riskiä, käytä
 
 ### Mainokset
 
-Seitsemän mainosta, jokainen kahdessa koossa: `-1080.png` (neliö) ja
+Kahdeksan mainosta, jokainen kahdessa koossa: `-1080.png` (neliö) ja
 `-1080x1350.png` (4:5, pysty). **Käytä pystyversiota Facebookin syötteessä** —
 se vie enemmän ruudun korkeutta kuin neliö.
 
 | Tiedosto | Kulma | Kenelle |
 |---|---|---|
 | `fb-mainos-veto-*` | Kylmä veto ei kuulu kotiin | Kylmä yleisö |
+| `fb-mainos-veto-edut-*` | Sama kuva + säästö ja kotitalousvähennys | Kylmä yleisö, A/B-pari veto-mainokselle |
 | `fb-mainos-hinta-*` | 95 € / 119 €, hinta näkyy etukäteen | Harkintavaihe |
 | `fb-mainos-saasto-*` | 10–15 % lämmityskuluista | "Miksi vaivautua" |
 | `fb-mainos-taloyhtio-*` | Rappukäytävät kerralla kuntoon | Taloyhtiöiden hallitukset |

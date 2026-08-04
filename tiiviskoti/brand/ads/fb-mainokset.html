@@ -58,6 +58,22 @@ body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;display:flex;fl
 .ad-veto .contact{color:var(--dtext)}
 .ad-veto .contact b{color:#fff}
 
+/* ---------- 1b · VETO + EDUT ----------
+   Sama kuva ja väite kuin veto-mainoksessa, mutta kaksi lukua mukana:
+   säästö ja kotitalousvähennys. Kortit ovat läpikuultavia, jotta kuva
+   jatkuu niiden takana eikä mainos hajoa kahteen osaan. */
+.ad-veto-edut .sub{margin-bottom:44px}
+/* kortit kiinni alalaidan tietoihin, ei kellumaan kuvan keskelle */
+.ad-veto-edut .statrow{margin-top:auto}
+.ad-veto-edut .foot{margin-top:0}
+.statrow{display:flex;gap:22px;margin-bottom:52px}
+.statcard{flex:1;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.26);
+  border-radius:24px;padding:30px 28px;backdrop-filter:blur(2px)}
+.statcard b{display:block;font-size:62px;font-weight:800;color:#8FD3AC;
+  letter-spacing:-.035em;line-height:1}
+.statcard span{display:block;margin-top:12px;font-size:25px;font-weight:500;
+  color:var(--dtext);line-height:1.32}
+
 /* ---------- 2 · HINTA (vaalea) ---------- */
 .ad-hinta{background:var(--bg);color:var(--ink);padding:76px}
 .ad-hinta .kicker{color:var(--green);margin-bottom:30px}
@@ -156,6 +172,26 @@ body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;display:flex;fl
   <div class="kicker">Tiivistevaihto · Uusimaa</div>
   <div class="claim">Kylmä veto<br>ei kuulu <span class="a">kotiin.</span></div>
   <p class="sub">Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan. Yksi käynti, ja veto on poissa.</p>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 1b · VETO + EDUT ============ -->
+<div class="ad ad-veto ad-veto-edut" id="ad-veto-edut">
+  <div class="photo"><img src="../../img/miksi-tyo.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="kicker">Tiivistevaihto · Uusimaa</div>
+  <div class="claim">Kylmä veto<br>ei kuulu <span class="a">kotiin.</span></div>
+  <p class="sub">Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan. Yksi käynti, ja veto on poissa.</p>
+  <div class="statrow">
+    <div class="statcard"><b>10–15 %</b><span>arvioitu säästö lämmityskuluissa</span></div>
+    <div class="statcard"><b>−40 %</b><span>kotitalousvähennys työn osuudesta</span></div>
+  </div>
   <div class="foot">
     <div class="brandline">
       <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>

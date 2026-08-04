@@ -16,6 +16,7 @@ const OUT  = 'C:/Users/josua/projects/loppusiivous-main-new/tiiviskoti/brand';
 
 const ads = [
   ['ad-veto',      'veto'],
+  ['ad-veto-edut', 'veto-edut'],
   ['ad-hinta',     'hinta'],
   ['ad-saasto',    'saasto'],
   ['ad-taloyhtio', 'taloyhtio'],
