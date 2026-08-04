@@ -50,7 +50,7 @@ Lämmin, rehellinen, käytännönläheinen. Korostetaan konkreettista hyötyä: 
 | Pelkkä kynnyskumi | 45 € |
 | **Minimiveloitus** (sis. kotikäynnin) | 120 € |
 
-Lisät: saranoiden & lukon säätö +25 €, vanhan liiman poisto +15 €, postiluukun tiivistys +19 €, karmin tilkitseminen +35 €, lukkorungon huolto +29 €, tuuletusventtiilin huolto +22 €.
+Lisät: saranoiden & lukon säätö +25 €, postiluukun tiivistys +19 €, karmin tilkitseminen +35 €, lukkorungon huolto +29 €, tuuletusventtiilin huolto +22 €.
 
 Kotitalousvähennys: −40 % työn osuudesta (netto ≈ 72 % hinnasta), max 2 250 € / henkilö (2026).
 

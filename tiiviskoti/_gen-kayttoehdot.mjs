@@ -99,8 +99,8 @@ const body = `
       Ikkunoiden yksikköhinta määräytyy saman käynnin ikkunamäärän mukaan yllä olevan
       porrastuksen mukaisesti.</p>
     <p><b>Lisätyöt</b> veloitetaan erikseen vain, jos ne on tilattu: karmin ja seinän välin
-      akryylisaumaus 19 € / aukko, helojen ja käyntivälyksen säätö 15 € / ikkuna, kahvan vaihto
-      29 € / kpl sekä vaihdettavan kahvan hinta, ja vanhan liiman poisto 15 €.</p>
+      akryylisaumaus 19 € / aukko, helojen ja käyntivälyksen säätö 15 € / ikkuna sekä kahvan vaihto
+      29 € / kpl ja vaihdettavan kahvan hinta.</p>
     <p>Hinnat sisältävät arvonlisäveron 25,5 %. Näet kokonaishinnan hintalaskurista ennen
       varausta.</p>
     <p><b>Hinta tarkistetaan paikan päällä.</b> Jos työn laajuus poikkeaa varauksessa ilmoitetusta —

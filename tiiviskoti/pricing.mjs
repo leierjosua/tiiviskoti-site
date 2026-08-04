@@ -59,7 +59,6 @@ export const TYPES = [
 export const EXTRAS = [
   { id: 'sauma',  name: 'Karmin ja seinän välin akryylisaumaus', price: 19, per: 'aukko',  unit: 'aukko',  min: 10 },
   { id: 'helat',  name: 'Helojen ja käyntivälyksen säätö',       price: 15, per: 'ikkuna', unit: 'ikkuna', min: 5 },
-  { id: 'poisto', name: 'Vanhan liiman poisto',                  price: 15, per: 'kerta',                  min: 15 },
   /* Määrällinen lisätyö viimeisenä: se vie laskurissa oman koko rivinsä,
      joten muut lisätyöt saavat täyttää kaksi saraketta rauhassa. */
   { id: 'kahva',  name: 'Kahvan vaihto',                         price: 29, per: 'kpl',    unit: 'kpl',    min: 15, note: '+ osa' },
