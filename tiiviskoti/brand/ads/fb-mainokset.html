@@ -87,6 +87,64 @@ body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;display:flex;fl
 .ad-saasto .foot{border-top:1px solid rgba(255,255,255,.28);padding-top:34px}
 .ad-saasto .contact{color:#DDF2E6}
 .ad-saasto .contact b{color:#fff}
+
+/* ---------- 4 · TALOYHTIÖT (syvä) ---------- */
+.ad-taloyhtio{background:var(--deep);color:#fff;padding:76px}
+.ad-taloyhtio .kicker{color:#8FD3AC;margin-bottom:30px}
+.ad-taloyhtio .claim{font-size:92px;margin-bottom:32px}
+.ad-taloyhtio .sub{color:var(--dtext);max-width:840px;margin-bottom:46px}
+.tiles{display:flex;gap:22px;margin-bottom:46px}
+.tile{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;padding:32px 26px}
+.tile b{display:block;font-size:34px;font-weight:800;color:#8FD3AC;line-height:1.15;margin-bottom:10px}
+.tile span{display:block;font-size:25px;font-weight:500;color:var(--dtext);line-height:1.35}
+.ad-taloyhtio .foot{border-top:1px solid rgba(255,255,255,.22);padding-top:34px}
+.ad-taloyhtio .contact{color:var(--dtext)}
+.ad-taloyhtio .contact b{color:#fff}
+
+/* ---------- 5 · VÄHENNYS (vaalea) ---------- */
+.ad-vahennys{background:var(--bg);color:var(--ink);padding:76px}
+.ad-vahennys .kicker{color:var(--green);margin-bottom:36px}
+.maths{display:flex;align-items:center;gap:30px;margin-bottom:40px}
+.maths .from{font-size:96px;font-weight:800;color:#9AA69E;letter-spacing:-.03em;
+  text-decoration:line-through;text-decoration-thickness:6px}
+.maths .arrow{font-size:66px;font-weight:800;color:#B9C4BC}
+.maths .to{font-size:152px;font-weight:800;color:var(--green);letter-spacing:-.04em;line-height:1}
+.maths .unit{font-size:34px;font-weight:700;color:var(--text);align-self:flex-end;padding-bottom:22px}
+.ad-vahennys .claim{font-size:74px;margin-bottom:30px}
+.ad-vahennys .sub{color:var(--text);max-width:880px;margin-bottom:44px}
+.ad-vahennys .foot{border-top:1px solid var(--line);padding-top:32px}
+.ad-vahennys .wordmark{color:var(--ink)}
+.ad-vahennys .contact{color:var(--text)}
+.ad-vahennys .contact b{color:var(--ink)}
+
+/* ---------- 6 · AJOITUS (tumma, kuva) ---------- */
+.ad-syksy{background:var(--deep);color:#fff;justify-content:flex-end;padding:76px}
+.ad-syksy .photo{position:absolute;inset:0;z-index:0}
+.ad-syksy .photo img{width:100%;height:100%;object-fit:cover}
+.ad-syksy .scrim{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(22,58,40,.62) 0%,rgba(22,58,40,.66) 34%,rgba(22,58,40,.95) 78%,rgba(22,58,40,.98) 100%)}
+.ad-syksy > *:not(.photo):not(.scrim){position:relative;z-index:2}
+.ad-syksy .kicker{color:var(--amber);margin-bottom:26px}
+.ad-syksy .claim{font-size:96px;margin-bottom:26px}
+.ad-syksy .sub{color:var(--dtext);max-width:840px;margin-bottom:56px}
+.ad-syksy .foot{border-top:1px solid rgba(255,255,255,.22);padding-top:34px}
+.ad-syksy .contact{color:var(--dtext)}
+.ad-syksy .contact b{color:#fff}
+
+/* ---------- 7 · VARAUS (vihreä, askeleet) ---------- */
+.ad-varaus{background:var(--green);color:#fff;padding:76px}
+.ad-varaus .kicker{color:#C8EBD8;margin-bottom:34px}
+.ad-varaus .claim{font-size:96px;margin-bottom:30px}
+.ad-varaus .sub{color:#E8F6EE;max-width:860px;margin-bottom:50px}
+.steps{display:flex;flex-direction:column;gap:26px;margin-bottom:52px}
+.step{display:flex;align-items:flex-start;gap:22px}
+.step .n{flex:none;width:60px;height:60px;border-radius:99px;background:#fff;color:var(--green);
+  font-size:31px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.step .t{font-size:31px;font-weight:600;line-height:1.32;padding-top:11px}
+.ad-varaus .foot{border-top:1px solid rgba(255,255,255,.28);padding-top:34px}
+.ad-varaus .contact{color:#DDF2E6}
+.ad-varaus .contact b{color:#fff}
 </style>
 </head>
 <body>
@@ -136,6 +194,80 @@ body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;display:flex;fl
     <div class="bullet"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lämpökamerakartoitus veloituksetta käynnillä</div>
     <div class="bullet"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta ennen työn alkua — ei yllätyslaskuja</div>
     <div class="bullet"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Varaat ajan verkosta alle minuutissa</div>
+  </div>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#F6F7F3"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#217A4E" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#217A4E"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 4 · TALOYHTIÖT ============ -->
+<div class="ad ad-taloyhtio" id="ad-taloyhtio">
+  <div class="kicker">Taloyhtiöille</div>
+  <div class="claim">Rappukäytävät<br>kerralla kuntoon.</div>
+  <p class="sub">Ulko-ovet, rappukäytävät ja yhteistilat samalla sopimuksella — yksi urakka, yksi lasku.</p>
+  <div class="tiles">
+    <div class="tile"><b>Kartoitus</b><span>Käymme kohteet läpi ja kirjaamme, mikä vuotaa</span></div>
+    <div class="tile"><b>Kirjallinen tarjous</b><span>Sopimushinta, jonka hallitus voi hyväksyä sellaisenaan</span></div>
+    <div class="tile"><b>Raportti</b><span>Mitä tehtiin ja missä — dokumentoituna hallitukselle</span></div>
+  </div>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi/taloyhtio</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 5 · KOTITALOUSVÄHENNYS ============ -->
+<div class="ad ad-vahennys" id="ad-vahennys">
+  <div class="kicker">Kotitalousvähennys</div>
+  <div class="maths">
+    <span class="from">95 €</span>
+    <span class="arrow">→</span>
+    <span class="to">68 €</span>
+    <span class="unit">/ ikkuna</span>
+  </div>
+  <div class="claim">Verottaja maksaa<br>osan puolestasi.</div>
+  <p class="sub">Kotitalousvähennys pudottaa työn osuudesta 40 %. Kerromme kiinteän hinnan sekä ennen että jälkeen vähennyksen, niin tiedät heti mistä puhutaan.</p>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 6 · AJOITUS ============ -->
+<div class="ad ad-syksy" id="ad-syksy">
+  <div class="photo"><img src="../../img/ikkunat.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="kicker">Ajoitus</div>
+  <div class="claim">Tiivisteet kuntoon<br><span class="a">ennen pakkasia.</span></div>
+  <p class="sub">Vetoisen ikkunan huomaa vasta kun ulkona on −20 °C — silloin jokainen päivä maksaa. Syksyllä ehtii vielä hyvin.</p>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 7 · VARAUS ============ -->
+<div class="ad ad-varaus" id="ad-varaus">
+  <div class="kicker">Varaus</div>
+  <div class="claim">Ei tarjouspyyntöä.<br>Ei odottelua.</div>
+  <p class="sub">Hinta on verkossa valmiina, ja kalenterista näet vapaat ajat omalla alueellasi.</p>
+  <div class="steps">
+    <div class="step"><span class="n">1</span><span class="t">Valitse ovet ja ikkunat</span></div>
+    <div class="step"><span class="n">2</span><span class="t">Näet kiinteän hinnan heti</span></div>
+    <div class="step"><span class="n">3</span><span class="t">Varaat ajan alle minuutissa</span></div>
   </div>
   <div class="foot">
     <div class="brandline">

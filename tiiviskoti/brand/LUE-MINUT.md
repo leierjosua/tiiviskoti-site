@@ -40,9 +40,22 @@ tai asentamaan Manrope. Jos et halua ottaa riskiä, käytä
 | `fb-kansikuva-1640x856.png` | 1640 × 856 | Kansikuva |
 | `fb-julkaisu-hinta-1080.png` | 1080 × 1080 | Julkaisu: hinnasto |
 | `fb-julkaisu-veto-1080.png` | 1080 × 1080 | Julkaisu: miksi tiivistää |
-| `fb-mainos-veto-1080.png` | 1080 × 1080 | **Mainos:** kylmä veto (oikea työkuva) |
-| `fb-mainos-hinta-1080.png` | 1080 × 1080 | **Mainos:** kiinteä hinta 95 € / 119 € |
-| `fb-mainos-saasto-1080.png` | 1080 × 1080 | **Mainos:** 10–15 % säästö |
+
+### Mainokset
+
+Seitsemän mainosta, jokainen kahdessa koossa: `-1080.png` (neliö) ja
+`-1080x1350.png` (4:5, pysty). **Käytä pystyversiota Facebookin syötteessä** —
+se vie enemmän ruudun korkeutta kuin neliö.
+
+| Tiedosto | Kulma | Kenelle |
+|---|---|---|
+| `fb-mainos-veto-*` | Kylmä veto ei kuulu kotiin | Kylmä yleisö |
+| `fb-mainos-hinta-*` | 95 € / 119 €, hinta näkyy etukäteen | Harkintavaihe |
+| `fb-mainos-saasto-*` | 10–15 % lämmityskuluista | "Miksi vaivautua" |
+| `fb-mainos-taloyhtio-*` | Rappukäytävät kerralla kuntoon | Taloyhtiöiden hallitukset |
+| `fb-mainos-vahennys-*` | 95 € → 68 € kotitalousvähennyksellä | Hintaherkät |
+| `fb-mainos-syksy-*` | Ennen pakkasia | Kausikampanja, elo–marraskuu |
+| `fb-mainos-varaus-*` | Ei tarjouspyyntöä, ei odottelua | Uudelleenkohdennus |
 
 ### Mainosgrafiikoiden muokkaus
 
