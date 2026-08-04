@@ -40,6 +40,21 @@ tai asentamaan Manrope. Jos et halua ottaa riskiä, käytä
 | `fb-kansikuva-1640x856.png` | 1640 × 856 | Kansikuva |
 | `fb-julkaisu-hinta-1080.png` | 1080 × 1080 | Julkaisu: hinnasto |
 | `fb-julkaisu-veto-1080.png` | 1080 × 1080 | Julkaisu: miksi tiivistää |
+| `fb-mainos-veto-1080.png` | 1080 × 1080 | **Mainos:** kylmä veto (oikea työkuva) |
+| `fb-mainos-hinta-1080.png` | 1080 × 1080 | **Mainos:** kiinteä hinta 95 € / 119 € |
+| `fb-mainos-saasto-1080.png` | 1080 × 1080 | **Mainos:** 10–15 % säästö |
+
+### Mainosgrafiikoiden muokkaus
+
+Kolme `fb-mainos-*`-kuvaa syntyvät yhdestä lähteestä, joten tekstin voi
+vaihtaa ilman kuvankäsittelyohjelmaa:
+
+1. muokkaa `ads/fb-mainokset.html` (tekstit ovat suoraan HTML:ssä),
+2. käynnistä dev-palvelin: `cd tiiviskoti && node _serve.mjs`,
+3. renderöi repon juuresta: `node tiiviskoti/brand/ads/build-fb-mainokset.mjs`.
+
+Kuvat tulevat sivuston omista työkuvista (`img/`, `print/`), eivät
+kuvapankista — samat kuvat siis mainoksissa ja sivustolla.
 
 **Profiilikuvassa on tarkoituksella vain merkki, ei nimeä.** Facebook rajaa
 profiilikuvan ympyräksi ja näyttää sen syötteessä noin 32 px kokoisena — siinä

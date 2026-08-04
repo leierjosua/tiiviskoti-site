@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>TiivisKoti — Facebook-mainokset 1080 × 1080</title>
+<!--
+  FACEBOOK-MAINOKSET · 1080 × 1080
+
+  RENDERÖINTI
+    node brand/ads/build-fb-mainokset.mjs   (repon juuresta, vaatii dev-palvelimen)
+    Tuottaa: brand/fb-mainos-veto-1080.png, -hinta-1080.png, -saasto-1080.png
+
+  MUOKKAUS
+    Tekstit ovat suoraan alla .ad-lohkoissa. Kuvat tulevat ../../img-kansiosta.
+    Rakenne noudattaa LUE-MINUT.md:tä: pieni vihreä yläotsikko versaalilla,
+    iso lihava väite, lyhyt selittävä teksti, alalaidassa merkki + osoite + puhelin.
+    Tumma ja vaalea vuorottelevat.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#217A4E; --green-l:#2E9E63; --deep:#163A28; --ink:#183A28;
+  --bg:#F6F7F3; --card:#FFFFFF; --line:#E4E8E0; --text:#4A544D; --amber:#E0A63A;
+  --dtext:#D7E4DB; --dmute:#9DB2A5;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;display:flex;flex-wrap:wrap;gap:32px;padding:32px}
+
+.ad{width:1080px;height:1080px;position:relative;overflow:hidden;display:flex;flex-direction:column;flex:none}
+
+/* ---------- yhteiset osat ---------- */
+.kicker{font-size:26px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:14px}
+.kicker::before{content:"";width:34px;height:3px;background:currentColor;border-radius:2px}
+.claim{font-size:104px;font-weight:800;line-height:1.02;letter-spacing:-.025em}
+.claim .a{color:var(--green-l)}
+.sub{font-size:31px;line-height:1.45;font-weight:500}
+
+.foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brandline{display:flex;align-items:center;gap:16px}
+.brandline svg{width:58px;height:58px;display:block}
+.wordmark{font-size:38px;font-weight:800;letter-spacing:-.01em}
+.contact{text-align:right;font-size:27px;font-weight:700;line-height:1.4}
+.contact b{display:block;font-size:31px;font-weight:800}
+
+/* ---------- 1 · VETO (tumma, kuva) ---------- */
+.ad-veto{background:var(--deep);color:#fff;justify-content:flex-end;padding:76px}
+.ad-veto .photo{position:absolute;inset:0;z-index:0}
+.ad-veto .photo img{width:100%;height:100%;object-fit:cover}
+.ad-veto .scrim{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(22,58,40,.34) 0%,rgba(22,58,40,.52) 38%,rgba(22,58,40,.93) 78%,rgba(22,58,40,.98) 100%)}
+.ad-veto > *:not(.photo):not(.scrim){position:relative;z-index:2}
+.ad-veto .kicker{color:#8FD3AC;margin-bottom:26px}
+.ad-veto .claim{margin-bottom:26px}
+.ad-veto .sub{color:var(--dtext);max-width:820px;margin-bottom:56px}
+.ad-veto .foot{border-top:1px solid rgba(255,255,255,.22);padding-top:34px}
+.ad-veto .contact{color:var(--dtext)}
+.ad-veto .contact b{color:#fff}
+
+/* ---------- 2 · HINTA (vaalea) ---------- */
+.ad-hinta{background:var(--bg);color:var(--ink);padding:76px}
+.ad-hinta .kicker{color:var(--green);margin-bottom:30px}
+.ad-hinta .claim{font-size:88px;margin-bottom:44px}
+.prices{display:flex;gap:26px;margin-bottom:34px}
+.price{flex:1;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:38px 34px}
+.price b{display:block;font-size:96px;font-weight:800;color:var(--green);letter-spacing:-.03em;line-height:1}
+.price span{display:block;font-size:29px;font-weight:700;color:var(--text);margin-top:10px}
+.price small{display:block;font-size:24px;font-weight:500;color:#7B857D;margin-top:6px}
+.strip{height:230px;border-radius:26px;overflow:hidden;margin-bottom:30px;border:1px solid var(--line)}
+.strip img{width:100%;height:100%;object-fit:cover}
+.fineprint{font-size:26px;font-weight:600;color:var(--text);margin-bottom:34px}
+.ad-hinta .foot{border-top:1px solid var(--line);padding-top:32px}
+.ad-hinta .wordmark{color:var(--ink)}
+.ad-hinta .contact{color:var(--text)}
+.ad-hinta .contact b{color:var(--ink)}
+
+/* ---------- 3 · SÄÄSTÖ (syvä vihreä) ---------- */
+.ad-saasto{background:var(--green);color:#fff;padding:76px}
+.ad-saasto .kicker{color:#C8EBD8;margin-bottom:44px}
+.bignum{font-size:250px;font-weight:800;line-height:.92;letter-spacing:-.045em}
+.bignum-label{font-size:34px;font-weight:700;color:#DDF2E6;margin-top:14px;margin-bottom:48px}
+.ad-saasto .sub{color:#E8F6EE;max-width:860px;margin-bottom:40px}
+.bullets{display:flex;flex-direction:column;gap:18px;margin-bottom:52px}
+.bullet{display:flex;align-items:flex-start;gap:16px;font-size:29px;font-weight:600;line-height:1.35}
+.bullet svg{width:32px;height:32px;flex:none;margin-top:3px}
+.ad-saasto .foot{border-top:1px solid rgba(255,255,255,.28);padding-top:34px}
+.ad-saasto .contact{color:#DDF2E6}
+.ad-saasto .contact b{color:#fff}
+</style>
+</head>
+<body>
+
+<!-- ============ 1 · VETO ============ -->
+<div class="ad ad-veto" id="ad-veto">
+  <div class="photo"><img src="../../img/miksi-tyo.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="kicker">Tiivistevaihto · Uusimaa</div>
+  <div class="claim">Kylmä veto<br>ei kuulu <span class="a">kotiin.</span></div>
+  <p class="sub">Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan. Yksi käynti, ja veto on poissa.</p>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 2 · HINTA ============ -->
+<div class="ad ad-hinta" id="ad-hinta">
+  <div class="kicker">Kiinteä hinta</div>
+  <div class="claim">Näet hinnan<br>ennen varausta.</div>
+  <div class="prices">
+    <div class="price"><b>95 €</b><span>/ ikkuna</span><small>karmi- ja puitetiivisteet</small></div>
+    <div class="price"><b>119 €</b><span>/ ovi</span><small>tiivisteet, kynnyskumi ja säätö</small></div>
+  </div>
+  <div class="strip"><img src="../../print/print-ovet.jpg" alt=""></div>
+  <p class="fineprint">Pienin veloitus 149 € / käynti · kotitalousvähennys −40 % · 2 vuoden takuu työlle</p>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 3 · SÄÄSTÖ ============ -->
+<div class="ad ad-saasto" id="ad-saasto">
+  <div class="kicker">Säästö</div>
+  <div class="bignum">10–15 %</div>
+  <div class="bignum-label">arvioitu pudotus lämmityskuluissa</div>
+  <p class="sub">Rako päästää lämmitettyä ilmaa ulos ja kylmää tilalle. Kun rako umpeutuu, sama sisälämpötila vaatii vähemmän energiaa.</p>
+  <div class="bullets">
+    <div class="bullet"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lämpökamerakartoitus veloituksetta käynnillä</div>
+    <div class="bullet"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta ennen työn alkua — ei yllätyslaskuja</div>
+    <div class="bullet"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Varaat ajan verkosta alle minuutissa</div>
+  </div>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#F6F7F3"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#217A4E" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#217A4E"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+</body>
+</html>
