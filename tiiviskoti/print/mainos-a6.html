@@ -2,16 +2,32 @@
 <html lang="fi">
 <head>
 <meta charset="utf-8">
-<title>TiivisKoti — postilaatikkomainos A5</title>
+<title>TiivisKoti — postilaatikkomainos A6</title>
 <!--
-  POSTILAATIKKOMAINOS · A5 (148 × 210 mm), kaksi kappaletta A4-vaakalle.
+  POSTILAATIKKOMAINOS · A6
 
-  TULOSTUS
-    Avaa selaimessa → Tulosta (Ctrl+P) → Kohde: Tallenna PDF
-    Koko: A4 · Suunta: Vaaka · Marginaalit: Ei mitään · Taustagrafiikka: PÄÄLLE
-    Leikkaa arkki keskeltä pystysuunnassa → kaksi A5-mainosta.
-    Painotaloon: sama PDF, mainitse "A5, 4/0, leikattu" — tai pyydä 3 mm bleed,
-    jolloin kasvata .flyer-korkeus/leveys ja lisää leikkuuvarat painon ohjeen mukaan.
+    Leikattu koko (trim) .... 105 × 148 mm
+    Leikkuuvara (bleed) ..... 2 mm joka reunalla
+    Dokumentin koko ......... 109 × 152 mm, yksi mainos per sivu
+
+  PDF:N TEKO
+    node build-mainos.mjs
+    Tuottaa mainos-a6.pdf oikeassa 109 × 152 mm koossa taustagrafiikoineen.
+    Selaimen Ctrl+P ei kelpaa tähän: se ei osaa mielivaltaista arkkikokoa
+    eikä säilytä leikkuuvaraa.
+
+  PAINOTALOLLE
+    "A6-flyer, 105 × 148 mm, 2 mm bleed, 4/0" — eli väri vain etupuolelle.
+    Useimmat painot lisäävät leikkuumerkit itse. Jos paino vaatii merkit
+    valmiiksi tiedostoon, sano niin — ne lisätään erikseen.
+
+  MITTAKAAVA
+    Taitto on tehty 150,6 × 210 mm mittakaavassa ja kutistetaan CSS:n
+    transformilla kertoimella 0,72381 → 109 × 152 mm. Näin jokaista
+    mm-arvoa ei tarvinnut laskea uusiksi A5:stä A6:een siirryttäessä.
+    Muokkaa siis alkuperäisiä mm-lukuja; skaalaus hoitaa loput.
+    Huomaa että pistekoot pienenevät samassa suhteessa — tarkista
+    luettavuus, jos pienennät tekstiä täältä lisää.
 
   MUOKKAUS — nämä kolme riviä ovat ne joita todennäköisesti muutat:
     Alennuksen määrä ja koodi .... etsi "ALE-KOODI"
@@ -35,15 +51,23 @@ body{font-family:'Manrope',system-ui,sans-serif;color:var(--text);background:#8E
 img,svg{display:block;max-width:100%}
 strong{font-weight:800;color:inherit}
 
-/* ---------- arkki: A4 vaaka = kaksi A5-mainosta vierekkäin ---------- */
-@page{size:A4 landscape;margin:0}
-.sheet{width:297mm;height:210mm;display:flex;background:#fff}
-.flyer{width:148.5mm;height:210mm;overflow:hidden;position:relative;
-       background:var(--bg);display:flex;flex-direction:column}
-/* Leikkuuviiva arkin keskellä — ei tulostu (screen only). */
-.sheet::after{content:"";position:absolute;left:50%;top:0;bottom:0;
-  border-left:1px dashed rgba(24,58,40,.35)}
-.sheet{position:relative}
+/* ---------- arkki: yksi A6-mainos leikkuuvaroineen ----------
+   .sheet on dokumentin koko (trim + 2 mm bleed joka reunalla).
+   .flyer on taitto isossa mittakaavassa, joka kutistetaan sen sisään.
+   Taustat ulottuvat reunaan asti, joten leikkuri saa osua 2 mm sinne
+   tai tänne ilman että paperin valkoinen reuna paljastuu. */
+:root{
+  --bleed:2mm;
+  --trim-w:105mm; --trim-h:148mm;
+  --page-w:109mm; --page-h:152mm;   /* trim + 2 × bleed */
+  --design-w:150.6mm; --design-h:210mm;
+  --scale:.72381;                    /* 150,6 → 109 mm ja 210 → 152 mm */
+}
+@page{size:109mm 152mm;margin:0}
+.sheet{width:var(--page-w);height:var(--page-h);overflow:hidden;position:relative;background:var(--bg)}
+.flyer{width:var(--design-w);height:var(--design-h);overflow:hidden;position:relative;
+       background:var(--bg);display:flex;flex-direction:column;
+       transform:scale(var(--scale));transform-origin:top left}
 
 /* ---------- 1 · yläbanneri ---------- */
 .top{background:var(--deep);color:#fff;padding:7mm 8mm 7mm}
@@ -52,13 +76,16 @@ strong{font-weight:800;color:inherit}
 .logo .mark{width:8mm;height:8mm;border-radius:2mm}
 .logo .word{font-size:5.4mm;font-weight:800;letter-spacing:-.02em;line-height:1}
 .logo .word .b{color:var(--green-l)}
+/* HUOM pistekoot: kaikki alla olevat mm-arvot kutistuvat kertoimella 0,72381.
+   Painetun tekstin alaraja on n. 1,8 mm (5 pt), joten pienin mm-arvo tässä
+   tiedostossa saa olla noin 2,5 mm. Älä pienennä alle sen. */
 .badge{display:flex;align-items:center;gap:1.6mm;background:rgba(255,255,255,.12);
   border:.3mm solid rgba(255,255,255,.22);border-radius:99px;padding:1.5mm 3mm;
-  font-size:2.6mm;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  font-size:2.9mm;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .badge svg{width:3.4mm;height:3.4mm}
 .top h1{font-size:7.8mm;font-weight:800;line-height:1.06;letter-spacing:-.03em;color:#fff}
 .top h1 .hl{color:#8FD9B0}
-.top p{margin-top:2.8mm;font-size:3.2mm;line-height:1.4;color:#C9DBD0;max-width:38ch}
+.top p{margin-top:2.8mm;font-size:3.5mm;line-height:1.4;color:#C9DBD0;max-width:38ch}
 
 /* ---------- 2 · kolme lukua ---------- */
 .stats{display:flex;gap:2.4mm;padding:0 8mm;margin-top:-5mm}
@@ -66,22 +93,24 @@ strong{font-weight:800;color:inherit}
   box-shadow:0 1mm 3mm rgba(24,58,40,.10)}
 .stat b{display:block;font-size:6.6mm;font-weight:800;color:var(--green);
   letter-spacing:-.03em;line-height:1}
-.stat span{display:block;margin-top:1.4mm;font-size:2.5mm;line-height:1.3;color:var(--mute)}
+.stat span{display:block;margin-top:1.4mm;font-size:2.8mm;line-height:1.3;color:var(--mute)}
 
 /* ---------- 3 · kuva + mitä käynnillä tehdään ----------
    Yksi rauhallinen, lähes neliön muotoinen kuva listan rinnalla.
    Kaksi matalaa kuvakaistaa näytti litistetyltä eikä kertonut mitään. */
-.midblock{display:flex;gap:4.5mm;padding:6mm 8mm 0;align-items:flex-start}
-.shot{flex:0 0 60mm;height:60mm;position:relative;border-radius:3mm;
+/* Kuva ja sen yläpehmuste on mitoitettu niin että taitto mahtuu 210 mm:iin.
+   Jos kasvatat kumpaakaan, build-mainos.mjs varoittaa ylivuodosta. */
+.midblock{display:flex;gap:4.5mm;padding:4mm 8mm 0;align-items:flex-start}
+.shot{flex:0 0 60mm;height:53mm;position:relative;border-radius:3mm;
   overflow:hidden;background:var(--sand)}
 .shot img{width:100%;height:100%;object-fit:cover}
 .shot span{position:absolute;left:2.5mm;bottom:2.5mm;background:rgba(22,58,40,.82);color:#fff;
-  font-size:2.4mm;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  font-size:2.7mm;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
   padding:1.2mm 2.4mm;border-radius:1.5mm}
 
 /* ---------- 4 · mitä käynnillä tehdään ---------- */
 .list{flex:1;display:flex;flex-direction:column;gap:4.4mm;padding-top:1.5mm}
-.li{display:flex;align-items:flex-start;gap:2.4mm;font-size:3.2mm;line-height:1.34;color:var(--ink)}
+.li{display:flex;align-items:flex-start;gap:2.4mm;font-size:3.5mm;line-height:1.34;color:var(--ink)}
 .li .tick{flex:none;width:4.2mm;height:4.2mm;border-radius:99px;background:var(--green);
   display:flex;align-items:center;justify-content:center;margin-top:.2mm}
 .li .tick svg{width:2.8mm;height:2.8mm}
@@ -89,39 +118,47 @@ strong{font-weight:800;color:inherit}
 /* ---------- 5 · hinta + koodi ---------- */
 .foot{margin-top:auto;padding:0 8mm 3.5mm;display:flex;gap:2.4mm;align-items:stretch}
 .price{flex:1.32;background:var(--green);color:#fff;border-radius:3.5mm;padding:3.4mm 4.2mm}
-.price .eyebrow{font-size:2.4mm;font-weight:800;letter-spacing:.11em;text-transform:uppercase;
+.price .eyebrow{font-size:2.7mm;font-weight:800;letter-spacing:.11em;text-transform:uppercase;
   color:rgba(255,255,255,.72)}
 .price .big{display:flex;align-items:baseline;gap:2mm;margin-top:1.2mm}
 .price .big b{font-size:10mm;font-weight:800;letter-spacing:-.04em;line-height:.9}
-.price .big i{font-style:normal;font-size:3.2mm;font-weight:700;color:rgba(255,255,255,.8)}
-.price .net{margin-top:1.6mm;font-size:2.8mm;color:rgba(255,255,255,.88)}
+.price .big i{font-style:normal;font-size:3.5mm;font-weight:700;color:rgba(255,255,255,.8)}
+.price .net{margin-top:1.6mm;font-size:3.1mm;color:rgba(255,255,255,.88)}
 .price .net b{color:#fff}
 .price .rule{height:.3mm;background:rgba(255,255,255,.22);margin:2.2mm 0 1.8mm}
-.price .also{font-size:2.7mm;line-height:1.4;color:rgba(255,255,255,.88)}
+.price .also{font-size:3.0mm;line-height:1.4;color:rgba(255,255,255,.88)}
 .price .dom{margin-top:2mm;font-size:4.6mm;font-weight:800;letter-spacing:-.02em}
-.price .tel{margin-top:.8mm;font-size:2.7mm;color:rgba(255,255,255,.8)}
+.price .tel{margin-top:.8mm;font-size:3.0mm;color:rgba(255,255,255,.8)}
 
 .code{flex:1;background:var(--card);border:.4mm solid var(--line);border-radius:3.5mm;
   padding:3.4mm 2.6mm;text-align:center;display:flex;flex-direction:column;align-items:center}
-.code .off{display:flex;align-items:center;gap:1.5mm;font-size:2.5mm;font-weight:800;
+.code .off{display:flex;align-items:center;gap:1.5mm;font-size:2.8mm;font-weight:800;
   letter-spacing:.07em;text-transform:uppercase;color:var(--green)}
 .code .off svg{width:3.2mm;height:3.2mm}
 .code .kw{margin-top:1.2mm;font-size:6.6mm;font-weight:800;letter-spacing:-.02em;color:var(--ink);line-height:1}
-.code .qr{width:21mm;height:21mm;margin:2.4mm 0 1.6mm}
-.code .scan{font-size:2.4mm;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+.code .qr{width:23mm;height:23mm;margin:2.4mm 0 1.6mm}
+.code .scan{font-size:2.7mm;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
 
-/* ---------- 6 · pikkuteksti ---------- */
-.fine{padding:0 8mm 3.5mm;font-size:2.2mm;line-height:1.4;color:var(--mute);text-align:center}
+/* ---------- 6 · pikkuteksti ----------
+   Alapehmuste on iso tarkoituksella: skaalauksen jälkeen 7,5 mm vastaa
+   5,4 mm arkin reunasta, eli 3,4 mm leikkuurajasta. Pienemmällä arvolla
+   teksti leikkautuisi pois — 3,5 mm jätti siihen vain 0,7 mm. */
+.fine{padding:0 8mm 7.5mm;font-size:2.6mm;line-height:1.4;color:var(--mute);text-align:center}
 
-/* ---------- ruudulla: esikatselu ---------- */
+/* ---------- ruudulla: esikatselu + leikkuuraja ----------
+   Katkoviiva näyttää mihin leikkuri osuu. Sen ulkopuolelle jäävä 2 mm
+   katoaa leikkauksessa, joten mitään olennaista ei saa olla siellä.
+   Viiva on vain ruudulla; PDF:ään se ei tule. */
 @media screen{
   body{padding:24px;display:flex;justify-content:center}
   .sheet{box-shadow:0 10px 50px rgba(0,0,0,.35)}
+  .sheet::after{content:"";position:absolute;inset:var(--bleed);
+    border:.3mm dashed rgba(224,166,58,.9);pointer-events:none}
 }
 @media print{
   body{background:#fff;padding:0}
-  .sheet::after{display:none}
   .sheet{box-shadow:none}
+  .sheet::after{display:none}
 }
 </style>
 </head>
@@ -196,20 +233,11 @@ strong{font-weight:800;color:inherit}
 
     <!-- ALE-VOIMASSA: päivitä päivämäärä kampanjan mukaan -->
     <p class="fine">Syötä koodi NAAPURI varauslomakkeen Alennuskoodi-kenttään · yksi koodi / talous · voimassa 30.9.2026 asti ·
-      hinnat sis. alv 25,5 % · lopullinen hinta vahvistetaan mittauksessa · TiivisKoti Oy, Y-tunnus 3414418-4</p>
+      hinnat sis. alv 25,5 % · TiivisKoti Oy, Y-tunnus 3414418-4</p>
 
   </article>
 
-  <!-- ============ SAMA MAINOS TOISEEN PUOLIKKAASEEN ============
-       Sisältö kopioidaan JS:llä, jotta tekstiä ei tarvitse ylläpitää kahdessa
-       paikassa. Tulostuksessa JS on jo ajettu, joten kopio on mukana PDF:ssä. -->
-  <article class="flyer" id="copy"></article>
-
 </div>
 
-<script>
-  document.getElementById('copy').innerHTML =
-    document.querySelector('.flyer').innerHTML;
-</script>
 </body>
 </html>
