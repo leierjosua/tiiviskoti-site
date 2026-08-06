@@ -23,6 +23,9 @@ export type JobRow = {
   status: 'hold' | 'tentative' | 'confirmed' | 'done' | 'cancelled';
   title: string; address: string | null; postal_code: string | null; city: string | null;
   price_cents: number; notes: string | null; source: string;
+  /* Mainoskampanja josta asiakas tuli, esim. qr-a6. null = ei tiedossa.
+     Eri asia kuin `source`, joka kertoo syntyikö työ adminissa vai verkossa. */
+  campaign: string | null;
   calendar_id: string; calendar_name: string; staff_name: string;
   customer_id: string | null; customer_name: string | null;
   customer_email: string | null; customer_phone: string | null;
@@ -89,7 +92,7 @@ export async function getCalendar(id: string) {
 export function listJobs(fromIso: string, toIso: string) {
   return sql<JobRow[]>`
     select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
-           j.address, j.postal_code, j.city, j.price_cents, j.notes, j.source,
+           j.address, j.postal_code, j.city, j.price_cents, j.notes, j.source, j.campaign,
            j.calendar_id, c.name as calendar_name, s.full_name as staff_name,
            j.customer_id, cu.full_name as customer_name,
            cu.email as customer_email, cu.phone as customer_phone
@@ -105,7 +108,7 @@ export function listJobs(fromIso: string, toIso: string) {
 export async function getJob(id: string) {
   const [job] = await sql<JobRow[]>`
     select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
-           j.address, j.postal_code, j.city, j.price_cents, j.notes, j.source,
+           j.address, j.postal_code, j.city, j.price_cents, j.notes, j.source, j.campaign,
            j.calendar_id, c.name as calendar_name, s.full_name as staff_name,
            j.customer_id, cu.full_name as customer_name,
            cu.email as customer_email, cu.phone as customer_phone

@@ -60,6 +60,18 @@ const schema = z.object({
      lasketaan täällä `tk.discount_codes`-taulusta, jottei sitä voi syöttää
      pyynnössä. Sama sääntö kuin matkalisällä. */
   discountCode: z.string().max(40).optional(),
+  /* Mistä mainoksesta asiakas tuli (sivuston ?src=-parametri). Pelkkä
+     merkintä raportointia varten — ei vaikuta hintaan eikä varaukseen.
+
+     Kelvoton arvo pudotetaan tyhjäksi eikä hylätä pyyntöä: arvo tulee
+     osoiterivistä, jota kuka tahansa voi muokata, ja rikkinäinen
+     mainoslinkki ei saa estää kauppaa. Siksi preprocess eikä pelkkä
+     regex — jälkimmäinen kaataisi koko varauksen. Sama muotorajaus kuin
+     kannan jobs_campaign_format-rajoitteessa. */
+  campaign: z.preprocess(
+    (v) => (typeof v === 'string' && /^[a-z0-9][a-z0-9._-]{0,59}$/.test(v) ? v : undefined),
+    z.string().optional(),
+  ),
 });
 
 /* Kelpaamaton alennuskoodi keskeyttää varauksen. Vaihtoehto olisi kirjata
@@ -190,10 +202,10 @@ export async function POST(request: Request) {
 
       const [job] = await tx<{ id: string; job_number: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status, title,
-                             address, postal_code, city, price_cents, notes, source)
+                             address, postal_code, city, price_cents, notes, source, campaign)
         values (${customerId}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
                 ${d.title ?? 'Tiivistetyö'}, ${d.address}, ${d.postalCode}, ${d.city ?? null},
-                ${totalCents}, ${d.notes ?? null}, 'web')
+                ${totalCents}, ${d.notes ?? null}, 'web', ${d.campaign ?? null})
         returning id, job_number
       `;
 

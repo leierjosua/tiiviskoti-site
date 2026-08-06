@@ -83,6 +83,14 @@ export default async function handler(req, res) {
     const discountCode = typeof body.discountCode === 'string'
       ? body.discountCode.slice(0, 40)
       : undefined;
+    /* Mainoskampanjan tunniste, jonka sivu poimi osoitteen ?src=-parametrista.
+       Kelvoton arvo pudotetaan pois eikä hylätä varausta: tämä on pelkkä
+       merkintä raportointia varten, eikä rikkinäinen mainoslinkki saa estää
+       kauppaa. Sama muotorajaus kuin CRM:ssä ja kannassa. */
+    const campaign = typeof body.campaign === 'string'
+      && /^[a-z0-9][a-z0-9._-]{0,59}$/.test(body.campaign)
+      ? body.campaign
+      : undefined;
     const counts = (body.counts && typeof body.counts === 'object') ? body.counts : {};
     const extras = (body.extras && typeof body.extras === 'object') ? body.extras : {};
     // Täsmällinen alkuhetki ja kalenteri siitä slotista jonka asiakas näki.
@@ -145,6 +153,7 @@ export default async function handler(req, res) {
       postalCode: String(postal),
       notes: notes ? String(notes) : undefined,
       discountCode,
+      campaign,
       workCents,
       title: `Tiivistys: ${quote.count} kohdetta`,
       // Rivit sellaisenaan pricing.mjs:stä: CRM tallentaa ne työn riveiksi ja

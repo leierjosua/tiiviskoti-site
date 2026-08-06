@@ -22,6 +22,45 @@ const ico = {
    miksi yksikköhinta muuttuu määrää kasvattaessa. */
 const TIER_HINT = 'Mitä useampi ikkuna, sitä halvempi: 5+ 85 € · 10+ 75 € · 20+ 65 €';
 
+/* ---------- mainoskampanjan tunnistus ----------
+   Osoitteen ?src=-parametri kertoo mistä mainoksesta kävijä tuli, esim.
+   postilaatikkomainoksen QR:stä ?src=qr-a6. Tunniste kulkee varauksen
+   mukana CRM:ään ja näkyy adminissa työn kohdalla.
+
+   MIKSI localStorage EIKÄ sessionStorage: painomainoksen nähnyt harkitsee
+   tyypillisesti päiviä ennen varaamista, ja istunto katkeaa siinä välissä.
+   sessionStorage riittää yhden sivulatauksen ketjuun (varaa -> ajanvaraus),
+   mutta menettäisi juuri ne kaupat joita mainoksella tavoitellaan.
+
+   MIKSI ENSIMMÄINEN VOITTAA: kaupan ansaitsee se mainos joka toi kävijän
+   sivustolle. Jos hän palaa myöhemmin suoraan osoitteella, tunnistetta ei
+   ylikirjoiteta tyhjällä eikä myöhemmällä.
+
+   Vanhentumisaika rajaa virheattribuutiota: kuukauden takaisen mainoksen
+   ei kuulu saada kunniaa tänään syntyneestä orgaanisesta varauksesta. */
+const CAMPAIGN_KEY = 'tk_campaign';
+const CAMPAIGN_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+const CAMPAIGN_RE = /^[a-z0-9][a-z0-9._-]{0,59}$/;
+
+function readCampaign(){
+  try{
+    const s = JSON.parse(localStorage.getItem(CAMPAIGN_KEY) || 'null');
+    if(!s || !CAMPAIGN_RE.test(s.v || '')) return undefined;
+    if(Date.now() - (s.t || 0) > CAMPAIGN_MAX_AGE_MS) return undefined;
+    return s.v;
+  }catch(_){ return undefined; }
+}
+
+(function captureCampaign(){
+  let v;
+  try{ v = new URLSearchParams(location.search).get('src'); }catch(_){ return; }
+  /* Arvo tulee osoiterivistä, jota kuka tahansa voi muokata. Kelpaamaton
+     hylätään tässä, jottei sitä tarvitse siivota myöhemmin ketjussa. */
+  if(!v || !CAMPAIGN_RE.test(v)) return;
+  if(readCampaign()) return;
+  try{ localStorage.setItem(CAMPAIGN_KEY, JSON.stringify({ v, t: Date.now() })); }catch(_){}
+})();
+
 const FAQ = [
   ['Paljonko tiivistys maksaa?','Pienin veloitus on 149 €, joka kattaa käynnin, matkat, kartoituksen ja lämpökamerakuvauksen. Sen jälkeen hinta muodostuu valitsemistasi kohteista kiinteillä hinnoilla. Ikkuna maksaa 95 € kappaleelta, ja hinta laskee määrän mukaan: 5–9 ikkunaa 85 €, 10–19 ikkunaa 75 € ja 20 ikkunasta ylöspäin 65 € kappaleelta. Ulko- ja parvekeovi on 119 €, terassin liuku- tai pariovi 149 €. Esimerkiksi yksi ikkuna on 149 € (minimiveloitus) ja kuusi ikkunaa 6 × 85 € = 510 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
   ['Miksi ovi on halvempi kun tilaan samalla muutakin?','Suurin yksittäinen kustannus pienessä työssä on matka ja työpisteen pystytys. Kun asentaja on jo paikalla, seuraava kohde maksaa vähemmän: ulko- ja parvekeovi 119 € → 99 € ja väli- tai huoneovi 89 € → 59 €, kun samaan käyntiin kuuluu vähintään yksi muu ovi tai ikkuna. Laskuri huomioi tämän automaattisesti.'],
@@ -779,6 +818,9 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
        taulustaan. Lähetetään vain jos koodi todella kelpasi tarkistuksessa,
        jottei kelvoton koodi kaada varausta turhaan. */
     discountCode: discount.state==='ok' ? discount.code : undefined,
+    /* Mainoskampanja, jos kävijä tuli mainoslinkistä viimeisen 30 pv aikana.
+       Pelkkä merkintä raportointia varten — ei vaikuta hintaan. */
+    campaign: readCampaign(),
   };
 
   try{

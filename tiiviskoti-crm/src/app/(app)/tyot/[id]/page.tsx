@@ -70,6 +70,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               value={<span className="tabular">{(job.price_cents / 100).toFixed(2)} €</span>}
             />
             <Row label="Lähde" value={job.source === 'web' ? 'Verkkosivu' : 'Hallinta'} />
+            {/* Mainoskampanja on eri asia kuin lähde: lähde kertoo syntyikö työ
+                verkossa vai hallinnassa, kampanja mikä mainos toi asiakkaan.
+                Näytetään vain kun tiedossa, jottei rivi toistu tyhjänä. */}
+            {job.campaign && <Row label="Kampanja" value={<code>{job.campaign}</code>} />}
             <Row label="Muistiinpanot" value={job.notes} />
           </div>
         </Card>
