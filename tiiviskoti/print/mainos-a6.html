@@ -231,11 +231,13 @@ strong{font-weight:800;color:inherit}
           −20 € koodilla
         </div>
         <div class="kw">NAAPURI</div>
-        <!-- QR osoittaa osoitteeseen https://tiiviskoti.fi/varaa.html — .html on
-             tarkoituksella mukana, koska vercel.json:ssa ei ole cleanUrls:ää ja
-             pelkkä /varaa vastaa 404. Uusi koodi:
-             npx qrcode -t svg -w 512 -m 0 -o qr-varaa.svg "https://..." -->
-        <img class="qr" src="qr-varaa.svg" alt="QR-koodi ajanvaraukseen">
+        <!-- QR osoittaa etusivun hintalaskuriin https://tiiviskoti.fi/#laskuri.
+             Sieltä asiakas näkee hinnan ja siirtyy varaamaan. Suoraan
+             ajanvaraus.html:ään ei saa osoittaa: se lukee valitut kohteet
+             sessionStoragesta, jonka varaa.html kirjoittaa — ilman sitä
+             sivulla ei ole mitään varattavaa. Uusi koodi:
+             npx qrcode -t svg -w 512 -m 0 -o qr-laskuri.svg "https://..." -->
+        <img class="qr" src="qr-laskuri.svg" alt="QR-koodi TiivisKodin hintalaskuriin">
         <div class="scan">Skannaa &amp; varaa</div>
       </div>
     </div>
