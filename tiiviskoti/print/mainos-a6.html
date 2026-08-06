@@ -70,9 +70,17 @@ strong{font-weight:800;color:inherit}
   --trim-w:105mm; --trim-h:148mm;
   --page-w:109mm; --page-h:152mm;   /* trim + 2 × bleed */
   --design-w:150.6mm; --design-h:210mm;
-  --scale:.72381;                    /* 150,6 → 109 mm ja 210 → 152 mm */
+  /* Kerroin kattaa arkin kokonaan ja hieman yli. Tarkka sovitus (.72381)
+     jätti oikeaan ja alareunaan n. 0,05 mm valkoista rakoa, koska Chromium
+     pyöristää @page-koon pisteiksi (109 → 109,05 mm) eikä skaalattu taitto
+     yltänyt sinne asti. Ylimenevä osa leikkautuu .sheet:in overflow:hiddeniin.
+     Ero taittoon on 0,09 %, eli turvamarginaalit eivät käytännössä muutu. */
+  --scale:.7255;
 }
 @page{size:109mm 152mm;margin:0}
+/* overflow:hidden on pakollinen: .flyer on transformilla kutistettu, mutta
+   transform ei pienennä asettelulaatikkoa — se vie yhä 150,6 × 210 mm tilaa.
+   Ilman leikkausta ylivuoto työntäisi PDF:ään toisen, tyhjän sivun. */
 .sheet{width:var(--page-w);height:var(--page-h);overflow:hidden;position:relative;background:var(--bg)}
 .flyer{width:var(--design-w);height:var(--design-h);overflow:hidden;position:relative;
        background:var(--bg);display:flex;flex-direction:column;
@@ -160,13 +168,18 @@ strong{font-weight:800;color:inherit}
    Viiva on vain ruudulla; PDF:ään se ei tule. */
 @media screen{
   body{padding:24px;display:flex;justify-content:center}
-  .sheet{box-shadow:0 10px 50px rgba(0,0,0,.35)}
+  .sheet{box-shadow:0 10px 50px rgba(0,0,0,.35);overflow:hidden}
   .sheet::after{content:"";position:absolute;inset:var(--bleed);
     border:.3mm dashed rgba(224,166,58,.9);pointer-events:none}
 }
 @media print{
-  body{background:#fff;padding:0}
-  .sheet{box-shadow:none}
+  /* Arkki mitoitetaan prosentteina eikä millimetreinä, jotta se on tasan
+     sivun kokoinen. Chromium pyöristää @page-koon pisteiksi (109 mm →
+     109,05 mm), ja kiinteä mm-mitta jätti oikeaan ja alareunaan n. 0,05 mm
+     valkoista viirua — eli tausta ei yltänyt aivan leikkuuvaran reunaan.
+     Prosentti seuraa sivun todellista kokoa pyöristyksestä riippumatta. */
+  html,body{width:100%;height:100%;margin:0;padding:0;background:var(--bg)}
+  .sheet{width:100%;height:100%;box-shadow:none}
   .sheet::after{display:none}
 }
 </style>
