@@ -187,14 +187,21 @@ function render(){
   if('disabled' in btn) btn.disabled=!active;
 }
 
-/* ---------- FAQ ---------- */
+/* ---------- FAQ ----------
+   index.html sisältää kysymykset valmiiksi (ks. _gen-faq.mjs), jotta ne
+   näkyvät myös crawlereille jotka eivät aja JavaScriptiä. Siellä tästä
+   jää jäljelle vain avaus/sulkeutuminen. Rakentaminen on tallella niitä
+   sivuja varten joilla on #faq mutta ei valmista markupia — ja jotta
+   FAQ-taulukon muokkaus näkyy heti, vaikka generaattori olisi ajamatta. */
 const faqEl=document.getElementById('faq');
 if(faqEl){
-  FAQ.forEach(([q,a])=>{
-    const d=document.createElement('div'); d.className='q';
-    d.innerHTML=`<button type="button">${q}<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>${a}</p></div>`;
-    faqEl.appendChild(d);
-  });
+  if(!faqEl.querySelector('.q')){
+    FAQ.forEach(([q,a])=>{
+      const d=document.createElement('div'); d.className='q';
+      d.innerHTML=`<button type="button">${q}<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>${a}</p></div>`;
+      faqEl.appendChild(d);
+    });
+  }
   faqEl.addEventListener('click',e=>{
     const btn=e.target.closest('button'); if(!btn) return;
     const q=btn.parentElement, a=q.querySelector('.a'), open=q.classList.contains('op');

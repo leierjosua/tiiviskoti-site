@@ -25,6 +25,72 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23217A4E'/%3E%3Crect x='31' y='20' width='38' height='60' rx='3' fill='none' stroke='%23F6F7F3' stroke-width='5'/%3E%3Crect x='35' y='20' width='4' height='60' fill='%23F6F7F3'/%3E%3C/svg%3E" />
+
+<!-- Yritysentiteetti (#business) määritellään etusivulla; tässä siihen
+     viitataan @id:llä, jotta hakukone yhdistää sivut samaan toimijaan. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://tiiviskoti.fi/taloyhtio.html#palvelu",
+      "name": "Taloyhtiöiden ovien ja ikkunoiden tiivistys",
+      "serviceType": "Rappukäytävien, yhteistilojen ja ulko-ovien tiivisteiden vaihto sopimushinnalla",
+      "description": "TiivisKoti kartoittaa taloyhtiön ovet ja ikkunat, antaa kirjallisen tarjouksen kiinteällä sopimushinnalla, tekee työn sovitussa aikataulussa ja raportoi hallitukselle.",
+      "url": "https://tiiviskoti.fi/taloyhtio.html",
+      "image": "https://tiiviskoti.fi/img/taloyhtio-hero.webp",
+      "provider": { "@id": "https://tiiviskoti.fi/#business" },
+      "areaServed": { "@type": "AdministrativeArea", "name": "Uusimaa" },
+      "audience": { "@type": "Audience", "audienceType": "Taloyhtiöt, isännöitsijät ja hallitukset" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://tiiviskoti.fi/taloyhtio.html#webpage",
+      "url": "https://tiiviskoti.fi/taloyhtio.html",
+      "name": "Taloyhtiöt — TiivisKoti | Ovien ja ikkunoiden tiivistys sopimushinnalla",
+      "isPartOf": { "@id": "https://tiiviskoti.fi/#website" },
+      "about": { "@id": "https://tiiviskoti.fi/taloyhtio.html#palvelu" },
+      "primaryImageOfPage": "https://tiiviskoti.fi/img/taloyhtio-hero.webp",
+      "inLanguage": "fi-FI"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://tiiviskoti.fi/taloyhtio.html#murupolku",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Etusivu", "item": "https://tiiviskoti.fi/" },
+        { "@type": "ListItem", "position": 2, "name": "Taloyhtiöt", "item": "https://tiiviskoti.fi/taloyhtio.html" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://tiiviskoti.fi/taloyhtio.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Saako taloyhtiö kotitalousvähennyksen?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Kotitalousvähennys on henkilökohtainen, joten taloyhtiö ei sitä saa. Hinta on kuitenkin kiinteä ja kilpailukykyinen, ja työn voi tarvittaessa jaksottaa talousarvioon. Osakas voi hyödyntää vähennystä oman huoneistonsa oviin." }
+        },
+        {
+          "@type": "Question",
+          "name": "Häiritseekö työ asukkaita?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Ei juurikaan. Tiivisteiden vaihto on nopeaa ja siistiä, ja teemme sen porras kerrallaan sovittuna aikana. Kulkureitit pidetään auki koko työn ajan." }
+        },
+        {
+          "@type": "Question",
+          "name": "Kuinka nopeasti pääsette aloittamaan?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Kartoituskäynnin saamme yleensä sovittua 1–2 viikon sisään. Itse työ ajoitetaan hallitukselle ja asukkaille sopivaan ajankohtaan tarjouksen hyväksymisen jälkeen." }
+        },
+        {
+          "@type": "Question",
+          "name": "Millä alueella toimitte?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Koko Uudenmaan alueella — Helsinki, Espoo, Vantaa ja kehyskunnat. Kerro taloyhtiön osoite tarjouspyynnössä, niin vahvistamme palvelun alueellanne." }
+        }
+      ]
+    }
+  ]
+}
+</script>
 <style>
 /* ============================================================
    TIIVISKOTI — vaalea & luotettava (AaltoAir-layout)
@@ -361,7 +427,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä sopimushinta · kartoitus veloituksetta · työ asukkaita häiritsemättä</p>
   </div>
   <div class="hero-card rv">
-    <img src="img/taloyhtio-hero.jpg" alt="Taloyhtiön valoisa julkisivu ja parvekkeet" width="1200" height="800" fetchpriority="high">
+    <img src="img/taloyhtio-hero.webp" alt="Taloyhtiön valoisa julkisivu ja parvekkeet" width="1100" height="1191" fetchpriority="high">
   </div>
 </div></header>
 

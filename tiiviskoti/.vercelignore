@@ -5,4 +5,5 @@ _serve.mjs
 _gen-tietosuoja.mjs
 img/_src
 _gen-kayttoehdot.mjs
+_gen-faq.mjs
 print

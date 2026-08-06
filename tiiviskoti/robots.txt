@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Sisäinen markkinointimateriaali: mainosmockupit ovat julkisia, mutta ne
+# ovat ohutta sisältöä eivätkä kuulu hakutuloksiin.
+Disallow: /brand/
+
 Sitemap: https://tiiviskoti.fi/sitemap.xml
