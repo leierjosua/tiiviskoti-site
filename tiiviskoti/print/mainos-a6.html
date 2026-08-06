@@ -31,8 +31,17 @@
 
   MUOKKAUS — nämä kolme riviä ovat ne joita todennäköisesti muutat:
     Alennuksen määrä ja koodi .... etsi "ALE-KOODI"
-    Kampanjan päättymispäivä .... etsi "ALE-VOIMASSA"
+    Kampanjan voimassaolo ....... etsi "ALE-VOIMASSA"
     Hinnat ....................... etsi "HINNAT" (lähde: ../pricing.mjs)
+
+  ALENNUSKOODI EI OLE TÄSSÄ TIEDOSTOSSA
+    Mainos vain mainostaa koodia; itse koodi elää CRM:n taulussa
+    tk.discount_codes (Alekoodit-näkymä). Jos koodia ei ole siellä,
+    varauslomake vastaa "Koodia ei tunnisteta" vaikka mainos lupaa
+    alennuksen. Tarkista koodi ennen painoon lähettämistä:
+      curl -X POST https://tiiviskoti.fi/api/check-discount \
+        -H "Content-Type: application/json" \
+        -d '{"code":"NAAPURI","subtotalCents":51000}'
 
   Kaikki väitteet on otettu index.html:stä, jotta mainos ja sivusto lupaavat saman.
 -->
@@ -231,8 +240,11 @@ strong{font-weight:800;color:inherit}
       </div>
     </div>
 
-    <!-- ALE-VOIMASSA: päivitä päivämäärä kampanjan mukaan -->
-    <p class="fine">Syötä koodi NAAPURI varauslomakkeen Alennuskoodi-kenttään · yksi koodi / talous · voimassa 30.9.2026 asti ·
+    <!-- ALE-VOIMASSA: koodilla ei ole päättymispäivää, joten sitä ei mainita.
+         Jos kampanja joskus rajataan, lisää voimassaolo tähän JA aseta sama
+         expires_at CRM:n Alekoodit-näkymässä. Pelkkä tämän tekstin muuttaminen
+         ei rajaa mitään — voimassaolo elää kannassa, ei mainoksessa. -->
+    <p class="fine">Syötä koodi NAAPURI varauslomakkeen Alennuskoodi-kenttään · yksi koodi / talous ·
       hinnat sis. alv 25,5 % · TiivisKoti Oy, Y-tunnus 3414418-4</p>
 
   </article>
