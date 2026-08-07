@@ -15,7 +15,7 @@ export const EMAIL_PARAGRAPH_MARGIN = "0";
 
 // ─── Company ─────────────────────────────────────────────────────────────────
 
-export const COMPANY_NAME = "TiivisKoti Oy";
+export const COMPANY_NAME = "TiivisKoti";
 export const COMPANY_SHORT = "TiivisKoti";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

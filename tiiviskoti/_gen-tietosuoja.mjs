@@ -53,13 +53,13 @@ const body = `
   <div class="lg">
     <div class="kicker">Tietosuoja</div>
     <h1 class="title" style="font-size:clamp(30px,4vw,44px);margin-bottom:16px">Tietosuojaseloste</h1>
-    <p class="lead">Tämä seloste kertoo, miten TiivisKoti Oy käsittelee henkilötietoja tiiviskoti.fi-sivustolla ja
+    <p class="lead">Tämä seloste kertoo, miten TiivisKoti käsittelee henkilötietoja tiiviskoti.fi-sivustolla ja
       asiakassuhteissa. Noudatamme EU:n yleistä tietosuoja-asetusta (GDPR) ja Suomen tietosuojalakia.</p>
     <span class="upd">Päivitetty 26.7.2026</span>
 
     <h2>1. Rekisterinpitäjä</h2>
     <div class="box">
-      <p><b>TiivisKoti Oy</b><br />
+      <p><b>TiivisKoti</b><br />
       Y-tunnus 3414418-4<br />
       Järvipuistonkatu 5, 04400 Järvenpää<br />
       Sähköposti: <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><br />
@@ -174,7 +174,7 @@ const out = `<!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tietosuojaseloste — TiivisKoti</title>
-<meta name="description" content="Miten TiivisKoti Oy käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat oikeutesi." />
+<meta name="description" content="Miten TiivisKoti käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat oikeutesi." />
 <meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#F6F7F3" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />

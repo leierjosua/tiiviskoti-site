@@ -59,13 +59,13 @@ const body = `
   <div class="lg">
     <div class="kicker">Käyttöehdot</div>
     <h1 class="title" style="font-size:clamp(30px,4vw,44px);margin-bottom:16px">Palvelun käyttöehdot</h1>
-    <p class="lead">Näitä ehtoja sovelletaan TiivisKoti Oy:n palveluihin, jotka varataan osoitteessa
+    <p class="lead">Näitä ehtoja sovelletaan TiivisKodin palveluihin, jotka varataan osoitteessa
       tiiviskoti.fi. Lue ehdot ennen varauksen tekemistä — varaamalla ajan hyväksyt ne.</p>
     <span class="upd">Päivitetty 26.7.2026</span>
 
     <h2>1. Palveluntarjoaja</h2>
     <div class="box">
-      <p><b>TiivisKoti Oy</b><br />
+      <p><b>TiivisKoti</b><br />
       Y-tunnus 3414418-4<br />
       Järvipuistonkatu 5, 04400 Järvenpää<br />
       <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a> · <a href="tel:+358458755996">045 875 5996</a></p>
@@ -158,7 +158,7 @@ const body = `
       <li>oven tai karmin rakenteellisista puutteista, joista on kerrottu tilaajalle ennen työn
         tekemistä;</li>
       <li>ulkoisista olosuhteista, väärästä käytöstä tai huolimattomuudesta;</li>
-      <li>muun kuin TiivisKoti Oy:n tai sen valtuuttaman asentajan tekemistä muutoksista.</li>
+      <li>muun kuin TiivisKodin tai sen valtuuttaman asentajan tekemistä muutoksista.</li>
     </ul>
     <p>Takuu on voimassa Suomessa. Takuu ei rajoita kuluttajalle kuluttajansuojalain nojalla
       kuuluvia oikeuksia.</p>
@@ -199,7 +199,7 @@ const out = `<!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Käyttöehdot — TiivisKoti</title>
-<meta name="description" content="TiivisKoti Oy:n palvelun käyttöehdot: hinnat, varaus ja vahvistus, maksuton peruutus, kuluttajan peruuttamisoikeus, maksu, takuu ja vastuu." />
+<meta name="description" content="TiivisKodin palvelun käyttöehdot: hinnat, varaus ja vahvistus, maksuton peruutus, kuluttajan peruuttamisoikeus, maksu, takuu ja vastuu." />
 <meta name="robots" content="index,follow" />
 <meta name="theme-color" content="#F6F7F3" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
