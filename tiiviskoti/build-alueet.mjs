@@ -61,12 +61,12 @@ const footer = (R, paitsi) => `<footer class="mfoot"><div class="wrap">
   <div class="mf-grid">
     <div class="mf-brand">
       <a href="${R}index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
-      <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla.</p>
+      <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
       <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Vastuuvakuutettu · 2 vuoden takuu työlle</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="${R}index.html#palvelut">Ovet</a><a href="${R}index.html#palvelut">Ikkunat</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
     <div class="mf-col"><h4>Yritys</h4><a href="${R}index.html#miksi">Miksi me</a><a href="${R}index.html#saasto">Säästöarvio</a><a href="${R}index.html#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
-    <div class="mf-col"><h4>Yhteys</h4><a href="tel:${TELH}">${TEL}</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="${R}toiminta-alueet.html">Uusimaa</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
+    <div class="mf-col"><h4>Yhteys</h4><a href="tel:${TELH}">${TEL}</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
   <div class="mf-cities">
     <h4>Toiminta-alueet</h4>
@@ -193,7 +193,9 @@ function kuntaSivu(a, i) {
         url,
         image: `${SITE}/img/${kuva}`,
         provider: { '@id': `${SITE}/#business` },
-        areaServed: { '@type': 'City', name: a.name, address: { '@type': 'PostalAddress', addressRegion: 'Uusimaa', addressCountry: 'FI' } },
+        /* Maakunta kunnasta, ei vakiona: Riihimäki on Kanta-Hämettä, ja väärä
+           maakunta rakenteisessa datassa on Googlelle suora virhe. */
+        areaServed: { '@type': 'City', name: a.name, address: { '@type': 'PostalAddress', addressRegion: a.maakunta || 'Uusimaa', addressCountry: 'FI' } },
         offers: {
           '@type': 'Offer',
           priceCurrency: 'EUR',
@@ -343,8 +345,10 @@ ${skripti}
 function hubSivu() {
   const R = '';
   const url = `${SITE}/toiminta-alueet.html`;
-  const title = 'Toiminta-alueet — TiivisKoti | Ovien ja ikkunoiden tiivistys Uudellamaalla';
-  const desc = `TiivisKoti tiivistää ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla — Helsingistä Hyvinkäälle. Samat kiinteät hinnat koko alueella: ikkuna ${WINDOW_TIERS[0].price} €, ovi ${TYPES[1].price} €.`;
+  const title = 'Toiminta-alueet — TiivisKoti | Ovien ja ikkunoiden tiivistys Uudellamaalla ja Riihimäellä';
+  /* "Uudellamaalla ja Riihimäellä", ei pelkkä kuntamäärä + Uusimaa: Riihimäki
+     on Kanta-Hämettä, joten "N kuntaa Uudellamaalla" olisi suoraan väärin. */
+  const desc = `TiivisKoti tiivistää ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla ja Riihimäellä — Helsingistä Riihimäelle. Samat kiinteät hinnat koko alueella: ikkuna ${WINDOW_TIERS[0].price} €, ovi ${TYPES[1].price} €.`;
 
   const ld = {
     '@context': 'https://schema.org',
@@ -414,7 +418,7 @@ ${nav(R)}
 
 <header class="sec" style="padding-bottom:0"><div class="wrap">
   <div class="kicker">Toiminta-alueet</div>
-  <h1 style="font-size:clamp(34px,4.8vw,54px);max-width:20ch">Tiivistämme ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla</h1>
+  <h1 style="font-size:clamp(34px,4.8vw,54px);max-width:20ch">Tiivistämme ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla ja Riihimäellä</h1>
   <p class="sub" style="max-width:64ch">Sama kiinteä hinta jokaisessa kunnassa: ikkuna ${WINDOW_TIERS[0].price} €, ulko- ja parvekeovi ${TYPES[1].price} €, pienin veloitus ${MIN_PRICE} € per käynti. Valitse kuntasi, niin näet mitä juuri siellä tyypillisesti tiivistetään.</p>
   <div class="aluegrid">
     ${ALUEET.map((a) => `<a class="aluecard rv" href="toiminta-alueet/${a.slug}.html">
@@ -430,7 +434,7 @@ ${laskuriOsio(R, null)}
 <section class="sec"><div class="wrap">
   <div class="ctaband rv">
     <h2>Etkö löydä kuntaasi?</h2>
-    <p>Palvelemme ${ALUEET.length}:a Uudenmaan kuntaa. Syötä postinumerosi laskuriin, niin näet heti palvelemmeko osoitettasi, mitkä ajat ovat vapaana ja mahdollisen matkalisän.</p>
+    <p>Palvelemme ${ALUEET.length}:a kuntaa Uudellamaalla ja Riihimäellä. Syötä postinumerosi laskuriin, niin näet heti palvelemmeko osoitettasi, mitkä ajat ovat vapaana ja mahdollisen matkalisän.</p>
     <div class="hero-cta">
       <a href="index.html#laskuri" class="btn btn-p btn-lg">Tarkista postinumerolla</a>
       <a href="tel:${TELH}" class="btn btn-o btn-lg on-deep">Soita ${TEL}</a>
@@ -454,8 +458,11 @@ mkdirSync('toiminta-alueet', { recursive: true });
    _alueet-data.mjs:stä jättäisi HTML-tiedoston paikalleen: se katoaisi
    footerista ja sitemapista mutta pysyisi Googlen indeksissä ja lupaisi
    palvelua alueella jota ei palvella. Juuri sen takia Inkoo, Raasepori ja
-   Hanko poistettiin — ne ovat 10xxx-postinumeroita, ja palvelualue on
-   etuliitteet 00–09. */
+   Hanko poistettiin — ne ovat 10xxx-postinumeroita eikä niitä palvella.
+   Palvelualue on Uudenmaan 00–09xxx-kunnat sekä Riihimäki (11xxx).
+
+   HUOM: sitemap.xml EI päivity tästä skriptistä, vaan se ylläpidetään käsin.
+   Kun lisäät tai poistat kunnan, muista sitemap erikseen. */
 const pitaa = new Set(ALUEET.map((a) => `${a.slug}.html`));
 for (const f of readdirSync('toiminta-alueet')) {
   if (f.endsWith('.html') && !pitaa.has(f)) {

@@ -12,12 +12,16 @@
    kopioi naapurikunnan tekstiä ja vaihda nimeä — se on juuri se kuvio
    josta rangaistaan.
 
-   PALVELUALUE = POSTINUMEROT 00xxx–09xxx.
-   Tämä on ainoa sääntö: kunta kuuluu palvelualueeseen jos sen postinumerot
-   alkavat 00–09. Käytännössä se kattaa Uudenmaan 23 kuntaa. Ulkopuolelle
-   jäävät Länsi-Uudenmaan 10xxx-kunnat Hanko, Inkoo ja Raasepori — niille
-   tehtiin sivut kertaalleen 2026-08-09 ja ne poistettiin heti kun asia
-   tarkistettiin.
+   PALVELUALUE = UUDENMAAN 00xxx–09xxx -KUNNAT + RIIHIMÄKI (11xxx).
+   Postinumeron alku ei siis yksin ratkaise, eikä palvelualue ole sama asia
+   kuin Uusimaa. Ulkopuolelle jäävät Länsi-Uudenmaan 10xxx-kunnat Hanko,
+   Inkoo ja Raasepori — niille tehtiin sivut kertaalleen 2026-08-09 ja ne
+   poistettiin heti kun asia tarkistettiin. Riihimäki taas EI ole Uuttamaata
+   vaan Kanta-Hämettä, mutta se palvellaan ilman matkalisää.
+
+   ÄLÄ SIIS KIRJOITA SIVUSTOLLE "N kuntaa Uudellamaalla". Se oli totta 23
+   kunnan aikaan, mutta Riihimäen myötä väite on väärä. Oikea muoto on
+   "Uudellamaalla ja Riihimäellä".
 
    TARKISTA ENNEN KUIN LISÄÄT KUNNAN. Totuuden lähde on CRM:n `tk.areas`,
    ei tämä tiedosto. Voit varmistaa yhdellä käskyllä ilman CRM-tunnuksia —
@@ -177,6 +181,23 @@ export const ALUEET = [
     faq: [
       ['Onko Hyvinkäällä eri hinta kuin pääkaupunkiseudulla?', 'Kohteiden hinnat ovat samat: ikkuna 95 €, ulko- ja parvekeovi 119 €. Etäisyys voi tuoda postinumerokohtaisen matkalisän, joka näkyy laskurissa ennen varauksen vahvistamista.'],
       ['Kuinka pitkä toimitusaika Hyvinkäälle on?', 'Vapaat ajat näet suoraan kalenterista postinumerolla. Pidemmän ajomatkan takia Hyvinkään käynnit sijoitetaan yleensä samaan päivään muiden pohjoisen alueen kohteiden kanssa, joten valikoima on hieman suppeampi kuin Keravalla.'],
+    ],
+  },
+  {
+    slug: 'riihimaki',
+    name: 'Riihimäki',
+    ine: 'Riihimäellä',
+    gen: 'Riihimäen',
+    /* Ainoa kunta jolla tämä on — muut ovat Uuttamaata, joka on templaatin
+       oletus. Vaikuttaa vain rakenteiseen dataan. */
+    maakunta: 'Kanta-Häme',
+    lead: 'Pääradan risteysasema ja toiminta-alueemme ainoa hämäläinen kaupunki — sama kiinteä hinta, ei matkalisää.',
+    intro: 'Riihimäki on syntynyt rautatien ympärille, ja se näkyy yhä rakennuskannassa. Aseman lähistöllä on 1900–1930-luvun puisia rautatieläistaloja, joissa on alkuperäiset kaksipuitteiset ikkunat — juuri sitä kantaa jossa tiivistys tuo suurimman hyödyn suhteessa hintaan. Toisessa ääripäässä on Peltosaari, 1970-luvun betonielementtilähiö, jonka kerrostaloissa parvekeovet ja niiden kynnyskumit ovat monessa asunnossa yhä tehtaan asentamat. Nämä kaksi kantaa vaativat eri otteen, mutta molemmat hoituvat samalla käynnillä.',
+    kulma: 'Riihimäki on sisämaata, ja se erottaa sen rannikkokunnista. Helsingissä ja Sipoossa tiivisteitä kuluttaa ennen kaikkea mereltä tuleva tuulikuorma; täällä ratkaisee lämpötilaero. Pakkanen painuu talvella selvästi alemmas kuin rannikolla, jolloin kova tiivistynyt tiiviste ei enää jousta takaisin karmia vasten ja veto tuntuu heti lattianrajassa. Siksi riihimäkeläisessä talossa vetoisuus paljastuu tyypillisesti vasta ensimmäisillä oikeilla pakkasilla, ei syyskuun tuulilla.',
+    osat: ['Keskusta', 'Peltosaari', 'Patastenmäki', 'Herajoki', 'Uramo', 'Hirsimäki', 'Juppala', 'Petsamo', 'Vahteristo', 'Kalmu', 'Arolampi'],
+    faq: [
+      ['Palveletteko Riihimäellä, vaikka se ei kuulu Uudellemaalle?', 'Kyllä. Riihimäki on Kanta-Hämettä, mutta se kuuluu toiminta-alueeseemme siinä missä Uudenmaan kunnatkin. Kohteiden hinnat ovat samat — ikkuna 95 €, ulko- ja parvekeovi 119 € — eikä Riihimäelle tule matkalisää. Voit varmistaa asian itse syöttämällä postinumerosi laskuriin ennen varausta.'],
+      ['Kannattaako 1970-luvun kerrostaloasunnossa tiivistää vain parvekeovi?', 'Usein kannattaa aloittaa siitä, koska parvekeovi on tuon ikäisessä asunnossa lähes poikkeuksetta vetoisin kohta: siinä on sekä pitkät karmitiivisteet että kynnyskumi, ja ovea käytetään päivittäin. Jos asunnossa on kuitenkin samalla julkisivulla useampi alkuperäinen ikkuna, ne kannattaa tiivistää samalla kertaa — käynti on jo maksettu, ja yksikköhinta putoaa selvästi.'],
     ],
   },
   {
