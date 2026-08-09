@@ -43,7 +43,7 @@ tai asentamaan Manrope. Jos et halua ottaa riskiä, käytä
 
 ### Mainokset
 
-Kahdeksan mainosta, jokainen kahdessa koossa: `-1080.png` (neliö) ja
+Kymmenen mainosta, jokainen kahdessa koossa: `-1080.png` (neliö) ja
 `-1080x1350.png` (4:5, pysty). **Käytä pystyversiota Facebookin syötteessä** —
 se vie enemmän ruudun korkeutta kuin neliö.
 
@@ -57,10 +57,26 @@ se vie enemmän ruudun korkeutta kuin neliö.
 | `fb-mainos-vahennys-*` | 95 € → 68 € kotitalousvähennyksellä | Hintaherkät |
 | `fb-mainos-syksy-*` | Ennen pakkasia | Kausikampanja, elo–marraskuu |
 | `fb-mainos-varaus-*` | Ei tarjouspyyntöä, ei odottelua | Uudelleenkohdennus |
+| `fb-mainos-talvi-*` | Tunsitko viime talvena vetoa ikkunoista? + säästö ja vähennys | Kylmä yleisö, kausikampanja |
+| `fb-mainos-kokonaisuus-*` | Yksi käynti, ovi ja ikkunat kuntoon | Facebook-ryhmät; ne jotka luulevat palvelun olevan pelkkä tiivistevaihto |
+
+**Kokonaisuusmainoksen otsikko on tarkoituksella neutraali.** Aiempi versio
+kuului "Emme vaihda vain tiivisteitä", mutta kielto- ja me-muotoinen otsikko
+lukeutuu Facebook-ryhmässä myyntipuheeksi, ei naapurin vinkiksi. Sama sisältö
+kerrotaan nyt leipätekstissä ja siruissa.
+
+Talvi- ja kokonaisuusmainoksessa on **oman työn valokuvat** (`img/tyo-tiivisteen-asennus.jpg`
+ja `img/tyo-oven-karmi.jpg`), joissa näkyy TiivisKoti-lippis. Ne ovat toistaiseksi
+vain mainoskäytössä, eivät sivustolla.
+
+**Kokonaisuusmainoksen sirut listaavat vain hintaan kuuluvat asiat.** Helat,
+käyntivälys, akryylisaumaus ja kahvan vaihto ovat käyttöehtojen mukaan
+erikseen veloitettavia lisätöitä, joten ne mainitaan leipätekstissä sanalla
+"lisätyönä" — siru antaisi niistä maksuttoman vaikutelman.
 
 ### Mainosgrafiikoiden muokkaus
 
-Kolme `fb-mainos-*`-kuvaa syntyvät yhdestä lähteestä, joten tekstin voi
+Kaikki `fb-mainos-*`-kuvat syntyvät yhdestä lähteestä, joten tekstin voi
 vaihtaa ilman kuvankäsittelyohjelmaa:
 
 1. muokkaa `ads/fb-mainokset.html` (tekstit ovat suoraan HTML:ssä),

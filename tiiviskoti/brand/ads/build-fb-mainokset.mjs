@@ -23,6 +23,8 @@ const ads = [
   ['ad-vahennys',  'vahennys'],
   ['ad-syksy',     'syksy'],
   ['ad-varaus',    'varaus'],
+  ['ad-talvi',       'talvi'],
+  ['ad-kokonaisuus', 'kokonaisuus'],
 ];
 
 const sizes = [

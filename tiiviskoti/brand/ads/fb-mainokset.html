@@ -161,6 +161,81 @@ body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;display:flex;fl
 .ad-varaus .foot{border-top:1px solid rgba(255,255,255,.28);padding-top:34px}
 .ad-varaus .contact{color:#DDF2E6}
 .ad-varaus .contact b{color:#fff}
+
+/* ---------- 8 · TALVI (tumma, kuva) ----------
+   Väitteen sijaan kysymys, johon lukija vastaa itse: vetoa tunteneelle
+   mainos on muistutus, muille se ohittuu. Siksi tämä on kylmän yleisön
+   mainos eikä sisällä hintoja.
+
+   Kuvarajaus on nostettu ylös (object-position), koska kiinnostavin kohta
+   — asennettava tiiviste — on kuvan yläkolmanneksessa. Oletusrajaus (50 % 50 %)
+   jättäisi sen tekstin ja scrimin alle. */
+.ad-talvi{background:var(--deep);color:#fff;justify-content:flex-end;padding:76px}
+.ad-talvi .photo{position:absolute;inset:0;z-index:0}
+/* Kuva on vaalea (valkoinen karmi, valkoinen lippis), joten tasainen vihreä
+   peite muuttaa sen helposti mintunväriseksi mössöksi. Kevyt kontrastin ja
+   kylläisyyden nosto pitää sen tunnistettavana valokuvana peitteen alla. */
+.ad-talvi .photo img{width:100%;height:100%;object-fit:cover;object-position:50% 22%;
+  filter:contrast(1.09) saturate(1.06)}
+.ad-talvi .scrim{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(22,58,40,.20) 0%,rgba(22,58,40,.30) 26%,rgba(22,58,40,.54) 42%,rgba(22,58,40,.66) 56%,rgba(22,58,40,.89) 76%,rgba(22,58,40,.97) 100%)}
+.ad-talvi > *:not(.photo):not(.scrim){position:relative;z-index:2}
+.ad-talvi .kicker{color:#8FD3AC;margin-bottom:26px}
+.ad-talvi .claim{font-size:96px;margin-bottom:28px}
+.ad-talvi .sub{color:var(--dtext);max-width:840px;margin-bottom:44px}
+.ad-talvi .foot{border-top:1px solid rgba(255,255,255,.22);padding-top:34px;margin-top:0}
+.ad-talvi .contact{color:var(--dtext)}
+.ad-talvi .contact b{color:#fff}
+/* Kortit kiinni alalaidan tietoihin, ei kellumaan kuvan keskelle — sama
+   ratkaisu kuin veto-edut-mainoksessa, jotta lohko istuu molempiin korkeuksiin. */
+.ad-talvi .statrow{margin-top:auto}
+/* Veto-edut-mainoksen valkoinen läpikuultava kortti toimii siellä, koska sen
+   takana on tumma seinä. Tässä kuvassa korttien kohdalle osuu valkoinen lippis,
+   joka kuultaa läpi ja syö luvuilta kontrastin — siksi tumma täyttö. */
+.ad-talvi .statcard{background:rgba(18,48,33,.46);border-color:rgba(255,255,255,.30)}
+
+/* ---------- 9 · KOKONAISUUS (tumma, kuva) ----------
+   Vastaa väärinkäsitykseen "te vain vaihdatte tiivisteet". Amber-yläotsikko
+   erottaa tämän talvimainoksesta, vaikka molemmat ovat tummia kuvamainoksia.
+
+   Sirut luettelevat VAIN hintaan kuuluvat asiat. Lisätyöt (helat, käyntivälys,
+   akryylisaumaus, kahvat) kerrotaan leipätekstissä sanalla "lisätyönä", koska
+   ne ovat käyttöehtojen mukaan erikseen veloitettavia — siru antaisi niistä
+   maksuttoman vaikutelman. */
+.ad-kokonaisuus{background:var(--deep);color:#fff;justify-content:flex-end;padding:76px}
+.ad-kokonaisuus .photo{position:absolute;inset:0;z-index:0}
+.ad-kokonaisuus .photo img{width:100%;height:100%;object-fit:cover;object-position:50% 26%;
+  filter:contrast(1.09) saturate(1.06)}
+/* Tässä tekstiä on enemmän kuin talvimainoksessa, joten yläosa tarvitsee
+   hieman vahvemman peitteen — mutta keskiosa jätetään kevyeksi, jotta työ
+   näkyy sirujen ja leipätekstin välissä eikä jää tyhjäksi vihreäksi alueeksi. */
+.ad-kokonaisuus .scrim{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(22,58,40,.44) 0%,rgba(22,58,40,.56) 26%,rgba(22,58,40,.64) 50%,rgba(22,58,40,.92) 78%,rgba(22,58,40,.97) 100%)}
+.ad-kokonaisuus > *:not(.photo):not(.scrim){position:relative;z-index:2}
+.ad-kokonaisuus .kicker{color:var(--amber);margin-bottom:26px}
+.ad-kokonaisuus .claim{font-size:92px;margin-bottom:28px}
+.ad-kokonaisuus .sub{color:var(--dtext);max-width:860px;margin-bottom:44px}
+.ad-kokonaisuus .foot{border-top:1px solid rgba(255,255,255,.22);padding-top:34px}
+.ad-kokonaisuus .contact{color:var(--dtext)}
+.ad-kokonaisuus .contact b{color:#fff}
+
+/* Sirut: luettelo joka luetaan silmäilemällä, ei rivi kerrallaan.
+   margin-top:auto työntää ne alalaidan tietojen yläpuolelle, jolloin sama
+   lohko istuu sekä 1080 × 1080- että 1080 × 1350 -korkeuteen. */
+.chips{display:flex;flex-wrap:wrap;gap:14px;margin-top:auto;margin-bottom:30px}
+
+/* Säästö ja kotitalousvähennys yhtenä rivinä eikä kortteina: tässä mainoksessa
+   sirut vievät jo tilan, ja veto-edut-mainoksen kokoiset kortit työntäisivät
+   alalaidan tiedot ulos neliöversiosta. Luvut erottuvat silti mintunvihreinä. */
+.statline{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 28px;
+  margin-bottom:46px;font-size:27px;font-weight:600;color:var(--dtext)}
+.statline span{display:inline-flex;align-items:baseline;gap:11px}
+.statline b{font-size:35px;font-weight:800;color:#8FD3AC;letter-spacing:-.02em}
+.chip{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:15px 26px;
+  font-size:26px;font-weight:700;line-height:1}
+.chip svg{width:23px;height:23px;flex:none}
+.ad-kokonaisuus .foot{margin-top:0}
 </style>
 </head>
 <body>
@@ -308,6 +383,52 @@ body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;display:flex;fl
   <div class="foot">
     <div class="brandline">
       <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#F6F7F3"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#217A4E" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#217A4E"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 8 · TALVI ============ -->
+<div class="ad ad-talvi" id="ad-talvi">
+  <div class="photo"><img src="../../img/tyo-tiivisteen-asennus.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="kicker">Ennen seuraavaa talvea</div>
+  <div class="claim">Tunsitko viime<br>talvena vetoa<br><span class="a">ikkunoista?</span></div>
+  <p class="sub">Ensi talvi tulee samalla tavalla. Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan — yhdellä käynnillä.</p>
+  <div class="statrow">
+    <div class="statcard"><b>10–15 %</b><span>arvioitu säästö lämmityskuluissa</span></div>
+    <div class="statcard"><b>−40 %</b><span>kotitalousvähennys työn osuudesta</span></div>
+  </div>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
+      <span class="wordmark">TiivisKoti</span>
+    </div>
+    <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
+  </div>
+</div>
+
+<!-- ============ 9 · KOKONAISUUS ============ -->
+<div class="ad ad-kokonaisuus" id="ad-kokonaisuus">
+  <div class="photo"><img src="../../img/tyo-oven-karmi.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="kicker">Tiivistys · Uusimaa</div>
+  <div class="claim">Yksi käynti,<br>ovi ja ikkunat<br><span class="a">kuntoon.</span></div>
+  <p class="sub">Ovi ei ala käydä kevyemmin pelkällä tiivisteellä. Siksi hintaan kuuluu myös kynnyskumi ja oven käynnin säätö. Ikkunoiden helat, käyntivälykset ja kahvat hoidamme lisätyönä samalla käynnillä.</p>
+  <div class="chips">
+    <span class="chip"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#8FD3AC" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Karmi- ja puitetiivisteet</span>
+    <span class="chip"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#8FD3AC" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kynnyskumi ulko-oviin</span>
+    <span class="chip"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#8FD3AC" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Oven käynnin säätö</span>
+    <span class="chip"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#8FD3AC" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Lämpökamerakartoitus</span>
+  </div>
+  <div class="statline">
+    <span><b>10–15 %</b>säästö lämmityskuluissa</span>
+    <span><b>−40 %</b>kotitalousvähennys</span>
+  </div>
+  <div class="foot">
+    <div class="brandline">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
       <span class="wordmark">TiivisKoti</span>
     </div>
     <div class="contact"><b>tiiviskoti.fi</b>045 875 5996</div>
