@@ -42,6 +42,45 @@ const CAMPAIGN_KEY = 'tk_campaign';
 const CAMPAIGN_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const CAMPAIGN_RE = /^[a-z0-9][a-z0-9._-]{0,59}$/;
 
+/* ---------- Google Ads -klikin tunniste ----------
+   Google lisää mainoslinkkiin ?gclid= (tai iOS:llä ?wbraid=/?gbraid=). Se
+   talletetaan samalla logiikalla kuin ?src= ja lähetetään varauksen mukana,
+   jotta tiedämme MIKÄ mainosklikki tuotti kaupan.
+
+   MIKSI EI GOOGLEN SKRIPTIÄ: gtag.js asettaisi seurantaevästeet ja lähettäisi
+   jokaisen kävijän Googlelle. Tietosuojaselosteemme lupaa ettei niin tehdä.
+   Tämä tapa lähettää Googlelle vain sen, että tietty klikki johti kauppaan —
+   ja vasta jälkikäteen, kun konversiot viedään Ads-tilille. Kävijöitä joista
+   ei tule asiakasta ei raportoida Googlelle lainkaan.
+
+   30 pv vastaa Google Adsin oletusattribuutioikkunaa. Ensimmäinen voittaa,
+   samasta syystä kuin kampanjatunnisteessa. */
+const GCLID_KEY = 'tk_gclid';
+const GCLID_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+const GCLID_RE = /^[A-Za-z0-9_-]{10,200}$/;
+
+function readGclid(){
+  try{
+    const s = JSON.parse(localStorage.getItem(GCLID_KEY) || 'null');
+    if(!s || !GCLID_RE.test(s.v || '')) return undefined;
+    if(Date.now() - (s.t || 0) > GCLID_MAX_AGE_MS) return undefined;
+    return s.v;
+  }catch(_){ return undefined; }
+}
+
+(function captureGclid(){
+  let v;
+  try{
+    const q = new URLSearchParams(location.search);
+    /* wbraid ja gbraid ovat iOS:n vastineet gclidille. Ne kelpaavat Adsin
+       konversiotuontiin samalla tavalla, joten talletetaan mikä tahansa. */
+    v = q.get('gclid') || q.get('wbraid') || q.get('gbraid');
+  }catch(_){ return; }
+  if(!v || !GCLID_RE.test(v)) return;
+  if(readGclid()) return;
+  try{ localStorage.setItem(GCLID_KEY, JSON.stringify({ v, t: Date.now() })); }catch(_){}
+})();
+
 function readCampaign(){
   try{
     const s = JSON.parse(localStorage.getItem(CAMPAIGN_KEY) || 'null');
@@ -821,6 +860,10 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     /* Mainoskampanja, jos kävijä tuli mainoslinkistä viimeisen 30 pv aikana.
        Pelkkä merkintä raportointia varten — ei vaikuta hintaan. */
     campaign: readCampaign(),
+    /* Google Ads -klikin tunniste, jos kävijä tuli mainoksesta. Palvelin
+       kirjaa sen konversioksi VASTA kun varaus on onnistunut, eikä välitä
+       sitä CRM:lle — se on markkinoinnin mittari, ei työn tieto. */
+    gclid: readGclid(),
   };
 
   try{

@@ -65,6 +65,74 @@ async function releaseCrmJob(jobId) {
   }
 }
 
+/* =========================================================
+   Mainoskonversion kirjaus.
+
+   Kirjoittaa onnistuneen varauksen `form_submissions`-tauluun omalla
+   slugillaan, jolloin se näkyy adminissa eikä vaadi uutta taulua. Rivistä
+   saa suoraan sen mitä Google Adsin konversiotuonti tarvitsee: klikin
+   tunniste, ajankohta ja kaupan arvo.
+
+   EI TALLENNA ASIAKKAAN TIETOJA. Ei nimeä, ei sähköpostia, ei katuosoitetta —
+   vain klikkitunniste, summa ja postinumero. Asiakastiedot ovat jo CRM:ssä;
+   niiden kahdentaminen markkinointitauluun olisi turhaa henkilötiedon
+   käsittelyä. Taulun pakolliseen `email`-kenttään menee vakioarvo.
+
+   Ilman gclidiä ei kirjata mitään: orgaaninen varaus ei ole mainoskonversio
+   eikä sitä pidä raportoida Googlelle.
+   ========================================================= */
+async function logAdConversion({ gclid, valueCents, ref, postal }) {
+  if (!gclid) return;
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!SUPABASE_URL || !SERVICE_ROLE) {
+    console.error('create-booking: konversiota ei kirjattu — Supabase-asetukset puuttuvat');
+    return;
+  }
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/form_submissions`, {
+      method: 'POST',
+      headers: {
+        apikey: SERVICE_ROLE,
+        Authorization: `Bearer ${SERVICE_ROLE}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        form_slug: 'ads-konversio',
+        /* `name` on adminin päänäyttökenttä — varausnumero ja summa kertovat
+           yhdellä silmäyksellä mistä on kyse. */
+        name: `Ads-konversio ${ref} — ${(valueCents / 100).toFixed(0)} €`,
+        /* Taulun `email` on NOT NULL, joten jotain on annettava. Tässä on
+           tarkoituksella kiinteä osoite eikä asiakkaan oma: rivi ei saa
+           sisältää henkilötietoa, ja vakioarvosta näkee heti ettei kyseessä
+           ole yhteydenotto johon pitäisi vastata. */
+        email: 'ads-konversio@tiiviskoti.fi',
+        postal_code: postal,
+        /* Ihmisluettava rivi adminin listaan. Varsinainen data on payloadissa. */
+        message: `Mainosklikki johti varaukseen ${ref}. Ei vaadi toimenpiteitä — viedään Google Adsiin konversiona.`,
+        /* Konversiotuonti tarvitsee nämä. Ajankohta ISO-muodossa, koska Google
+           Ads vaatii aikavyöhykkeellisen leiman. Rakenteisena payloadissa,
+           jotta vientiin tarvittavan CSV:n saa suoraan kyselyllä. */
+        payload: {
+          gclid,
+          conversion_time: new Date().toISOString(),
+          value_eur: Number((valueCents / 100).toFixed(2)),
+          currency: 'EUR',
+          ref,
+        },
+      }),
+    });
+    if (!r.ok) {
+      console.error('create-booking: konversion kirjaus epäonnistui', r.status, await r.text());
+    }
+  } catch (e) {
+    /* Niellään tarkoituksella. Varaus on jo tehty ja asiakkaalle vastataan
+       onnistuminen — mainosmittarin vika ei ole asiakkaan ongelma. */
+    console.error('create-booking: konversion kirjaus kaatui:', e);
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -87,10 +155,27 @@ export default async function handler(req, res) {
        Kelvoton arvo pudotetaan pois eikä hylätä varausta: tämä on pelkkä
        merkintä raportointia varten, eikä rikkinäinen mainoslinkki saa estää
        kauppaa. Sama muotorajaus kuin CRM:ssä ja kannassa. */
-    const campaign = typeof body.campaign === 'string'
+    const campaignRaw = typeof body.campaign === 'string'
       && /^[a-z0-9][a-z0-9._-]{0,59}$/.test(body.campaign)
       ? body.campaign
       : undefined;
+    /* Google Ads -klikin tunniste. EI välitetä CRM:lle: se on markkinoinnin
+       mittari eikä työn tieto, ja tuntemattoman kentän lisääminen CRM-kutsuun
+       voisi kaataa varauksen. Kirjataan erikseen vasta kun varaus onnistui. */
+    const gclid = typeof body.gclid === 'string'
+      && /^[A-Za-z0-9_-]{10,200}$/.test(body.gclid)
+      ? body.gclid
+      : undefined;
+
+    /* CRM näyttää `campaign`-arvon työn "Lähde"-kenttänä, ja ilman sitä siinä
+       lukee vain "Verkkosivu". Mainoksesta tullut varaus merkitään siksi
+       kampanjaksi `google-ads`, jotta sen näkee työstä yhdellä silmäyksellä
+       ilman että konversiotaulua tarvitsee avata.
+
+       Oikea ?src=-kampanja voittaa aina: jos kävijä tuli postilaatikkomainoksen
+       QR-koodista ja klikkasi joskus myös mainosta, kunnia kuuluu sille
+       kampanjalle joka on nimenomaisesti merkitty. Gclid on vain vara-arvo. */
+    const campaign = campaignRaw || (gclid ? 'google-ads' : undefined);
     const counts = (body.counts && typeof body.counts === 'object') ? body.counts : {};
     const extras = (body.extras && typeof body.extras === 'object') ? body.extras : {};
     // Täsmällinen alkuhetki ja kalenteri siitä slotista jonka asiakas näki.
@@ -194,6 +279,16 @@ export default async function handler(req, res) {
     if (reservation.calendarCreated === false) {
       console.error('create-booking: kalenteritapahtumaa EI luotu:', reservation.jobNumber, reservation.calendarError);
     }
+
+    /* Mainoskonversio talteen. Tämä on tarkoituksella VIIMEINEN asia ennen
+       vastausta ja kokonaan omassa try/catchissaan: varaus on jo voimassa,
+       eikä mittarin pettäminen saa näkyä asiakkaalle millään tavalla. */
+    await logAdConversion({
+      gclid,
+      valueCents: reservation.totalCents ?? workCents,
+      ref: reservation.jobNumber,
+      postal: String(postal),
+    });
 
     return res.status(200).json({
       ok: true,
