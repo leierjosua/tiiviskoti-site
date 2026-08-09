@@ -860,9 +860,9 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     /* Mainoskampanja, jos kävijä tuli mainoslinkistä viimeisen 30 pv aikana.
        Pelkkä merkintä raportointia varten — ei vaikuta hintaan. */
     campaign: readCampaign(),
-    /* Google Ads -klikin tunniste, jos kävijä tuli mainoksesta. Palvelin
-       kirjaa sen konversioksi VASTA kun varaus on onnistunut, eikä välitä
-       sitä CRM:lle — se on markkinoinnin mittari, ei työn tieto. */
+    /* Google Ads -klikin tunniste, jos kävijä tuli mainoksesta. Tallentuu
+       työn kentäksi CRM:ään, josta se viedään Adsiin konversiona. Peruttu
+       varaus vie gclidin mukanaan — peruttua kauppaa ei raportoida. */
     gclid: readGclid(),
   };
 

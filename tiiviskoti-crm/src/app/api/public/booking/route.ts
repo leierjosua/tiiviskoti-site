@@ -72,6 +72,17 @@ const schema = z.object({
     (v) => (typeof v === 'string' && /^[a-z0-9][a-z0-9._-]{0,59}$/.test(v) ? v : undefined),
     z.string().optional(),
   ),
+  /* Google Ads -klikin tunniste (gclid/wbraid/gbraid) sivuston osoiterivistä.
+     Tästä syntyy Adsin offline-konversio: klikki + aika + kaupan arvo.
+
+     Sama puolustus kuin kampanjalla — arvo tulee julkisesta osoiterivistä,
+     joten kelvoton pudotetaan pois eikä varausta hylätä. Mainoslinkin
+     rikkoutuminen ei saa estää kauppaa; mittari on toissijainen kauppaan
+     nähden. Sama muotorajaus kuin kannan jobs_gclid_format-rajoitteessa. */
+  gclid: z.preprocess(
+    (v) => (typeof v === 'string' && /^[A-Za-z0-9_-]{10,200}$/.test(v) ? v : undefined),
+    z.string().optional(),
+  ),
 });
 
 /* Kelpaamaton alennuskoodi keskeyttää varauksen. Vaihtoehto olisi kirjata
@@ -202,10 +213,12 @@ export async function POST(request: Request) {
 
       const [job] = await tx<{ id: string; job_number: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status, title,
-                             address, postal_code, city, price_cents, notes, source, campaign)
+                             address, postal_code, city, price_cents, notes, source,
+                             campaign, gclid)
         values (${customerId}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
                 ${d.title ?? 'Tiivistetyö'}, ${d.address}, ${d.postalCode}, ${d.city ?? null},
-                ${totalCents}, ${d.notes ?? null}, 'web', ${d.campaign ?? null})
+                ${totalCents}, ${d.notes ?? null}, 'web',
+                ${d.campaign ?? null}, ${d.gclid ?? null})
         returning id, job_number
       `;
 
