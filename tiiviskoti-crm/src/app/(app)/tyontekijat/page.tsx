@@ -1,7 +1,8 @@
 import { listStaff } from '@/lib/data';
 import { requireManager } from '@/lib/session';
-import { Card, CardHeader, Empty } from '@/components/ui';
-import { AddStaffForm, ToggleActive } from './ui';
+import { adminAuthConfigured } from '@/lib/supabase-admin';
+import { Card, CardHeader, Empty, PageHead } from '@/components/ui';
+import { AddStaffForm, SetPasswordForm, ToggleActive } from './ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,17 +13,19 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 export default async function StaffPage() {
-  await requireManager();
+  const me = await requireManager();
   const staff = await listStaff();
+  /* Salasanan asetus on omistajan oikeus, ei toimiston: sillä ottaa
+     kenen tahansa tunnuksen haltuun. Sama tarkistus tehdään uudelleen
+     server actionissa — tämä vain piilottaa lomakkeen, ei suojaa mitään. */
+  const canSetPasswords = me.role === 'owner';
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-[22px] font-extrabold tracking-tight text-text">Työntekijät</h1>
-        <p className="text-sm text-muted">
-          Kirjautuminen vaatii sekä Supabase Auth -tunnuksen että aktiivisen rivin täällä.
-        </p>
-      </header>
+      <PageHead
+        title="Työntekijät"
+        sub="Kirjautuminen vaatii sekä Supabase Auth -tunnuksen että aktiivisen rivin täällä."
+      />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <Card className="overflow-x-auto">
@@ -57,12 +60,28 @@ export default async function StaffPage() {
           )}
         </Card>
 
-        <Card className="h-fit">
-          <CardHeader title="Lisää työntekijä" />
-          <div className="p-4">
-            <AddStaffForm />
-          </div>
-        </Card>
+        <div className="space-y-6">
+          <Card className="h-fit">
+            <CardHeader title="Lisää työntekijä" />
+            <div className="p-4">
+              <AddStaffForm />
+            </div>
+          </Card>
+
+          {canSetPasswords && (
+            <Card className="h-fit">
+              <CardHeader title="Aseta salasana" />
+              <div className="p-4">
+                <SetPasswordForm
+                  configured={adminAuthConfigured()}
+                  people={staff
+                    .filter((p) => p.active)
+                    .map((p) => ({ id: p.id, full_name: p.full_name, email: p.email }))}
+                />
+              </div>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
