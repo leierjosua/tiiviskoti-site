@@ -6,8 +6,15 @@
    tämä on muutettava samalla.
 
    Kaksi sävyä, kuten sivustollakin:
-     dark  = tummalla pinnalla (sivupalkki) — läpikuultava neliö, vihreä palkki
-     light = vaalealla pinnalla — täysi vihreä neliö, vaalea palkki */
+     dark  = tummalla pinnalla — läpikuultava neliö, vihreä palkki
+     light = vaalealla pinnalla — täysi vihreä neliö, vaalea palkki
+
+   TONE ON VALITTAVA PINNAN MUKAAN, eikä oletukseen saa luottaa: `dark`
+   vaalealla taustalla piirtää lähes valkoisen neliön ja lähes valkoisen
+   oven, jolloin näkyviin jää vain ohut vihreä palkki ja logo näyttää
+   rikkinäiseltä. Juuri niin kävi kirjautumissivulla. Sivupalkki on nyt
+   vaalea, joten siellä käytetään `light`; ainoa tumma pinta on
+   kirjautumissivun vasen paneeli. */
 
 export function BrandMark({
   size = 26,
@@ -37,12 +44,18 @@ export function BrandMark({
   );
 }
 
-/** Nimilogo. `Tiivis` vahvana, `Koti` korostusvärillä — kuten sivustolla. */
+/** Nimilogo. `Tiivis` vahvana, `Koti` korostusvärillä — kuten sivustolla.
+ *  Tumman sävyn värit ovat auki kirjoitettuina, koska `nav`-tokenit
+ *  tarkoittavat nyt vaaleaa sivupalkkia eivätkä kelpaa tummalle pinnalle. */
 export function BrandWord({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
   const onDark = tone === 'dark';
   return (
-    <span className={`text-[15px] font-extrabold tracking-tight ${onDark ? 'text-nav-text' : 'text-text'}`}>
-      Tiivis<span style={{ color: onDark ? '#2E9E63' : '#217A4E' }}>Koti</span>
+    <span
+      className="text-base font-extrabold tracking-tight"
+      style={{ color: onDark ? '#EAF2EC' : undefined }}
+    >
+      <span className={onDark ? undefined : 'text-text'}>Tiivis</span>
+      <span style={{ color: onDark ? '#5FC98D' : '#217A4E' }}>Koti</span>
     </span>
   );
 }

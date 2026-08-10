@@ -3,15 +3,30 @@
 /* =========================================================
    TiivisKoti CRM — ilme.
 
-   Tumma syvänvihreä sivupalkki, vaalea työtila. Brändi näkyy heti
-   sivupalkissa, mutta taulukot ja lomakkeet ovat vaalealla pinnalla —
-   niitä katsotaan koko työpäivä.
+   PERIAATE: väri tarkoittaa jotain. Pinnat ovat neutraalin harmaita ja
+   teksti lähes mustaa; vihreää käytetään vain siellä missä se kantaa
+   merkitystä — napit, valittu kohta, vahvistettu tila. Tätä katsotaan koko
+   työpäivä, ja aiemmin sivu oli kauttaaltaan vihreän sävyinen, jolloin
+   vihreä ei erottanut mitään mistään.
 
-   Värit ovat SAMAT kuin tiiviskoti.fi:llä (index.html :root), jotta
-   paneli ja sivusto ovat tunnistettavasti sama brändi:
-     vihreä  #217A4E   tummin #183A28   syvä #163A28
-     tausta  #F6F7F3   kortti #FFFFFF   pehmeä vihreä #E4F0E9
-     amber   #E0A63A   viivat #E4E8E0 / #D2D9CE
+   MITÄ KORJATTIIN 2026-08-10 (Josua: "todella vaikea käyttää noilla
+   väreillä"):
+
+   - `faint` oli #7B857D = kontrasti 3,8:1 valkoista vasten. WCAG AA vaatii
+     leipätekstiltä 4,5:1. Se oli käytössä 58 paikassa, mm. jokaisen
+     tunnusluvun otsikkona. Nyt #616C66 = 5,4:1.
+   - `warn` oli #B7791F = 3,65:1, ja sitä käytettiin tekstivärinä vielä
+     omalla sävytetyllä taustallaan. Nyt #8A5A0C = 5,9:1.
+   - Pinnat olivat vihreän sävyisiä (#F6F7F3 / #F0F3EE / #E4F0E9) ja kortin
+     ero taustaan oli ~3 %. Kortit eivät erottuneet. Nyt neutraali harmaa
+     tausta ja selvä ero valkoiseen korttiin.
+   - Sivupalkki oli tumma vihreä möhkäle lähes valkoisella sivulla, eli
+     sivun raskain elementti oli navigaatio. Nyt vaalea.
+
+   Vihreä #217A4E on TARKOITUKSELLA ennallaan: se on sama kuin
+   tiiviskoti.fi:llä (index.html :root), ja sen kontrasti 5,3:1 riittää.
+   Älä vaihda sitä ilman että vaihdat myös sivuston — paneli ja sivusto
+   ovat tunnistettavasti sama brändi.
 
    HUOM tokenien nimistä: `ink-900…600` ovat historiallisia (paneli oli
    ensin tumma). Ne tarkoittavat nyt pintojen syvyyttä vaalealla:
@@ -21,43 +36,54 @@
    ========================================================= */
 
 @theme {
-  /* Pinnat, vaaleasta syvempään */
-  --color-ink-900: #F6F7F3;   /* sivun tausta */
+  /* Pinnat, vaaleasta syvempään. Neutraali harmaa, ei vihreää sävyä. */
+  --color-ink-900: #EEF1F3;   /* sivun tausta */
   --color-ink-800: #FFFFFF;   /* kortti */
-  --color-ink-700: #F0F3EE;   /* hover */
-  --color-ink-600: #E4F0E9;   /* korostettu pinta, valittu tila */
-  --color-line: #E4E8E0;
-  --color-line-soft: #EDF0EA;
+  --color-ink-700: #F2F4F6;   /* hover */
+  --color-ink-600: #E7EFEA;   /* korostettu pinta, valittu tila */
+  --color-line: #D8DEE3;
+  --color-line-soft: #E7EBEF;
 
-  /* Teksti */
-  --color-text: #183A28;
-  --color-muted: #4A544D;
-  --color-faint: #7B857D;
+  /* Teksti. Kaikki kolme yltävät WCAG AA:han valkoisella (4,5:1). */
+  --color-text: #16211B;      /* 15,8:1 */
+  --color-muted: #47534C;     /*  7,9:1 */
+  --color-faint: #616C66;     /*  5,4:1 */
 
   /* Brändi */
-  --color-accent: #217A4E;
+  --color-accent: #217A4E;       /* 5,3:1 — sama kuin tiiviskoti.fi */
   --color-accent-ink: #FFFFFF;   /* teksti vihreän päällä */
   --color-accent-dim: #E4F0E9;
 
-  /* Sivupalkki — oma tumma paletti */
-  --color-nav: #163A28;
-  --color-nav-deep: #102C1E;
-  --color-nav-line: #24503A;
-  --color-nav-text: #EAF2EC;
-  --color-nav-muted: #A8C0B0;
+  /* Sivupalkki — vaalea paneeli, ei oma maailmansa */
+  --color-nav: #FFFFFF;
+  --color-nav-deep: #F2F4F6;
+  --color-nav-line: #E1E6EA;
+  --color-nav-text: #16211B;
+  --color-nav-muted: #47534C;
 
-  /* Tilat */
-  --color-warn: #B7791F;
-  --color-danger: #C0483D;
-  --color-info: #2A6F97;
+  /* Tilat. Kaikki tummennettu AA-tasolle — näitä käytetään tekstivärinä
+     omalla sävytetyllä taustallaan, mikä laskee kontrastia entisestään. */
+  --color-warn: #8A5A0C;      /* 5,9:1 */
+  --color-danger: #B03A2E;    /* 6,1:1 */
+  --color-info: #1F5F85;      /* 7,0:1 */
 
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
 
-  /* Sama pyöristys ja pehmeä vihreään taittuva varjo kuin sivustolla */
+  /* Tekstikoot isommiksi KOKO sovelluksessa kerralla. `text-xs` on
+     käytössä 80:ssä ja `text-sm` kymmenissä paikoissa; koon nostaminen
+     täällä osuu niihin kaikkiin ilman että 23 tiedostoa muokataan yksi
+     kerrallaan. Tailwindin oletukset ovat 12 px ja 14 px. */
+  --text-xs: 0.8125rem;       /* 13 px */
+  --text-xs--line-height: 1.45;
+  --text-sm: 0.9375rem;       /* 15 px */
+  --text-sm--line-height: 1.5;
+
+  /* Pyöristys ennallaan; varjo neutraaliksi, koska vihreään taittuva varjo
+     harmaalla pinnalla näytti likaiselta. */
   --radius-card: 14px;
-  --shadow-card: 0 1px 2px rgba(24, 58, 40, .04), 0 14px 32px -22px rgba(24, 58, 40, .28);
-  --shadow-nav: 0 20px 40px -30px rgba(16, 44, 30, .6);
+  --shadow-card: 0 1px 2px rgba(16, 24, 32, .05), 0 12px 28px -20px rgba(16, 24, 32, .22);
+  --shadow-nav: none;
 }
 
 html {
@@ -94,8 +120,6 @@ body {
   scrollbar-color: var(--color-line2, #D2D9CE) transparent;
 }
 
-/* Sivupalkin sisällä käytetään omaa palettia, joten vierityspalkkikin
-   tummenee — muuten palkkiin jää vaalea raita. */
 .nav-surface {
   scrollbar-color: var(--color-nav-line) transparent;
 }

@@ -37,7 +37,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <form action={logout}>
             <button
               type="submit"
-              className="text-[11px] font-semibold text-nav-muted underline underline-offset-2 transition-colors hover:text-nav-text"
+              className="text-xs font-semibold text-accent underline underline-offset-2 transition-colors hover:text-text"
             >
               Kirjaudu ulos
             </button>

@@ -6,9 +6,14 @@ import { useState } from 'react';
 import { cx } from './ui';
 import { BrandMark, BrandWord } from './brand';
 
-/* Navigaatio toimii kahdessa muodossa: työpöydällä kiinteä syvänvihreä
-   sivupalkki, puhelimessa yläpalkki jonka takaa valikko avautuu. Asentaja
-   katsoo päivän työt puhelimesta, joten kiinteä sivupalkki ei riitä. */
+/* Navigaatio toimii kahdessa muodossa: työpöydällä kiinteä sivupalkki,
+   puhelimessa yläpalkki jonka takaa valikko avautuu. Asentaja katsoo päivän
+   työt puhelimesta, joten kiinteä sivupalkki ei riitä.
+
+   Sivupalkki oli aiemmin tumma vihreä ja siten sivun raskain elementti,
+   vaikka sisältö on se mitä katsotaan. Nyt se on vaalea paneeli ja erottuu
+   työtilasta vain reunaviivalla — vihreä on säästetty aktiiviselle kohdalle,
+   joka on ainoa asia mitä valikosta pitää nähdä yhdellä silmäyksellä. */
 
 export type NavItem = { href: string; label: string };
 
@@ -34,16 +39,17 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout }: {
         onClick={onClick}
         aria-current={active ? 'page' : undefined}
         className={cx(
-          'relative block rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+          'relative block rounded-lg py-2.5 pr-3 pl-4 transition-colors',
           active
-            ? 'bg-white/12 text-nav-text'
-            : 'text-nav-muted hover:bg-white/6 hover:text-nav-text',
+            ? 'bg-accent-dim font-bold text-accent'
+            : 'font-medium text-nav-muted hover:bg-ink-700 hover:text-nav-text',
         )}
       >
-        {/* Aktiivinen kohta saa vaalean palkin vasempaan reunaan: väri yksin
-            ei riitä erottumaan tummalla pinnalla. */}
+        {/* Aktiivinen kohta erottuu kolmella tavalla: pinta, lihavointi ja
+            palkki. Pelkkä väri ei riitä — se katoaa värisokealta ja
+            heikossa valossa. */}
         {active && (
-          <span className="absolute top-1/2 left-0 h-4 w-0.5 -translate-y-1/2 rounded-full bg-white/70" />
+          <span className="absolute top-1/2 left-0 h-5 w-1 -translate-y-1/2 rounded-r-full bg-accent" />
         )}
         {item.label}
       </Link>
@@ -51,46 +57,47 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout }: {
   });
 
   const account = (
-    <div className="rounded-lg bg-white/6 px-3 py-2.5">
-      <p className="truncate text-[13px] font-semibold text-nav-text">{staffName}</p>
-      <p className="truncate text-[11px] text-nav-muted">{staffEmail}</p>
-      <p className="mt-0.5 text-[11px] text-nav-muted/70">{staffRole}</p>
-      <div className="mt-1.5">{logout}</div>
+    <div className="rounded-lg bg-nav-deep px-3 py-3">
+      <p className="truncate text-sm font-bold text-nav-text">{staffName}</p>
+      <p className="truncate text-xs text-nav-muted">{staffEmail}</p>
+      <p className="mt-0.5 text-xs text-faint">{staffRole}</p>
+      <div className="mt-2">{logout}</div>
     </div>
   );
 
   return (
     <>
       {/* Puhelin: yläpalkki */}
-      <header className="nav-surface sticky top-0 z-30 flex items-center gap-2.5 bg-nav px-4 py-3 md:hidden">
-        <BrandMark size={22} />
-        <span className="flex-1"><BrandWord /></span>
+      <header className="nav-surface sticky top-0 z-30 flex items-center gap-2.5 border-b border-nav-line bg-nav px-4 py-3 md:hidden">
+        <BrandMark size={24} tone="light" />
+        <span className="flex-1"><BrandWord tone="light" /></span>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-label="Valikko"
-          className="rounded-lg border border-nav-line px-3 py-1.5 text-sm text-nav-muted transition-colors hover:text-nav-text"
+          className="rounded-lg border border-line bg-ink-800 px-3.5 py-2 text-sm font-semibold text-text transition-colors hover:bg-ink-700"
         >
           {open ? 'Sulje' : 'Valikko'}
         </button>
       </header>
 
       {open && (
-        <div className="nav-surface bg-nav px-3 pb-3 md:hidden">
+        <div className="nav-surface border-b border-nav-line bg-nav px-3 pb-3 md:hidden">
           <nav className="space-y-0.5">{links(() => setOpen(false))}</nav>
           <div className="mt-3">{account}</div>
         </div>
       )}
 
-      {/* Työpöytä: sivupalkki */}
-      <aside className="nav-surface hidden w-56 shrink-0 flex-col bg-nav shadow-(--shadow-nav) md:flex">
+      {/* Työpöytä: sivupalkki. Reunaviiva erottaa sen työtilasta nyt kun
+          kumpikin on vaalea. */}
+      <aside className="nav-surface hidden w-60 shrink-0 flex-col border-r border-nav-line bg-nav md:flex">
         <div className="flex items-center gap-2.5 px-4 py-5">
-          <BrandMark size={26} />
-          <BrandWord />
+          <BrandMark size={28} tone="light" />
+          <BrandWord tone="light" />
         </div>
 
-        <nav className="flex-1 space-y-0.5 px-3">{links()}</nav>
+        <nav className="flex-1 space-y-1 px-3">{links()}</nav>
 
         <div className="px-3 pb-4">{account}</div>
       </aside>

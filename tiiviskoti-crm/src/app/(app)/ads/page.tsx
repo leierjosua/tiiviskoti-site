@@ -75,24 +75,24 @@ export default async function AdsPage() {
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="p-4">
-          <div className="text-xs font-semibold tracking-wide text-faint uppercase">Konversioita</div>
-          <div className="mt-1 text-2xl font-extrabold text-text tabular">{laskettavat.length}</div>
-          <div className="text-xs text-muted">{kuussa.length} tässä kuussa</div>
+        <Card className="p-5">
+          <div className="text-sm font-semibold text-muted">Konversioita</div>
+          <div className="mt-2 text-[30px] leading-none font-extrabold text-text tabular">{laskettavat.length}</div>
+          <div className="mt-2 text-xs text-faint">{kuussa.length} tässä kuussa</div>
         </Card>
-        <Card className="p-4">
-          <div className="text-xs font-semibold tracking-wide text-faint uppercase">Kaupan arvo</div>
-          <div className="mt-1 text-2xl font-extrabold text-accent tabular">{eur(arvo)}</div>
-          <div className="text-xs text-muted">
+        <Card className="p-5">
+          <div className="text-sm font-semibold text-muted">Kaupan arvo</div>
+          <div className="mt-2 text-[30px] leading-none font-extrabold text-accent tabular">{eur(arvo)}</div>
+          <div className="mt-2 text-xs text-faint">
             {kuussa.length > 0 ? `${eur(kuussa.reduce((s, r) => s + r.price_cents, 0))} tässä kuussa` : 'ei tässä kuussa'}
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="text-xs font-semibold tracking-wide text-faint uppercase">Keskikauppa</div>
-          <div className="mt-1 text-2xl font-extrabold text-text tabular">
+        <Card className="p-5">
+          <div className="text-sm font-semibold text-muted">Keskikauppa</div>
+          <div className="mt-2 text-[30px] leading-none font-extrabold text-text tabular">
             {laskettavat.length > 0 ? eur(Math.round(arvo / laskettavat.length)) : '—'}
           </div>
-          <div className="text-xs text-muted">Vertaa klikkihintaan Adsissa</div>
+          <div className="mt-2 text-xs text-faint">Vertaa klikkihintaan Adsissa</div>
         </Card>
       </div>
 

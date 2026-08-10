@@ -14,24 +14,28 @@ export default function LoginPage() {
           lomakkeelle. */}
       {/* overflow-hidden on pakollinen: alanurkan hehku on isompi kuin palkki
           ja vuotaisi muuten vaalealle puolelle. */}
-      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-nav p-10 lg:flex">
+      {/* Värit on kirjoitettu tähän auki eikä oteta `nav`-tokeneista: ne
+          tarkoittavat nyt sivupalkin VAALEAA pintaa. Tämä paneeli on
+          tarkoituksella yhä tumma — kirjautumisruutu on brändihetki kerran
+          päivässä, ei pinta jolla työskennellään. */}
+      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-[#163A28] p-10 lg:flex">
         <div className="flex items-center gap-2.5">
           <BrandMark size={28} tone="dark" />
-          <span className="text-base font-extrabold tracking-tight text-nav-text">
-            Tiivis<span className="text-nav-muted">Koti</span>
+          <span className="text-base font-extrabold tracking-tight text-[#EAF2EC]">
+            Tiivis<span className="text-[#5FC98D]">Koti</span>
           </span>
         </div>
 
         <div>
-          <h2 className="max-w-sm text-[30px] leading-[1.15] font-extrabold tracking-tight text-nav-text">
+          <h2 className="max-w-sm text-[30px] leading-[1.15] font-extrabold tracking-tight text-[#EAF2EC]">
             Vedoton koti.<br />Lämpö sisällä.
           </h2>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-nav-muted">
+          <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#BCD3C5]">
             Varausten, kalenterien ja palvelualueiden hallinta.
           </p>
         </div>
 
-        <p className="text-xs text-nav-muted/70">Ovien ja ikkunoiden tiivistys · Uusimaa</p>
+        <p className="text-xs text-[#A8C0B0]">Ovien ja ikkunoiden tiivistys · Uusimaa</p>
 
         {/* Hillitty vihreä hehku alanurkkaan, ettei suuri tumma pinta jää
             täysin litteäksi. */}
@@ -54,7 +58,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <h1 className="text-[22px] font-extrabold tracking-tight text-text">Kirjaudu hallintaan</h1>
+            <h1 className="text-[28px] leading-tight font-extrabold tracking-tight text-text">Kirjaudu hallintaan</h1>
             <p className="mt-1 text-sm text-muted">Käytä työsähköpostiasi.</p>
           </div>
 

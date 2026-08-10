@@ -18,19 +18,22 @@ type DayJob = {
 const eur = (cents: number) => (cents / 100).toLocaleString('fi-FI', { maximumFractionDigits: 0 }) + ' €';
 
 /* Tunnusluku. Vertailuluku alle kertoo mihin lukua verrataan — pelkkä
-   numero ilman mittakaavaa ei kerro onko päivä hyvä vai huono. */
+   numero ilman mittakaavaa ei kerro onko päivä hyvä vai huono.
+
+   Otsikko oli ennen 11 px:n harvennettu versaali haalealla harmaalla, eli
+   juuri se osa jota ilman luku on merkityksetön oli vaikeimmin luettava. */
 function Metric({ label, value, sub, tone = 'plain' }: {
   label: string; value: string; sub?: string; tone?: 'plain' | 'accent';
 }) {
   return (
-    <Card className="p-4">
-      <p className="text-[11px] font-bold tracking-wide text-faint uppercase">{label}</p>
-      <p className={`mt-1.5 text-[26px] leading-none font-extrabold tabular ${
+    <Card className="p-5">
+      <p className="text-sm font-semibold text-muted">{label}</p>
+      <p className={`mt-2 text-[32px] leading-none font-extrabold tabular ${
         tone === 'accent' ? 'text-accent' : 'text-text'
       }`}>
         {value}
       </p>
-      {sub && <p className="mt-1.5 text-xs text-muted">{sub}</p>}
+      {sub && <p className="mt-2 text-xs text-faint">{sub}</p>}
     </Card>
   );
 }
@@ -161,16 +164,16 @@ export default async function TodayPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-[22px] font-extrabold tracking-tight text-text">
+          <h1 className="text-[28px] leading-tight font-extrabold tracking-tight text-text">
             {onlyMine ? 'Omat työt' : 'Yhteenveto'}
           </h1>
-          <p className="mt-0.5 text-sm text-muted">
+          <p className="mt-1 text-sm text-muted">
             {formatDateKey(today)} · {todayJobs.length} keikkaa tänään
           </p>
         </div>
         {!onlyMine && (
           <Link href="/tyot/uusi"
-                className="rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-accent-ink hover:bg-[#1A6340]">
+                className="rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink hover:bg-[#1A6340]">
             Uusi työ
           </Link>
         )}
@@ -220,7 +223,7 @@ export default async function TodayPage() {
       {/* Tänään tehtävät keikat: sama korttimuoto kuin ennen, koska se toimii
           puhelimessa. Reitti ja soitto ovat päivän tärkeimmät napit. */}
       <section className="space-y-2">
-        <h2 className="text-sm font-bold tracking-wide text-text uppercase">Keikat tänään</h2>
+        <h2 className="text-[19px] font-bold text-text">Keikat tänään</h2>
         {todayJobs.length === 0 ? (
           <Card><Empty>Ei keikkoja tänään.</Empty></Card>
         ) : (

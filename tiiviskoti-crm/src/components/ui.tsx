@@ -8,7 +8,7 @@ export function cx(...parts: (string | false | null | undefined)[]) {
 }
 
 const BUTTON_BASE =
-  'inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold ' +
+  'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold ' +
   'transition-all disabled:opacity-45 disabled:pointer-events-none';
 
 const BUTTON_VARIANTS = {
@@ -37,10 +37,13 @@ export function Card({ children, className }: { children: ReactNode; className?:
   );
 }
 
+/* Otsikko on tavallista tekstiä, ei harvennettua pikkuversaalia. Versaali
+   luetaan kirjain kerrallaan eikä sanan muotona, ja 13 px:n harvennettuna
+   se oli tämän panelin vaikeimmin luettava elementti. */
 export function CardHeader({ title, action }: { title: ReactNode; action?: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-soft px-4 py-3">
-      <h2 className="text-[13px] font-bold tracking-wide text-text uppercase">{title}</h2>
+    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3.5">
+      <h2 className="text-[17px] font-bold text-text">{title}</h2>
       {action}
     </div>
   );
@@ -51,16 +54,16 @@ export function Field({
 }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold text-muted">{label}</span>
+      <span className="mb-1.5 block text-sm font-semibold text-text">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs leading-relaxed text-faint">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-xs leading-relaxed text-faint">{hint}</span>}
     </label>
   );
 }
 
 const CONTROL =
-  'w-full rounded-lg border border-line bg-ink-800 px-3 py-2 text-sm text-text ' +
-  'placeholder:text-faint transition-colors focus:border-accent focus:ring-2 focus:ring-accent/15 focus:outline-none';
+  'w-full rounded-lg border border-line bg-ink-800 px-3 py-2.5 text-sm text-text ' +
+  'placeholder:text-faint transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none';
 
 export function Input({ className, ...props }: ComponentProps<'input'>) {
   return <input {...props} className={cx(CONTROL, 'tabular', className)} />;
@@ -75,7 +78,7 @@ export function Textarea({ className, ...props }: ComponentProps<'textarea'>) {
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <div className="px-4 py-12 text-center text-sm text-faint">{children}</div>;
+  return <div className="px-4 py-12 text-center text-sm text-muted">{children}</div>;
 }
 
 export function ErrorNote({ children }: { children: ReactNode }) {
@@ -99,11 +102,11 @@ export function OkNote({ children }: { children: ReactNode }) {
 /* Tilamerkki. Pisteen väri kantaa merkityksen ja teksti toistaa sen, jotta
    tila ei ole pelkän värin varassa. */
 const STATUS_STYLES: Record<string, { chip: string; dot: string; label: string }> = {
-  hold:      { chip: 'border-line bg-ink-700 text-faint',           dot: 'bg-faint',   label: 'Varauksessa' },
-  tentative: { chip: 'border-warn/30 bg-warn/10 text-warn',         dot: 'bg-warn',    label: 'Alustava' },
-  confirmed: { chip: 'border-accent/30 bg-accent-dim text-accent',  dot: 'bg-accent',  label: 'Vahvistettu' },
-  done:      { chip: 'border-info/30 bg-info/10 text-info',         dot: 'bg-info',    label: 'Tehty' },
-  cancelled: { chip: 'border-line bg-ink-700 text-faint line-through', dot: 'bg-faint', label: 'Peruttu' },
+  hold:      { chip: 'border-line bg-ink-700 text-muted',           dot: 'bg-faint',   label: 'Varauksessa' },
+  tentative: { chip: 'border-warn/35 bg-warn/12 text-warn',         dot: 'bg-warn',    label: 'Alustava' },
+  confirmed: { chip: 'border-accent/35 bg-accent-dim text-accent',  dot: 'bg-accent',  label: 'Vahvistettu' },
+  done:      { chip: 'border-info/35 bg-info/12 text-info',         dot: 'bg-info',    label: 'Tehty' },
+  cancelled: { chip: 'border-line bg-ink-700 text-muted line-through', dot: 'bg-faint', label: 'Peruttu' },
 };
 
 export function StatusBadge({ status }: { status: string }) {
@@ -112,10 +115,10 @@ export function StatusBadge({ status }: { status: string }) {
   };
   return (
     <span className={cx(
-      'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap',
+      'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-bold whitespace-nowrap',
       s.chip,
     )}>
-      <span className={cx('h-1.5 w-1.5 rounded-full', s.dot)} />
+      <span className={cx('h-2 w-2 rounded-full', s.dot)} />
       {s.label}
     </span>
   );
@@ -128,8 +131,8 @@ export function PageHead({ title, sub, action }: {
   return (
     <header className="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 className="text-[22px] font-extrabold tracking-tight text-text">{title}</h1>
-        {sub && <p className="mt-0.5 text-sm text-muted">{sub}</p>}
+        <h1 className="text-[28px] leading-tight font-extrabold tracking-tight text-text">{title}</h1>
+        {sub && <p className="mt-1 text-sm text-muted">{sub}</p>}
       </div>
       {action}
     </header>
