@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { sql } from '@/lib/db';
+import { readHealthBanner, type HealthBanner } from '@/lib/health';
 import { requireStaff } from '@/lib/session';
-import { addDays, dateKeyOf, formatDateKey, helsinkiDateTime, timeOf } from '@/lib/time';
+import { addDays, dateKeyOf, formatDateKey, formatInstant, helsinkiDateTime, timeOf } from '@/lib/time';
 import { Card, CardHeader, Empty, StatusBadge } from '@/components/ui';
 import { MarkDone } from './tyot/[id]/ui';
 
@@ -34,6 +35,57 @@ function Metric({ label, value, sub, tone = 'plain' }: {
   );
 }
 
+/* Varoitus rikkoutuneesta Google-yhteydestä.
+
+   MIKSI TÄMÄ ON ETUSIVULLA EIKÄ ASETUKSISSA: kun yhteys on poikki, varaus
+   näyttää onnistuvan kaikille — asiakkaalle, sivustolle ja tälle näkymälle.
+   Vain vahvistusposti, työmääräin ja kalenteritapahtuma jäävät tulematta.
+   Sähköpostivaroitusta ei silloin voi lähettää, koska posti kulkee saman
+   yhteyden läpi, joten tämä on se paikka jossa rikko on pakko näkyä.
+
+   Kaksi eri oiretta, tärkein ensin: toteutunut vahinko (asiakas ilman
+   vahvistusta) ennen ennustettua (tarkistus punaisena). */
+function HealthWarning({ health }: { health: HealthBanner }) {
+  const broken = health.lastOk === false;
+  if (!broken && health.failedDeliveries === 0) return null;
+
+  const stale = health.lastCheckedAt
+    ? Date.now() - health.lastCheckedAt.getTime() > 36 * 3600_000
+    : false;
+
+  return (
+    <div className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
+      <p className="font-bold">
+        {health.failedDeliveries > 0
+          ? `${health.failedDeliveries} varausta ilman vahvistusta`
+          : 'Google-yhteys ei toimi'}
+      </p>
+      <p className="mt-1 text-danger/90">
+        {health.failedDeliveries > 0 && (
+          <>
+            Viimeisen 7 vrk:n aikana verkosta tulleista varauksista{' '}
+            {health.failedDeliveries} kpl jäi ilman vahvistuspostia. Asiakas ei tiedä
+            varauksesta, eikä keikka välttämättä ole kalenterissa.{' '}
+          </>
+        )}
+        {broken && (
+          <>
+            Kuntotarkistus epäonnistui{health.lastCheckedAt ? ` ${formatInstant(health.lastCheckedAt)}` : ''}:{' '}
+            {health.detail ?? 'tuntematon syy'}. Uusista varauksista ei lähde vahvistusta
+            ennen kuin tämä on korjattu.
+          </>
+        )}
+        {stale && !broken && ' Kuntotarkistus ei ole ajanut yli vuorokauteen.'}
+      </p>
+      <p className="mt-1.5 text-xs text-danger/80">
+        Korjaus: hae uusi Google-tunnus{' '}
+        <code className="font-mono">scripts/google-oauth-setup.mjs</code> ja vie se
+        GOOGLE_OAUTH_REFRESH_TOKEN-muuttujaan.
+      </p>
+    </div>
+  );
+}
+
 export default async function TodayPage() {
   const staff = await requireStaff();
 
@@ -47,7 +99,7 @@ export default async function TodayPage() {
      yrityksen tilannekuva. Tunnusluvut ovat siksi vain toimistolle. */
   const onlyMine = staff.role === 'installer';
 
-  const [jobs, stats] = await Promise.all([
+  const [jobs, stats, health] = await Promise.all([
     sql<DayJob[]>`
       select j.id, j.job_number, j.starts_at, j.ends_at, j.status::text as status, j.title,
              j.address, j.postal_code, j.city, j.price_cents, j.notes,
@@ -91,6 +143,9 @@ export default async function TodayPage() {
       from tk.jobs j
       where j.status <> 'cancelled'
     `,
+    /* Asentajalle ei näytetä: hän ei voi korjata Google-tunnusta, ja
+       päivänäkymä on hänelle työlista eikä yrityksen tilannekuva. */
+    onlyMine ? Promise.resolve(null) : readHealthBanner(),
   ]);
 
   const s = stats[0];
@@ -120,6 +175,10 @@ export default async function TodayPage() {
           </Link>
         )}
       </header>
+
+      {/* Ennen tunnuslukuja: rikkoutunut vahvistusketju on tärkeämpi tieto
+          kuin päivän myynti, ja se on helppo ohittaa jos se on alempana. */}
+      {health && <HealthWarning health={health} />}
 
       {s && (
         <>
