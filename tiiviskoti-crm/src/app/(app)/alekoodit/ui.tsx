@@ -36,7 +36,7 @@ function ValueFields({ kind, amount, percent }: {
     </Field>
   ) : (
     <Field label="Alennus €">
-      <Input name="amount" type="number" min={1} max={1000} step={5} defaultValue={amount || 20} />
+      <Input name="amount" type="number" min={1} max={1000} step={1} defaultValue={amount || 20} />
       <input type="hidden" name="percent" value={0} />
     </Field>
   );
