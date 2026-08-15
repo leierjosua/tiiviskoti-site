@@ -15,14 +15,18 @@ export type ConversionRow = {
   price_cents: number;
 };
 
-/* Aikaleima UTC:na ja nimenomainen +00:00-siirtymä.
+/* Aikaleima UTC:na ja rivikohtainen siirtymä `+0000`.
 
    Google hyväksyy joko tiedoston alussa annetun `Parameters:TimeZone=`-rivin
    tai rivikohtaisen siirtymän. Rivikohtainen on turvallisempi: se ei riipu
    siitä mitä aikavyöhykettä Ads-tilillä sattuu olemaan, eikä kesäajan vaihdos
-   voi siirtää konversiota tunnilla väärään suuntaan. */
+   voi siirtää konversiota tunnilla väärään suuntaan.
+
+   HUOM: tiedostolatauksen muoto on `yyyy-MM-dd HH:mm:ssZ`, jossa Z on siirtymä
+   ILMAN kaksoispistettä (esim. `+0000`, `-0500`). Kaksoispisteellinen `+00:00`
+   on API:n muoto, ja latain hylkää sen ("Conversion Time on virheellinen"). */
 function adsTime(d: Date): string {
-  return `${d.toISOString().slice(0, 19).replace('T', ' ')}+00:00`;
+  return `${d.toISOString().slice(0, 19).replace('T', ' ')}+0000`;
 }
 
 /* Kenttien lainaus. gclid ja valuutta ovat aina turvallisia merkkejä, mutta
