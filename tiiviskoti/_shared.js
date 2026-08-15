@@ -543,6 +543,16 @@ if(mNextBtn) mNextBtn.addEventListener('click',()=>{ if(viewM===11){viewM=0;view
    kortin korkeus animoidaan uuteen mittaan, jottei alla oleva sisältö nytkähdä.
    Näkymän vaihtaminen ei nollaa mitään tilaa — takaisin pääsee aina. */
 const stepCard = document.getElementById('stepCard');
+/* Etusivun polku halutaan järjestyksessä postinumero → laskuri → kalenteri:
+   asiakas näkee palvelemmeko alueella ENNEN palveluvalintaa. HTML:ssä laskuri on
+   ensin (se on myös #laskuri-ankkuri ja "Laske hinta" -osio), joten siirretään
+   postinumerovaihe sen eteen ennen kuin vaiheet luetaan DOM:ista. Sivuilla joilla
+   ei ole molempia (ajanvaraus.html) tämä ei tee mitään. */
+if(stepCard){
+  const _calc=stepCard.querySelector('[data-step="calc"]');
+  const _postal=stepCard.querySelector('[data-step="postal"]');
+  if(_calc && _postal) stepCard.insertBefore(_postal, _calc);
+}
 /* Vaiheet luetaan DOM:ista, jolloin sama moottori ajaa etusivun täyden polun
    (laskuri → postinumero → aika → tiedot → valmis) ja ajanvaraus.html:n
    lyhyemmän polun ilman erillistä koodia. Kukin vaihe kertoo itse otsikkonsa,
@@ -652,14 +662,14 @@ function syncToDetails(){
   b.textContent = ok ? 'Jatka yhteystietoihin' : 'Valitse ensin aika';
 }
 
-/* Laskurin CTA vie postinumerovaiheeseen samalla kortilla. Vanhoilla sivuilla
-   cpBtn on linkki varaa.html:ään, jolloin tätä ei ole. */
+/* Laskurin CTA vie kalenterivaiheeseen samalla kortilla; postinumero on jo
+   kysytty ensimmäisessä vaiheessa. Vanhoilla sivuilla cpBtn on linkki
+   varaa.html:ään, jolloin tätä ei ole. */
 const cpBtnEl=document.getElementById('cpBtn');
 if(cpBtnEl && cpBtnEl.tagName==='BUTTON'){
   cpBtnEl.addEventListener('click',()=>{
     if(!(booking.count>0 && booking.total>0)) return;
-    if(window.__renderGatePrice) window.__renderGatePrice();
-    goStep('postal');
+    goStep('cal');
   });
 }
 
@@ -1027,10 +1037,11 @@ if(document.getElementById('tabKoti')){
     gShow.disabled=false; gShow.textContent=lbl;
 
     if(avail.state==='ready' || avail.state==='none'){
-      /* Etusivulla kalenteri on saman kortin seuraava vaihe. Vanhoilla
-         sivuilla (varaa.html) se on erillinen sivu, jolloin postinumero
-         kuljetetaan kyselyparametrina ettei sitä tarvitse syöttää uudelleen. */
-      if(stepIdx('cal')>=0) goStep('cal');
+      /* Alue vahvistettu → etusivulla siirrytään laskuriin (palveluvalinta);
+         kalenteri tulee vasta laskurin jälkeen. Vanhoilla sivuilla (varaa.html)
+         ei ole laskurivaihetta, jolloin postinumero kuljetetaan ajanvaraukseen
+         kyselyparametrina ettei sitä tarvitse syöttää uudelleen. */
+      if(stepIdx('calc')>=0) goStep('calc');
       else location.href = `ajanvaraus.html?pn=${encodeURIComponent(avail.postal)}`;
     }
   });
