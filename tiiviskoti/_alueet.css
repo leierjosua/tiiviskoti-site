@@ -391,12 +391,13 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 @media(max-width:620px){
   .sec{padding:52px 0}
 
-  /* NAV — läpinäkyvä hero:n päällä, kompakti oikea ryhmä (AaltoAir-tyyli) */
-  nav.top{position:fixed;top:0;left:0;right:0;background:transparent;border-bottom:1px solid transparent;backdrop-filter:none}
+  /* NAV — kompakti kiinteä palkki. Aluesivujen hero on VAALEA (toisin kuin
+     etusivun koko ruudun tumma hero), joten navi on normaali vaalea palkki
+     tummalla logolla ja burgerilla. Aiemmin tässä oli etusivulta kopioitu
+     läpinäkyvä valkoinen navi, jolloin logo ja burger jäivät näkymättömiin
+     vaaleaa heroa vasten (mobiilibugi). */
+  nav.top{background:var(--bg);border-bottom:1px solid var(--line);backdrop-filter:saturate(1.1)}
   nav.top .wrap{height:62px;gap:12px}
-  nav.top:not(.scr) .logo,nav.top:not(.scr) .logo .d,nav.top:not(.scr) .logo .b{color:#fff}
-  nav.top:not(.scr) .burger span{background:#fff}
-  nav.top.scr{background:var(--bg);border-color:var(--line);backdrop-filter:saturate(1.1)}
   .nlinks{display:none}
   /* Nappi pois navista puhelimessa: alalaidan .mcta-palkki kantaa saman CTA:n,
      ja 23px logo + nappi + burger eivat mahtuneet 390px leveyteen (nappi meni logon paalle). */

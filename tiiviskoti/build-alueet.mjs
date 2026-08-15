@@ -41,7 +41,7 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const nav = (R) => `<nav class="top" id="nav"><div class="wrap">
   <a href="${R}index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
   <div class="nlinks" id="nlinks">
-    <a href="${R}index.html#palvelut">Palvelut</a><a href="#laskuri">Hinta</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="${R}index.html#saasto">Säästö</a>
+    <a href="${R}index.html#palvelut">Palvelut</a><a href="#laskuri">Hinta</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="${R}meista.html">Meistä</a><a href="${R}index.html#saasto">Säästö</a>
   </div>
   <a href="tel:${TELH}" class="ntel">${TEL}</a>
   <a href="#laskuri" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
@@ -114,9 +114,9 @@ const IDX = readFileSync('index.html', 'utf8');
 
 function laskuriOsio(R, a) {
   const alku = IDX.indexOf('<section class="sec alt" id="laskuri">');
-  const loppu = IDX.indexOf('<!-- MIKSI ME -->');
+  const loppu = IDX.indexOf('<!-- /VARAUS -->');
   if (alku < 0 || loppu < 0 || loppu <= alku) {
-    throw new Error('Laskuriosiota ei löytynyt index.html:stä — tarkista onko #laskuri tai "MIKSI ME" -kommentti muuttunut.');
+    throw new Error('Laskuriosiota ei löytynyt index.html:stä — tarkista onko #laskuri tai "<!-- /VARAUS -->" -kommentti muuttunut.');
   }
   let sec = IDX.slice(alku, loppu).trimEnd();
 
@@ -450,6 +450,110 @@ ${skripti}
 `;
 }
 
+function meistaSivu() {
+  const R = '';
+  const url = `${SITE}/meista.html`;
+  const title = 'Meistä — TiivisKoti';
+  const desc = 'TiivisKoti on kahden tekijän yritys: sama porukka vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ovien ja ikkunoiden tiivistevaihto kiinteään hintaan Uudellamaalla ja Riihimäellä.';
+
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    '@id': `${url}#webpage`,
+    url,
+    name: title,
+    description: desc,
+    isPartOf: { '@id': `${SITE}/#website` },
+    inLanguage: 'fi-FI',
+  };
+
+  /* Nimiä ei ole vielä annettu, joten kortit näyttävät roolit. Kuvat: valkopaita
+     = omistaja, tumma paita = puheenjohtaja/asentaja (käyttäjän ohje 15.8.). */
+  const tiimi = [
+    {
+      img: 'meista-omistaja.jpg',
+      alt: 'TiivisKodin omistaja',
+      role: 'Omistaja &amp; asentaja',
+      bio: 'Vastaa yrityksestä ja hinnoittelusta — ja siitä että jokainen käynti hoidetaan juuri niin kuin on luvattu.',
+    },
+    {
+      img: 'meista-asentaja.jpg',
+      alt: 'TiivisKodin puheenjohtaja ja asentaja',
+      role: 'Puheenjohtaja &amp; asentaja',
+      bio: 'Tekee kartoitukset ja tiivisteasennukset itse työmaalla. Sinua palvelee sama henkilö alusta loppuun.',
+    },
+  ];
+
+  return `<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}" />
+<link rel="canonical" href="${url}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TiivisKoti" />
+<meta property="og:locale" content="fi_FI" />
+<meta property="og:url" content="${url}" />
+<meta property="og:title" content="${esc(title)}" />
+<meta property="og:description" content="${esc(desc)}" />
+<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#F6F7F3" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23217A4E'/%3E%3Crect x='31' y='20' width='38' height='60' rx='3' fill='none' stroke='%23F6F7F3' stroke-width='5'/%3E%3Crect x='35' y='20' width='4' height='60' fill='%23F6F7F3'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="_alueet.css" />
+<script type="application/ld+json">
+${JSON.stringify(ld, null, 2)}
+</script>
+</head>
+<body>
+${nav(R)}
+
+<div class="wrap crumb"><a href="index.html">Etusivu</a> › Meistä</div>
+
+<header class="sec" style="padding-bottom:0"><div class="wrap">
+  <div class="kicker">Meistä</div>
+  <h1 style="font-size:clamp(34px,4.8vw,54px);max-width:18ch">Kaksi tekijää, ei alihankintaa</h1>
+  <p class="sub" style="max-width:60ch">Meidät tapaat myös työmaalla: sama porukka vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ei myyntimiehiä eikä alihankintaa — siksi hinta on kiinteä ja vastuu selvä.</p>
+</div></header>
+
+<section class="sec" style="padding-top:clamp(20px,3vw,32px)"><div class="wrap">
+  <div class="rv" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;max-width:720px">
+    ${tiimi.map((t) => `<figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden">
+      <img src="img/${t.img}" alt="${esc(t.alt)}" width="800" height="1066" loading="lazy" style="width:100%;height:auto;display:block;aspect-ratio:4/5;object-fit:cover;object-position:center 22%" />
+      <figcaption style="padding:16px 18px">
+        <b style="display:block;font-size:17px;color:var(--ink)">${t.role}</b>
+        <span style="display:block;margin-top:6px;font-size:14.5px;line-height:1.55;color:var(--text)">${t.bio}</span>
+      </figcaption>
+    </figure>`).join('\n    ')}
+  </div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="ctaband rv">
+    <h2>Tiivistetään sinunkin kotisi</h2>
+    <p>Syötä postinumerosi laskuriin — näet heti palvelemmeko osoitettasi, kiinteän hinnan ja vapaat ajat.</p>
+    <div class="hero-cta">
+      <a href="index.html#laskuri" class="btn btn-p btn-lg">Laske hinta ja varaa aika</a>
+      <a href="tel:${TELH}" class="btn btn-o btn-lg on-deep">Soita ${TEL}</a>
+    </div>
+  </div>
+</div></section>
+
+${footer(R, null)}
+${skripti}
+<script type="module" src="${R}_shared.js"></script>
+</body>
+</html>
+`;
+}
+
 /* ---------- ajo ---------- */
 
 mkdirSync('toiminta-alueet', { recursive: true });
@@ -473,6 +577,9 @@ for (const f of readdirSync('toiminta-alueet')) {
 
 writeFileSync('toiminta-alueet.html', hubSivu());
 console.log('✓ toiminta-alueet.html');
+
+writeFileSync('meista.html', meistaSivu());
+console.log('✓ meista.html');
 
 ALUEET.forEach((a, i) => {
   writeFileSync(`toiminta-alueet/${a.slug}.html`, kuntaSivu(a, i));
