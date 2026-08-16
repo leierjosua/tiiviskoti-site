@@ -609,6 +609,7 @@ function goStepIdx(next, opts){
   const from=stepNodes[curIdx], to=stepNodes[next];
   const swap=()=>{
     from.hidden=true; to.hidden=false; curIdx=next; paintStepChrome();
+    if(window.tkTrack) window.tkTrack({type:'funnel', step:to.dataset.step});
     /* Kortin yläreuna samaan kohtaan kuin mistä lähdettiin, jotta näkymä
        todella vaihtuu "samassa paikassa" eikä hyppää sivun toiseen kohtaan. */
     if(!(opts&&opts.noScroll)){
@@ -1115,4 +1116,8 @@ if('IntersectionObserver' in window){
 setTimeout(()=>rvEls.forEach(el=>{ if(el.getBoundingClientRect().top<innerHeight) el.classList.add('in'); }),1000);
 const yrEl=document.getElementById('yr'); if(yrEl) yrEl.textContent=new Date().getFullYear();
 render(); renderCal(); renderSlots(); syncBookingSummary();
-if(document.getElementById('stepCard')) paintStepChrome();
+if(document.getElementById('stepCard')){
+  paintStepChrome();
+  /* Funnelin ensimmäinen vaihe (näkyvissä jo latauksessa) analytiikkaan. */
+  if(window.tkTrack && stepNodes[curIdx]) window.tkTrack({type:'funnel', step:stepNodes[curIdx].dataset.step});
+}

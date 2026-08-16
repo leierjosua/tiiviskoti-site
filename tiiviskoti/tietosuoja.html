@@ -419,6 +419,13 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     <p>Sivustollamme <b>ei käytetä seuranta- eikä analytiikkaevästeitä</b>. Emme seuraa kävijöitä sivustolta
       toiselle emmekä luovuta kävijätietoja mainosverkostoille profilointia varten. Siksi sivustolla ei ole
       evästebanneria eikä esimerkiksi Google Analyticsia.</p>
+    <p>Mittaamme sivuston käyttöä <b>evästeettömästi ja anonyymisti</b> oman järjestelmämme avulla:
+      kirjaamme muun muassa sivunäyttöjä, mistä kävijä saapui, laitetyypin sekä varauspolun etenemisen.
+      Tämä ei käytä evästeitä eikä tallenna mitään selaimesi muistiin. Kävijästä muodostetaan palvelimella
+      <b>päivittäin vaihtuva satunnaistunniste</b> (johdettu selaimen tiedoista), josta ei voi palata
+      sinuun — <b>IP-osoitettasi ei tallenneta</b>. Tietoja käytetään vain sivuston ja palvelun
+      kehittämiseen, ei profilointiin, eikä niitä luovuteta kolmansille. Käsittelyn perusteena on
+      oikeutettu etu.</p>
     <p>Selaimen muistiin tallennetaan seuraavat tiedot. Mitään niistä ei lähetetä kolmansille sivustolla
       käynnin aikana:</p>
     <ul>
@@ -491,7 +498,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <a href="index.html#laskuri" class="btn btn-p">Varaa aika</a>
 </div>
 
-<script type="module" src="_shared.js"></script>
+<script defer src="_analytics.js"></script><script type="module" src="_shared.js"></script>
 <script type="module" src="_mcta.js"></script>
 <script src="_chat.js" defer></script>
 </body>
