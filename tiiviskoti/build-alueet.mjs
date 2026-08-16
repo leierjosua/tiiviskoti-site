@@ -467,18 +467,20 @@ function meistaSivu() {
     inLanguage: 'fi-FI',
   };
 
-  /* Nimiä ei ole vielä annettu, joten kortit näyttävät roolit. Kuvat: valkopaita
-     = omistaja, tumma paita = puheenjohtaja/asentaja (käyttäjän ohje 15.8.). */
+  /* Kuvat: valkopaita = Josua (omistaja), tumma paita = Daniel (puheenjohtaja
+     ja asentaja). Kuvat rajattu 4:5 (800×1000). */
   const tiimi = [
     {
       img: 'meista-omistaja.jpg',
-      alt: 'TiivisKodin omistaja',
+      alt: 'Josua, TiivisKodin omistaja',
+      name: 'Josua',
       role: 'Omistaja &amp; asentaja',
       bio: 'Vastaa yrityksestä ja hinnoittelusta — ja siitä että jokainen käynti hoidetaan juuri niin kuin on luvattu.',
     },
     {
       img: 'meista-asentaja.jpg',
-      alt: 'TiivisKodin puheenjohtaja ja asentaja',
+      alt: 'Daniel, TiivisKodin puheenjohtaja ja asentaja',
+      name: 'Daniel',
       role: 'Puheenjohtaja &amp; asentaja',
       bio: 'Tekee kartoitukset ja tiivisteasennukset itse työmaalla. Sinua palvelee sama henkilö alusta loppuun.',
     },
@@ -526,10 +528,11 @@ ${nav(R)}
 <section class="sec" style="padding-top:clamp(20px,3vw,32px)"><div class="wrap">
   <div class="rv" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;max-width:720px">
     ${tiimi.map((t) => `<figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden">
-      <img src="img/${t.img}" alt="${esc(t.alt)}" width="800" height="1066" loading="lazy" style="width:100%;height:auto;display:block;aspect-ratio:4/5;object-fit:cover;object-position:center 22%" />
+      <img src="img/${t.img}" alt="${esc(t.alt)}" width="800" height="1000" loading="lazy" style="width:100%;height:auto;display:block;aspect-ratio:4/5;object-fit:cover;object-position:center" />
       <figcaption style="padding:16px 18px">
-        <b style="display:block;font-size:17px;color:var(--ink)">${t.role}</b>
-        <span style="display:block;margin-top:6px;font-size:14.5px;line-height:1.55;color:var(--text)">${t.bio}</span>
+        <b style="display:block;font-size:18px;color:var(--ink)">${t.name}</b>
+        <span style="display:block;margin-top:2px;font-size:14px;font-weight:700;color:var(--green)">${t.role}</span>
+        <span style="display:block;margin-top:9px;font-size:14.5px;line-height:1.55;color:var(--text)">${t.bio}</span>
       </figcaption>
     </figure>`).join('\n    ')}
   </div>
