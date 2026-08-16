@@ -8,23 +8,30 @@
 //   - hinnat: pricing.mjs MIN_PRICE + WINDOW_TIERS + TYPES + EXTRAS
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const DIR = 'C:/Users/josua/projects/loppusiivous-main-new/tiiviskoti';
+const DIR = import.meta.dirname;
 const src = readFileSync(`${DIR}/varaa.html`, 'utf8');
-const L = src.split('\n');
-const slice = (from, to) => L.slice(from - 1, to).join('\n');
 
-const css  = slice(14, 283);
-const nav  = slice(287, 295);
-let   foot = slice(337, 355);
-let   mcta = slice(357, 360);
+// Poimi jaetut osat varaa.html:stä HTML-markkereilla — EI kovakoodatuilla
+// rivinumeroilla. Rivinumerot ajautuivat aiemmin pieleen varaa.html:n
+// muuttuessa ja tuottivat sivun ilman navia, footeria ja canonicalia.
+const grab = (open, close, label) => {
+  const i = src.indexOf(open);
+  const j = i === -1 ? -1 : src.indexOf(close, i + open.length);
+  if (i === -1 || j === -1) {
+    throw new Error(`varaa.html: osaa "${label}" ei löytynyt (${open} … ${close})`);
+  }
+  return src.slice(i, j + close.length);
+};
 
+const styleBlock = grab('<style>', '</style>', 'style');
+const css  = styleBlock.slice('<style>'.length, -'</style>'.length); // sisältö ilman tageja
+const nav  = grab('<nav', '</nav>', 'nav');
+let   foot = grab('<footer', '</footer>', 'footer');
+const mcta = ''; // varaa.html:stä poistettiin alalaidan mobiili-CTA-palkki
+
+// Defensiivinen: jos varaa.html joskus taas käyttää #varaa-ankkureita, ohjaa ne
+// varaussivulle. Nykyisin no-op (footer käyttää jo /-linkkejä).
 foot = foot.replace(/href="#varaa"/g, 'href="varaa.html"');
-mcta = mcta.replace(/href="#varaa"/g, 'href="index.html#laskuri"');
-// Tällä sivulla Käyttöehdot on nykyinen sivu; Tietosuoja linkitetään.
-foot = foot.replace(
-  '<span><a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a></span>',
-  '<span><a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span>',
-);
 
 const extraCss = `
 /* ---------- käyttöehdot (sama tyyli kuin tietosuojaseloste) ---------- */
@@ -201,6 +208,21 @@ const out = `<!doctype html>
 <title>Käyttöehdot — TiivisKoti</title>
 <meta name="description" content="TiivisKodin palvelun käyttöehdot: hinnat, varaus ja vahvistus, maksuton peruutus, kuluttajan peruuttamisoikeus, maksu, takuu ja vastuu." />
 <meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://tiiviskoti.fi/kayttoehdot.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TiivisKoti" />
+<meta property="og:locale" content="fi_FI" />
+<meta property="og:url" content="https://tiiviskoti.fi/kayttoehdot.html" />
+<meta property="og:title" content="Käyttöehdot — TiivisKoti" />
+<meta property="og:description" content="TiivisKodin palvelun käyttöehdot: hinnat, varaus ja vahvistus, maksuton peruutus, kuluttajan peruuttamisoikeus, maksu, takuu ja vastuu." />
+<meta property="og:image" content="https://tiiviskoti.fi/img/og-tiiviskoti.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="TiivisKodin asentaja asentaa uutta karmitiivistettä oven karmiin" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Käyttöehdot — TiivisKoti" />
+<meta name="twitter:description" content="TiivisKodin palvelun käyttöehdot: hinnat, varaus ja vahvistus, maksuton peruutus, kuluttajan peruuttamisoikeus, maksu, takuu ja vastuu." />
+<meta name="twitter:image" content="https://tiiviskoti.fi/img/og-tiiviskoti.jpg" />
 <meta name="theme-color" content="#F6F7F3" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

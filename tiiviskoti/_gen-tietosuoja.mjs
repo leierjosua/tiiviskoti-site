@@ -2,23 +2,30 @@
 // niin että sivu on pikselintarkasti samaa designia eikä tyylejä duplikoida käsin.
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const DIR = 'C:/Users/josua/projects/loppusiivous-main-new/tiiviskoti';
+const DIR = import.meta.dirname;
 const src = readFileSync(`${DIR}/varaa.html`, 'utf8');
-const L = src.split('\n');
 
-// Lohkorajat varaa.html:stä (1-indeksoidut rivit -> 0-indeksoitu slice)
-const slice = (from, to) => L.slice(from - 1, to).join('\n');
-const css   = slice(14, 283);   // <style> sisältö ilman tageja
-const nav   = slice(287, 295);  // <nav> ... </nav>
-let   foot  = slice(337, 355);  // <footer> ... </footer>
-let   mcta  = slice(357, 360);  // mobiili-CTA-palkki
+// Poimi jaetut osat varaa.html:stä HTML-markkereilla — EI kovakoodatuilla
+// rivinumeroilla. Rivinumerot ajautuivat aiemmin pieleen varaa.html:n
+// muuttuessa ja tuottivat sivun ilman navia, footeria ja canonicalia.
+const grab = (open, close, label) => {
+  const i = src.indexOf(open);
+  const j = i === -1 ? -1 : src.indexOf(close, i + open.length);
+  if (i === -1 || j === -1) {
+    throw new Error(`varaa.html: osaa "${label}" ei löytynyt (${open} … ${close})`);
+  }
+  return src.slice(i, j + close.length);
+};
 
-// Tällä sivulla ei ole #varaa-osiota, joten ankkurit ohjataan varaussivulle.
+const styleBlock = grab('<style>', '</style>', 'style');
+const css  = styleBlock.slice('<style>'.length, -'</style>'.length); // sisältö ilman tageja
+const nav  = grab('<nav', '</nav>', 'nav');
+let   foot = grab('<footer', '</footer>', 'footer');
+const mcta = ''; // varaa.html:stä poistettiin alalaidan mobiili-CTA-palkki
+
+// Defensiivinen: jos varaa.html joskus taas käyttää #varaa-ankkureita, ohjaa ne
+// varaussivulle. Nykyisin no-op (footer periyttää /-linkit suoraan varaa.html:stä).
 foot = foot.replace(/href="#varaa"/g, 'href="varaa.html"');
-mcta = mcta.replace(/href="#varaa"/g, 'href="index.html#laskuri"');
-// Footerin Tietosuoja- ja Käyttöehdot-linkit periytyvät suoraan varaa.html:stä,
-// joten tässä ei tarvita korvausta. (Aiempi korvaus etsi tekstiä "Tietosuoja ·
-// Käyttöehdot", joka poistui varaa.html:stä 2026-07-26 — se ei siis tehnyt mitään.)
 
 const extraCss = `
 /* ---------- tietosuojaseloste ---------- */
@@ -127,13 +134,33 @@ const body = `
       tietosuojakehykseen (Data Privacy Framework). Tietokantamme sijaitsee Yhdistyneessä kuningaskunnassa,
       jonka tietosuojan tason Euroopan komissio on todennut riittäväksi.</p>
 
-    <h2>7. Evästeet</h2>
-    <p>Sivustollamme <b>ei käytetä seuranta-, analytiikka- eikä mainosevästeitä</b>. Emme seuraa kävijöitä
-      emmekä jaa kävijätietoja mainosverkostoille. Siksi sivustolla ei ole evästebanneria.</p>
-    <p>Käytämme yhtä selaimen istuntomuistiin (sessionStorage) tallennettavaa tietoa nimeltä
-      <code>tk_booking</code>. Se säilyttää hintalaskurissa tekemäsi valinnat, kun siirryt varaussivulle, ja
-      poistuu kun suljet selainvälilehden. Tietoa ei lähetetä kolmansille. Kyseessä on palvelun pyytämäsi
-      toiminnon kannalta välttämätön tieto, joten se ei edellytä suostumusta.</p>
+    <h2>7. Evästeet ja mainonnan mittaus</h2>
+    <p>Sivustollamme <b>ei käytetä seuranta- eikä analytiikkaevästeitä</b>. Emme seuraa kävijöitä sivustolta
+      toiselle emmekä luovuta kävijätietoja mainosverkostoille profilointia varten. Siksi sivustolla ei ole
+      evästebanneria eikä esimerkiksi Google Analyticsia.</p>
+    <p>Mittaamme sivuston käyttöä <b>evästeettömästi ja anonyymisti</b> oman järjestelmämme avulla:
+      kirjaamme muun muassa sivunäyttöjä, mistä kävijä saapui, laitetyypin sekä varauspolun etenemisen.
+      Tämä ei käytä evästeitä eikä tallenna mitään selaimesi muistiin. Kävijästä muodostetaan palvelimella
+      <b>päivittäin vaihtuva satunnaistunniste</b> (johdettu selaimen tiedoista), josta ei voi palata
+      sinuun — <b>IP-osoitettasi ei tallenneta</b>. Tietoja käytetään vain sivuston ja palvelun
+      kehittämiseen, ei profilointiin, eikä niitä luovuteta kolmansille. Käsittelyn perusteena on
+      oikeutettu etu.</p>
+    <p>Selaimen muistiin tallennetaan seuraavat tiedot. Mitään niistä ei lähetetä kolmansille sivustolla
+      käynnin aikana:</p>
+    <ul>
+      <li><code>tk_booking</code> (istuntomuisti) — säilyttää hintalaskurissa tekemäsi valinnat, kun siirryt
+        varaussivulle. Poistuu kun suljet selainvälilehden. Palvelun pyytämäsi toiminnon kannalta
+        välttämätön tieto, joten se ei edellytä suostumusta.</li>
+      <li><code>tk_campaign</code> ja <code>tk_gclid</code> (paikallinen muisti, 30 vrk) — merkintä siitä,
+        mistä mainoksesta tulit sivustolle. Tallennetaan vain jos saavuit mainoslinkistä. Näitä ei käytetä
+        profilointiin eikä sinun tunnistamiseesi.</li>
+    </ul>
+    <p><b>Jos teet varauksen mainoslinkistä tultuasi</b>, ilmoitamme Google Adsille että kyseinen
+      mainosklikki johti kauppaan. Ilmoitus sisältää mainosklikin tunnisteen, ajankohdan ja kaupan arvon —
+      <b>ei nimeäsi, yhteystietojasi eikä osoitettasi</b>. Käsittelyn perusteena on oikeutettu etu (oman
+      mainontamme tuloksellisuuden mittaaminen). Jos et tee varausta, Googlelle ei ilmoiteta mitään.
+      Voit estää tämän tyhjentämällä selaimesi paikallisen muiston tai käyttämällä sivustoa ilman
+      mainoslinkkiä.</p>
 
     <h2>8. Oikeutesi</h2>
     <p>Sinulla on oikeus:</p>
@@ -176,6 +203,21 @@ const out = `<!doctype html>
 <title>Tietosuojaseloste — TiivisKoti</title>
 <meta name="description" content="Miten TiivisKoti käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat oikeutesi." />
 <meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://tiiviskoti.fi/tietosuoja.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TiivisKoti" />
+<meta property="og:locale" content="fi_FI" />
+<meta property="og:url" content="https://tiiviskoti.fi/tietosuoja.html" />
+<meta property="og:title" content="Tietosuojaseloste — TiivisKoti" />
+<meta property="og:description" content="Miten TiivisKoti käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat oikeutesi." />
+<meta property="og:image" content="https://tiiviskoti.fi/img/og-tiiviskoti.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="TiivisKodin asentaja asentaa uutta karmitiivistettä oven karmiin" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tietosuojaseloste — TiivisKoti" />
+<meta name="twitter:description" content="Miten TiivisKoti käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat oikeutesi." />
+<meta name="twitter:image" content="https://tiiviskoti.fi/img/og-tiiviskoti.jpg" />
 <meta name="theme-color" content="#F6F7F3" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
