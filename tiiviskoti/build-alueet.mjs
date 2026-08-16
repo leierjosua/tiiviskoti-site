@@ -39,9 +39,9 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 /* ---------- yhteiset palaset ---------- */
 
 const nav = (R) => `<nav class="top" id="nav"><div class="wrap">
-  <a href="${R}index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
+  <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
   <div class="nlinks" id="nlinks">
-    <a href="${R}index.html#palvelut">Palvelut</a><a href="#laskuri">Hinta</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="${R}meista.html">Meistä</a><a href="${R}index.html#saasto">Säästö</a>
+    <a href="/#palvelut">Palvelut</a><a href="#laskuri">Hinta</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="${R}meista.html">Meistä</a><a href="/#saasto">Säästö</a>
   </div>
   <a href="tel:${TELH}" class="ntel">${TEL}</a>
   <a href="#laskuri" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
@@ -60,12 +60,12 @@ const alueLinkit = (R, paitsi) => ALUEET
 const footer = (R, paitsi) => `<footer class="mfoot"><div class="wrap">
   <div class="mf-grid">
     <div class="mf-brand">
-      <a href="${R}index.html" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
+      <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
       <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
       <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Vastuuvakuutettu · 2 vuoden takuu työlle</div>
     </div>
-    <div class="mf-col"><h4>Palvelut</h4><a href="${R}index.html#palvelut">Ovet</a><a href="${R}index.html#palvelut">Ikkunat</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
-    <div class="mf-col"><h4>Yritys</h4><a href="${R}index.html#miksi">Miksi me</a><a href="${R}index.html#saasto">Säästöarvio</a><a href="${R}index.html#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:${TELH}">${TEL}</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
   <div class="mf-cities">
@@ -264,7 +264,7 @@ ${JSON.stringify(ld, null, 2)}
 <body>
 ${nav(R)}
 
-<div class="wrap crumb"><a href="${R}index.html">Etusivu</a> › <a href="${R}toiminta-alueet.html">Toiminta-alueet</a> › ${a.name}</div>
+<div class="wrap crumb"><a href="/">Etusivu</a> › <a href="${R}toiminta-alueet.html">Toiminta-alueet</a> › ${a.name}</div>
 
 <header class="hero"><div class="wrap hero-grid">
   <div>
@@ -414,7 +414,7 @@ ${JSON.stringify(ld, null, 2)}
 <body>
 ${nav(R)}
 
-<div class="wrap crumb"><a href="index.html">Etusivu</a> › Toiminta-alueet</div>
+<div class="wrap crumb"><a href="/">Etusivu</a> › Toiminta-alueet</div>
 
 <header class="sec" style="padding-bottom:0"><div class="wrap">
   <div class="kicker">Toiminta-alueet</div>
@@ -436,7 +436,7 @@ ${laskuriOsio(R, null)}
     <h2>Etkö löydä kuntaasi?</h2>
     <p>Palvelemme ${ALUEET.length}:a kuntaa Uudellamaalla ja Riihimäellä. Syötä postinumerosi laskuriin, niin näet heti palvelemmeko osoitettasi, mitkä ajat ovat vapaana ja mahdollisen matkalisän.</p>
     <div class="hero-cta">
-      <a href="index.html#laskuri" class="btn btn-p btn-lg">Tarkista postinumerolla</a>
+      <a href="/#laskuri" class="btn btn-p btn-lg">Tarkista postinumerolla</a>
       <a href="tel:${TELH}" class="btn btn-o btn-lg on-deep">Soita ${TEL}</a>
     </div>
   </div>
@@ -517,7 +517,7 @@ ${JSON.stringify(ld, null, 2)}
 <body>
 ${nav(R)}
 
-<div class="wrap crumb"><a href="index.html">Etusivu</a> › Meistä</div>
+<div class="wrap crumb"><a href="/">Etusivu</a> › Meistä</div>
 
 <header class="sec" style="padding-bottom:0"><div class="wrap">
   <div class="kicker">Meistä</div>
@@ -543,7 +543,7 @@ ${nav(R)}
     <h2>Tiivistetään sinunkin kotisi</h2>
     <p>Syötä postinumerosi laskuriin — näet heti palvelemmeko osoitettasi, kiinteän hinnan ja vapaat ajat.</p>
     <div class="hero-cta">
-      <a href="index.html#laskuri" class="btn btn-p btn-lg">Laske hinta ja varaa aika</a>
+      <a href="/#laskuri" class="btn btn-p btn-lg">Laske hinta ja varaa aika</a>
       <a href="tel:${TELH}" class="btn btn-o btn-lg on-deep">Soita ${TEL}</a>
     </div>
   </div>

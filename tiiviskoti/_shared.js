@@ -815,7 +815,7 @@ function gateBookingOnCalculator(){
       note=document.createElement('div');
       note.id='bNeedCalc';
       note.style.cssText='background:var(--green-soft);border:1px solid var(--line2);border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:14.5px;line-height:1.5';
-      note.innerHTML='Valitse ensin ovet ja ikkunat hintalaskurista — näet kiinteän hinnan ennen varausta. <a href="index.html#laskuri" style="color:var(--green);font-weight:700;text-decoration:underline">Siirry laskuriin</a>';
+      note.innerHTML='Valitse ensin ovet ja ikkunat hintalaskurista — näet kiinteän hinnan ennen varausta. <a href="/#laskuri" style="color:var(--green);font-weight:700;text-decoration:underline">Siirry laskuriin</a>';
       form.parentNode.insertBefore(note, form);
     }
     note.style.display='block';
@@ -825,7 +825,7 @@ const bFormEl=document.getElementById('bForm');
 if(bFormEl) bFormEl.addEventListener('submit',async e=>{
   e.preventDefault(); const err=document.getElementById('bErr'); err.style.display='none';
   if(!(booking.count>0 && booking.total>0)){
-    err.innerHTML='Valitse ensin ovet tai ikkunat hintalaskurista. <a href="index.html#laskuri" style="text-decoration:underline;font-weight:700">Siirry laskuriin</a>';
+    err.innerHTML='Valitse ensin ovet tai ikkunat hintalaskurista. <a href="/#laskuri" style="text-decoration:underline;font-weight:700">Siirry laskuriin</a>';
     err.style.display='block'; return;
   }
   if(avail.state==='unserved'){
@@ -884,7 +884,7 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     const data=await r.json().catch(()=>({}));
     if(!r.ok || !data.ok){
       if(data && data.error==='no_items'){
-        err.innerHTML='Varaus vaatii vähintään yhden oven tai ikkunan. <a href="index.html#laskuri" style="text-decoration:underline;font-weight:700">Valitse kohteet laskurista</a>';
+        err.innerHTML='Varaus vaatii vähintään yhden oven tai ikkunan. <a href="/#laskuri" style="text-decoration:underline;font-weight:700">Valitse kohteet laskurista</a>';
       } else if(data && data.error==='slot_taken'){
         /* Joku ehti varata saman ajan. Haetaan vapaat ajat uudelleen, jotta
            asiakas näkee heti mitä on jäljellä eikä yritä samaa aikaa toiste. */
@@ -1009,7 +1009,7 @@ if(document.getElementById('tabKoti')){
     const fee = (avail.travelFeeCents||0)/100;
     if(q.total<=0){
       p.textContent='Valitse kohteet';
-      n.innerHTML='<a href="index.html#laskuri" style="color:var(--green);font-weight:700">Siirry hintalaskuriin</a>';
+      n.innerHTML='<a href="/#laskuri" style="color:var(--green);font-weight:700">Siirry hintalaskuriin</a>';
       m.textContent='Näet kiinteän hinnan ennen varausta';
       e.style.display='none';
       return;
