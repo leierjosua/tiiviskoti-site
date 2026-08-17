@@ -1090,12 +1090,15 @@ if(document.getElementById('tabKoti')){
     gShow.disabled=false; gShow.textContent=lbl;
 
     if(avail.state==='ready' || avail.state==='none'){
-      /* Alue vahvistettu → etusivulla siirrytään laskuriin (palveluvalinta);
-         kalenteri tulee vasta laskurin jälkeen. Vanhoilla sivuilla (varaa.html)
-         ei ole laskurivaihetta, jolloin postinumero kuljetetaan ajanvaraukseen
-         kyselyparametrina ettei sitä tarvitse syöttää uudelleen. */
+      /* Alue vahvistettu → siirrytään laskuriin (palveluvalinta); kalenteri
+         tulee vasta laskurin jälkeen. Etusivulla laskuri on saman kortin vaihe.
+         varaa.html:ssä ei ole laskurivaihetta, joten ohjataan etusivun laskuriin
+         ja postinumero kuljetetaan mukana (?pn=), ettei sitä syötetä kahdesti —
+         näin varaus ei koskaan ohita palveluvalintaa (muuten hinta jäisi 0 €).
+         Ennen tässä mentiin suoraan ajanvaraukseen (postinumero → aika) ohi
+         laskurin, jolloin kohteita ei valittu ja varaus kaatui/jäi tyhjäksi. */
       if(stepIdx('calc')>=0) goStep('calc');
-      else location.href = `ajanvaraus.html?pn=${encodeURIComponent(avail.postal)}`;
+      else location.href = `/?pn=${encodeURIComponent(avail.postal)}#laskuri`;
     }
   });
 
@@ -1129,6 +1132,20 @@ if(!document.getElementById('calcTypes')){
      ja aiemmin kutsuttuna kortti näyttäisi "Valitse kohteet" vaikka valinta
      olisi olemassa. */
   if(window.__renderGatePrice) window.__renderGatePrice();
+}
+
+/* varaa.html ohjaa etusivun laskuriin postinumeron kanssa (?pn=). Esitäytetään
+   postinumero ja siirrytään suoraan laskurivaiheeseen, ettei sitä tarvitse
+   syöttää kahdesti — flow on silloin postinumero → laskuri → aika. Vain
+   etusivulla, jolla on sekä postinumerokenttä että laskurivaihe. */
+if(document.getElementById('fPostal') && stepIdx('calc')>=0){
+  const pn0 = new URLSearchParams(location.search).get('pn') || '';
+  if(/^\d{5}$/.test(pn0)){
+    const inp=document.getElementById('fPostal'); if(inp) inp.value=pn0;
+    avail.postal=pn0;
+    loadAvailability();
+    goStep('calc',{noScroll:true});
+  }
 }
 
 /* Ajanvaraussivu (ajanvaraus.html) saa postinumeron kyselyparametrina
