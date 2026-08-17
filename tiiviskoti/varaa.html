@@ -382,7 +382,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 /* --- Vaihekortti: sama moottori kuin etusivulla (laskuri → postinumero → aika →
    yhteystiedot → kuittaus). Sivu ei vaihdu, kortin sisältö vaihtuu paikallaan. --- */
 .order-note{display:none;font-size:12px;line-height:1.5;color:var(--mute);padding:12px 14px;border-top:1px solid var(--line)}
-.book-wrap{margin:clamp(28px,3.5vw,42px) auto 0}
+.book-wrap{display:block;grid-template-columns:none;margin:clamp(28px,3.5vw,42px) auto 0}
 .stepcard{max-width:560px;margin-inline:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;box-shadow:var(--sh);overflow:hidden}
 .stepcard.wide{max-width:var(--max);background:none;border:none;box-shadow:none;padding:0;overflow:visible}
 .stepcard-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;min-height:26px}
@@ -403,6 +403,16 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .steprecap .when{font-weight:800;font-size:15px;color:var(--ink);line-height:1.3}
 .steprecap .svc{font-size:13px;color:var(--text);margin-top:2px}
 .steprecap .chg{flex:0 0 auto;background:none;border:none;padding:0;color:var(--green);font-family:inherit;font-weight:700;font-size:13.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+/* Laskurin rivien lisätyylit (etusivun kanssa yhtenevät) */
+.wtype-tier{display:block;margin-top:3px;color:var(--green);font-weight:600}
+.wtype-price s{opacity:.55;font-weight:600}
+.cp-unit{font-size:12px;color:var(--dmute);font-weight:600}
+.extra-note{font-weight:600;font-size:11.5px;color:var(--mute)}
+.extra.extra-q{cursor:default;padding-left:51px;grid-column:1/-1;border-left:none}
+.extra-stp{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+.extra-stp .stp{width:27px;height:27px;border-radius:7px;font-size:16px}
+.extra-stp .qty{font-size:15px;min-width:18px}
+.extra.off{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 <body>
