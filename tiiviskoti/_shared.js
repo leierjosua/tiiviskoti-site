@@ -81,6 +81,53 @@ function readGclid(){
   try{ localStorage.setItem(GCLID_KEY, JSON.stringify({ v, t: Date.now() })); }catch(_){}
 })();
 
+/* ---------- Meta-klikin tunnisteet (fbclid → _fbc, _fbp) ----------
+   Sama periaate kuin gclidissä: talletetaan Facebook/Instagram-mainosklikin
+   tunniste ja lähetetään vasta toteutuneen varauksen/liidin mukana Metan
+   CAPIin (api/create-booking, api/create-lead). Selaimeen ei ladata Meta
+   Pixeliä eikä aseteta seurantaevästeitä — tietosuojaseloste pysyy voimassa.
+
+   _fbc rakennetaan fbclidistä Metan kaavalla fb.1.<aikaleima>.<fbclid>. Jos
+   sivulla joskus on Meta Pixel, se asettaa _fbp/_fbc-evästeet ja ne luetaan
+   suoraan; muuten fbclid-pohjainen arvo riittää osumaan. 90 pv = Metan
+   attribuutioikkuna; ensimmäinen klikki voittaa kuten kampanjatunnisteessa. */
+const FBC_KEY = 'tk_fbc';
+const FBCLID_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+const FBCLID_RE = /^[A-Za-z0-9._-]{5,400}$/;
+
+function readCookie(name){
+  try{
+    const m = document.cookie.match(
+      new RegExp('(?:^|; )' + name.replace(/[.$?*|{}()\[\]\\/+^]/g, '\\$&') + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : undefined;
+  }catch(_){ return undefined; }
+}
+
+function readFbc(){
+  // Selaimen oma _fbc-eväste voittaa, jos Pixel joskus lisätään.
+  const cookie = readCookie('_fbc');
+  if(cookie) return cookie;
+  try{
+    const s = JSON.parse(localStorage.getItem(FBC_KEY) || 'null');
+    if(!s || !s.v) return undefined;
+    if(Date.now() - (s.t || 0) > FBCLID_MAX_AGE_MS) return undefined;
+    return s.v;
+  }catch(_){ return undefined; }
+}
+
+// _fbp syntyy vain jos Meta Pixel on käytössä; ilman sitä palautuu undefined.
+function readFbp(){ return readCookie('_fbp'); }
+
+(function captureFbclid(){
+  let v;
+  try{ v = new URLSearchParams(location.search).get('fbclid'); }catch(_){ return; }
+  if(!v || !FBCLID_RE.test(v)) return;
+  if(readCookie('_fbc')) return;   // Pixel hoiti jo
+  if(readFbc()) return;            // ensimmäinen klikki voittaa
+  const fbc = `fb.1.${Date.now()}.${v}`;
+  try{ localStorage.setItem(FBC_KEY, JSON.stringify({ v: fbc, t: Date.now() })); }catch(_){}
+})();
+
 function readCampaign(){
   try{
     const s = JSON.parse(localStorage.getItem(CAMPAIGN_KEY) || 'null');
@@ -875,6 +922,11 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
        työn kentäksi CRM:ään, josta se viedään Adsiin konversiona. Peruttu
        varaus vie gclidin mukanaan — peruttua kauppaa ei raportoida. */
     gclid: readGclid(),
+    /* Meta-klikin tunnisteet CAPIa varten, jos kävijä tuli Facebook/Instagram
+       -mainoksesta. Sama logiikka kuin gclidillä: pelkkä tunniste, lähetetään
+       vain toteutuneen varauksen mukana. */
+    fbc: readFbc(),
+    fbp: readFbp(),
   };
 
   try{

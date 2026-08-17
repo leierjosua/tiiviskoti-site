@@ -5,6 +5,8 @@
 //
 // Käyttää service_role-avainta vain palvelinpuolella, kuten create-booking.mjs.
 
+import { sendMetaEvent, buildUserData } from '../meta-capi.mjs';
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -141,6 +143,21 @@ export default async function handler(req, res) {
     await queueLeadNotification(row.id, {
       contact, email, phone, role, yhtio, addr, doors, when, message,
       postalCode: postalFrom(addr), pageUrl,
+    });
+
+    /* Meta CAPI: taloyhtiön tarjouspyyntö on liidi (Lead). Sama periaate kuin
+       varauksessa — vain toteutuneesta liidistä, ei kaadu jos Meta pettää. */
+    await sendMetaEvent({
+      eventName: 'Lead',
+      eventId: row.id,
+      eventSourceUrl: pageUrl || req.headers?.referer || 'https://tiiviskoti.fi/taloyhtio.html',
+      userData: buildUserData({
+        email, phone, name: contact, postal: postalFrom(addr),
+        fbc: typeof body.fbc === 'string' ? body.fbc : undefined,
+        fbp: typeof body.fbp === 'string' ? body.fbp : undefined,
+        req,
+      }),
+      customData: { content_category: 'taloyhtio-lead' },
     });
 
     const ref = 'TK-YHT-' + String(row.id).replace(/-/g, '').slice(0, 6).toUpperCase();

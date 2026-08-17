@@ -584,6 +584,16 @@ faqEl.addEventListener('click',e=>{
   if(!open){ q.classList.add('op'); a.style.maxHeight=a.scrollHeight+'px'; }
 });
 
+/* Meta-klikin tunnisteet (fbclid → _fbc) CAPIa varten. Tämä sivu ei lataa
+   _shared.js:ää, joten sama logiikka on tässä pienenä itsenäisenä versiona:
+   talletetaan fbclid ja lähetetään se toteutuneen liidin mukana. Ei Pixeliä,
+   ei seurantaevästeitä — sama periaate kuin gclidillä muualla sivustolla. */
+const TK_FBC_KEY='tk_fbc', TK_FBC_MAX_AGE=90*24*60*60*1000;
+function tkCookie(n){try{const m=document.cookie.match(new RegExp('(?:^|; )'+n.replace(/[.$?*|{}()\[\]\\/+^]/g,'\\$&')+'=([^;]*)'));return m?decodeURIComponent(m[1]):undefined;}catch(_){return undefined;}}
+function tkFbc(){const c=tkCookie('_fbc');if(c)return c;try{const s=JSON.parse(localStorage.getItem(TK_FBC_KEY)||'null');if(!s||!s.v)return undefined;if(Date.now()-(s.t||0)>TK_FBC_MAX_AGE)return undefined;return s.v;}catch(_){return undefined;}}
+function tkFbp(){return tkCookie('_fbp');}
+(function(){let v;try{v=new URLSearchParams(location.search).get('fbclid');}catch(_){return;}if(!v||!/^[A-Za-z0-9._-]{5,400}$/.test(v))return;if(tkCookie('_fbc')||tkFbc())return;try{localStorage.setItem(TK_FBC_KEY,JSON.stringify({v:`fb.1.${Date.now()}.${v}`,t:Date.now()}));}catch(_){}})();
+
 /* tarjouspyyntölomake */
 const tForm=document.getElementById('tForm');
 tForm.addEventListener('submit',async e=>{
@@ -602,6 +612,9 @@ tForm.addEventListener('submit',async e=>{
     phone: val('qPhone'), email, addr: val('qAddr'),
     doors: val('qDoors'), when: val('qWhen'), message: val('qMsg'),
     pageUrl: location.href,
+    /* Meta-klikin tunnisteet CAPIa varten, jos taloyhtiön edustaja tuli
+       Facebook/Instagram-mainoksesta. */
+    fbc: tkFbc(), fbp: tkFbp(),
   };
 
   try{

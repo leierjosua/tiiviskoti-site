@@ -17,6 +17,7 @@
 // Supabase-tunnuksia. Vanhat taulut jäävät paikoilleen historiadataksi.
 
 import { computePricing } from '../pricing.mjs';
+import { sendMetaEvent, buildUserData } from '../meta-capi.mjs';
 
 const CRM_BASE_URL = process.env.CRM_BASE_URL;
 const BOOKING_SECRET = process.env.BOOKING_SECRET;
@@ -212,6 +213,29 @@ export default async function handler(req, res) {
     if (reservation.calendarCreated === false) {
       console.error('create-booking: kalenteritapahtumaa EI luotu:', reservation.jobNumber, reservation.calendarError);
     }
+
+    /* Meta CAPI: ilmoitetaan toteutunut varaus (Schedule) palvelimelta.
+       Sama periaate kuin gclidissä — vain oikeasta kaupasta, vasta kun se
+       tapahtui. sendMetaEvent ei koskaan heitä eikä muuta vastausta, joten
+       markkinointiseuranta ei voi kaataa jo tehtyä varausta. event_id =
+       jobId, jotta mahdollinen selain-Pixel deduplikoituu tähän. */
+    await sendMetaEvent({
+      eventName: 'Schedule',
+      eventId: reservation.jobId || reservation.jobNumber,
+      eventSourceUrl: req.headers?.referer || 'https://tiiviskoti.fi/varaa.html',
+      userData: buildUserData({
+        email, phone, name, postal,
+        fbc: typeof body.fbc === 'string' ? body.fbc : undefined,
+        fbp: typeof body.fbp === 'string' ? body.fbp : undefined,
+        req,
+      }),
+      customData: {
+        currency: 'EUR',
+        value: (reservation.totalCents ?? workCents) / 100,
+        content_category: 'booking',
+        num_items: quote.count,
+      },
+    });
 
     return res.status(200).json({
       ok: true,
