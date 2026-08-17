@@ -1138,13 +1138,17 @@ if(!document.getElementById('calcTypes')){
    postinumero ja siirrytään suoraan laskurivaiheeseen, ettei sitä tarvitse
    syöttää kahdesti — flow on silloin postinumero → laskuri → aika. Vain
    etusivulla, jolla on sekä postinumerokenttä että laskurivaihe. */
-if(document.getElementById('fPostal') && stepIdx('calc')>=0){
+if(document.getElementById('fPostal') && document.getElementById('gShow') && stepIdx('calc')>=0){
   const pn0 = new URLSearchParams(location.search).get('pn') || '';
   if(/^\d{5}$/.test(pn0)){
-    const inp=document.getElementById('fPostal'); if(inp) inp.value=pn0;
-    avail.postal=pn0;
-    loadAvailability();
-    goStep('calc',{noScroll:true});
+    const inp=document.getElementById('fPostal');
+    inp.value=pn0;
+    /* Sama polku kuin käyttäjän klikatessa "Näytä vapaat ajat": input-tapahtuma
+       asettaa avail.postalin ja tarkistaa alueen, minkä jälkeen gShow-klikki
+       siirtää laskurivaiheeseen (postinumero → laskuri → aika). Viive antaa
+       aluetarkistuksen (250 ms debounce) ehtiä ennen klikkiä. */
+    inp.dispatchEvent(new Event('input', { bubbles: true }));
+    setTimeout(() => { const b=document.getElementById('gShow'); if(b) b.click(); }, 600);
   }
 }
 
