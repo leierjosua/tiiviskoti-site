@@ -214,13 +214,15 @@ export default async function handler(req, res) {
       console.error('create-booking: kalenteritapahtumaa EI luotu:', reservation.jobNumber, reservation.calendarError);
     }
 
-    /* Meta CAPI: ilmoitetaan toteutunut varaus (Schedule) palvelimelta.
+    /* Meta CAPI: ilmoitetaan toteutunut varaus ostoksena (Purchase) palvelimelta.
+       Varaus on kiinteähintainen työtilaus = maksullinen kauppa, joten sitä
+       optimoidaan Metan Purchase-tapahtumana (arvo = varauksen hinta EUR).
        Sama periaate kuin gclidissä — vain oikeasta kaupasta, vasta kun se
        tapahtui. sendMetaEvent ei koskaan heitä eikä muuta vastausta, joten
        markkinointiseuranta ei voi kaataa jo tehtyä varausta. event_id =
        jobId, jotta mahdollinen selain-Pixel deduplikoituu tähän. */
     await sendMetaEvent({
-      eventName: 'Schedule',
+      eventName: 'Purchase',
       eventId: reservation.jobId || reservation.jobNumber,
       eventSourceUrl: req.headers?.referer || 'https://tiiviskoti.fi/varaa.html',
       userData: buildUserData({
