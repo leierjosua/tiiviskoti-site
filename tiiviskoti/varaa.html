@@ -413,6 +413,26 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .extra-stp .stp{width:27px;height:27px;border-radius:7px;font-size:16px}
 .extra-stp .qty{font-size:15px;min-width:18px}
 .extra.off{opacity:.4;cursor:not-allowed}
+/* Mobiili: laskuri yhteen sarakkeeseen ja yhteenveto kiinteäksi hintapalkiksi
+   navin alle (order:-1 + sticky), jotta hinta näkyy koko ajan palveluita
+   valitessa. Sama käytös kuin etusivulla. */
+@media(max-width:960px){.calc-wrap{grid-template-columns:1fr;gap:36px}.quote{position:static}}
+@media(max-width:620px){
+  .stepcard{overflow:clip}
+  .calc-wrap{gap:16px}
+  .quote{order:-1;position:sticky;top:62px;z-index:30;padding:13px 15px;border-radius:14px;display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;box-shadow:0 14px 28px -16px rgba(0,0,0,.6)}
+  .q-t,.rc-lines,.q-meta,.q-note{display:none}
+  .q-total{grid-column:1;grid-row:1;margin:0;padding:0;border-top:none}
+  .q-total .pt{font-size:10.5px}
+  .q-total .pv{font-size:28px;margin-top:1px}
+  .q-total .pv small{font-size:.44em}
+  .q-net{grid-column:1;grid-row:2;margin-top:2px;font-size:12.5px;line-height:1.3}
+  .qn-l{display:none}.qn-s{display:inline}
+  .q-btn{grid-column:2;grid-row:1/span 2;width:auto;margin-top:0;padding:13px 18px;font-size:15px;white-space:nowrap}
+  .q-btn-long{display:none}
+  .order-note{display:block}
+  .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
+}
 </style>
 </head>
 <body>
