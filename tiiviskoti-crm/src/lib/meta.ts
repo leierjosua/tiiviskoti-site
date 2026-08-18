@@ -43,13 +43,21 @@ function sumActions(actions: Action[] | undefined, types: string[]): number {
   return actions.reduce((n, a) => (types.includes(a.action_type) ? n + Number(a.value || 0) : n), 0);
 }
 
-/** Hakee mainoskohtaiset insightsit annetulta jaksolta (oletus 30 pv). */
-export async function getMetaStats(datePreset = 'last_30d'): Promise<MetaStats> {
+/** Hakee mainoskohtaiset insightsit viimeisiltä `days` päivältä (ml. tänään).
+    Metan date_preset=last_30d päättyy EILISEEN, joten tämän päivän kulut eivät
+    näkyisi. Käytämme nimenomaista time_rangea, jotta tänään pyörivät mainokset
+    näkyvät heti. */
+export async function getMetaStats(days = 30): Promise<MetaStats> {
   if (!TOKEN) return { configured: false, rows: [], totals: zero(), error: 'META_ACCESS_TOKEN puuttuu' };
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  const until = new Date();
+  const since = new Date(until);
+  since.setDate(since.getDate() - (days - 1));
+  const timeRange = JSON.stringify({ since: fmt(since), until: fmt(until) });
   const fields = 'ad_id,ad_name,spend,impressions,clicks,inline_link_clicks,actions';
   const url =
     `https://graph.facebook.com/${GV}/act_${ACCOUNT}/insights` +
-    `?level=ad&date_preset=${datePreset}&fields=${encodeURIComponent(fields)}` +
+    `?level=ad&time_range=${encodeURIComponent(timeRange)}&fields=${encodeURIComponent(fields)}` +
     `&limit=500&access_token=${encodeURIComponent(TOKEN)}`;
   try {
     const res = await fetch(url, { cache: 'no-store' });

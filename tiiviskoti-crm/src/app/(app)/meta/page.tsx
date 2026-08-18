@@ -19,7 +19,7 @@ const num = (n: number) => new Intl.NumberFormat('fi-FI').format(n);
 
 export default async function MetaPage() {
   await requireManager();
-  const stats = await getMetaStats('last_30d');
+  const stats = await getMetaStats(30);
   const t = stats.totals;
   const ctr = t.impressions > 0 ? (t.clicks / t.impressions) * 100 : 0;
   const cpc = t.linkClicks > 0 ? t.spendCents / t.linkClicks : 0;
