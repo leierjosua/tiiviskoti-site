@@ -13,6 +13,7 @@ const NAV = [
   { href: '/liidit', label: 'Liidit', managerOnly: true },
   { href: '/analytiikka/sivusto', label: 'Analytiikka', managerOnly: true },
   { href: '/ads', label: 'Ads-konversiot', managerOnly: true },
+  { href: '/meta', label: 'Meta-mainokset', managerOnly: true },
   { href: '/alekoodit', label: 'Alennuskoodit', managerOnly: true },
   { href: '/tyontekijat', label: 'Työntekijät', managerOnly: true },
 ];
