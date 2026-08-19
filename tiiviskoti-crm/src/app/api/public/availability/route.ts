@@ -23,7 +23,12 @@ export async function GET(request: Request) {
 
   const postal = (params.get('postal') ?? '').trim();
   const days = Math.min(Math.max(Number(params.get('days') ?? 60) || 60, 1), 180);
-  const minutes = Math.min(Math.max(Number(params.get('minutes') ?? 120) || 120, 15), 600);
+  /* Yläraja on koko päivä (24 h), ei 10 h: iso keikka (esim. 30+ ikkunaa) voi
+     kestää yli 10 h, ja jos haku katkaistaan 600 minuuttiin se tarjoaisi ajan
+     joka ei oikeasti mahdu koko työlle — ja varaus kaatuisi vasta tallennukseen.
+     Todellisen mahtumisen ratkaisevat työajat ja päällekkäisyysrajoite, ei tämä
+     luku. PIDÄ SAMANA kuin booking-reitin durationMinutes.max. */
+  const minutes = Math.min(Math.max(Number(params.get('minutes') ?? 120) || 120, 15), 1440);
 
   if (!/^\d{5}$/.test(postal)) {
     return json({ error: 'postal_required' }, { status: 400, origin });

@@ -30,7 +30,12 @@ export const runtime = 'nodejs';
 const schema = z.object({
   calendarId: z.string().uuid(),
   startsAt: z.string().datetime(),
-  durationMinutes: z.number().int().min(15).max(600),
+  /* Yläraja koko päivä (24 h): iso keikka (30+ ikkunaa / useita ovia) ylittää
+     10 h, ja liian matala katto hylkäsi ne "validation"-virheellä, joka näkyi
+     asiakkaalle vain "Varauksen tallennus ei onnistunut". Todellisen keston
+     rajaavat työajat ja tk.jobs-päällekkäisyysrajoite, ei tämä luku.
+     PIDÄ SAMANA kuin availability-reitin minutes-katto. */
+  durationMinutes: z.number().int().min(15).max(1440),
   name: z.string().min(1),
   email: z.string().email(),
   phone: z.string().min(1),
