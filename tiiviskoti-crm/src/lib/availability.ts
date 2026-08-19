@@ -44,6 +44,19 @@ export type FreeSlotsInput = {
 
 const MIN = 60_000;
 
+/* Kalenteriin varattavan lohkon yläraja minuutteina — "paikanpitäjä".
+
+   Iso keikka (esim. 30+ ikkunaa) voi arvioltaan kestää monta tuntia, eikä se
+   mahtuisi vapaaseen aikaan → asiakas ei saisi varattua ja kauppa menetettäisiin.
+   Siksi kalenteriin varataan enintään tämän mittainen lohko, ja työn todellinen
+   arvioitu kesto kirjataan työn muistiinpanoihin toimiston sovitettavaksi.
+
+   Tavallinen keikka (≤ 5 h) mahtuu tähän kokonaan eikä sen kalenterivaraus
+   muutu — vain tätä pidemmät työt saavat paikanpitäjän. Sekä vapaiden aikojen
+   haku (availability-reitti) että varaus (booking-reitti) käyttävät tätä samaa
+   rajaa, jotta tarjottu aika ja varattu lohko ovat aina yhtä pitkät. */
+export const MAX_BOOKING_BLOCK_MINUTES = 300;
+
 /* ---------- aikavälialgebra ---------- */
 
 function normalize(intervals: Interval[]): Interval[] {

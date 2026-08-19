@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
+import { MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
 import { areaForPostal, purgeExpiredHolds } from '@/lib/data';
 import { deliverBooking, saveJobLines } from '@/lib/deliver';
 import { removeCalendarEventForJob } from '@/lib/deliver';
@@ -30,11 +31,11 @@ export const runtime = 'nodejs';
 const schema = z.object({
   calendarId: z.string().uuid(),
   startsAt: z.string().datetime(),
-  /* Yläraja koko päivä (24 h): iso keikka (30+ ikkunaa / useita ovia) ylittää
-     10 h, ja liian matala katto hylkäsi ne "validation"-virheellä, joka näkyi
-     asiakkaalle vain "Varauksen tallennus ei onnistunut". Todellisen keston
-     rajaavat työajat ja tk.jobs-päällekkäisyysrajoite, ei tämä luku.
-     PIDÄ SAMANA kuin availability-reitin minutes-katto. */
+  /* Työn TODELLINEN arvioitu kesto (pricing.mjs). Ei hylätä isoja arvoja:
+     kalenteriin varattava lohko katkaistaan erikseen MAX_BOOKING_BLOCK_MINUTES:iin
+     (paikanpitäjä), ja todellinen kesto viedään muistiinpanoihin. Näin iso keikka
+     mahtuu aina eikä kauppa mene "validation"-virheeseen. 24 h on vain järkevä
+     yläraja roskasyötteelle. */
   durationMinutes: z.number().int().min(15).max(1440),
   name: z.string().min(1),
   email: z.string().email(),
@@ -135,7 +136,22 @@ export async function POST(request: Request) {
 
   const d = parsed.data;
   const starts = new Date(d.startsAt);
-  const ends = new Date(starts.getTime() + d.durationMinutes * 60_000);
+
+  /* Paikanpitäjä: kalenteriin varataan enintään MAX_BOOKING_BLOCK_MINUTES, jotta
+     iso keikka mahtuu vapaaseen aikaan eikä varaus kaadu — muuten kauppa
+     menetettäisiin. Työn todellinen arvioitu kesto liitetään muistiinpanoihin,
+     jotta toimisto osaa sovittaa oikean keston kalenteriin. Tavallinen keikka
+     (≤ MAX_BOOKING_BLOCK_MINUTES) ei muutu lainkaan. */
+  const blockMinutes = Math.min(d.durationMinutes, MAX_BOOKING_BLOCK_MINUTES);
+  const ends = new Date(starts.getTime() + blockMinutes * 60_000);
+  const oversized = d.durationMinutes > MAX_BOOKING_BLOCK_MINUTES;
+  const estHours = (d.durationMinutes / 60).toFixed(1).replace('.', ',');
+  const notes = oversized
+    ? `⚠ ISO KEIKKA: arvioitu kesto ~${estHours} h (${d.durationMinutes} min). Kalenteriin `
+      + `varattu vain ${Math.round(blockMinutes / 60 * 10) / 10} h paikanpitäjänä — `
+      + `sovita todellinen kesto ja siirrä tarvittaessa.`
+      + (d.notes ? `\n\n${d.notes}` : '')
+    : (d.notes ?? null);
 
   await purgeExpiredHolds();
 
@@ -222,7 +238,7 @@ export async function POST(request: Request) {
                              campaign, gclid)
         values (${customerId}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
                 ${d.title ?? 'Tiivistetyö'}, ${d.address}, ${d.postalCode}, ${d.city ?? null},
-                ${totalCents}, ${d.notes ?? null}, 'web',
+                ${totalCents}, ${notes}, 'web',
                 ${d.campaign ?? null}, ${d.gclid ?? null})
         returning id, job_number
       `;
