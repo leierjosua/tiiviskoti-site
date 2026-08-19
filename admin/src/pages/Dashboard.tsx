@@ -3,6 +3,7 @@ import { formatCents, formatDate, formatAddress, STATUS_LABELS, STATUS_COLORS } 
 import { Badge } from "@/components/ui/badge";
 import { KpiCard } from "@/components/KpiCard";
 import {
+  Euro,
   CalendarPlus,
   CalendarDays,
   Briefcase,
@@ -24,8 +25,8 @@ export default function Dashboard() {
     return (
       <div className="animate-pulse space-y-6">
         <div className="h-8 bg-border rounded-xl w-48" />
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="h-12 bg-surface rounded-xl" />
           ))}
         </div>
@@ -41,9 +42,18 @@ export default function Dashboard() {
 
   const cards = [
     {
+      label: "Myynti tänään",
+      value: formatCents(stats.todaySales),
+      sub: "sis. ALV",
+      icon: Euro,
+      iconColor: "text-accent-dark",
+      iconBg: "bg-accent-muted",
+      accent: "border-l-accent",
+    },
+    {
       label: "Uudet varaukset",
-      value: formatCents(stats.todayNewBookingsValue),
-      sub: `${stats.todayNewBookings} varausta · tänään`,
+      value: stats.todayNewBookings,
+      sub: "tänään",
       icon: CalendarPlus,
       iconColor: "text-blue-600",
       iconBg: "bg-blue-50",
@@ -51,17 +61,17 @@ export default function Dashboard() {
     },
     {
       label: "Varaukset",
-      value: formatCents(stats.last30DaysBookingsValue),
-      sub: `${stats.last30DaysBookings} varausta · viim. 30 pv`,
+      value: stats.last30DaysBookings,
+      sub: "viim. 30 pv",
       icon: CalendarDays,
       iconColor: "text-violet-600",
       iconBg: "bg-violet-50",
       accent: "border-l-violet-400",
     },
     {
-      label: "Keikat tänään",
+      label: "Keikkoja tänään",
       value: stats.todayGigCount,
-      sub: formatCents(stats.todayGigsValue),
+      sub: "asentajilla",
       icon: Briefcase,
       iconColor: "text-amber-600",
       iconBg: "bg-amber-50",
@@ -89,7 +99,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {cards.map((card) => (
           <KpiCard key={card.label} {...card} />
         ))}
