@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fi"><head>
+<meta charset="utf-8">
+<title>TiivisKoti — mainos: taloyhtiö</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="_ad.css" rel="stylesheet">
+<style>
+  .photo img{object-position:center 42%}
+  /* vahvempi ala-/keskiscrim, jotta kicker ja otsikko erottuvat keltaisesta talosta */
+  .scrim.b{background:linear-gradient(180deg,
+    rgba(16,40,28,.10) 0%, rgba(16,40,28,.30) 36%,
+    rgba(16,40,28,.60) 54%, rgba(16,40,28,.82) 74%, rgba(16,40,28,.96) 100%)}
+  .display{font-size:96px}
+  .badges{margin-top:32px;gap:16px 30px}
+</style>
+</head>
+<body class="on-dark">
+  <div class="photo"><img src="../img/taloyhtio-hero.jpg" alt=""></div>
+  <div class="scrim b"></div>
+  <div class="vignette"></div>
+  <div class="grain"></div>
+
+  <div class="canvas pad">
+    <div class="layer">
+      <div class="brandrow">
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="22" fill="#217A4E"/>
+            <rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/>
+            <rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/>
+          </svg>
+          <div class="wordmark"><span class="d">Tiivis</span><span class="b">Koti</span></div>
+        </div>
+        <span class="pill glass-pill">Taloyhtiöt</span>
+      </div>
+
+      <div class="grow"></div>
+
+      <div class="kicker">Taloyhtiöille</div>
+      <h1 class="display mt-s">Taloyhtiön ovet ja<br>ikkunat <span class="hl">kuntoon.</span></h1>
+      <p class="lead mt-s">Vähemmän vetoa ja lämpöhukkaa koko kiinteistössä — kiinteä tarjous,
+        yksi yhteyshenkilö, siisti jälki.</p>
+
+      <div class="badges">
+        <span class="badge"><svg style="color:#8FD3AC" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Kiinteä tarjous kohteelle</span>
+        <span class="badge"><svg style="color:#8FD3AC" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Asennustyön takuu</span>
+        <span class="badge"><svg style="color:#8FD3AC" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Koko Uusimaa</span>
+      </div>
+
+      <a class="cta mt-l">Pyydä tarjous
+        <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h12M12 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <div class="divider mt-l"></div>
+      <div class="foot" style="margin-top:26px">
+        <div class="url">tiiviskoti.fi</div>
+        <div class="fineprint">Ikkuna- ja ovitiivistys<br>Vastuuvakuutettu ammattityö</div>
+      </div>
+    </div>
+  </div>
+</body></html>

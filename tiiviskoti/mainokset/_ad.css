@@ -1,0 +1,130 @@
+/* ==========================================================================
+   TiivisKoti — Meta-mainosten design-system (stills, 1080×1350 @2x)
+   Värit & logo OTETTU SUORAAN tiiviskoti/index.html:stä (ei brändiohjeesta).
+   Fontti: Manrope (sama kuin sivusto + logo).
+   ========================================================================== */
+
+:root{
+  /* täsmälleen index.html :root */
+  --bg:#F6F7F3; --alt:#ECF0E9; --card:#FFFFFF; --imgtop:#EAF1EC;
+  --ink:#183A28; --text:#4A544D; --mute:#7B857D;
+  --green:#217A4E; --green-d:#1A6340; --green-l:#2E9E63; --green-soft:#E4F0E9;
+  --deep:#163A28; --deep2:#1E4A34;
+  --line:#E4E8E0; --line2:#D2D9CE; --star:#E0A63A;
+  --dtext:#D7E4DB; --dmute:#9DB2A5;
+  --mint:#8FD3AC;        /* vaalea vihreä korostus tummalla (sama kuin vanhat fb-mainokset) */
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+html,body{width:1080px;height:1350px}
+body{
+  position:relative;overflow:hidden;
+  font-family:"Manrope",system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+}
+
+/* ---- kangas & kerrokset ------------------------------------------------- */
+.canvas{position:absolute;inset:0;display:flex;flex-direction:column}
+.pad{padding:84px 78px}
+
+.photo{position:absolute;inset:0;z-index:0}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* cinemaattinen scrim tummille kuvamainoksille — pohjaväri --deep #163A28 */
+.scrim{position:absolute;inset:0;z-index:1;pointer-events:none}
+.scrim.b{background:linear-gradient(180deg,
+  rgba(22,58,40,.05) 0%, rgba(22,58,40,.22) 42%,
+  rgba(22,58,40,.72) 74%, rgba(22,58,40,.95) 100%)}
+.scrim.tb{background:linear-gradient(180deg,
+  rgba(22,58,40,.55) 0%, rgba(22,58,40,.10) 26%,
+  rgba(22,58,40,.20) 55%, rgba(22,58,40,.92) 100%)}
+
+.grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.vignette{position:absolute;inset:0;z-index:2;pointer-events:none;
+  box-shadow:inset 0 0 240px 60px rgba(16,40,28,.26)}
+
+.layer{position:relative;z-index:3;display:flex;flex-direction:column;height:100%}
+
+/* ---- brändirivi (ylä) — OIKEA logo -------------------------------------- */
+.brandrow{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:15px}
+.mark{width:70px;height:70px;display:block;flex:none}
+.wordmark{font-weight:800;font-size:42px;letter-spacing:-.03em;line-height:1;color:var(--ink)}
+.wordmark .d{color:var(--ink)}
+.wordmark .b{color:var(--green)}
+
+.pill{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:23px;
+  padding:13px 22px;border-radius:999px;letter-spacing:.005em;white-space:nowrap}
+.pill svg{width:19px;height:19px}
+
+/* ---- typografia --------------------------------------------------------- */
+.kicker{font-weight:800;font-size:25px;letter-spacing:.18em;
+  text-transform:uppercase;display:flex;align-items:center;gap:16px;color:var(--green)}
+.kicker::before{content:"";width:40px;height:3px;background:currentColor;border-radius:2px;flex:none}
+
+.display{font-weight:800;font-size:108px;line-height:1.02;letter-spacing:-.03em;color:var(--ink)}
+.display .hl{color:var(--green)}
+.display .g{color:var(--green)}
+
+.lead{font-size:32px;line-height:1.45;font-weight:500;max-width:840px;color:var(--text)}
+
+/* ---- todiste-/lukupaneeli ---------------------------------------------- */
+.proof{display:flex;gap:20px}
+.proofcard{flex:1;border-radius:22px;padding:30px 28px 28px}
+.proofcard b{display:block;font-weight:800;font-size:60px;line-height:1;letter-spacing:-.03em}
+.proofcard span{display:block;margin-top:12px;font-size:23px;font-weight:600;line-height:1.3}
+
+/* lasinen kortti tummalle kuvalle */
+.glass .proofcard{background:rgba(22,58,40,.34);border:1px solid rgba(255,255,255,.20);
+  backdrop-filter:blur(4px)}
+.glass .proofcard b{color:var(--mint)}
+.glass .proofcard span{color:var(--dtext)}
+
+/* valkoinen kortti vaalealle */
+.sandcards .proofcard{background:#fff;border:1px solid var(--line)}
+.sandcards .proofcard b{color:var(--green)}
+.sandcards .proofcard span{color:var(--text)}
+
+/* ---- luottamusmerkit ---------------------------------------------------- */
+.badges{display:flex;flex-wrap:wrap;gap:14px 22px}
+.badge{display:inline-flex;align-items:center;gap:11px;font-size:24px;font-weight:600;color:var(--ink)}
+.badge svg{width:24px;height:24px;flex:none;color:var(--green)}
+
+/* ---- CTA — VIHREÄ (kuten sivuston napit) ------------------------------- */
+.cta{display:inline-flex;align-items:center;gap:16px;align-self:flex-start;
+  font-weight:800;font-size:34px;letter-spacing:-.01em;
+  color:#fff;background:linear-gradient(180deg,var(--green-l),var(--green));
+  padding:26px 40px;border-radius:999px;
+  box-shadow:0 18px 40px -14px rgba(33,122,78,.55), inset 0 1px 0 rgba(255,255,255,.28)}
+.cta .arrow{display:inline-flex;width:44px;height:44px;border-radius:999px;background:#fff;
+  align-items:center;justify-content:center}
+.cta .arrow svg{width:22px;height:22px;stroke:var(--green)}
+
+/* ---- footer ------------------------------------------------------------- */
+.foot{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.url{font-weight:800;font-size:32px;letter-spacing:-.02em;color:var(--ink)}
+.fineprint{font-size:22px;font-weight:500;line-height:1.35;text-align:right;color:var(--text)}
+
+/* ---- tumma teema (kuvamainokset) --------------------------------------- */
+.on-dark{color:#fff}
+.on-dark .kicker{color:var(--mint)}
+.on-dark .display{color:#fff}
+.on-dark .display .hl{color:var(--mint)}
+.on-dark .lead{color:var(--dtext)}
+.on-dark .wordmark, .on-dark .wordmark .d, .on-dark .wordmark .b{color:#fff}
+.on-dark .badge{color:var(--dtext)}
+.on-dark .badge svg{color:var(--mint)}
+.on-dark .url{color:#fff}
+.on-dark .fineprint{color:var(--dmute)}
+
+.pill.glass-pill{background:rgba(22,58,40,.42);border:1px solid rgba(255,255,255,.24);color:#fff}
+.pill.green-pill{background:var(--green);color:#fff}
+.pill.soft-pill{background:var(--green-soft);color:var(--green);border:1px solid var(--line)}
+
+/* apuvälit */
+.grow{flex:1 1 auto}
+.mt-s{margin-top:22px}.mt-m{margin-top:34px}.mt-l{margin-top:48px}
+.divider{height:1px;background:currentColor;opacity:.2}
