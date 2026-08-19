@@ -17,13 +17,12 @@ export function useDashboardStats() {
       const thirtyDaysAgoStr = `${thirtyDaysAgo.getFullYear()}-${String(thirtyDaysAgo.getMonth() + 1).padStart(2, "0")}-${String(thirtyDaysAgo.getDate()).padStart(2, "0")}`;
 
       const [
-        todaySalesRes,
         todayNewBookingsRes,
         last30DaysBookingsRes,
         todayGigsRes,
         recentBookingsRes,
       ] = await Promise.all([
-        // Sales today (all non-cancelled bookings created today, with ALV — includes pending)
+        // New bookings today (non-cancelled, created today) — price_cents for value
         supabase
           .from("bookings")
           .select("price_cents")
@@ -32,20 +31,13 @@ export function useDashboardStats() {
           .lt("created_at", today.end)
           .neq("status", "cancelled"),
 
-        // New bookings today (any status, created today)
+        // Bookings last 30 days (non-cancelled, created in last 30 days) — price_cents for value
         supabase
           .from("bookings")
-          .select("id", { count: "exact", head: true })
+          .select("price_cents")
           .is("deleted_at", null)
-          .gte("created_at", today.start)
-          .lt("created_at", today.end),
-
-        // Bookings last 3 days (created in last 3 days)
-        supabase
-          .from("bookings")
-          .select("id", { count: "exact", head: true })
-          .is("deleted_at", null)
-          .gte("created_at", finnishDayRange(thirtyDaysAgoStr).start),
+          .gte("created_at", finnishDayRange(thirtyDaysAgoStr).start)
+          .neq("status", "cancelled"),
 
         // Today's gigs (bookings scheduled for today, not cancelled)
         supabase
@@ -66,17 +58,21 @@ export function useDashboardStats() {
           .limit(8),
       ]);
 
-      const todaySales = (todaySalesRes.data || []).reduce(
-        (sum: number, b: { price_cents: number }) => sum + b.price_cents,
-        0
-      );
+      const sumCents = (rows: { price_cents: number }[] | null) =>
+        (rows || []).reduce((sum, b) => sum + (b.price_cents || 0), 0);
+
+      const todayNewBookingsRows = todayNewBookingsRes.data || [];
+      const last30DaysBookingsRows = last30DaysBookingsRes.data || [];
+      const todayGigs = todayGigsRes.data || [];
 
       return {
-        todaySales,
-        todayNewBookings: todayNewBookingsRes.count || 0,
-        last30DaysBookings: last30DaysBookingsRes.count || 0,
-        todayGigCount: todayGigsRes.data?.length || 0,
-        todayGigs: todayGigsRes.data || [],
+        todayNewBookings: todayNewBookingsRows.length,
+        todayNewBookingsValue: sumCents(todayNewBookingsRows),
+        last30DaysBookings: last30DaysBookingsRows.length,
+        last30DaysBookingsValue: sumCents(last30DaysBookingsRows),
+        todayGigCount: todayGigs.length,
+        todayGigsValue: sumCents(todayGigs as { price_cents: number }[]),
+        todayGigs,
         recentBookings: recentBookingsRes.data || [],
       };
     },
