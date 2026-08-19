@@ -187,27 +187,22 @@ export default async function TodayPage() {
         <>
           {/* Kaksi saraketta jo puhelimessa: yksi allekkain vei neljä ruutua
               pystysuunnassa, eikä päivän keikkoja nähnyt vierittämättä. */}
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            <Metric
-              label="Myynti tänään"
-              value={eur(s.myynti_tanaan)}
-              tone="accent"
-              sub={`${s.keikat_tanaan} keikkaa kalenterissa`}
-            />
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
             <Metric
               label="Uudet varaukset"
-              value={String(s.uudet_varaukset)}
-              sub={s.uudet_varaukset > 0 ? `arvo ${eur(s.uudet_arvo)}` : 'tänään saapuneet'}
+              value={eur(s.uudet_arvo)}
+              tone="accent"
+              sub={`${s.uudet_varaukset} varausta tänään`}
             />
             <Metric
               label="Varaukset 30 pv"
-              value={String(s.kpl_30pv)}
-              sub={`myynti ${eur(s.myynti_30pv)}`}
+              value={eur(s.myynti_30pv)}
+              sub={`${s.kpl_30pv} varausta`}
             />
             <Metric
               label="Keikat tänään"
               value={String(s.keikat_tanaan)}
-              sub={`${s.tulevat} tulevaa varausta`}
+              sub={`myynti ${eur(s.myynti_tanaan)}`}
             />
           </div>
 
