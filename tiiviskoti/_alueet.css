@@ -202,9 +202,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .mname{font-weight:800;font-size:19px;color:var(--ink);text-transform:capitalize}
 .mnav{width:36px;height:36px;border-radius:9px;border:1.5px solid var(--line2);background:var(--card);color:var(--green);cursor:pointer;display:grid;place-items:center}
 .mnav:hover{border-color:var(--green)}.mnav:disabled{opacity:.35;cursor:not-allowed}
-.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;max-width:460px;margin-inline:auto}
 .dow span{text-align:center;font-size:11.5px;font-weight:700;color:var(--mute);text-transform:uppercase}
-.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:460px;margin-inline:auto}
 .day{aspect-ratio:1;border-radius:9px;border:1.5px solid transparent;background:var(--alt);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative}
 .day.empty{background:transparent;cursor:default}
 .day.off{background:transparent;color:var(--line2);cursor:not-allowed}
