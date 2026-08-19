@@ -89,10 +89,12 @@ function readGclid(){
 
    _fbc rakennetaan fbclidistä Metan kaavalla fb.1.<aikaleima>.<fbclid>. Jos
    sivulla joskus on Meta Pixel, se asettaa _fbp/_fbc-evästeet ja ne luetaan
-   suoraan; muuten fbclid-pohjainen arvo riittää osumaan. 90 pv = Metan
-   attribuutioikkuna; ensimmäinen klikki voittaa kuten kampanjatunnisteessa. */
+   suoraan; muuten fbclid-pohjainen arvo riittää osumaan. 7 pv = Metan
+   klikkiattribuution oletusikkuna; TUOREIN klikki voittaa (ei ensimmäinen),
+   jotta ansio menee viimeksi klikatulle mainokselle eikä vanhalle klikille,
+   joka roikkui muistissa kuukausia ja ylikirjasi kaikki myöhemmät varaukset. */
 const FBC_KEY = 'tk_fbc';
-const FBCLID_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+const FBCLID_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const FBCLID_RE = /^[A-Za-z0-9._-]{5,400}$/;
 
 function readCookie(name){
@@ -122,8 +124,10 @@ function readFbp(){ return readCookie('_fbp'); }
   let v;
   try{ v = new URLSearchParams(location.search).get('fbclid'); }catch(_){ return; }
   if(!v || !FBCLID_RE.test(v)) return;
-  if(readCookie('_fbc')) return;   // Pixel hoiti jo
-  if(readFbc()) return;            // ensimmäinen klikki voittaa
+  if(readCookie('_fbc')) return;   // Pixelin oma _fbc voittaa, jos Pixel joskus lisätään
+  // TUOREIN klikki voittaa: uusi fbclid ylikirjoittaa aiemman tallennetun,
+  // jotta ansio menee viimeksi klikatulle mainokselle (last click) — ei
+  // ensimmäiselle, joka jäisi roikkumaan ja vinouttaisi attribuution.
   const fbc = `fb.1.${Date.now()}.${v}`;
   try{ localStorage.setItem(FBC_KEY, JSON.stringify({ v: fbc, t: Date.now() })); }catch(_){}
 })();
