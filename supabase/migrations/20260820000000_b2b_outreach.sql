@@ -235,7 +235,7 @@ with (security_invoker = on) as
 select
   p.id, p.company_name, p.city, p.phone, p.website, p.email,
   p.contact_name, p.contact_title, p.google_rating, p.status, p.do_not_contact,
-  p.last_contacted_at, p.notes, p.created_at,
+  p.segment, p.last_contacted_at, p.notes, p.created_at,
   e.id            as enrollment_id,
   e.campaign_id   as enrollment_campaign_id,
   e.status        as enrollment_status,
