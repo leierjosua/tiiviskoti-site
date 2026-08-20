@@ -10,6 +10,7 @@ import { sendViaGmail } from "../_shared/email-helpers.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { requireServiceRole } from "../_shared/auth.ts";
 import { buildEmail, type EmailBuildResult } from "../_shared/email-builders.ts";
+import { sendViaResend } from "../_shared/resend.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -298,6 +299,12 @@ async function handleFailure(
       })
       .eq("id", item.id);
     console.error(`Outbox item ${item.id} moved to dead_letter: ${error}`);
+    // Riippumaton hälytys Resendillä (EI Gmailin kautta, jotta se toimii myös
+    // silloin kun juuri Gmail-lähetys on rikki — kuten tokenin vanhennuttua).
+    // Näin liidi-/varausilmoituksen pysyvä epäonnistuminen ei jää huomaamatta.
+    await alertDeadLetter(item.id, error).catch((e) =>
+      console.error("dead_letter-hälytys epäonnistui:", e)
+    );
   } else {
     // Exponential backoff: 2^attempts * 60 seconds
     const delaySec = Math.pow(2, newAttempts) * 60;
@@ -312,6 +319,45 @@ async function handleFailure(
       .eq("id", item.id);
     console.warn(`Outbox item ${item.id} retry scheduled at ${nextRun} (attempt ${newAttempts})`);
   }
+}
+
+// Hälyttää Resendillä kun jokin viesti antaa periksi (dead_letter). Resend on
+// tarkoituksella eri kanava kuin Gmail: jos Gmail-token kuolee, ilmoitukset
+// dead-letteröityvät — ja juuri silloin tämä hälytys pitää mennä silti perille.
+async function alertDeadLetter(itemId: string, error: string) {
+  const { data: row } = await supabase
+    .from("email_outbox")
+    .select("type, payload, reference_type, reference_id")
+    .eq("id", itemId)
+    .single();
+
+  const p = (row?.payload ?? {}) as Record<string, unknown>;
+  const kind = row?.type ?? "?";
+  // Ihmisluettava tiivistelmä eri viestityypeille.
+  const who = [p.name, p.email, p.phone].filter(Boolean).join(" · ");
+  const summary = who || (p.booking_id ? `varaus ${p.booking_id}` : JSON.stringify(p).slice(0, 200));
+  const isLead = kind === "contact" || row?.reference_type === "form_submission";
+
+  const subject = `⚠️ Sähköposti ei lähtenyt${isLead ? " — LIIDI vaarassa jäädä huomaamatta" : ""} (dead_letter)`;
+  const html = `
+    <div style="font-family:system-ui,sans-serif;max-width:560px">
+      <h2 style="color:#b91c1c;margin:0 0 12px">Sähköposti epäonnistui pysyvästi</h2>
+      <p style="margin:0 0 16px">Jonossa oleva viesti (<b>${kind}</b>) ei lähtenyt useasta yrityksestä huolimatta ja siirrettiin <b>dead_letter</b>-tilaan. ${isLead ? "<b>Tämä on liidi-ilmoitus — tarkista adminin Lomakkeet-osio, liidin data on tallessa mutta et ehkä saanut siitä muuta ilmoitusta.</b>" : ""}</p>
+      <table style="font-size:14px;border-collapse:collapse">
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280">Tyyppi</td><td>${kind}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280">Tiedot</td><td>${summary}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280;vertical-align:top">Virhe</td><td style="color:#b91c1c">${String(error).slice(0, 400)}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280">Outbox-id</td><td>${itemId}</td></tr>
+      </table>
+      <p style="margin:16px 0 0;color:#6b7280;font-size:13px">Tämä hälytys tuli Resendin kautta (ei Gmailin), joten se toimii myös silloin kun Gmail-lähetys on rikki.</p>
+    </div>`;
+
+  await sendViaResend({
+    from: "TiivisKoti Järjestelmä <alerts@mail.tiiviskoti.fi>",
+    to: "info@tiiviskoti.fi",
+    subject,
+    html,
+  });
 }
 
 function jsonRes(data: unknown, status = 200) {
