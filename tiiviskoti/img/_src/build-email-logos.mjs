@@ -14,8 +14,10 @@ const variants = {
   'logo-email-white.png': { door: '#ffffff', win: '#ffffff', seal: '#F2C879', w1: '#ffffff', w2: '#77C6A0', width: 720 },
   // Iso valkoinen: send-booking-email / send-contact-email käyttävät width=200
   'logo-email-badge.png': { door: '#ffffff', win: '#ffffff', seal: '#F2C879', w1: '#ffffff', w2: '#77C6A0', width: 1200 },
-  // Tumma: vaalealle pohjalle (allekirjoitukset, PDF-dokumentit)
-  'logo-email.png':       { door: '#215A43', win: '#215A43', seal: '#E0A44E', w1: '#163A28', w2: '#217A4E', width: 720 },
+  // HUOM: logo-email.png (vaalean pohjan / kuitti-PDF:n logo) EI enää synny täältä.
+  // Se tehdään uudesta brändilogosta:
+  //   sips --resampleWidth 1080 brand/logo-vihrea-4000.png --out img/logo-email.png
+  // Älä lisää sitä takaisin tänne — muuten vanha ovi-ikoni ylikirjoittaa uuden badgen.
 };
 
 const svg = (v) => `<svg xmlns="http://www.w3.org/2000/svg" width="560" height="120" viewBox="0 0 560 120" fill="none">
