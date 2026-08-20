@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; color: #4B5A50; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 210mm; min-height: 297mm; padding: 0 0 24mm 0; position: relative; }
+
+  /* Header */
+  .head { background: #215A43; color: #fff; padding: 22px 30px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-family: 'Gabarito', Arial, sans-serif; font-weight: 800; font-size: 26px; letter-spacing: .3px; }
+  .logo .k { color: #77C6A0; }
+  .head .meta { text-align: right; font-size: 12px; color: #BFE0CE; line-height: 1.6; }
+  .head .meta b { color: #fff; }
+
+  .body { padding: 30px 30px 0 30px; }
+
+  h1 { font-family: 'Gabarito', Arial, sans-serif; color: #123528; font-size: 30px; font-weight: 800; margin-bottom: 4px; }
+  .sub { color: #6E7A6F; font-size: 13px; margin-bottom: 22px; }
+
+  .lead { background: #F4ECDB; border-left: 4px solid #E0A44E; border-radius: 8px; padding: 16px 18px; font-size: 15px; line-height: 1.55; color: #123528; margin-bottom: 24px; }
+  .lead b { color: #215A43; }
+
+  h2 { font-family: 'Gabarito', Arial, sans-serif; color: #215A43; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; margin: 22px 0 10px; }
+  p { font-size: 14px; line-height: 1.6; }
+
+  .work { font-size: 14px; line-height: 1.65; color: #4B5A50; }
+
+  /* Material card */
+  .mat { display: flex; gap: 16px; background: #FBF7EF; border: 1px solid #E7DCC6; border-radius: 12px; padding: 18px 20px; margin-top: 6px; }
+  .mat .badge { flex: 0 0 auto; background: #215A43; color: #fff; border-radius: 10px; padding: 12px 14px; text-align: center; align-self: flex-start; }
+  .mat .badge .t { font-family: 'Gabarito', Arial, sans-serif; font-weight: 800; font-size: 18px; }
+  .mat .badge .s { font-size: 10px; color: #BFE0CE; letter-spacing: .5px; }
+  .mat ul { list-style: none; font-size: 13.5px; line-height: 1.5; }
+  .mat li { padding-left: 18px; position: relative; margin-bottom: 4px; color: #4B5A50; }
+  .mat li:before { content: "✓"; position: absolute; left: 0; color: #215A43; font-weight: 800; }
+
+  /* Price */
+  .pricebox { display: flex; justify-content: space-between; align-items: center; background: #215A43; color: #fff; border-radius: 12px; padding: 20px 24px; margin-top: 22px; }
+  .pricebox .label { font-size: 13px; color: #BFE0CE; }
+  .pricebox .label b { display: block; font-family: 'Gabarito', Arial, sans-serif; color: #fff; font-size: 17px; font-weight: 800; margin-top: 2px; }
+  .pricebox .amt { font-family: 'Gabarito', Arial, sans-serif; font-size: 34px; font-weight: 800; color: #F2C879; }
+  .pricebox .amt small { font-size: 14px; color: #BFE0CE; font-weight: 400; display: block; text-align: right; }
+
+  .khv { font-size: 12.5px; color: #6E7A6F; margin-top: 8px; }
+
+  .guarantee { display: inline-flex; align-items: center; gap: 8px; background: #E0A44E; color: #123528; font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: 999px; margin-top: 18px; }
+
+  .foot { position: absolute; bottom: 0; left: 0; right: 0; background: #F4ECDB; padding: 14px 30px; font-size: 11.5px; color: #6E7A6F; display: flex; justify-content: space-between; }
+  .foot b { color: #215A43; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="head">
+      <div class="logo">Tiivis<span class="k">Koti</span></div>
+      <div class="meta">
+        <div><b>TARJOUS</b> · nro {{tarjous_nro}}</div>
+        <div>{{pvm}}</div>
+        <div>Voimassa 30 pv</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <h1>Tarjous ikkunoiden tiivistyksestä</h1>
+      <div class="sub">Vastaanottaja: {{asiakas}}{{kohde}}</div>
+
+      <h2>Työn sisältö</h2>
+      <p class="work">
+        Vaihdamme vanhat tiivisteet uusiin: poistamme kuluneen tiivisteen, asennamme uudet
+        kohteeseen sopivalla materiaalilla ja värillä sekä teemme tarvittavat silikonisaumaukset.
+      </p>
+
+      <h2>Materiaali</h2>
+      <div class="mat">
+        <div class="badge">
+          <div class="t">TPE</div>
+          <div class="s">TIIVISTE</div>
+        </div>
+        <ul>
+          <li><b>Nykyaikainen TPE-tiiviste</b> (termoplastinen elastomeeri) — parasta hinta-laatua tiivistykseen.</li>
+          <li>Joustava ja muotonsa säilyttävä — <b>ei kovetu</b> kuten vanhat kumitiivisteet.</li>
+          <li>Kestää UV-säteilyä, pakkasta ja lämpöä — toimii luotettavasti vuodesta toiseen.</li>
+          <li>Vaimentaa ääntä ja tiivistää tiukasti — veto ja melu jäävät ulos.</li>
+          <li>Asennetaan kohteeseen sopivalla värillä, siisti lopputulos.</li>
+        </ul>
+      </div>
+
+      <div class="pricebox">
+        <div class="label">Kokonaishinta<b>TPE-tiivisteillä, sis. työ ja materiaali</b></div>
+        <div class="amt">2 015 €<small>sis. alv 25,5 %</small></div>
+      </div>
+      <div class="khv"><b style="color:#215A43;">Kotitalousvähennyksen jälkeen arviolta 1 451 €</b> — vähennys −40 % työn osuudesta (yksityisasiakkaille). Lopullinen hinta vahvistetaan maksuttomalla kartoituskäynnillä.</div>
+
+      <div class="guarantee">🛡 Työn takuu 2 vuotta</div>
+    </div>
+
+    <div class="foot">
+      <div><b>TiivisKoti</b> · Ovi- ja ikkunatiivistyksen erikoisliike · koko Uusimaa</div>
+      <div>tiiviskoti.fi · info@tiiviskoti.fi</div>
+    </div>
+  </div>
+</body>
+</html>

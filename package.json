@@ -8,6 +8,7 @@
     "render": "node scripts/render.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "playwright": "1.58.2"
   }
 }
