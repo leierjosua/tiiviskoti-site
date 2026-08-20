@@ -49,9 +49,7 @@ function buildReceiptHtml(b: Record<string, any>): string {
   const tot = b.price_cents; // cached total = SUM(items) - discount
   const ex = Math.round(tot / (1 + _ALV / 100));
   const vat = tot - ex;
-  let mat = 0;
-  for (const x of lineItems) mat += (x.material_cost_cents || 0) * (x.quantity || 1);
-  const work = tot - mat;
+  const work = workPortionCents(tot); // kiinteä 90 % kokonaishinnasta (sis. ALV)
 
   const rows = items.map((i, idx) => `
     <tr style="border-bottom:1px solid #e5e7eb;background:${idx % 2 === 0 ? "#f9fafb" : "white"} !important">
@@ -151,7 +149,7 @@ async function generateContractPdfViaChromium(contractId: string): Promise<Uint8
   if (!resp.ok) throw new Error("Contract PDF API " + resp.status);
   return new Uint8Array(await resp.arrayBuffer());
 }
-import { COMPANY_EMAIL, MONTH_NAMES_SHORT, FREQ_LABELS } from "./constants.ts";
+import { COMPANY_EMAIL, MONTH_NAMES_SHORT, FREQ_LABELS, workPortionCents } from "./constants.ts";
 import { formatDateFi, formatDateShort, formatCentsFi, formatAddress, slugify, postalCity } from "./formatting.ts";
 import { EMAIL_FONT_FAMILY, COMPANY_NAME, generateDefaultSignatureHtml } from "./email-styles.ts";
 
@@ -947,11 +945,9 @@ async function buildBookingEmail(supabase: SupabaseClient, type: string, booking
         const discLabel = booking.manual_discount_reason ? `Alennus (${booking.manual_discount_reason})` : "Alennus";
         receiptRows += receiptRow(discLabel, `-${formatCentsFi(booking.manual_discount_cents)}`, "#dc2626");
       }
-      // Work portion: total minus material costs from all line items
-      let rMat = 0;
-      for (const li of rItems) rMat += (li.material_cost_cents || 0) * (li.quantity || 1);
-      const rWork = totalCents - rMat;
-      if (rWork > 0 && rWork < totalCents) {
+      // Työn osuus: kiinteä 90 % kokonaishinnasta (sis. ALV), kotitalousvähennystä varten
+      const rWork = workPortionCents(totalCents);
+      if (rWork > 0) {
         receiptRows += receiptRow("Työn osuus", formatCentsFi(rWork), "#6b7280");
       }
       baseVars.receipt_rows = receiptRows;
@@ -1124,7 +1120,7 @@ function buildBookingEmailFallback(type: string, booking: any, _payload?: any): 
           ${allFallbackItems.map(item => receiptRow(`${item.name}${(item.quantity || 1) > 1 ? ` ×${item.quantity}` : ""}`, formatCentsFi(item.price_cents * (item.quantity || 1)))).join("")}
           ${booking.discount_amount_cents > 0 ? receiptRow("Alennus", `-${formatCentsFi(booking.discount_amount_cents)}`, "#dc2626") : ""}
           ${booking.manual_discount_cents > 0 ? receiptRow(booking.manual_discount_reason ? `Alennus (${booking.manual_discount_reason})` : "Alennus", `-${formatCentsFi(booking.manual_discount_cents)}`, "#dc2626") : ""}
-          ${(() => { let m = 0; for (const li of allFallbackItems) m += (li.material_cost_cents || 0) * (li.quantity || 1); const w = fbTotalCents - m; return w > 0 && w < fbTotalCents ? receiptRow("Työn osuus", formatCentsFi(w), "#6b7280") : ""; })()}
+          ${(() => { const w = workPortionCents(fbTotalCents); return w > 0 ? receiptRow("Työn osuus", formatCentsFi(w), "#6b7280") : ""; })()}
           <table style="width:100%;margin-top:16px;border-top:2px solid ${BRAND_NAVY}15"><tr><td style="font-weight:700;font-size:15px;padding:14px 0 0;color:${BRAND_NAVY}">Yhteensä</td><td style="text-align:right;font-weight:800;font-size:22px;color:${BRAND_NAVY};padding:14px 0 0">${priceFmt}</td></tr></table>
         </div>
         <div style="text-align:center;margin-bottom:20px"><span style="display:inline-block;background:${BRAND_BLUE}22;color:${BRAND_NAVY};padding:8px 24px;border-radius:0;font-weight:700;font-size:13px;text-transform:uppercase;border:1px solid ${BRAND_BLUE}44">&#10003; Maksettu</span></div>`) };

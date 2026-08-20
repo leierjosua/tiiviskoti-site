@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from "https://esm.sh/pdf-lib@1.17.1";
+import { workPortionCents as calcWorkPortionCents } from "./constants.ts";
 
 const LOGO_URL = "https://tiiviskoti.fi/img/logo-email.png";
 
@@ -215,7 +216,6 @@ export async function generateReceiptPdf(booking: any): Promise<Uint8Array> {
   }
 
   let subtotalCents = 0;
-  let materialCostCents = 0;
 
   for (const item of items) {
     drawText(item.name, col1, y, { size: 10 });
@@ -254,12 +254,8 @@ export async function generateReceiptPdf(booking: any): Promise<Uint8Array> {
   const totalExVat = Math.round(totalIncVat / (1 + VAT_RATE));
   const vatAmount = totalIncVat - totalExVat;
 
-  // Calculate work portion (total minus material costs)
-  for (const extra of booking.extra_items || []) {
-    materialCostCents += extra.material_cost_cents || 0;
-  }
-  materialCostCents += service?.material_cost_cents || 0;
-  const workPortionCents = totalIncVat - materialCostCents;
+  // Työn osuus: kiinteä 90 % kokonaishinnasta (sis. ALV), kotitalousvähennystä varten
+  const workPortionCents = calcWorkPortionCents(totalIncVat);
 
   // Totals rows
   const totalsRows = [
