@@ -8,17 +8,13 @@ import { writeFileSync, readFileSync } from 'node:fs';
 const FONT = './Manrope-ExtraBold.ttf';
 const OUT = 'C:/Users/josua/projects/loppusiivous-main-new/tiiviskoti/img';
 
-// variantit: door/seal/word1/word2 -värit
-const variants = {
-  // Valkoinen: tummalle (vihreälle) sähköpostin ylapalkille
-  'logo-email-white.png': { door: '#ffffff', win: '#ffffff', seal: '#F2C879', w1: '#ffffff', w2: '#77C6A0', width: 720 },
-  // Iso valkoinen: send-booking-email / send-contact-email käyttävät width=200
-  'logo-email-badge.png': { door: '#ffffff', win: '#ffffff', seal: '#F2C879', w1: '#ffffff', w2: '#77C6A0', width: 1200 },
-  // HUOM: logo-email.png (vaalean pohjan / kuitti-PDF:n logo) EI enää synny täältä.
-  // Se tehdään uudesta brändilogosta:
-  //   sips --resampleWidth 1080 brand/logo-vihrea-4000.png --out img/logo-email.png
-  // Älä lisää sitä takaisin tänne — muuten vanha ovi-ikoni ylikirjoittaa uuden badgen.
-};
+// HUOM: Sähköpostilogoja EI enää generoida tästä vanhasta ovi-ikoni-SVG:stä.
+// Kaikki kolme tehdään uusista brändilogoista (moderni badge):
+//   sips --resampleWidth 1080 brand/logo-vihrea-4000.png    --out img/logo-email.png        # vaalea pohja / kuitti-PDF
+//   sips --resampleWidth 1080 brand/logo-valkoinen-4000.png --out img/logo-email-white.png  # tumma sähköpostipalkki
+//   sips --resampleWidth 1200 brand/logo-valkoinen-4000.png --out img/logo-email-badge.png  # iso valkoinen
+// Älä lisää variantteja takaisin — vanha ovi-ikoni ylikirjoittaisi uuden badgen.
+const variants = {};
 
 const svg = (v) => `<svg xmlns="http://www.w3.org/2000/svg" width="560" height="120" viewBox="0 0 560 120" fill="none">
   <rect x="18" y="20" width="60" height="88" rx="8" fill="none" stroke="${v.door}" stroke-width="8"/>
