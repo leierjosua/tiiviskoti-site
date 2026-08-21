@@ -444,7 +444,10 @@ function receiptRow(label: string, amount: string, amountColor = "#1a1a1a"): str
     </tr></table>`;
 }
 
-const LOGO_URL = "https://tiiviskoti.fi/img/logo-email-badge.png";
+// Otsikkopalkki on VAALEA (#f1f5f9) → käytä vihreää logoa (ei valkoista, joka
+// olisi näkymätön). ?v=2 pakottaa Gmailin hakemaan uuden logon (Gmail
+// välimuistittaa kuvat URLin mukaan; ilman versiota vanha logo jäisi näkyviin).
+const LOGO_URL = "https://tiiviskoti.fi/img/logo-email.png?v=2";
 
 function emailWrapper(content: string): string {
   return `<!DOCTYPE html>
