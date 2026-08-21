@@ -420,3 +420,100 @@ export function receiptEmailText(data: ReceiptEmailData): string {
     `${PHONE} · info@tiiviskoti.fi`,
   ].join('\n');
 }
+
+/* ---------- Tarjous (ennen työtä) ---------- */
+
+export type OfferEmailData = {
+  jobNumber: string;
+  customerName: string;
+  lines: MailLine[];
+  totalCents: number;
+  validDays: number;
+};
+
+export function offerEmailSubject(data: OfferEmailData): string {
+  return `Tarjous ${data.jobNumber} — ${COMPANY}`;
+}
+
+export function offerEmailHtml(data: OfferEmailData): string {
+  const workCents = Math.round(data.totalCents * 0.9);
+  const rows = data.lines.map((l) => `
+    <tr>
+      <td style="padding:9px 0;border-bottom:1px solid #E6E2DA;color:${INK};font-size:15px">
+        ${l.qty > 1 ? `<strong>${l.qty}×</strong> ` : ''}${esc(l.name)}
+      </td>
+      <td style="padding:9px 0;border-bottom:1px solid #E6E2DA;text-align:right;color:${INK};font-size:15px;font-weight:600;white-space:nowrap">
+        ${eur(l.sum * 100)}
+      </td>
+    </tr>`).join('');
+
+  return `<!DOCTYPE html>
+<html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:${CREAM};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CREAM};padding:24px 12px">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:14px;overflow:hidden">
+
+  <tr><td style="background:${GREEN};padding:26px 28px">
+    <div style="color:#FFFFFF;font-size:21px;font-weight:700;letter-spacing:-.3px">${COMPANY}</div>
+    <div style="color:#BFD8CC;font-size:14px;margin-top:3px">Ovien ja ikkunoiden tiivistys</div>
+  </td></tr>
+
+  <tr><td style="padding:28px 28px 8px">
+    <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Tarjous · Voimassa ${data.validDays} pv</div>
+    <h1 style="margin:8px 0 0;color:${INK};font-size:23px;font-weight:700;line-height:1.3">Kiitos yhteydenotosta, ${esc(firstName(data.customerName))}!</h1>
+    <p style="margin:12px 0 0;color:${MUTED};font-size:15px;line-height:1.6">
+      Liitteenä tarjous ${esc(data.jobNumber)}. Hyväksy tarjous vastaamalla tähän viestiin
+      tai soittamalla — sovitaan sopiva aika työlle.
+    </p>
+  </td></tr>
+
+  <tr><td style="padding:24px 28px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}
+      <tr>
+        <td style="padding:14px 0 0;color:${MUTED};font-size:14px">Työn osuus (kotitalousvähennys)</td>
+        <td style="padding:14px 0 0;text-align:right;color:${INK};font-size:14px;white-space:nowrap">${eur(workCents)}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0 0;color:${INK};font-size:17px;font-weight:700">Yhteensä</td>
+        <td style="padding:8px 0 0;text-align:right;color:${GREEN};font-size:19px;font-weight:700;white-space:nowrap">${eur(data.totalCents)}</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="padding:4px 0 0;color:${MUTED};font-size:13px">Sisältää ALV 25,5 %</td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:24px 28px 28px">
+    <div style="border-top:1px solid #E6E2DA;padding-top:18px;color:${MUTED};font-size:14px;line-height:1.7">
+      Kysyttävää tarjouksesta? Soita
+      <a href="tel:${PHONE_HREF}" style="color:${GREEN};font-weight:700;text-decoration:none">${PHONE}</a>
+      tai vastaa tähän viestiin.
+    </div>
+  </td></tr>
+
+  <tr><td style="background:${CREAM};padding:18px 28px;text-align:center;color:${MUTED};font-size:12px;line-height:1.6">
+    <strong>${COMPANY}</strong> &middot; Y-tunnus ${BUSINESS_ID}<br>
+    ${COMPANY_ADDRESS}<br>
+    <a href="tel:${PHONE_HREF}" style="color:${GREEN};text-decoration:none">${PHONE}</a> &middot;
+    <a href="mailto:info@tiiviskoti.fi" style="color:${GREEN};text-decoration:none">info@tiiviskoti.fi</a>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+export function offerEmailText(data: OfferEmailData): string {
+  return [
+    `Kiitos yhteydenotosta, ${firstName(data.customerName)}!`,
+    '',
+    `Liitteenä tarjous ${data.jobNumber}, yhteensä ${eur(data.totalCents)} (sis. ALV 25,5 %).`,
+    `Tarjous on voimassa ${data.validDays} päivää. Työn osuus on eritelty kotitalousvähennystä varten.`,
+    'Hyväksy tarjous vastaamalla tähän viestiin tai soittamalla.',
+    '',
+    `${COMPANY} · Y-tunnus ${BUSINESS_ID}`,
+    COMPANY_ADDRESS,
+    `${PHONE} · info@tiiviskoti.fi`,
+  ].join('\n');
+}

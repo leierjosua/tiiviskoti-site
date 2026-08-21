@@ -8,8 +8,11 @@ import { requireStaff } from '@/lib/session';
 import { removeCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
+import { generateOfferPdf } from '@/lib/offer-pdf';
 import { sendMail } from '@/lib/google';
-import { receiptEmailSubject, receiptEmailHtml, receiptEmailText } from '@/lib/mail-templates';
+import { receiptEmailSubject, receiptEmailHtml, receiptEmailText, offerEmailSubject, offerEmailHtml, offerEmailText } from '@/lib/mail-templates';
+
+const OFFER_VALID_DAYS = 14;
 
 export type ActionState = { error?: string; ok?: string };
 
@@ -299,4 +302,87 @@ export async function sendReceipt(_prev: ActionState, formData: FormData): Promi
   revalidatePath(`/tyot/${id}`);
   if (sendErr) return { error: `Kuitin lähetys epäonnistui: ${sendErr}` };
   return { ok: `Kuitti lähetetty osoitteeseen ${job.customer_email}.` };
+}
+
+/* Lähetä tarjous asiakkaalle ennen työtä. Kuin kuitti, mutta ei muuta työn
+   tilaa: PDF (VOIMASSA 14 pv) + sähköposti + tk.mail_log (kind='offer'). */
+export async function sendOffer(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireStaff();
+  const id = String(formData.get('id') ?? '');
+  if (!id) return { error: 'Työtä ei löytynyt.' };
+
+  const job = await getJob(id);
+  if (!job) return { error: 'Työtä ei löytynyt.' };
+  if (!job.customer_email) return { error: 'Asiakkaalla ei ole sähköpostiosoitetta — lisää se ensin.' };
+  if (!job.price_cents || job.price_cents <= 0) return { error: 'Työllä ei ole hintaa, tarjousta ei voi tehdä.' };
+
+  const lines = await sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
+    select name, quantity, unit_price_cents from tk.job_lines
+     where job_id = ${id} order by sort_order
+  `;
+  const offerLines = lines.length
+    ? lines.map((l) => ({ name: l.name, quantity: l.quantity, unitPriceCents: l.unit_price_cents }))
+    : [{ name: job.title || 'Palvelu', quantity: 1, unitPriceCents: job.price_cents }];
+
+  let pdf: Uint8Array;
+  try {
+    pdf = await generateOfferPdf({
+      jobNumber: job.job_number,
+      createdAt: new Date(),
+      workDate: job.starts_at,
+      customer: {
+        name: job.customer_name ?? 'Asiakas',
+        address: job.address,
+        postalCode: job.postal_code,
+        city: job.city,
+        email: job.customer_email,
+        phone: job.customer_phone,
+      },
+      lines: offerLines,
+      totalIncVatCents: job.price_cents,
+    });
+  } catch (e) {
+    return { error: `Tarjouksen luonti epäonnistui: ${(e as Error).message}` };
+  }
+
+  const mailData = {
+    jobNumber: job.job_number,
+    customerName: job.customer_name ?? 'Asiakas',
+    lines: offerLines.map((l) => ({
+      name: l.name,
+      qty: l.quantity,
+      unit: l.unitPriceCents / 100,
+      sum: (l.unitPriceCents * l.quantity) / 100,
+    })),
+    totalCents: job.price_cents,
+    validDays: OFFER_VALID_DAYS,
+  };
+  const subject = offerEmailSubject(mailData);
+  const html = offerEmailHtml(mailData);
+  const text = offerEmailText(mailData);
+
+  let providerId: string | null = null;
+  let sendErr: string | null = null;
+  try {
+    const r = await sendMail({
+      to: job.customer_email,
+      subject,
+      html,
+      text,
+      attachment: { filename: `tarjous-${job.job_number}.pdf`, mimeType: 'application/pdf', content: pdf },
+    });
+    providerId = r.id;
+  } catch (e) {
+    sendErr = (e as Error).message;
+  }
+
+  await sql`
+    insert into tk.mail_log (job_id, kind, to_email, subject, provider_id, error, sent_at)
+    values (${id}, 'offer', ${job.customer_email}, ${subject},
+            ${providerId}, ${sendErr}, ${sendErr ? null : new Date()})
+  `;
+
+  revalidatePath(`/tyot/${id}`);
+  if (sendErr) return { error: `Tarjouksen lähetys epäonnistui: ${sendErr}` };
+  return { ok: `Tarjous lähetetty osoitteeseen ${job.customer_email}.` };
 }
