@@ -9,6 +9,7 @@ import { removeCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
 import { sendMail } from '@/lib/google';
+import { receiptEmailSubject, receiptEmailHtml, receiptEmailText } from '@/lib/mail-templates';
 
 export type ActionState = { error?: string; ok?: string };
 
@@ -259,15 +260,20 @@ export async function sendReceipt(_prev: ActionState, formData: FormData): Promi
     return { error: `Kuitin luonti epäonnistui: ${(e as Error).message}` };
   }
 
-  const subject = `Kuitti #${job.job_number} — TiivisKoti`;
-  const euro = (job.price_cents / 100).toFixed(2).replace('.', ',');
-  const html = `<div style="font-family:system-ui,Arial,sans-serif;max-width:520px;color:#1f2937">
-    <p>Hei ${job.customer_name ?? ''},</p>
-    <p>Kiitos kun valitsit TiivisKodin! Liitteenä kuitti työstä <b>#${job.job_number}</b>, yhteensä <b>${euro} €</b>.</p>
-    <p>Kuitissa on työn osuus valmiiksi eriteltynä kotitalousvähennystä varten.</p>
-    <p style="color:#6b7280;font-size:13px">TiivisKoti.fi · info@tiiviskoti.fi · 045 875 5996</p>
-  </div>`;
-  const text = `Hei ${job.customer_name ?? ''},\n\nKiitos kun valitsit TiivisKodin! Liitteenä kuitti työstä #${job.job_number}, yhteensä ${euro} €.\nKuitissa on työn osuus eriteltynä kotitalousvähennystä varten.\n\nTiivisKoti.fi · info@tiiviskoti.fi · 045 875 5996`;
+  const mailData = {
+    jobNumber: job.job_number,
+    customerName: job.customer_name ?? 'Asiakas',
+    lines: receiptLines.map((l) => ({
+      name: l.name,
+      qty: l.quantity,
+      unit: l.unitPriceCents / 100,
+      sum: (l.unitPriceCents * l.quantity) / 100,
+    })),
+    totalCents: job.price_cents,
+  };
+  const subject = receiptEmailSubject(mailData);
+  const html = receiptEmailHtml(mailData);
+  const text = receiptEmailText(mailData);
 
   let providerId: string | null = null;
   let sendErr: string | null = null;
