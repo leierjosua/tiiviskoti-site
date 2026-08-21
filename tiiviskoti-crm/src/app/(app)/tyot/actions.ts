@@ -6,6 +6,9 @@ import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { requireStaff } from '@/lib/session';
 import { removeCalendarEventForJob } from '@/lib/deliver';
+import { getJob } from '@/lib/data';
+import { generateReceiptPdf } from '@/lib/receipt-pdf';
+import { sendMail } from '@/lib/google';
 
 export type ActionState = { error?: string; ok?: string };
 
@@ -212,4 +215,82 @@ export async function setJobStatus(formData: FormData) {
   revalidatePath(`/tyot/${id}`);
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
+}
+
+/* Merkitse maksetuksi & lähetä kuitti asiakkaalle.
+   Kuitti = keikan tiedoista koostettu PDF (työn osuus 90 %, uusi logo), joka
+   lähetetään Gmaililla ja kirjataan tk.mail_log:iin (kind='receipt'). */
+export async function sendReceipt(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireStaff();
+  const id = String(formData.get('id') ?? '');
+  if (!id) return { error: 'Työtä ei löytynyt.' };
+
+  const job = await getJob(id);
+  if (!job) return { error: 'Työtä ei löytynyt.' };
+  if (!job.customer_email) return { error: 'Asiakkaalla ei ole sähköpostiosoitetta — lisää se ensin.' };
+  if (!job.price_cents || job.price_cents <= 0) return { error: 'Työllä ei ole hintaa, kuittia ei voi tehdä.' };
+
+  const lines = await sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
+    select name, quantity, unit_price_cents from tk.job_lines
+     where job_id = ${id} order by sort_order
+  `;
+  const receiptLines = lines.length
+    ? lines.map((l) => ({ name: l.name, quantity: l.quantity, unitPriceCents: l.unit_price_cents }))
+    : [{ name: job.title || 'Palvelu', quantity: 1, unitPriceCents: job.price_cents }];
+
+  let pdf: Uint8Array;
+  try {
+    pdf = await generateReceiptPdf({
+      jobNumber: job.job_number,
+      createdAt: new Date(),
+      workDate: job.starts_at,
+      customer: {
+        name: job.customer_name ?? 'Asiakas',
+        address: job.address,
+        postalCode: job.postal_code,
+        city: job.city,
+        email: job.customer_email,
+        phone: job.customer_phone,
+      },
+      lines: receiptLines,
+      totalIncVatCents: job.price_cents,
+    });
+  } catch (e) {
+    return { error: `Kuitin luonti epäonnistui: ${(e as Error).message}` };
+  }
+
+  const subject = `Kuitti #${job.job_number} — TiivisKoti`;
+  const euro = (job.price_cents / 100).toFixed(2).replace('.', ',');
+  const html = `<div style="font-family:system-ui,Arial,sans-serif;max-width:520px;color:#1f2937">
+    <p>Hei ${job.customer_name ?? ''},</p>
+    <p>Kiitos kun valitsit TiivisKodin! Liitteenä kuitti työstä <b>#${job.job_number}</b>, yhteensä <b>${euro} €</b>.</p>
+    <p>Kuitissa on työn osuus valmiiksi eriteltynä kotitalousvähennystä varten.</p>
+    <p style="color:#6b7280;font-size:13px">TiivisKoti.fi · info@tiiviskoti.fi · 045 875 5996</p>
+  </div>`;
+  const text = `Hei ${job.customer_name ?? ''},\n\nKiitos kun valitsit TiivisKodin! Liitteenä kuitti työstä #${job.job_number}, yhteensä ${euro} €.\nKuitissa on työn osuus eriteltynä kotitalousvähennystä varten.\n\nTiivisKoti.fi · info@tiiviskoti.fi · 045 875 5996`;
+
+  let providerId: string | null = null;
+  let sendErr: string | null = null;
+  try {
+    const r = await sendMail({
+      to: job.customer_email,
+      subject,
+      html,
+      text,
+      attachment: { filename: `kuitti-${job.job_number}.pdf`, mimeType: 'application/pdf', content: pdf },
+    });
+    providerId = r.id;
+  } catch (e) {
+    sendErr = (e as Error).message;
+  }
+
+  await sql`
+    insert into tk.mail_log (job_id, kind, to_email, subject, provider_id, error, sent_at)
+    values (${id}, 'receipt', ${job.customer_email}, ${subject},
+            ${providerId}, ${sendErr}, ${sendErr ? null : new Date()})
+  `;
+
+  revalidatePath(`/tyot/${id}`);
+  if (sendErr) return { error: `Kuitin lähetys epäonnistui: ${sendErr}` };
+  return { ok: `Kuitti lähetetty osoitteeseen ${job.customer_email}.` };
 }

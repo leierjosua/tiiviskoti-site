@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { deleteJob, rescheduleJob, setJobStatus, updateJob, type ActionState } from '../actions';
+import { deleteJob, rescheduleJob, sendReceipt, setJobStatus, updateJob, type ActionState } from '../actions';
 import { Button, ErrorNote, Field, Input, Textarea, cx } from '@/components/ui';
 import { SubmitButton } from '@/components/submit';
 import { dateKeyOf, timeOf } from '@/lib/time';
@@ -153,6 +153,26 @@ export function MarkDone({ id }: { id: string }) {
       <input type="hidden" name="status" value="done" />
       <SubmitButton variant="outline" className="text-sm" pendingLabel="Merkitään…">Merkitse tehdyksi</SubmitButton>
     </form>
+  );
+}
+
+/** Merkitse maksetuksi & lähetä kuitti asiakkaalle (PDF sähköpostiin). */
+export function SendReceipt({ id, alreadySent }: { id: string; alreadySent?: boolean }) {
+  const [state, action, pending] = useActionState<ActionState, FormData>(sendReceipt, {});
+  return (
+    <div className="space-y-2">
+      {alreadySent && !state.ok && (
+        <p className="text-xs text-accent">✓ Kuitti on jo lähetetty tälle työlle.</p>
+      )}
+      <form action={action}>
+        <input type="hidden" name="id" value={id} />
+        <Button type="submit" variant={alreadySent ? 'outline' : undefined} disabled={pending} className="text-sm">
+          {pending ? 'Lähetetään…' : alreadySent ? 'Lähetä kuitti uudelleen' : 'Merkitse maksetuksi & lähetä kuitti'}
+        </Button>
+      </form>
+      {state.error && <ErrorNote>{state.error}</ErrorNote>}
+      {state.ok && <p className="text-xs text-green-600">{state.ok}</p>}
+    </div>
   );
 }
 

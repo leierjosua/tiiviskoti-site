@@ -161,37 +161,70 @@ function encodeHeader(value: string): string {
   return `=?UTF-8?B?${Buffer.from(value, 'utf8').toString('base64')}?=`;
 }
 
-/** Gmail haluaa base64url-koodatun RFC 822 -viestin. */
-function buildMime(opts: { to: string; subject: string; html: string; text: string }): string {
-  const boundary = `tk_${Math.random().toString(36).slice(2)}`;
-  const message = [
-    `From: ${encodeHeader('TiivisKoti')} <${SENDER_EMAIL}>`,
-    `To: ${opts.to}`,
-    `Subject: ${encodeHeader(opts.subject)}`,
-    'MIME-Version: 1.0',
-    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+export type MailAttachment = { filename: string; mimeType: string; content: Uint8Array | Buffer };
+
+/** base64 pilkottuna 76 merkin riveihin (RFC 2045). */
+function base64Lines(buf: Buffer): string {
+  return buf.toString('base64').replace(/(.{76})/g, '$1\r\n');
+}
+
+/** Gmail haluaa base64url-koodatun RFC 822 -viestin. Liite → multipart/mixed. */
+function buildMime(opts: { to: string; subject: string; html: string; text: string; attachment?: MailAttachment }): string {
+  const alt = `alt_${Math.random().toString(36).slice(2)}`;
+  const altPart = [
+    `Content-Type: multipart/alternative; boundary="${alt}"`,
     '',
-    `--${boundary}`,
+    `--${alt}`,
     'Content-Type: text/plain; charset="UTF-8"',
     'Content-Transfer-Encoding: base64',
     '',
     Buffer.from(opts.text, 'utf8').toString('base64'),
     '',
-    `--${boundary}`,
+    `--${alt}`,
     'Content-Type: text/html; charset="UTF-8"',
     'Content-Transfer-Encoding: base64',
     '',
     Buffer.from(opts.html, 'utf8').toString('base64'),
     '',
-    `--${boundary}--`,
-    '',
+    `--${alt}--`,
   ].join('\r\n');
+
+  const headers = [
+    `From: ${encodeHeader('TiivisKoti')} <${SENDER_EMAIL}>`,
+    `To: ${opts.to}`,
+    `Subject: ${encodeHeader(opts.subject)}`,
+    'MIME-Version: 1.0',
+  ];
+
+  let message: string;
+  if (opts.attachment) {
+    const mix = `mix_${Math.random().toString(36).slice(2)}`;
+    message = [
+      ...headers,
+      `Content-Type: multipart/mixed; boundary="${mix}"`,
+      '',
+      `--${mix}`,
+      altPart,
+      '',
+      `--${mix}`,
+      `Content-Type: ${opts.attachment.mimeType}; name="${opts.attachment.filename}"`,
+      'Content-Transfer-Encoding: base64',
+      `Content-Disposition: attachment; filename="${opts.attachment.filename}"`,
+      '',
+      base64Lines(Buffer.from(opts.attachment.content)),
+      '',
+      `--${mix}--`,
+      '',
+    ].join('\r\n');
+  } else {
+    message = [...headers, altPart, ''].join('\r\n');
+  }
 
   return Buffer.from(message, 'utf8').toString('base64url');
 }
 
 export async function sendMail(opts: {
-  to: string; subject: string; html: string; text: string;
+  to: string; subject: string; html: string; text: string; attachment?: MailAttachment;
 }): Promise<{ id: string }> {
   const token = await accessToken();
   const res = await fetch(

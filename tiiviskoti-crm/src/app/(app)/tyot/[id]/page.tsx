@@ -5,7 +5,7 @@ import { requireStaff } from '@/lib/session';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib/time';
 import { sql } from '@/lib/db';
-import { DeleteJob, EditJobForm, RescheduleForm, StatusButtons } from './ui';
+import { DeleteJob, EditJobForm, RescheduleForm, SendReceipt, StatusButtons } from './ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -118,6 +118,9 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           <CardHeader title="Tila" />
           <div className="space-y-4 p-4">
             <StatusButtons id={job.id} status={job.status} />
+            <div className="border-t border-line pt-4">
+              <SendReceipt id={job.id} alreadySent={mails.some((m) => m.kind === 'receipt' && m.sent_at)} />
+            </div>
             <div className="border-t border-line pt-4">
               <DeleteJob id={job.id} status={job.status} />
             </div>
