@@ -7,6 +7,7 @@ const NAV = [
   { href: '/', label: 'Tänään' },
   { href: '/kalenteri', label: 'Kalenteri' },
   { href: '/tyot', label: 'Työt' },
+  { href: '/tarjoukset', label: 'Tarjoukset', managerOnly: true },
   { href: '/asiakkaat', label: 'Asiakkaat' },
   { href: '/kalenterit', label: 'Työajat', managerOnly: true },
   { href: '/alueet', label: 'Palvelualueet', managerOnly: true },

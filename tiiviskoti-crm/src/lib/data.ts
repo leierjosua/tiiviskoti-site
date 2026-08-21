@@ -258,3 +258,47 @@ export async function availability(opts: {
     };
   });
 }
+
+/* ---------- Tarjoukset (prospektit) ---------- */
+
+export type OfferLine = { name: string; quantity: number; unit_price_cents: number };
+
+export type OfferRow = {
+  id: string;
+  offer_number: string;
+  customer_name: string;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  postal_code: string | null;
+  city: string | null;
+  lines: OfferLine[];
+  total_cents: number;
+  travel_fee_cents: number;
+  notes: string | null;
+  status: 'sent' | 'accepted' | 'declined' | 'expired';
+  valid_until: string | null;
+  provider_id: string | null;
+  error: string | null;
+  sent_at: Date | null;
+  created_at: Date;
+};
+
+export async function listOffers(): Promise<OfferRow[]> {
+  return sql<OfferRow[]>`
+    select id, offer_number, customer_name, email, phone, address, postal_code, city,
+           lines, total_cents, travel_fee_cents, notes, status, valid_until,
+           provider_id, error, sent_at, created_at
+      from tk.offers order by created_at desc
+  `;
+}
+
+export async function getOffer(id: string): Promise<OfferRow | null> {
+  const [row] = await sql<OfferRow[]>`
+    select id, offer_number, customer_name, email, phone, address, postal_code, city,
+           lines, total_cents, travel_fee_cents, notes, status, valid_until,
+           provider_id, error, sent_at, created_at
+      from tk.offers where id = ${id}
+  `;
+  return row ?? null;
+}
