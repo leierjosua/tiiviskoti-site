@@ -6,7 +6,7 @@
 
 import { type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { buildRawEmail, buildRawEmailWithAttachment, buildRawEmailWithAttachments } from "./email-helpers.ts";
-import { htmlToPdf } from "./html-to-pdf.ts";
+import { generateReceiptPdf } from "./generate-receipt-pdf.ts";
 
 // Chromium PDF APIs on Vercel
 const VERCEL_SITE = "https://tiiviskoti.fi";
@@ -487,8 +487,11 @@ async function buildBookingEmailResult(supabase: SupabaseClient, payload: any): 
       pdfBytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) pdfBytes[i] = binary.charCodeAt(i);
     } else {
-      const receiptHtml = buildReceiptHtml(booking);
-      pdfBytes = await htmlToPdf(receiptHtml);
+      // Vercel-PDF-palvelu (loppusiivous-site-new) on poissa käytöstä, joten
+      // renderöi kuitti itsenäisellä pdf-lib-generaattorilla — sama kuin
+      // send-booking-email. Ei ulkoista riippuvuutta, sisältää työn osuus 90 %
+      // ja uuden logon.
+      pdfBytes = await generateReceiptPdf(booking);
     }
   }
 
