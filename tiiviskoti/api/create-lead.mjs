@@ -74,6 +74,35 @@ async function queueLeadNotification(submissionId, f) {
   }
 }
 
+// Peilaa liidi CRM:n tk.leads-tauluun, jotta se näkyy adminin Liidit-sivulla
+// (admin.tiiviskoti.fi/liidit). form_submissions-taulua CRM ei lue. Palvelin­
+// puolen kutsu CRM:n avoimeen endpointtiin; try/catch — ei saa kaataa liidin
+// tallennusta jos CRM on hetkellisesti nurin.
+const CRM_LEAD_URL = process.env.CRM_LEAD_URL || 'https://admin.tiiviskoti.fi/api/public/taloyhtio-lead';
+async function mirrorToCrmLeads(f) {
+  try {
+    const extra = [
+      f.role ? `Rooli: ${f.role}` : null,
+      f.addr ? `Osoite: ${f.addr}` : null,
+      f.doors ? `Ovien määrä (arvio): ${f.doors}` : null,
+      f.when ? `Aikataulutoive: ${f.when}` : null,
+    ].filter(Boolean).join(' · ');
+    await fetch(CRM_LEAD_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name: `${f.yhtio} — ${f.contact}`,
+        email: f.email || '',
+        phone: f.phone,
+        postal_code: f.postalCode || '',
+        message: ['Taloyhtiö-tarjouspyyntö', f.message, extra].filter(Boolean).join('\n'),
+      }),
+    });
+  } catch (e) {
+    console.error('create-lead: CRM-peilaus epäonnistui:', e);
+  }
+}
+
 // Taloyhtiön osoite on yksi vapaa kenttä ("Katuosoite, postinumero"),
 // joten postinumero poimitaan siitä jos se on tunnistettavissa.
 function postalFrom(addr) {
@@ -143,6 +172,12 @@ export default async function handler(req, res) {
     await queueLeadNotification(row.id, {
       contact, email, phone, role, yhtio, addr, doors, when, message,
       postalCode: postalFrom(addr), pageUrl,
+    });
+
+    // Peilaa CRM:n Liidit-sivulle (tk.leads) — sinne minne admin oikeasti katsoo.
+    await mirrorToCrmLeads({
+      contact, email, phone, role, yhtio, addr, doors, when, message,
+      postalCode: postalFrom(addr),
     });
 
     /* Meta CAPI: taloyhtiön tarjouspyyntö on liidi (Lead). Sama periaate kuin
