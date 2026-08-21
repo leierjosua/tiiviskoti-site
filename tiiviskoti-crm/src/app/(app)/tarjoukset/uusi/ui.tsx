@@ -32,6 +32,8 @@ export function OfferBuilder() {
   const [kahva, setKahva] = useState(0);
   const [postal, setPostal] = useState('');
   const [travel, setTravel] = useState<{ cents: number; area: string | null }>({ cents: 0, area: null });
+  const [discount, setDiscount] = useState(0);
+  const [discountLabel, setDiscountLabel] = useState('');
 
   // Matkalisä alueesta, kun postinumero on täydellinen.
   useEffect(() => {
@@ -42,7 +44,11 @@ export function OfferBuilder() {
   }, [postal]);
 
   const countsForCalc = { ...counts, extra_kahva: kahva };
-  const pricing = computePricing(countsForCalc, extras, { travelFee: travel.cents / 100 });
+  const pricing = computePricing(countsForCalc, extras, {
+    travelFee: travel.cents / 100,
+    discount,
+    discountLabel,
+  });
 
   const setCount = (id: string, v: number) => setCounts((c) => ({ ...c, [id]: v }));
 
@@ -103,6 +109,20 @@ export function OfferBuilder() {
                 <Stepper name={`qty_extra_${e.id}`} value={kahva} onChange={setKahva} />
               </div>
             ))}
+          </div>
+        </Card>
+
+        <Card>
+          <CardHeader title="Alennus" action={discount > 0 ? <span className="text-xs font-semibold text-accent">−{eur(discount)}</span> : undefined} />
+          <div className="grid gap-4 p-4 sm:grid-cols-[160px_1fr]">
+            <Field label="Alennus (€)" hint="Vähennetään loppusummasta.">
+              <Input name="discount" type="number" min={0} step="1" value={discount || ''}
+                onChange={(e) => setDiscount(Math.max(0, parseInt(e.target.value, 10) || 0))} placeholder="0" />
+            </Field>
+            <Field label="Alennuksen nimi" hint="Näkyy asiakkaalle rivinä (esim. Kanta-asiakasalennus).">
+              <Input name="discountLabel" value={discountLabel}
+                onChange={(e) => setDiscountLabel(e.target.value)} placeholder="Alennus" />
+            </Field>
           </div>
         </Card>
 

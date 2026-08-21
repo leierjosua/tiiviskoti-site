@@ -57,7 +57,7 @@ export const EXTRAS: OfferExtra[] = [
 ];
 
 export type PricingLine = {
-  kind: 'type' | 'extra' | 'min' | 'travel';
+  kind: 'type' | 'extra' | 'min' | 'travel' | 'discount';
   id: string;
   name: string;
   qty: number;
@@ -105,7 +105,7 @@ function extraQtyFor(extra: OfferExtra, counts: Record<string, unknown>, totalIt
 export function computePricing(
   counts: Record<string, number> = {},
   extras: Record<string, boolean> = {},
-  opts: { travelFee?: number } = {},
+  opts: { travelFee?: number; discount?: number; discountLabel?: string } = {},
 ): Pricing {
   const travelFee = Math.max(0, Number(opts.travelFee) || 0);
   const c = counts || {};
@@ -151,5 +151,15 @@ export function computePricing(
     lines.push({ kind: 'travel', id: 'travel', name: 'Matkalisä', qty: 1, unit: travelFee, sum: travelFee, min: 0 });
   }
 
-  return { lines, subtotal, work, travelFee, total: work + travelFee, count: totalItems, minutes };
+  let total = work + travelFee;
+
+  /* Vapaa alennus koko käynnistä. Vähennetään lopuksi minimin ja matkalisän
+     jälkeen, eikä summa mene alle nollan. Näkyy omana miinusrivinään. */
+  const discount = Math.min(Math.max(0, Number(opts.discount) || 0), total);
+  if (discount > 0) {
+    lines.push({ kind: 'discount', id: 'discount', name: opts.discountLabel?.trim() || 'Alennus', qty: 1, unit: -discount, sum: -discount, min: 0 });
+    total -= discount;
+  }
+
+  return { lines, subtotal, work, travelFee, total, count: totalItems, minutes };
 }

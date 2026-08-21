@@ -65,7 +65,9 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   const { counts, extras } = readCounts(formData);
   const area = d.postalCode ? await areaForPostal(d.postalCode) : null;
   const travelFee = (area?.travelFeeCents ?? 0) / 100;
-  const pricing = computePricing(counts, extras, { travelFee });
+  const discount = Math.max(0, Number(formData.get('discount')) || 0);
+  const discountLabel = String(formData.get('discountLabel') ?? '').trim() || undefined;
+  const pricing = computePricing(counts, extras, { travelFee, discount, discountLabel });
 
   if (pricing.total <= 0) return { error: 'Valitse vähintään yksi palvelu tarjoukseen.' };
 
