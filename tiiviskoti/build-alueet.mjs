@@ -471,23 +471,37 @@ function meistaSivu() {
     inLanguage: 'fi-FI',
   };
 
-  /* Kuvat: valkopaita = Josua (omistaja), tumma paita = Daniel (puheenjohtaja
-     ja asentaja). Kuvat rajattu 4:5 (800×1000). */
+  /* Henkilökuvat poistettu 2026-08-22: puhelimella otetut muotokuvat antoivat
+     yrityksestä harrastelijamaisen vaikutelman, mikä on taloyhtiöasiakkaalle
+     juuri väärä signaali. Tilalle nimikirjainmerkki brändin väreissä — se
+     kestää katsoa, skaalautuu joka kokoon eikä vanhene.
+
+     Henkilöt itse jäävät sivulle: "kaksi tekijää, ei alihankintaa" on koko
+     sivun myyntiargumentti, joten nimet, roolit ja vastuut ovat edelleen
+     esillä. Vain valokuva on poissa. Todisteet siirretään kuvien sijaan
+     konkreettisiin faktoihin (Y-tunnus, vakuutus, takuu) alle. */
   const tiimi = [
     {
-      img: 'meista-omistaja.jpg',
-      alt: 'Josua, TiivisKodin omistaja',
+      alkukirjaimet: 'JL',
       name: 'Josua',
       role: 'Omistaja &amp; asentaja',
       bio: 'Vastaa yrityksestä ja hinnoittelusta — ja siitä että jokainen käynti hoidetaan juuri niin kuin on luvattu.',
     },
     {
-      img: 'meista-asentaja.jpg',
-      alt: 'Daniel, TiivisKodin puheenjohtaja ja asentaja',
+      alkukirjaimet: 'DS',
       name: 'Daniel',
       role: 'Puheenjohtaja &amp; asentaja',
       bio: 'Tekee kartoitukset ja tiivisteasennukset itse työmaalla. Sinua palvelee sama henkilö alusta loppuun.',
     },
+  ];
+
+  /* Kuvien tilalle mitattavia lupauksia: taloyhtiön hallitus arvioi
+     toimittajaa näillä, ei kasvokuvilla. */
+  const faktat = [
+    { iso: 'Y-tunnus', pieni: '3414418-4 · rekisteröity yritys' },
+    { iso: 'Vastuu&shy;vakuutettu', pieni: 'voimassa oleva vastuuvakuutus' },
+    { iso: '2 vuotta', pieni: 'takuu asennustyölle' },
+    { iso: '0 €', pieni: 'kartoituskäynti, ei sitoumusta' },
   ];
 
   return `<!doctype html>
@@ -532,15 +546,46 @@ ${nav(R)}
 </div></header>
 
 <section class="sec" style="padding-top:clamp(20px,3vw,32px)"><div class="wrap">
-  <div class="rv" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;max-width:720px">
-    ${tiimi.map((t) => `<figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden">
-      <img src="img/${t.img}" alt="${esc(t.alt)}" width="800" height="1000" loading="lazy" style="width:100%;height:auto;display:block;aspect-ratio:4/5;object-fit:cover;object-position:center" />
-      <figcaption style="padding:16px 18px">
+  <div class="rv" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;max-width:720px">
+    ${tiimi.map((t) => `<figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;gap:16px;align-items:flex-start;padding:20px">
+      <span aria-hidden="true" style="flex:0 0 auto;width:56px;height:56px;border-radius:14px;background:var(--green-soft);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:19px;letter-spacing:.02em;color:var(--green-d)">${t.alkukirjaimet}</span>
+      <figcaption style="min-width:0">
         <b style="display:block;font-size:18px;color:var(--ink)">${t.name}</b>
         <span style="display:block;margin-top:2px;font-size:14px;font-weight:700;color:var(--green)">${t.role}</span>
         <span style="display:block;margin-top:9px;font-size:14.5px;line-height:1.55;color:var(--text)">${t.bio}</span>
       </figcaption>
     </figure>`).join('\n    ')}
+  </div>
+
+  <div class="rv" style="margin-top:clamp(30px,4vw,44px)">
+    <h2 style="font-size:clamp(22px,2.6vw,28px);max-width:24ch">Mihin voit luottaa</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-top:16px">
+      ${faktat.map((f) => `<div class="wstat">
+        <b style="font-size:20px;white-space:normal">${f.iso}</b>
+        <span>${f.pieni}</span>
+      </div>`).join('\n      ')}
+    </div>
+  </div>
+</div></section>
+
+<section class="sec alt"><div class="wrap">
+  <div class="rv" style="max-width:760px">
+    <div class="kicker">Näin työ etenee</div>
+    <h2 style="font-size:clamp(24px,3vw,34px);max-width:20ch">Sama porukka alusta loppuun</h2>
+    <div style="display:grid;gap:14px;margin-top:22px">
+      ${[
+        ['1', 'Kartoitus veloituksetta', 'Käymme kohteessa, mittaamme vetokohdat ja käymme ovet läpi yksi kerrallaan. Et maksa käynnistä mitään etkä sitoudu mihinkään.'],
+        ['2', 'Kiinteä hinta kirjallisena', 'Saat hinnan ennen työn aloitusta. Se ei muutu matkan varrella — jos laajuus poikkeaa, sovimme siitä kanssasi etukäteen.'],
+        ['3', 'Asennus sovittuna päivänä', 'Vanhat tiivisteet pois, pinnat puhtaaksi, uudet tiivisteet ja oven käynnin säätö. Jäljet siivotaan mennessä.'],
+        ['4', 'Takuu ja jälkihoito', 'Asennustyölle kahden vuoden takuu. Jos jokin ei toimi kuten pitää, tulemme korjaamaan sen.'],
+      ].map(([n, t, d]) => `<div style="display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)">
+        <span aria-hidden="true" style="flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px">${n}</span>
+        <div style="min-width:0">
+          <b style="display:block;font-size:16.5px;color:var(--ink)">${t}</b>
+          <span style="display:block;margin-top:5px;font-size:14.5px;line-height:1.6;color:var(--text)">${d}</span>
+        </div>
+      </div>`).join('\n      ')}
+    </div>
   </div>
 </div></section>
 
