@@ -458,7 +458,7 @@ function meistaSivu() {
   const R = '';
   const url = `${SITE}/meista.html`;
   const title = 'Meistä — TiivisKoti';
-  const desc = 'TiivisKoti on kahden tekijän yritys: sama porukka vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ovien ja ikkunoiden tiivistevaihto kiinteään hintaan Uudellamaalla ja Riihimäellä.';
+  const desc = 'TiivisKoti tekee työt omalla porukalla: sama tiimi vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ovien ja ikkunoiden tiivistevaihto kiinteään hintaan Uudellamaalla ja Riihimäellä.';
 
   const ld = {
     '@context': 'https://schema.org',
@@ -476,10 +476,14 @@ function meistaSivu() {
      juuri väärä signaali. Tilalle nimikirjainmerkki brändin väreissä — se
      kestää katsoa, skaalautuu joka kokoon eikä vanhene.
 
-     Henkilöt itse jäävät sivulle: "kaksi tekijää, ei alihankintaa" on koko
+     Henkilöt itse jäävät sivulle: "oma porukka, ei alihankintaa" on koko
      sivun myyntiargumentti, joten nimet, roolit ja vastuut ovat edelleen
      esillä. Vain valokuva on poissa. Todisteet siirretään kuvien sijaan
-     konkreettisiin faktoihin (Y-tunnus, vakuutus, takuu) alle. */
+     konkreettisiin faktoihin (Y-tunnus, vakuutus, takuu) alle.
+
+     ÄLÄ kirjoita tähän henkilömäärää ("kaksi tekijää", "kahden hengen").
+     Tekijöitä on enemmän kuin tällä listalla; alla luetellaan vain
+     vastuuhenkilöt, ja siksi otsikko on "Vastuuhenkilöt" eikä "Tiimi". */
   const tiimi = [
     {
       alkukirjaimet: 'JL',
@@ -541,11 +545,13 @@ ${nav(R)}
 
 <header class="sec" style="padding-bottom:0"><div class="wrap">
   <div class="kicker">Meistä</div>
-  <h1 style="font-size:clamp(34px,4.8vw,54px);max-width:18ch">Kaksi tekijää, ei alihankintaa</h1>
-  <p class="sub" style="max-width:60ch">Meidät tapaat myös työmaalla: sama porukka vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ei myyntimiehiä eikä alihankintaa — siksi hinta on kiinteä ja vastuu selvä.</p>
+  <h1 style="font-size:clamp(34px,4.8vw,54px);max-width:18ch">Oma porukka, ei alihankintaa</h1>
+  <p class="sub" style="max-width:60ch">Meidät tapaat myös työmaalla: oma porukkamme vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ei myyntimiehiä eikä alihankintaa — siksi hinta on kiinteä ja vastuu selvä.</p>
 </div></header>
 
 <section class="sec" style="padding-top:clamp(20px,3vw,32px)"><div class="wrap">
+  <h2 class="rv" style="font-size:clamp(22px,2.6vw,28px);max-width:24ch;margin-bottom:6px">Vastuuhenkilöt</h2>
+  <p class="rv" style="font-size:15px;color:var(--mute);max-width:56ch;margin-bottom:20px">Heidät tavoitat koko projektin ajan ja he vastaavat siitä että työ etenee sovitusti. Asennukset tekee oma porukkamme — emme käytä alihankkijoita.</p>
   <div class="rv" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;max-width:720px">
     ${tiimi.map((t) => `<figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;gap:16px;align-items:flex-start;padding:20px">
       <span aria-hidden="true" style="flex:0 0 auto;width:56px;height:56px;border-radius:14px;background:var(--green-soft);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:19px;letter-spacing:.02em;color:var(--green-d)">${t.alkukirjaimet}</span>
