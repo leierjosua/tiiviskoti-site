@@ -81,7 +81,7 @@
         {
           "@type": "Question",
           "name": "Kuinka nopeasti pääsette aloittamaan?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Kartoituskäynnin saamme yleensä sovittua 1–2 viikon sisään. Itse työ ajoitetaan hallitukselle ja asukkaille sopivaan ajankohtaan tarjouksen hyväksymisen jälkeen." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Kartoituskäynnin voitte varata suoraan sivun kalenterista — vapaat ajat näkyvät heti, ja vahvistus tulee sähköpostiin saman tien. Itse työ ajoitetaan hallitukselle ja asukkaille sopivaan ajankohtaan tarjouksen hyväksymisen jälkeen." }
         },
         {
           "@type": "Question",
@@ -135,6 +135,8 @@ h2.title{font-size:clamp(29px,3.8vw,44px);font-weight:800;max-width:18ch;letter-
 a.btn-p{color:#fff}
 .btn-o{background:var(--card);color:var(--ink);border-color:var(--line2)}.btn-o:hover{border-color:var(--green);color:var(--green)}
 .btn-lg{padding:16px 32px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:disabled:hover{background:var(--green)}
 .arrow{transition:transform .18s}.btn:hover .arrow{transform:translateX(3px)}
 .lnk{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--green);font-size:15px}
 .lnk .arrow{width:15px;height:15px}
@@ -240,9 +242,13 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .mname{font-weight:800;font-size:19px;color:var(--ink);text-transform:capitalize}
 .mnav{width:36px;height:36px;border-radius:9px;border:1.5px solid var(--line2);background:var(--card);color:var(--green);cursor:pointer;display:grid;place-items:center}
 .mnav:hover{border-color:var(--green)}.mnav:disabled{opacity:.35;cursor:not-allowed}
-.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+/* Leveysrajaus on pakollinen, ei kosmeettinen: `.day` on aspect-ratio:1
+   seitsemän sarakkeen ruudukossa, joten ilman kattoa päivistä tulee leveän
+   kortin sisällä valtavia neliöitä. Sama korjaus kuin index/varaa/ajanvaraus
+   -sivuilla ja `_alueet.css`:ssä. */
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;max-width:460px;margin-inline:auto}
 .dow span{text-align:center;font-size:11.5px;font-weight:700;color:var(--mute);text-transform:uppercase}
-.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:460px;margin-inline:auto}
 .day{aspect-ratio:1;border-radius:9px;border:1.5px solid transparent;background:var(--alt);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative}
 .day.empty{background:transparent;cursor:default}
 .day.off{background:transparent;color:var(--line2);cursor:not-allowed}
@@ -401,8 +407,79 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .tform-done .ok{width:60px;height:60px;border-radius:50%;background:var(--green-soft);display:grid;place-items:center;margin:0 auto 16px;color:var(--green)}
 .tform-done .refno{font-weight:800;font-size:22px;color:var(--green);margin:10px 0}
 
+/* POSTINUMEROVAIHE — sama ulkoasu kuin etusivun varauksen aloituskortissa
+   (index.html `.gate-*`). Luokat ja arvot on kopioitu sieltä sellaisenaan,
+   jotta kenttä näyttää samalta kummallakin sivulla eikä ala elää omaa
+   elämäänsä. Jos muutat etusivun `.gate-field`-lohkoa, muuta tämä samalla. */
+.gate-field{margin-top:22px;background:var(--green-soft);border:1px solid var(--line);
+  border-radius:var(--r);padding:16px 16px 18px}
+.gate-field label{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;
+  color:var(--ink);letter-spacing:-.01em}
+.gate-step{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  background:var(--green);color:#fff;font-size:13px;font-weight:800;flex:0 0 auto}
+.gate-hint{display:block;font-size:14px;line-height:1.55;color:var(--text);margin:7px 0 12px}
+.gate-hint b{color:var(--ink)}
+/* Iso väljä kenttä: viisi numeroa on koko syöte, joten se saa näkyä.
+   Tasalevyiset numerot pitävät leveyden vakaana kirjoitettaessa. */
+.gate-field .gate-postal{font-size:26px;font-weight:800;letter-spacing:.16em;text-align:center;
+  padding:14px 12px;max-width:220px;font-variant-numeric:tabular-nums;color:var(--ink);
+  background:var(--card)}
+.gate-field .gate-postal::placeholder{font-weight:600;letter-spacing:.16em;color:#B9C3BB}
+.gate-cta{width:100%;margin-top:16px;padding:15px;font-size:16px}
+.gate-ticks{display:flex;justify-content:center;gap:18px;margin-top:14px;
+  font-size:13.5px;color:var(--green);font-weight:700}
+/* Palvelualueen huomiolaatikko, sama kuin etusivulla. `.ok`/`.bad` ovat
+   turvallisia tässä: sivun muut `.ok`-säännöt ovat jälkeläisvalitsimia
+   (`.tform-done .ok`, `.book-done .ok`), eikä kumpikaan ole tämän esi-isä. */
+.area-note{border:1px solid var(--line);background:var(--green-soft);border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:14px;line-height:1.55}
+.area-note b{display:block;color:var(--ink)}
+.area-note span{display:block;color:var(--mute);margin-top:2px}
+.area-note.ok{border-color:rgba(33,90,67,.35)}
+.area-note.bad{background:#FDF3F2;border-color:rgba(200,80,70,.35)}
+.area-note a{color:var(--green);font-weight:700}
+.bsum .when svg{flex:none}
+select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%237B857D' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+
+/* VAIHENÄKYMÄ — postinumero → aika → tiedot → valmis.
+   Sama kortti ja sama moottori kuin ajanvaraus.html:ssä: sivu ei vaihdu
+   missään kohtaa, vain kortin sisältö ristihäivytetään paikallaan ja kortin
+   korkeus animoidaan, jottei alla oleva sisältö nytkähdä. Luokat on nimetty
+   samoin kuin siellä, jotta molemmat näyttävät ja tuntuvat samalta. */
+.stepcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:24px;box-shadow:var(--sh);overflow:hidden;max-width:560px;margin:clamp(26px,3.5vw,40px) auto 0}
+.stepcard.wide{max-width:760px}
+.stepcard-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;min-height:26px}
+.stepback{display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0;
+  color:var(--green);font-family:inherit;font-weight:700;font-size:14.5px;cursor:pointer}
+.stepback:hover{text-decoration:underline;text-underline-offset:3px}
+.stepback[hidden]{display:none}
+.steptag{font-weight:800;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+/* Etenemispisteet: aktiivinen vaihe venyy viivaksi — kertoo sekä sijainnin
+   että sen, montako vaihetta on jäljellä. */
+.stepdots{display:flex;justify-content:center;gap:6px;margin-bottom:18px}
+.stepdots i{width:7px;height:7px;border-radius:99px;background:var(--line2);transition:.32s var(--ease)}
+.stepdots i.on{width:22px;background:var(--green)}
+.stepdots i.done{background:var(--green-l)}
+/* Ulos häivytys on nopeampi kuin sisään, jolloin uusi näkymä ehtii ottaa
+   paikan eikä välissä näy tyhjää. */
+.vstep{animation:step-in .22s var(--ease) both}
+.vstep[hidden]{display:none}
+@keyframes step-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.stepcard.leaving .vstep{animation:step-out .13s var(--ease) both}
+@keyframes step-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-6px)}}
+.steprecap{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:var(--green-soft);border:1px solid var(--line);border-radius:var(--r);
+  padding:13px 16px;margin-bottom:18px}
+.steprecap .when{font-weight:800;font-size:15px;color:var(--ink);line-height:1.3}
+.steprecap .svc{font-size:13px;color:var(--text);margin-top:2px}
+.steprecap .chg{flex:0 0 auto;background:none;border:none;padding:0;color:var(--green);
+  font-family:inherit;font-weight:700;font-size:13.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:620px){.steprecap{flex-direction:column;align-items:flex-start;gap:8px}}
+
 @media(max-width:960px){.tbenefits{grid-template-columns:1fr}.steps{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:620px){.tincl,.tform .row{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
+/* Aikapainikkeet kolmeen sarakkeeseen puhelimessa, kuten varaa.html:ssä —
+   neljä kellonaikaa 390px leveydellä jää liian kapeaksi kosketettavaksi. */
+@media(max-width:620px){.tincl,.tform .row{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.slots{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
@@ -412,7 +489,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     <a href="/#palvelut">Palvelut</a><a href="/#laskuri">Hinta</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="toiminta-alueet.html">Toiminta-alueet</a><a href="meista.html">Meistä</a><a href="/#saasto">Säästö</a>
   </div>
   <a href="tel:+358458755996" class="ntel">045 875 5996</a>
-  <a href="#tarjous" class="btn btn-p" style="padding:10px 20px">Pyydä tarjous</a>
+  <a href="#varaa" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
   <button class="burger" id="burger" aria-label="Valikko"><span></span><span></span><span></span></button>
 </div></nav>
 
@@ -423,7 +500,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     <h1>Taloyhtiön ovet ja ikkunat<br>kuntoon <span class="a">kerralla.</span></h1>
     <p class="hero-sub">Tiivistämme rappukäytävät, yhteistilat ja ikkunat kiinteällä sopimushinnalla. Yksi kumppani ja selkeä tarjous hallitukselle.</p>
     <div class="hero-cta">
-      <a href="#tarjous" class="btn btn-p btn-lg">Pyydä tarjous</a>
+      <a href="#varaa" class="btn btn-p btn-lg">Varaa ilmainen kartoituskäynti</a>
       <a href="tel:+358458755996" class="btn btn-o btn-lg">Soita 045 875 5996</a>
     </div>
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä sopimushinta · kartoitus veloituksetta · työ asukkaita häiritsemättä</p>
@@ -441,6 +518,144 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     <div class="metric"><b><span class="a">10–15 %</span></b><span>arvioitu pudotus lämmityskuluissa</span></div>
   </div>
 </section>
+
+<!-- VARAA KARTOITUSKÄYNTI — sivun päätoiminto, heti heron alla.
+     Vaihenäkymä: postinumero → aika → taloyhtiön tiedot → valmis. Sama kortti
+     ja sama logiikka kuin kuluttajapuolen ajanvaraus.html:ssä, jotta varaus
+     tuntuu samalta riippumatta siitä kumpaa kautta asiakas tuli.
+
+     Miksi vaiheittain eikä kaikki kerralla: postinumero on pakko tietää ennen
+     aikoja (vapaat ajat riippuvat palvelualueesta), ja yhteystietojen kysyminen
+     ennen kuin aikaa on edes valittu on turha este. Yksi kysymys kerrallaan. -->
+<section class="sec" id="varaa"><div class="wrap">
+  <div class="center rv">
+    <div class="kicker" id="varaaKicker">Veloitukseton · ei sitoumusta</div>
+    <h2 class="title" id="varaaTitle">Varaa ilmainen kartoituskäynti</h2>
+    <p class="sub step-sub" id="varaaSub">Kolme askelta: postinumero, aika ja taloyhtiön tiedot.
+      Käynti kestää noin 20 minuuttia eikä sido teitä mihinkään.</p>
+  </div>
+
+  <div class="stepcard rv" id="stepCard">
+    <div class="stepcard-head">
+      <button type="button" class="stepback" id="stepBack" hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Takaisin</span>
+      </button>
+      <span class="steptag" id="stepTag"></span>
+    </div>
+    <div class="stepdots" id="stepDots" aria-hidden="true"></div>
+
+    <!-- VAIHE 1: postinumero -->
+    <div class="vstep" data-step="postal"
+         data-tag="Vaihe 1/3" data-focus="kartPostal"
+         data-title="Varaa ilmainen kartoituskäynti"
+         data-kicker="Veloitukseton · ei sitoumusta"
+         data-sub="Kolme askelta: postinumero, aika ja taloyhtiön tiedot. Käynti kestää noin 20 minuuttia eikä sido teitä mihinkään.">
+      <div class="gate-field">
+        <label for="kartPostal">
+          <span class="gate-step">1</span>
+          Taloyhtiön postinumero
+        </label>
+        <span class="gate-hint">
+          Syötä <b>taloyhtiön postinumero</b> — näytämme vain ne ajat, jotka ovat
+          vapaana teidän alueellanne.
+        </span>
+        <input class="bk-input gate-postal" id="kartPostal" inputmode="numeric" maxlength="5" required
+               placeholder="04400" autocomplete="postal-code" aria-describedby="kartNote" />
+      </div>
+
+      <div class="area-note" id="kartNote" style="margin-top:14px"></div>
+
+      <button type="button" class="btn btn-p gate-cta" id="toCal" disabled>Jatka</button>
+
+      <div class="gate-ticks">
+        <span>✓ Veloitukseton</span><span>✓ Ei sitoumusta</span>
+      </div>
+    </div>
+
+    <!-- VAIHE 2: aika -->
+    <div class="vstep" data-step="cal" hidden
+         data-tag="Vaihe 2/3" data-wide="1"
+         data-back="Muuta postinumeroa"
+         data-title="Valitkaa sopiva aika"
+         data-kicker="Vapaat ajat"
+         data-sub="Näytämme vain ne ajat, jotka ovat oikeasti vapaana kartoituskalenterissa.">
+      <div class="bcal-head">
+        <button type="button" class="mnav" id="kMPrev" aria-label="Edellinen kuukausi">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="mname" id="kMName"></div>
+        <button type="button" class="mnav" id="kMNext" aria-label="Seuraava kuukausi">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="dow"><span>Ma</span><span>Ti</span><span>Ke</span><span>To</span><span>Pe</span><span>La</span><span>Su</span></div>
+      <div class="grid-days" id="kGridDays"></div>
+      <div class="slots-wrap">
+        <div class="slots-title" id="kSlotsTitle">Valitkaa päivä nähdäksenne vapaat ajat</div>
+        <div class="slots" id="kSlots"></div>
+      </div>
+      <!-- Siirtyminen on oma nappinsa eikä tapahdu heti aikaa klikatessa:
+           valinnan voi vielä vaihtaa ennen kuin näkymä vaihtuu. -->
+      <button type="button" class="btn btn-p btn-lg" id="toDetails"
+              style="width:100%;margin-top:18px" disabled>Valitkaa ensin aika</button>
+    </div>
+
+    <!-- VAIHE 3: taloyhtiön tiedot -->
+    <div class="vstep" data-step="form" hidden
+         data-tag="Vaihe 3/3" data-focus="bkYhtio"
+         data-back="Takaisin kalenteriin"
+         data-title="Taloyhtiön tiedot"
+         data-kicker="Viimeinen askel"
+         data-sub="Vahvistamme ajan heti sähköpostilla.">
+      <div class="steprecap">
+        <div>
+          <div class="when" id="bkWhenText">—</div>
+          <div class="svc">Veloitukseton kartoituskäynti · noin 20 min</div>
+        </div>
+        <button type="button" class="chg" id="bkChange">Vaihda aika</button>
+      </div>
+
+      <div class="bk-field"><label for="bkYhtio">Taloyhtiön nimi</label>
+        <input id="bkYhtio" class="bk-input" placeholder="As Oy Esimerkki" /></div>
+      <div class="bk-field"><label for="bkAddr">Taloyhtiön katuosoite</label>
+        <input id="bkAddr" class="bk-input" placeholder="Esimerkkikuja 5" autocomplete="street-address" /></div>
+      <div class="bk-row">
+        <div class="bk-field"><label for="bkContact">Yhteyshenkilö</label>
+          <input id="bkContact" class="bk-input" placeholder="Etu- ja sukunimi" autocomplete="name" /></div>
+        <div class="bk-field"><label for="bkRole">Rooli</label>
+          <select id="bkRole" class="bk-input"><option>Isännöitsijä</option><option>Hallituksen puheenjohtaja</option><option>Hallituksen jäsen</option><option>Muu</option></select></div>
+      </div>
+      <div class="bk-row">
+        <div class="bk-field"><label for="bkPhone">Puhelin</label>
+          <input id="bkPhone" class="bk-input" type="tel" placeholder="045 123 4567" autocomplete="tel" /></div>
+        <div class="bk-field"><label for="bkEmail">Sähköposti</label>
+          <input id="bkEmail" class="bk-input" type="email" placeholder="nimi@esimerkki.fi" autocomplete="email" /></div>
+      </div>
+      <div class="bk-field"><label for="bkDoors">Ovien ja ikkunoiden määrä (arvio)</label>
+        <select id="bkDoors" class="bk-input"><option>En osaa sanoa</option><option>1–5 kpl</option><option>6–15 kpl</option><option>16–30 kpl</option><option>Yli 30 kpl</option></select></div>
+
+      <div class="bk-err" id="kErr" style="display:none"></div>
+      <button type="button" class="btn btn-p btn-lg" id="kBook" style="width:100%">Varaa ilmainen kartoituskäynti</button>
+      <div class="bk-trust">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/></svg>
+        Käynti on veloitukseton eikä sido taloyhtiötä mihinkään · <a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:2px;color:inherit">Tietosuoja</a>
+      </div>
+    </div>
+
+    <!-- VAIHE 4: valmis -->
+    <div class="vstep book-done" data-step="done" hidden
+         data-tag="Valmis"
+         data-title="Kartoituskäynti vahvistettu"
+         data-kicker="Kiitos"
+         data-sub="Lähetimme vahvistuksen sähköpostiinne.">
+      <div class="ok"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h3>Kartoituskäynti vahvistettu</h3>
+      <div class="refno" id="kartRef">1000</div>
+      <p class="bsub" id="kartDoneText" style="max-width:46ch;margin:8px auto 0"></p>
+    </div>
+  </div>
+</div></section>
 
 <!-- MIKSI TALOYHTIÖT -->
 <section class="sec" id="edut"><div class="wrap">
@@ -497,8 +712,8 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 
 <!-- TARJOUSPYYNTÖ -->
 <section class="sec alt" id="tarjous"><div class="wrap">
-  <div class="center rv"><div class="kicker">Pyydä tarjous</div><h2 class="title">Kerro taloyhtiöstänne — palaamme tarjouksella</h2>
-    <p class="sub">Täytä tiedot, niin sovimme veloituksettoman kartoituskäynnin ja toimitamme kirjallisen sopimushinnan.</p></div>
+  <div class="center rv"><div class="kicker">Ette tarvitse käyntiä vielä?</div><h2 class="title">Pyytäkää pelkkä tarjous</h2>
+    <p class="sub">Jos aikataulu ei ole vielä selvillä, jättäkää tiedot tästä — otamme yhteyttä ja sovimme kartoituskäynnin kanssanne. Voitte myös <a href="#varaa" style="color:var(--green);font-weight:700;text-decoration:underline;text-underline-offset:2px">varata ajan suoraan kalenterista</a>.</p></div>
   <div class="tform rv">
     <div id="tqForm">
       <form id="tForm">
@@ -528,6 +743,8 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
       <div class="ok"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3>Tarjouspyyntö vastaanotettu</h3><div class="refno" id="qRef">TK-YHT-000000</div>
       <p class="bsub" id="qDoneText" style="margin-top:8px"></p>
+
+
       <button class="btn btn-o" style="margin-top:16px" id="qReset">Tee uusi tarjouspyyntö</button>
     </div>
   </div>
@@ -539,7 +756,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   <div class="faq" id="faq">
     <div class="q"><button type="button">Saako taloyhtiö kotitalousvähennyksen?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Kotitalousvähennys on henkilökohtainen, joten taloyhtiö ei sitä saa. Hinta on kuitenkin kiinteä ja kilpailukykyinen, ja työn voi tarvittaessa jaksottaa talousarvioon. Osakas voi hyödyntää vähennystä oman huoneistonsa oviin.</p></div></div>
     <div class="q"><button type="button">Häiritseekö työ asukkaita?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Ei juurikaan. Tiivisteiden vaihto on nopeaa ja siistiä, ja teemme sen porras kerrallaan sovittuna aikana. Kulkureitit pidetään auki koko työn ajan.</p></div></div>
-    <div class="q"><button type="button">Kuinka nopeasti pääsette aloittamaan?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Kartoituskäynnin saamme yleensä sovittua 1–2 viikon sisään. Itse työ ajoitetaan hallitukselle ja asukkaille sopivaan ajankohtaan tarjouksen hyväksymisen jälkeen.</p></div></div>
+    <div class="q"><button type="button">Kuinka nopeasti pääsette aloittamaan?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Kartoituskäynnin voitte varata suoraan sivun kalenterista — vapaat ajat näkyvät heti, ja vahvistus tulee sähköpostiin saman tien. Itse työ ajoitetaan hallitukselle ja asukkaille sopivaan ajankohtaan tarjouksen hyväksymisen jälkeen.</p></div></div>
     <div class="q"><button type="button">Millä alueella toimitte?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Koko Uudenmaan alueella — Helsinki, Espoo, Vantaa ja kehyskunnat. Kerro taloyhtiön osoite tarjouspyynnössä, niin vahvistamme palvelun alueellanne.</p></div></div>
   </div>
 </div></section>
@@ -553,7 +770,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
       <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Vastuuvakuutettu · 2 vuoden takuu työlle</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="/#laskuri">Hintalaskuri</a></div>
-    <div class="mf-col"><h4>Taloyhtiöille</h4><a href="#edut">Miksi me</a><a href="#prosessi">Näin etenemme</a><a href="#ukk">UKK</a><a href="#tarjous">Pyydä tarjous</a></div>
+    <div class="mf-col"><h4>Taloyhtiöille</h4><a href="#edut">Miksi me</a><a href="#prosessi">Näin etenemme</a><a href="#ukk">UKK</a><a href="#varaa">Varaa aika</a><a href="#tarjous">Pyydä tarjous</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:+358458755996">045 875 5996</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="#tarjous">Uusimaa</a></div>
   </div>
   <div class="mf-cities">
@@ -565,7 +782,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 
 <div class="mcta">
   <a href="tel:+358458755996" class="btn btn-o tel" aria-label="Soita"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></a>
-  <a href="#tarjous" class="btn btn-p">Pyydä tarjous</a>
+  <a href="#varaa" class="btn btn-p">Varaa aika</a>
 </div>
 
 <script>
@@ -637,21 +854,422 @@ tForm.addEventListener('submit',async e=>{
     document.getElementById('tqForm').style.display='none';
     document.getElementById('tqDone').style.display='block';
     document.getElementById('qRef').textContent=data.ref;
-    /* Ei luvata sähköpostivahvistusta: tarjouspyynnöstä ei lähde automaattiviestiä. */
-    document.getElementById('qDoneText').textContent=`Kiitos, ${contact}! Tarjouspyyntö on vastaanotettu${yhtio?(' taloyhtiön "'+yhtio+'" osalta'):''}. Otamme yhteyttä yleensä saman päivän aikana numeroon ${payload.phone} tai osoitteeseen ${email} ja sovimme veloituksettoman kartoituskäynnin.`;
+    /* Ei luvata sähköpostivahvistusta: tarjouspyynnöstä ei lähde automaattiviestiä.
+       Kalenteri on sivun yläosassa omana osionaan, joten tästä ohjataan sinne
+       niille jotka haluavat käynnin heti eivätkä jäädä odottamaan soittoa. */
+    document.getElementById('qDoneText').textContent=`Kiitos, ${contact}! Tarjouspyyntö on vastaanotettu${yhtio?(' taloyhtiön "'+yhtio+'" osalta'):''}. Otamme yhteyttä yleensä saman päivän aikana numeroon ${payload.phone} tai osoitteeseen ${email}.`;
     document.getElementById('tqDone').scrollIntoView({behavior:'smooth',block:'center'});
     btn.disabled=false; btn.textContent=btnLabel;
+
+    /* Esitäytetään yläosan varauslomake samoilla tiedoilla: jos he haluavat
+       käynnin heti, sitä ei tarvitse naputella toiseen kertaan. */
+    kPrefillFromLead(payload, data.ref||'');
   }catch(_){
     err.textContent='Yhteysvirhe. Tarkista verkkoyhteys ja yritä uudelleen, tai soita 045 875 5996.';
     err.style.display='block';
     btn.disabled=false; btn.textContent=btnLabel;
   }
 });
+/* ═══════════════════════════════════════════════════════════════
+   KARTOITUSKÄYNNIN AJANVARAUS — sivun päätoiminto (#varaa)
+
+   Vapaat ajat tulevat CRM:n rajapinnasta, joka laskee ne kartoituskalenterin
+   työajoista, poikkeuspäivistä ja jo varatuista käynneistä — ei koskaan
+   arvottuna. Jos rajapinta ei vastaa, näytetään puhelinnumero eikä
+   keksittyjä aikoja.
+
+   Varaus tekee KAKSI asiaa tässä järjestyksessä:
+     1. tallentaa liidin (`/api/create-lead`), ja vasta sitten
+     2. varaa ajan (`/api/create-kartoitus`).
+   Järjestys on tärkeä: jos ajan varaus kaatuu tai aika ehditään viedä,
+   yhteydenotto on jo adminissa eikä kauppaa menetetä. Aiemmin liidi syntyi
+   erillisestä lomakkeesta ennen kalenteria; nyt kun kalenteri on ensimmäinen
+   asia sivulla, sama turva pitää tehdä täällä.
+
+   Tämä sivu ei lataa `_shared.js`:ää (siinä on kuluttajapuolen hintalaskuri
+   koko vaihenäkymineen), joten kalenteri on tässä omana pienenä versionaan.
+   Ulkoasu tulee samoista CSS-luokista, joten se näyttää samalta.
+   ═══════════════════════════════════════════════════════════════ */
+const CRM_BASE='https://tiiviskoti-crm.vercel.app';
+
+/* Kartoituskäynnin kesto. PIDÄ SYNKASSA CRM:n `KARTOITUS_MINUTES`-vakion
+   kanssa (tiiviskoti-crm/src/lib/availability.ts) — muuten sivu tarjoaa eri
+   mittaisia aikoja kuin kalenteriin varataan. CRM ei lue tätä lukua
+   pyynnöstä, vaan käyttää aina omaansa. */
+const KARTOITUS_MIN=20;
+
+const K_MONTHS=['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu','heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu'];
+const K_WD=['sunnuntai','maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai'];
+
+/* Ajat näytetään AINA Suomen aikaa, ei selaimen aikavyöhykkeellä: rajapinta
+   palauttaa UTC:tä, ja `new Date(iso).getHours()` antaisi ulkomailla olevalle
+   isännöitsijälle väärän kellonajan. */
+const K_FI_TIME=new Intl.DateTimeFormat('fi-FI',{timeZone:'Europe/Helsinki',hour:'2-digit',minute:'2-digit',hour12:false});
+const K_FI_DATE=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Helsinki',year:'numeric',month:'2-digit',day:'2-digit'});
+const kTime=d=>K_FI_TIME.format(d).replace('.',':');
+const kDateKey=d=>K_FI_DATE.format(d);
+const kPad=n=>String(n).padStart(2,'0');
+const kKeyOf=d=>`${d.getFullYear()}-${kPad(d.getMonth()+1)}-${kPad(d.getDate())}`;
+
+/* Tämän päivän raja Suomen ajassa, jottei ulkomailta katsottaessa kadoteta
+   tai lisätä yhtä päivää kalenterin alkuun. */
+const kTodayKey=kDateKey(new Date());
+const kToday=new Date(Number(kTodayKey.slice(0,4)),Number(kTodayKey.slice(5,7))-1,Number(kTodayKey.slice(8,10)));
+const kMax=new Date(kToday); kMax.setDate(kMax.getDate()+70);
+
+/* state: 'postal' | 'loading' | 'ready' | 'none' | 'unserved' | 'error' */
+const kart={state:'postal',slotsByDay:new Map(),postal:'',area:null,leadRef:'',booked:false};
+let kViewY=kToday.getFullYear(),kViewM=kToday.getMonth(),kSelDay=null,kSelSlot=null;
+
+const kEl=id=>document.getElementById(id);
+
+/** Postinumero vapaamuotoisesta osoitekentästä ("Katuosoite, 04400"). */
+function kPostalFrom(addr){ const m=String(addr||'').match(/\b(\d{5})\b/); return m?m[1]:''; }
+
+/** Varauslomakkeen kentät yhtenä oliona. */
+function kFields(){
+  const v=id=>(kEl(id).value||'').trim();
+  return { yhtio:v('bkYhtio'), addr:v('bkAddr'), contact:v('bkContact'), role:v('bkRole'),
+           phone:v('bkPhone'), email:v('bkEmail'), doors:v('bkDoors') };
+}
+
+/** Esitäyttö alaosan tarjouspyynnöstä, jottei samoja tietoja tarvitse antaa
+ *  kahdesti. Vaihetta ei vaihdeta itsestään: asiakas on juuri lähettänyt
+ *  lomakkeen ja lukee kiitosviestiä — näkymän kaappaaminen kesken lukemisen
+ *  olisi töykeää. Yläosan CTA odottaa valmiiksi täytettynä. */
+function kPrefillFromLead(p, ref){
+  kart.leadRef=ref||'';
+  const set=(id,val)=>{ if(val) kEl(id).value=val; };
+  set('bkYhtio',p.yhtio); set('bkAddr',p.addr); set('bkContact',p.contact);
+  set('bkRole',p.role); set('bkPhone',p.phone); set('bkEmail',p.email); set('bkDoors',p.doors);
+  const postal=kPostalFrom(p.addr);
+  if(postal && postal!==kart.postal){ kEl('kartPostal').value=postal; kart.postal=postal; kLoadAvailability(); }
+}
+
+function kFreeSlots(d){
+  if(!d || d<kToday || d>kMax) return [];
+  return kart.slotsByDay.get(kKeyOf(d))||[];
+}
+
+async function kLoadAvailability(){
+  if(!/^\d{5}$/.test(kart.postal)){
+    kart.state='postal'; kart.slotsByDay=new Map(); kart.area=null;
+    kSelDay=null; kSelSlot=null; kRenderAll(); return;
+  }
+  kart.state='loading'; kRenderAll();
+  try{
+    /* `kartoitus=1` hakee ajat kartoituskäyntien omasta kalenterista, ei
+       asennuskalenterista. Ilman sitä sivu tarjoaisi asentajan maksullisia
+       työaikoja veloituksettomaan käyntiin. `minutes` kulkee mukana vain
+       vara-arvona — kartoitustilassa CRM käyttää aina omaa kestoaan. */
+    const r=await fetch(`${CRM_BASE}/api/public/availability?postal=${kart.postal}&days=70&minutes=${KARTOITUS_MIN}&kartoitus=1`);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data=await r.json();
+    if(data.served===false){
+      kart.state='unserved'; kart.slotsByDay=new Map(); kart.area=null;
+      kSelDay=null; kSelSlot=null; kRenderAll(); return;
+    }
+    kart.area=data.area?data.area.name:null;
+    const map=new Map();
+    (data.slots||[]).forEach(s=>{
+      const key=kDateKey(new Date(s.startsAt));
+      if(!map.has(key)) map.set(key,[]);
+      map.get(key).push({time:kTime(new Date(s.startsAt)),startsAt:s.startsAt,calendarId:s.calendarId});
+    });
+    kart.slotsByDay=map;
+    kart.state=map.size?'ready':'none';
+  }catch(_){ kart.state='error'; }
+  // Valittu aika voi kadota päivityksessä (joku ehti varata sen).
+  if(kSelDay&&kSelSlot&&!kFreeSlots(kSelDay).some(s=>s.time===kSelSlot)) kSelSlot=null;
+  kRenderAll();
+}
+
+/* Huomiolaatikko elää vaiheessa 1: se kertoo palvellaanko postinumerossa,
+   ja vasta 'ready' avaa jatkonapin seuraavaan vaiheeseen. Kalenteria ei
+   piiloteta täällä — se on oma vaiheensa, johon ei pääse ennen kuin aikoja
+   on löytynyt. */
+/* Rakenne on sama kuin etusivun aluehuomiossa: `<b>` otsikoksi ja `<span>`
+   selitteeksi, jotta `.area-note`-tyylit osuvat kumpaankin samalla tavalla. */
+function kRenderNote(){
+  const box=kEl('kartNote'), s=kart.state;
+
+  if(s==='postal'){ box.className='area-note';
+    box.innerHTML='<b>Syötä postinumero</b><span>Kartoituskäynneillä on oma kalenterinsa — näytämme vapaat ajat heti.</span>'; return; }
+  if(s==='loading'){ box.className='area-note'; box.innerHTML='<b>Tarkistetaan aluetta…</b>'; return; }
+  if(s==='unserved'){ box.className='area-note bad';
+    box.innerHTML=`<b>Emme vielä palvele postinumerossa ${kart.postal}</b><span>Jättäkää tarjouspyyntö sivun alaosassa, niin otamme yhteyttä kun laajennumme — tai soittakaa <a href="tel:+358458755996">045 875 5996</a>.</span>`; return; }
+  if(s==='error'){ box.className='area-note bad';
+    box.innerHTML='<b>Alueen tarkistus ei onnistunut</b><span>Jättäkää tarjouspyyntö sivun alaosassa tai soittakaa <a href="tel:+358458755996">045 875 5996</a>, niin sovitaan aika puhelimessa.</span>'; return; }
+  if(s==='none'){ box.className='area-note bad';
+    box.innerHTML='<b>Kalenteri on täynnä seuraavien viikkojen osalta</b><span>Jättäkää tarjouspyyntö sivun alaosassa, niin etsimme ajan yhdessä.</span>'; return; }
+  box.className='area-note ok';
+  box.innerHTML=`<b>Palvelemme postinumerossa ${kart.postal}${kart.area?` · ${kart.area}`:''}</b><span>Käynti kestää noin ${KARTOITUS_MIN} minuuttia eikä maksa mitään.</span>`;
+}
+
+function kRenderCal(){
+  const grid=kEl('kGridDays'); if(!grid) return;
+  kEl('kMName').textContent=`${K_MONTHS[kViewM]} ${kViewY}`;
+  const first=new Date(kViewY,kViewM,1);
+  let startDow=first.getDay(); startDow=startDow===0?6:startDow-1;
+  const daysInMonth=new Date(kViewY,kViewM+1,0).getDate();
+  grid.innerHTML='';
+  for(let i=0;i<startDow;i++){ const e=document.createElement('div'); e.className='day empty'; grid.appendChild(e); }
+  for(let dn=1;dn<=daysInMonth;dn++){
+    const d=new Date(kViewY,kViewM,dn);
+    const el=document.createElement('button'); el.type='button'; el.textContent=dn;
+    const isToday=d.getTime()===kToday.getTime(); if(isToday) el.classList.add('today');
+    if(d<kToday||d>kMax){ el.className='day off'+(isToday?' today':''); el.disabled=true; grid.appendChild(el); continue; }
+    const free=kFreeSlots(d);
+    if(free.length===0){ el.className='day full'+(isToday?' today':''); el.disabled=true; }
+    else{
+      el.className='day free'+(isToday?' today':'');
+      const dot=document.createElement('span'); dot.className='dot'; el.appendChild(dot);
+      if(kSelDay&&kKeyOf(kSelDay)===kKeyOf(d)) el.classList.add('sel');
+      el.addEventListener('click',()=>{ kSelDay=d; kSelSlot=null; kRenderCal(); kRenderSlots(); kRenderCta(); });
+    }
+    grid.appendChild(el);
+  }
+  kEl('kMPrev').disabled=(kViewY===kToday.getFullYear()&&kViewM===kToday.getMonth());
+}
+
+function kRenderSlots(){
+  const wrap=kEl('kSlots'), title=kEl('kSlotsTitle'); if(!wrap) return;
+  wrap.innerHTML='';
+  if(!kSelDay){ title.textContent='Valitse päivä nähdäksesi vapaat ajat'; return; }
+  const free=kFreeSlots(kSelDay);
+  title.textContent=`Vapaat ajat — ${K_WD[kSelDay.getDay()]} ${kSelDay.getDate()}.${kSelDay.getMonth()+1}.`;
+  if(free.length===0){ wrap.innerHTML='<div class="slots-empty">Ei vapaita aikoja tänä päivänä. Valitkaa toinen päivä.</div>'; return; }
+  free.forEach(s=>{
+    const b=document.createElement('button'); b.type='button';
+    b.className='slot'+(kSelSlot===s.time?' sel':''); b.textContent=s.time;
+    b.addEventListener('click',()=>{ kSelSlot=s.time; kRenderSlots(); kRenderCta(); });
+    wrap.appendChild(b);
+  });
+}
+
+/** Valittuna oleva aika täysine tietoineen, jotta varaus osuu täsmälleen
+ *  siihen slottiin jonka asiakas näki. */
+function kSelected(){
+  if(!kSelDay||!kSelSlot) return null;
+  return kFreeSlots(kSelDay).find(s=>s.time===kSelSlot)||null;
+}
+
+function kRenderCta(){
+  const sel=kSelected();
+  // Vaiheen 2 jatkonappi: siirtyminen on oma tekonsa, jotta valitun ajan voi
+  // vielä vaihtaa ennen kuin näkymä vaihtuu.
+  const next=kEl('toDetails');
+  next.disabled=!sel;
+  next.textContent=sel
+    ? `Jatka — ${K_WD[kSelDay.getDay()].slice(0,2)} ${kSelDay.getDate()}.${kSelDay.getMonth()+1}. klo ${sel.time}`
+    : 'Valitkaa ensin aika';
+  // Vaiheen 1 jatkonappi aukeaa vasta kun aikoja on oikeasti löytynyt.
+  kEl('toCal').disabled = kart.state!=='ready';
+  // Vaiheen 3 kooste: valittu aika on esillä myös kun kalenteri ei ole näkyvissä.
+  kEl('bkWhenText').textContent=sel
+    ? `${K_WD[kSelDay.getDay()]} ${kSelDay.getDate()}.${kSelDay.getMonth()+1}. klo ${sel.time}`
+    : '—';
+}
+
+function kRenderAll(){ kRenderNote(); kRenderCal(); kRenderSlots(); kRenderCta(); }
+
+/* ---------- VAIHEMOOTTORI ----------
+   Sama periaate kuin `_shared.js`:n vaihenäkymässä, mutta omana pienenä
+   versionaan: tämä sivu ei lataa `_shared.js`:ää lainkaan. Vaiheet luetaan
+   DOM:ista, joten kukin kertoo itse otsikkonsa, paluulinkkinsä ja sen
+   tarvitseeko se leveän kortin — uuden vaiheen lisääminen ei vaadi koodia. */
+const stepCard=kEl('stepCard');
+const stepNodes=[...stepCard.children].filter(n=>n.hasAttribute('data-step'));
+const stepIdx=name=>stepNodes.findIndex(n=>n.dataset.step===name);
+let curIdx=Math.max(0, stepNodes.findIndex(n=>!n.hidden));
+const kReduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+(function initDots(){
+  const dots=kEl('stepDots');
+  // Valmis-vaihe ei ole oma askeleensa pisteissä: se on lopputulos, ei vaihe.
+  stepNodes.filter(n=>n.dataset.step!=='done').forEach(()=>dots.appendChild(document.createElement('i')));
+})();
+
+function paintStepChrome(){
+  const cur=stepNodes[curIdx];
+  const back=kEl('stepBack'), tag=kEl('stepTag'), dots=kEl('stepDots');
+  const label=cur.dataset.back;
+  back.hidden=!label;
+  if(label) back.querySelector('span').textContent=label;
+  tag.textContent=cur.dataset.tag||'';
+  [...dots.children].forEach((d,i)=>{ d.className = i===curIdx ? 'on' : (i<curIdx ? 'done' : ''); });
+  if(cur.dataset.title)  kEl('varaaTitle').textContent=cur.dataset.title;
+  if(cur.dataset.kicker) kEl('varaaKicker').textContent=cur.dataset.kicker;
+  const sub=kEl('varaaSub');
+  if(cur.dataset.sub){ sub.textContent=cur.dataset.sub; sub.style.display=''; } else sub.style.display='none';
+  // Kalenteri tarvitsee leveämmän kortin kuin kapeat lomakevaiheet.
+  stepCard.classList.toggle('wide', cur.dataset.wide==='1');
+}
+
+/* Vaihto: vanha näkymä häivytetään nopeasti pois, uusi tilalle, ja kortin
+   mitat animoidaan uusiin — muuten kortti hyppäisi kalenterin kohdalla. */
+function goStepIdx(next, opts){
+  if(next<0 || next>=stepNodes.length || next===curIdx) return;
+  const from=stepNodes[curIdx], to=stepNodes[next];
+  const swap=()=>{
+    from.hidden=true; to.hidden=false; curIdx=next; paintStepChrome();
+    if(!(opts&&opts.noScroll)){
+      const y=stepCard.getBoundingClientRect().top+window.scrollY-96;
+      window.scrollTo({top:Math.max(0,y), behavior: kReduceMotion ? 'auto' : 'smooth'});
+    }
+    /* Kohdistus vain isolla ruudulla: puhelimessa se avaisi näppäimistön heti
+       ja peittäisi juuri vaihtuneen näkymän. */
+    const f=to.dataset.focus && kEl(to.dataset.focus);
+    if(f && innerWidth>620) setTimeout(()=>f.focus({preventScroll:true}),240);
+  };
+  if(kReduceMotion || !stepCard.animate){ swap(); return; }
+  const r0=stepCard.getBoundingClientRect();
+  stepCard.classList.add('leaving');
+  setTimeout(()=>{
+    stepCard.classList.remove('leaving');
+    swap();
+    const r1=stepCard.getBoundingClientRect();
+    const frames=[{},{}];
+    if(Math.abs(r1.height-r0.height)>2){ frames[0].height=r0.height+'px'; frames[1].height=r1.height+'px'; }
+    if(Math.abs(r1.width-r0.width)>2){ frames[0].maxWidth=r0.width+'px'; frames[1].maxWidth=r1.width+'px'; }
+    if(Object.keys(frames[0]).length) stepCard.animate(frames,{duration:300,easing:'cubic-bezier(.2,.6,.3,1)'});
+  },130);
+}
+const goStep=(name,opts)=>goStepIdx(stepIdx(name),opts);
+
+kEl('stepBack').addEventListener('click',()=>goStepIdx(curIdx-1));
+kEl('toCal').addEventListener('click',()=>{ if(kart.state==='ready') goStep('cal'); });
+kEl('toDetails').addEventListener('click',()=>{ if(kSelected()) goStep('form'); });
+kEl('bkChange').addEventListener('click',()=>goStep('cal'));
+
+kEl('kMPrev').addEventListener('click',()=>{ if(kViewM===0){kViewM=11;kViewY--;}else kViewM--; kRenderCal(); });
+kEl('kMNext').addEventListener('click',()=>{ if(kViewM===11){kViewM=0;kViewY++;}else kViewM++; kRenderCal(); });
+
+kEl('kartPostal').addEventListener('input',e=>{
+  const v=e.target.value.replace(/\D/g,'').slice(0,5);
+  e.target.value=v;
+  /* Haku käynnistyy heti viidennestä numerosta, mutta vaihe EI vaihdu itsestään:
+     asiakas näkee ensin palvellaanko häntä ja painaa sitten itse eteenpäin.
+     Automaattinen hyppy veisi näkyvistä juuri sen tiedon jota hän odotti. */
+  if(v.length===5){ kart.postal=v; kLoadAvailability(); }
+  else { kart.state='postal'; kart.slotsByDay=new Map(); kart.area=null; kRenderAll(); }
+});
+// Enter postinumerokentässä = "Näytä vapaat ajat", jos aikoja on.
+kEl('kartPostal').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){ e.preventDefault(); if(kart.state==='ready') goStep('cal'); }
+});
+
+/* Liidi tallennetaan kerran ja vain kerran. Jos ajan varaus kaatuu ja
+   asiakas yrittää uudelleen, samaa yhteydenottoa ei kirjata kahdesti
+   adminiin — mutta ensimmäinen yritys on jo turvannut liidin. */
+async function kEnsureLead(f){
+  if(kart.leadRef) return kart.leadRef;
+  try{
+    const r=await fetch('/api/create-lead',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        yhtio:f.yhtio, contact:f.contact, role:f.role, phone:f.phone, email:f.email,
+        addr:`${f.addr}, ${kart.postal}`, doors:f.doors,
+        message:'Varasi kartoituskäynnin verkosta.',
+        pageUrl:location.href, fbc:tkFbc(), fbp:tkFbp(),
+      }),
+    });
+    const d=await r.json().catch(()=>({}));
+    if(r.ok && d.ok && d.ref){ kart.leadRef=d.ref; return d.ref; }
+  }catch(_){ /* Liidin kaatuminen ei saa estää ajan varausta — se on se tärkeämpi. */ }
+  return '';
+}
+
+kEl('kBook').addEventListener('click',async()=>{
+  const sel=kSelected(); const err=kEl('kErr'); const btn=kEl('kBook');
+  if(!sel) return;
+  const f=kFields();
+
+  // --- kenttien tarkistus ennen kuin mitään lähetetään ---
+  const missing=[];
+  if(!f.yhtio) missing.push('taloyhtiön nimi');
+  if(!f.addr) missing.push('katuosoite');
+  if(!f.contact) missing.push('yhteyshenkilö');
+  if(!f.phone) missing.push('puhelin');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) missing.push('sähköposti');
+  if(missing.length){
+    err.textContent=`Täyttäkää vielä: ${missing.join(', ')}.`;
+    err.style.display='block';
+    kEl(missing[0]==='sähköposti'?'bkEmail':'bkYhtio').focus();
+    return;
+  }
+
+  err.style.display='none';
+  const label=btn.textContent;
+  btn.disabled=true; btn.textContent='Varataan…';
+
+  // Liidi ensin: jos ajan varaus epäonnistuu, yhteydenotto on silti tallessa.
+  await kEnsureLead(f);
+
+  try{
+    const r=await fetch('/api/create-kartoitus',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        calendarId:sel.calendarId, startsAt:sel.startsAt,
+        association:f.yhtio, contactName:f.contact, role:f.role,
+        email:f.email, phone:f.phone,
+        address:f.addr, postal:kart.postal,
+        doors:f.doors, leadRef:kart.leadRef,
+        fbc:tkFbc(), fbp:tkFbp(),
+      }),
+    });
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok||!data.ok){
+      /* Aika ehdittiin varata tai alue ei ole meidän — kumpikin vaatii oman
+         viestinsä, muuten asiakkaalle valitetaan väärästä asiasta. */
+      if(data.error==='slot_taken'){
+        err.textContent='Valitettavasti tuo aika ehdittiin juuri varata. Valitkaa toinen aika kalenterista.';
+        err.style.display='block';
+        kSelSlot=null; btn.textContent=label; await kLoadAvailability(); return;
+      }
+      if(data.error==='area_not_served'||data.error==='calendar_not_kartoitus'){
+        err.textContent='Emme valitettavasti palvele tätä aluetta vielä. Yhteydenottonne on tallessa ja olemme teihin yhteydessä.';
+      }else if(data.error==='in_past'){
+        err.textContent='Valittu aika on jo mennyt. Valitkaa uusi aika kalenterista.';
+        kSelSlot=null; await kLoadAvailability();
+      }else{
+        err.textContent='Ajan varaus ei onnistunut. Yhteydenottonne on silti tallessa ja otamme yhteyttä — tai soittakaa 045 875 5996.';
+      }
+      err.style.display='block';
+      btn.disabled=false; btn.textContent=label;
+      return;
+    }
+    // Onnistui: viimeinen vaihe esiin. Takaisin-nappi katoaa samalla, koska
+    // valmis-vaiheella ei ole `data-back`ia — varausta ei voi enää perua tästä.
+    kart.booked=true;
+    kEl('kartRef').textContent=data.ref;
+    kEl('kartDoneText').textContent=
+      `Nähdään ${K_WD[kSelDay.getDay()]}na ${kSelDay.getDate()}.${kSelDay.getMonth()+1}. klo ${sel.time} osoitteessa ${f.addr}, ${kart.postal}. `+
+      `Lähetimme vahvistuksen osoitteeseen ${f.email}. `+
+      `Varmistattehan, että pääsemme rappukäytäviin ja yhteistiloihin käynnin aikana.`;
+    goStep('done');
+  }catch(_){
+    err.textContent='Yhteysvirhe. Yhteydenottonne on tallessa ja otamme yhteyttä — tai soittakaa 045 875 5996.';
+    err.style.display='block';
+    btn.disabled=false; btn.textContent=label;
+  }
+});
+
 document.getElementById('qReset').addEventListener('click',()=>{
   document.getElementById('tqDone').style.display='none';
   document.getElementById('tqForm').style.display='block';
+  /* Liidin viite nollataan, jotta seuraava tarjouspyyntö kirjautuu omana
+     yhteydenottonaan eikä liity edellisen taloyhtiön varaukseen. Yläosan
+     kalenteria ei kosketa: se on oma toimintonsa, ja jo vahvistettu käynti
+     saa jäädä näkyviin. */
+  if(!kart.booked) kart.leadRef='';
   tForm.reset();
 });
+
+/* Varausosio on heti sivun alussa, joten aloitustila piirretään latauksessa —
+   muuten ensimmäinen näkymä olisi tyhjä kortti ilman otsikkoa tai pisteitä. */
+paintStepChrome();
+kRenderAll();
 
 /* vuosi + reveal */
 document.getElementById('yr').textContent=new Date().getFullYear();

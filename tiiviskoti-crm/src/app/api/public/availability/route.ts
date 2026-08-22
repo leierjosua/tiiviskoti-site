@@ -1,5 +1,5 @@
-import { areaForPostal, availability } from '@/lib/data';
-import { MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
+import { areaForPostal, availability, kartoitusCalendarId } from '@/lib/data';
+import { KARTOITUS_MINUTES, MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
 import { json, preflight } from '../cors';
 
 /* GET /api/public/availability?postal=04400&days=60&minutes=120
@@ -41,10 +41,36 @@ export async function GET(request: Request) {
     return json({ served: false, postal, slots: [] }, { origin });
   }
 
+  /* Taloyhtiön veloitukseton kartoituskäynti hakee ajat omasta kalenteristaan
+     (`?kartoitus=1`). Alue tarkistetaan silti yllä: postinumero kertoo
+     palvellaanko taloyhtiötä lainkaan, vaikka aikoja ei rajatakaan alueella —
+     kartoituskalenteri ei ole `tk.calendar_areas`-taulussa, mikä on juuri se
+     seikka joka pitää sen erossa kuluttajan varauskalenterista. */
+  const wantsKartoitus = params.get('kartoitus') === '1';
+  let calendarId: string | undefined;
+  let areaId: string | undefined = area.id;
+  let durationMinutes = minutes;
+
+  if (wantsKartoitus) {
+    const kartoitusId = kartoitusCalendarId();
+    if (!kartoitusId) {
+      /* Kalenteria ei ole määritetty. Palautetaan virhe eikä tyhjää listaa:
+         tyhjä lista näyttäisi sivulla "kalenteri on täynnä", mikä on valhe —
+         kalenteria ei ole olemassa. Sivu ohjaa tällöin soittamaan. */
+      console.error('availability: KARTOITUS_CALENDAR_ID puuttuu');
+      return json({ error: 'kartoitus_unavailable' }, { status: 503, origin });
+    }
+    calendarId = kartoitusId;
+    areaId = undefined;
+    // Kesto tulee palvelimelta, jottei tarjottu aika ja varattava lohko voi erota.
+    durationMinutes = KARTOITUS_MINUTES;
+  }
+
   const groups = await availability({
-    durationMinutes: minutes,
+    durationMinutes,
     until: new Date(Date.now() + days * 86_400_000),
-    areaId: area.id,
+    areaId,
+    calendarId,
   });
 
   // Sivu ei tarvitse tietää kuka työn tekee — se valitsee ajan, ja kalenteri
@@ -68,7 +94,7 @@ export async function GET(request: Request) {
     served: true,
     postal,
     area: { name: area.name, travelFeeCents: area.travelFeeCents },
-    durationMinutes: minutes,
+    durationMinutes,
     slots,
   }, { origin });
 }

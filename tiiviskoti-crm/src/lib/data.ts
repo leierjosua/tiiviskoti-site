@@ -7,6 +7,30 @@ import { freeSlots, type CalendarException, type Interval, type WeeklyHour } fro
    SQL:ää voi lukea kokonaisuutena.
    ========================================================= */
 
+/* Taloyhtiöiden kartoituskäyntien oma kalenteri.
+
+   Miksi ympäristömuuttuja eikä sarake `tk.calendars`-taulussa: sovelluksen
+   tunnuksilla (`tk_app`) ei ole DDL-oikeuksia `tk`-skeemaan, joten uutta
+   `purpose`-saraketta ei voi lisätä ilman postgres-roolia. Nimeen perustuva
+   tunnistus taas hajoaisi heti kun kalenterin nimeä muokataan adminissa.
+
+   Kalenteri EI ole `tk.calendar_areas`-taulussa. Se on koko erottelun ydin:
+   julkinen saatavuusreitti rajaa kalenterit alueella, joten kartoituskalenteri
+   ei voi vahingossa päätyä kuluttajan varauskalenteriin. Kartoitusreitti hakee
+   sen suoraan tällä tunnuksella.
+
+   HUOM: `tk.jobs`-taulun päällekkäisyysrajoite on kalenterikohtainen
+   (`EXCLUDE ... calendar_id WITH =`), ei henkilökohtainen. Kartoitus ja
+   asennus voivat siis osua samaan hetkeen, koska ne ovat eri kalentereissa.
+   Tämä on tietoinen valinta — kartoituskalenterin työajat ovat samat kuin
+   asennusten (ma–pe 08–18), jotta aikoja on tarjolla koko viikon. Jos
+   päällekkäisyys alkaa haitata, kavenna kartoituskalenterin työaikoja niin
+   etteivät ne mene asennusaikojen kanssa ristiin. */
+export function kartoitusCalendarId(): string | null {
+  const id = process.env.KARTOITUS_CALENDAR_ID?.trim();
+  return id && /^[0-9a-f-]{36}$/i.test(id) ? id : null;
+}
+
 export type StaffRow = {
   id: string; email: string; full_name: string; phone: string | null;
   role: 'owner' | 'admin' | 'installer'; active: boolean;

@@ -57,6 +57,17 @@ const MIN = 60_000;
    rajaa, jotta tarjottu aika ja varattu lohko ovat aina yhtä pitkät. */
 export const MAX_BOOKING_BLOCK_MINUTES = 300;
 
+/* Taloyhtiön veloituksettoman kartoituskäynnin kesto minuutteina.
+
+   Kiinteä, koska kartoituksessa ei ole hinnoiteltuja kohteita joista kesto
+   voisi laskea — asiakas ei vielä tiedä montako ovea tiivistetään, ja juuri
+   sen selvittäminen on käynnin tarkoitus.
+
+   HUOM: `taloyhtio.html` kysyy vapaat ajat tällä samalla luvulla
+   (`KARTOITUS_MIN`). Jos muutat tätä, muuta se myös siellä — muuten sivu
+   tarjoaa eri mittaisia aikoja kuin kalenteriin varataan. */
+export const KARTOITUS_MINUTES = 20;
+
 /* ---------- aikavälialgebra ---------- */
 
 function normalize(intervals: Interval[]): Interval[] {

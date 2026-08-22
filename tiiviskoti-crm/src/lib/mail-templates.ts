@@ -517,3 +517,268 @@ export function offerEmailText(data: OfferEmailData): string {
     `${PHONE} · info@tiiviskoti.fi`,
   ].join('\n');
 }
+
+/* ---------- Taloyhtiön kartoituskäynti ----------
+
+   Veloitukseton käynti, joten näissä viesteissä EI ole hintoja eikä rivejä —
+   kartoituksesta ei synny laskua. Se on myös syy omiin pohjiin: varauksen
+   vahvistuspohja lupaisi kiinteän hinnan ja kotitalousvähennyksen, joista
+   kumpikaan ei päde taloyhtiön kartoitukseen.
+
+   Viesti tekee kolme asiaa, joista jokainen on kartoituskäynnin oma riski:
+     1. varmistaa kulun (rappukäytävät ja yhteistilat ovat lukossa),
+     2. kertoo kuka on paikalla ja kauanko käynti kestää,
+     3. tekee peruutuksesta helppoa — turha ajo maksaa meille, ei asiakkaalle.
+   ---------------------------------------------------------------- */
+
+export type KartoitusData = {
+  jobNumber: string;
+  /** Taloyhtiön nimi, esim. "As Oy Esimerkki". */
+  association: string;
+  contactName: string;
+  role?: string | null;
+  phone: string;
+  email: string;
+  startsAt: Date;
+  endsAt: Date;
+  address: string;
+  postalCode: string;
+  city?: string | null;
+  /** Lomakkeen arvio ovien ja ikkunoiden määrästä. */
+  doors?: string | null;
+  notes?: string | null;
+};
+
+export function kartoitusSubject(data: KartoitusData): string {
+  const key = dateKeyOf(data.startsAt);
+  const [, m, d] = key.split('-').map(Number);
+  return `Kartoituskäynti vahvistettu ${data.jobNumber} — ${d}.${m}. klo ${timeOf(data.startsAt)}`;
+}
+
+export function kartoitusHtml(data: KartoitusData): string {
+  const when = whenText(data.startsAt, data.endsAt);
+  const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')]
+    .filter(Boolean).join(', ');
+  const minutes = Math.round((data.endsAt.getTime() - data.startsAt.getTime()) / 60_000);
+
+  return `<!DOCTYPE html>
+<html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:${CREAM};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CREAM};padding:24px 12px">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:14px;overflow:hidden">
+
+  <tr><td style="background:${GREEN};padding:26px 28px">
+    <div style="color:#FFFFFF;font-size:21px;font-weight:700;letter-spacing:-.3px">TiivisKoti</div>
+    <div style="color:#BFD8CC;font-size:14px;margin-top:3px">Ovien ja ikkunoiden tiivistys</div>
+  </td></tr>
+
+  <tr><td style="padding:28px 28px 8px">
+    <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Kartoituskäynti sovittu</div>
+    <h1 style="margin:8px 0 0;color:${INK};font-size:23px;font-weight:700;line-height:1.3">Kiitos, ${esc(firstName(data.contactName))} — aika on varattu</h1>
+    <p style="margin:12px 0 0;color:${MUTED};font-size:15px;line-height:1.6">
+      Tulemme katsomaan taloyhtiön <strong style="color:${INK}">${esc(data.association)}</strong> ovet ja ikkunat
+      paikan päälle. Käynti on <strong style="color:${INK}">veloitukseton</strong> eikä sido teitä mihinkään —
+      sen jälkeen saatte kirjallisen sopimushinnan hallituksen käsiteltäväksi.
+    </p>
+  </td></tr>
+
+  <tr><td style="padding:20px 28px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CREAM};border-radius:10px">
+      <tr><td style="padding:16px 18px">
+        <div style="color:${MUTED};font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase">Aika</div>
+        <div style="color:${INK};font-size:16px;font-weight:700;margin-top:2px">${esc(when)}</div>
+        <div style="color:${MUTED};font-size:13px;margin-top:2px">Käynti kestää noin ${minutes} minuuttia</div>
+        <div style="color:${MUTED};font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-top:12px">Kohde</div>
+        <div style="color:${INK};font-size:15px;margin-top:2px">${esc(place)}</div>
+        <div style="color:${MUTED};font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-top:12px">Viitenumero</div>
+        <div style="color:${INK};font-size:15px;font-weight:600;margin-top:2px">${esc(data.jobNumber)}</div>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:18px 28px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFF8E8;border-radius:10px">
+      <tr><td style="padding:14px 18px;color:#6B4F1D;font-size:14px;line-height:1.6">
+        <strong>Yksi asia varmistettavaksi:</strong> tarvitsemme pääsyn rappukäytäviin ja yhteistiloihin.
+        Varmistattehan, että joku on vastassa tai että ovet saadaan auki sovittuna aikana.
+        Jos tämä ei onnistu, siirretään käyntiä mieluummin etukäteen.
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:22px 28px 0">
+    <div style="color:${INK};font-size:15px;font-weight:700;margin-bottom:8px">Mitä käynnillä tapahtuu</div>
+    <div style="color:${MUTED};font-size:14.5px;line-height:1.75">
+      1. Käymme läpi ulko-ovet, rappukäytävien ovet ja yhteistilojen ikkunat.<br>
+      2. Mittaamme vetokohdat ja kirjaamme tiivistettävät kohteet.<br>
+      3. Saatte kirjallisen kiinteän sopimushinnan ja raportin hallitukselle.
+    </div>
+  </td></tr>
+
+  ${data.notes ? `<tr><td style="padding:18px 28px 0">
+    <div style="color:${MUTED};font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase">Lisätietonne</div>
+    <div style="color:${INK};font-size:14px;line-height:1.6;margin-top:4px">${esc(data.notes)}</div>
+  </td></tr>` : ''}
+
+  <tr><td style="padding:24px 28px 28px">
+    <div style="border-top:1px solid #E6E2DA;padding-top:18px;color:${MUTED};font-size:14px;line-height:1.7">
+      Sopiiko aika sittenkään huonosti? Soita
+      <a href="tel:${PHONE_HREF}" style="color:${GREEN};font-weight:700;text-decoration:none">${PHONE}</a>
+      tai vastaa tähän viestiin — siirrämme käynnin mielellämme, kunhan tiedämme siitä etukäteen.
+    </div>
+  </td></tr>
+
+  <tr><td style="background:${CREAM};padding:18px 28px;text-align:center;color:${MUTED};font-size:13px">
+    ${COMPANY} &middot; Y-tunnus ${BUSINESS_ID} &middot; Uusimaa<br>
+    <a href="tel:${PHONE_HREF}" style="color:${GREEN};text-decoration:none">${PHONE}</a> &middot;
+    <a href="mailto:info@tiiviskoti.fi" style="color:${GREEN};text-decoration:none">info@tiiviskoti.fi</a>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+export function kartoitusText(data: KartoitusData): string {
+  const when = whenText(data.startsAt, data.endsAt);
+  const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  const minutes = Math.round((data.endsAt.getTime() - data.startsAt.getTime()) / 60_000);
+
+  return [
+    'TIIVISKOTI — KARTOITUSKÄYNTI VAHVISTETTU',
+    '',
+    `Kiitos, ${firstName(data.contactName)} — aika on varattu.`,
+    '',
+    `Taloyhtiö:   ${data.association}`,
+    `Aika:        ${when} (noin ${minutes} min)`,
+    `Kohde:       ${place}`,
+    `Viitenumero: ${data.jobNumber}`,
+    '',
+    'Käynti on veloitukseton eikä sido teitä mihinkään.',
+    '',
+    'VARMISTATTEHAN PÄÄSYN rappukäytäviin ja yhteistiloihin — joku vastassa',
+    'tai ovet auki sovittuna aikana. Jos se ei onnistu, siirretään käyntiä',
+    'mieluummin etukäteen.',
+    '',
+    'Käynnillä:',
+    '  1. Käymme läpi ulko-ovet, rappukäytävien ovet ja yhteistilojen ikkunat.',
+    '  2. Mittaamme vetokohdat ja kirjaamme tiivistettävät kohteet.',
+    '  3. Saatte kirjallisen kiinteän sopimushinnan ja raportin hallitukselle.',
+    '',
+    data.notes ? `Lisätietonne: ${data.notes}\n` : '',
+    `Muutokset ja peruutukset: ${PHONE} tai info@tiiviskoti.fi`,
+    '',
+    `${COMPANY} · Y-tunnus ${BUSINESS_ID} · Uusimaa`,
+  ].filter((l) => l !== '').join('\n');
+}
+
+export function kartoitusWorkOrderSubject(data: KartoitusData): string {
+  const key = dateKeyOf(data.startsAt);
+  const [, m, d] = key.split('-').map(Number);
+  return `KARTOITUS ${data.jobNumber} — ${d}.${m}. klo ${timeOf(data.startsAt)} ${data.address}`;
+}
+
+export function kartoitusWorkOrderHtml(data: KartoitusData): string {
+  const when = whenText(data.startsAt, data.endsAt);
+  const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')]
+    .filter(Boolean).join(', ');
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
+  const minutes = Math.round((data.endsAt.getTime() - data.startsAt.getTime()) / 60_000);
+
+  return `<!DOCTYPE html>
+<html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:${CREAM};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CREAM};padding:20px 12px">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:14px;overflow:hidden">
+
+  <tr><td style="background:${GREEN_DARK};padding:20px 24px">
+    <div style="color:#BFD8CC;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Kartoituskäynti &middot; ei veloitusta</div>
+    <div style="color:#FFFFFF;font-size:20px;font-weight:700;margin-top:4px">${esc(data.jobNumber)}</div>
+    <div style="color:#BFD8CC;font-size:14px;margin-top:2px">${esc(when)} &middot; ${minutes} min</div>
+  </td></tr>
+
+  <tr><td style="padding:22px 24px 0">
+    <div style="color:${MUTED};font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Taloyhtiö</div>
+    <div style="color:${INK};font-size:19px;font-weight:700;margin-top:4px;line-height:1.35">${esc(data.association)}</div>
+    <div style="color:${MUTED};font-size:15px;margin-top:6px">${esc(place)}</div>
+    <div style="margin-top:10px">
+      <a href="${mapUrl}" style="display:inline-block;background:${GREEN};color:#FFFFFF;font-size:15px;font-weight:700;text-decoration:none;padding:11px 18px;border-radius:8px">Avaa kartalla</a>
+    </div>
+  </td></tr>
+
+  <tr><td style="padding:20px 24px 0">
+    <div style="color:${MUTED};font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Yhteyshenkilö</div>
+    <div style="color:${INK};font-size:17px;font-weight:600;margin-top:4px">
+      ${esc(data.contactName)}${data.role ? `<span style="color:${MUTED};font-weight:400;font-size:14px"> &middot; ${esc(data.role)}</span>` : ''}
+    </div>
+    <div style="margin-top:8px">
+      <a href="tel:${esc(data.phone.replace(/\s/g, ''))}" style="display:inline-block;border:1px solid ${GREEN};color:${GREEN};font-size:15px;font-weight:700;text-decoration:none;padding:10px 16px;border-radius:8px">Soita ${esc(data.phone)}</a>
+    </div>
+    <div style="color:${MUTED};font-size:14px;margin-top:8px">${esc(data.email)}</div>
+  </td></tr>
+
+  ${data.doors ? `<tr><td style="padding:20px 24px 0">
+    <div style="color:${MUTED};font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Ovien ja ikkunoiden määrä (asiakkaan arvio)</div>
+    <div style="color:${INK};font-size:17px;font-weight:700;margin-top:4px">${esc(data.doors)}</div>
+  </td></tr>` : ''}
+
+  ${data.notes ? `<tr><td style="padding:20px 24px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFF8E8;border-radius:10px">
+      <tr><td style="padding:13px 16px;color:#6B4F1D;font-size:14px;line-height:1.6">
+        <strong>Asiakkaan lisätiedot:</strong><br>${esc(data.notes)}
+      </td></tr>
+    </table>
+  </td></tr>` : ''}
+
+  <tr><td style="padding:22px 24px 24px">
+    <div style="border-top:1px solid #E6E2DA;padding-top:16px;color:${MUTED};font-size:13px;line-height:1.7">
+      Tämä on <strong>veloitukseton kartoitus</strong> — paikan päällä ei laskuteta mitään.
+      Kirjaa tiivistettävät kohteet ja määrät, niin hinta lasketaan tarjoukseen jälkikäteen.
+      Soita yhteyshenkilölle ennen lähtöä, jos rappukäytävien oviin tarvitaan avausta.
+    </div>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+export function kartoitusWorkOrderText(data: KartoitusData): string {
+  const when = whenText(data.startsAt, data.endsAt);
+  const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  const minutes = Math.round((data.endsAt.getTime() - data.startsAt.getTime()) / 60_000);
+
+  return [
+    `KARTOITUSKÄYNTI ${data.jobNumber} — EI VELOITUSTA`,
+    '',
+    `Aika:        ${when} (${minutes} min)`,
+    `Taloyhtiö:   ${data.association}`,
+    `Kohde:       ${place}`,
+    `Yhteyshlö:   ${data.contactName}${data.role ? ` (${data.role})` : ''}`,
+    `Puhelin:     ${data.phone}`,
+    `Email:       ${data.email}`,
+    data.doors ? `Ovia/ikkunoita (arvio): ${data.doors}` : '',
+    '',
+    data.notes ? `Asiakkaan lisätiedot: ${data.notes}\n` : '',
+    'Veloitukseton kartoitus — paikan päällä ei laskuteta mitään.',
+    'Kirjaa tiivistettävät kohteet ja määrät, hinta lasketaan tarjoukseen jälkikäteen.',
+    'Soita yhteyshenkilölle ennen lähtöä, jos rappukäytäviin tarvitaan avausta.',
+  ].filter((l) => l !== '').join('\n');
+}
+
+/** Kalenteritapahtuman kuvaus kartoituskäynnistä. */
+export function kartoitusCalendarDescription(data: KartoitusData): string {
+  return [
+    `Kartoituskäynti ${data.jobNumber} — VELOITUKSETON`,
+    '',
+    `Taloyhtiö:  ${data.association}`,
+    `Yhteyshlö:  ${data.contactName}${data.role ? ` (${data.role})` : ''}`,
+    `Puhelin:    ${data.phone}`,
+    `Sähköposti: ${data.email}`,
+    `Osoite:     ${[data.address, data.postalCode, data.city].filter(Boolean).join(', ')}`,
+    data.doors ? `Ovia/ikkunoita (arvio): ${data.doors}` : '',
+    data.notes ? `\nLisätiedot: ${data.notes}` : '',
+  ].filter((l) => l !== '').join('\n');
+}
