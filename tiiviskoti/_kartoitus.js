@@ -111,11 +111,17 @@ const DONE_HTML = `
  * @param {(name:'cal'|'form'|'done')=>void} o.goTo vaiheensiirto — sivun oma
  * @param {string} [o.rootPrefix] polkuetuliite alikansiosivuille ("../")
  * @param {()=>string|undefined} [o.fbc] Meta-klikin tunnisteet CAPIa varten
+ * @param {()=>string|undefined} [o.campaign] mainoskampanja (?src=, utm_*, klikkitunniste)
+ * @param {()=>string|undefined} [o.gclid] Google Ads -klikin tunniste
  */
 export function mountKartoitus(o) {
   const { noteEl, calEl, formEl, doneEl, postalEl, continueEl, goTo } = o;
   const fbc = o.fbc || (() => undefined);
   const fbp = o.fbp || (() => undefined);
+  /* Kampanja kulkee varauksen mukana CRM:ään, jotta kartoituskäynnit voi
+     lukea mainoskohtaisesti eikä vain yhtenä "verkosta tuli" -kasana. */
+  const campaign = o.campaign || (() => undefined);
+  const gclid = o.gclid || (() => undefined);
   const R = o.rootPrefix || '';
 
   calEl.innerHTML = CAL_HTML;
@@ -315,6 +321,7 @@ export function mountKartoitus(o) {
           address: f.addr, postal: st.postal,
           doors: f.doors, leadRef: st.leadRef,
           fbc: fbc(), fbp: fbp(),
+          campaign: campaign(), gclid: gclid(),
         }),
       });
       const data = await r.json().catch(() => ({}));

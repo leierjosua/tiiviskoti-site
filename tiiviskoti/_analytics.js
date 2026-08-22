@@ -9,8 +9,35 @@
    (funnel tulee _shared.js:stä window.tkTrackilla). */
 (function () {
   var EP = 'https://admin.tiiviskoti.fi/api/public/track';
+
+  /* ---------- mainoskampanja ----------
+     Mistä kävijä tuli: oma ?src=-merkintämme, mainostyökalun utm_*, tai
+     pelkkä klikkitunniste (fbclid/gclid) josta tunnistetaan ainakin alusta.
+     Ennen tässä luettiin vain ?src=, jolloin kaikki Metan ja Googlen kautta
+     tullut liikenne kirjautui kampanjattomana — elokuussa 2026 se oli
+     kaikki maksettu liikenne.
+
+     TÄSTÄ EI LUETA localStoragea, vaikka _shared.js tallettaa kampanjan
+     sinne 30 päiväksi. Tämä tiedosto on luvattu pitää tallennustilaan
+     koskemattomana (ks. yllä), eikä lupausta rikota mittarin takia. Riittää
+     että laskeutumissivun sivunäyttö kantaa kampanjan: saman kävijän muut
+     tapahtumat yhdistyvät siihen raportissa visitor_hashin kautta.
+
+     Sama tunnistus on _shared.js:ssä ja taloyhtio.html:ssä. Jos muutat
+     sääntöä, muuta se kaikkiin kolmeen. */
+  var CAMPAIGN_RE = /^[a-z0-9][a-z0-9._-]{0,59}$/;
   var campaign = null;
-  try { campaign = new URLSearchParams(location.search).get('src'); } catch (e) { /* ei väliä */ }
+  try {
+    var q = new URLSearchParams(location.search);
+    var named = q.get('src') || q.get('utm_campaign') || q.get('utm_source');
+    if (named) {
+      /* Mainostyökalujen nimissä on välilyöntejä ja isoja kirjaimia. */
+      var v = String(named).toLowerCase().replace(/[^a-z0-9._-]+/g, '-')
+        .replace(/^[-._]+/, '').slice(0, 60);
+      campaign = CAMPAIGN_RE.test(v) ? v : null;
+    } else if (q.get('fbclid')) campaign = 'meta-ads';
+    else if (q.get('gclid') || q.get('wbraid') || q.get('gbraid')) campaign = 'google-ads';
+  } catch (e) { /* ei väliä */ }
 
   /* ---------- A/B-testi ----------
      Versio arvotaan KERRAN SIVULATAUSTA KOHTI ja pidetään muistissa. Ei

@@ -78,6 +78,23 @@ export default async function handler(req, res) {
     const startsAt    = typeof body.startsAt === 'string' ? body.startsAt : null;
     const calendarId  = typeof body.calendarId === 'string' ? body.calendarId : null;
 
+    // Mainoskampanja ja Google Ads -klikin tunniste osoiterivistä. Sama
+    // muotorajaus kuin `create-booking.mjs`:ssä ja kannan rajoitteissa.
+    // Kelvoton arvo pudotetaan pois eikä varausta hylätä: arvo tulee
+    // julkisesta osoiterivistä, eikä rikkinäinen mainoslinkki saa estää
+    // sovittua käyntiä. Mittari on toissijainen käyntiin nähden.
+    const campaignRaw = typeof body.campaign === 'string'
+      && /^[a-z0-9][a-z0-9._-]{0,59}$/.test(body.campaign)
+      ? body.campaign
+      : undefined;
+    const gclid = typeof body.gclid === 'string'
+      && /^[A-Za-z0-9_-]{10,200}$/.test(body.gclid)
+      ? body.gclid
+      : undefined;
+    // Ilman kampanjaa CRM:n "Lähde"-kenttä jäisi tyhjäksi vaikka klikki
+    // tiedetään Googlen mainoksesta tulleeksi.
+    const campaign = campaignRaw || (gclid ? 'google-ads' : undefined);
+
     const fields = [];
     if (!association) fields.push('association');
     if (!contactName) fields.push('contactName');
@@ -108,6 +125,8 @@ export default async function handler(req, res) {
       doors: doors || undefined,
       notes: notes || undefined,
       leadRef: leadRef || undefined,
+      campaign,
+      gclid,
     });
 
     if (reservation.conflict) {

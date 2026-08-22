@@ -771,9 +771,31 @@ const TK_FBC_KEY='tk_fbc', TK_FBC_MAX_AGE=90*24*60*60*1000;
 function tkCookie(n){try{const m=document.cookie.match(new RegExp('(?:^|; )'+n.replace(/[.$?*|{}()\[\]\\/+^]/g,'\\$&')+'=([^;]*)'));return m?decodeURIComponent(m[1]):undefined;}catch(_){return undefined;}}
 function tkFbc(){const c=tkCookie('_fbc');if(c)return c;try{const s=JSON.parse(localStorage.getItem(TK_FBC_KEY)||'null');if(!s||!s.v)return undefined;if(Date.now()-(s.t||0)>TK_FBC_MAX_AGE)return undefined;return s.v;}catch(_){return undefined;}}
 function tkFbp(){return tkCookie('_fbp');}
+/* Mainoskampanja osoiterivistä. Tämä sivu on mainosten laskeutumissivu, ja
+   koko kartoitusputki tapahtuu yhden sivulatauksen sisällä — siksi pelkkä
+   osoiterivi riittää eikä kampanjaa tarvitse tallettaa kuten _shared.js
+   tekee monisivuista polkua varten. Sama tunnistussääntö kuin _shared.js:ssä
+   ja _analytics.js:ssä; jos muutat sitä, muuta kaikkiin kolmeen. */
+function tkCampaign(){
+  let q; try{ q=new URLSearchParams(location.search); }catch(_){ return undefined; }
+  const named=q.get('src')||q.get('utm_campaign')||q.get('utm_source');
+  if(named){
+    const v=String(named).toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^[-._]+/,'').slice(0,60);
+    return /^[a-z0-9][a-z0-9._-]{0,59}$/.test(v)?v:undefined;
+  }
+  if(q.get('fbclid')) return 'meta-ads';
+  if(q.get('gclid')||q.get('wbraid')||q.get('gbraid')) return 'google-ads';
+  return undefined;
+}
+function tkGclid(){
+  let v; try{ v=new URLSearchParams(location.search); }catch(_){ return undefined; }
+  const g=v.get('gclid')||v.get('wbraid')||v.get('gbraid');
+  return g && /^[A-Za-z0-9_-]{10,200}$/.test(g) ? g : undefined;
+}
 /* Julkaistaan moduulille: `_kartoitus.js` on ES-moduuli eikä näe tämän
    klassisen skriptin lohkotason funktioita. */
 window.tkFbc=tkFbc; window.tkFbp=tkFbp;
+window.tkCampaign=tkCampaign; window.tkGclid=tkGclid;
 (function(){let v;try{v=new URLSearchParams(location.search).get('fbclid');}catch(_){return;}if(!v||!/^[A-Za-z0-9._-]{5,400}$/.test(v))return;if(tkCookie('_fbc')||tkFbc())return;try{localStorage.setItem(TK_FBC_KEY,JSON.stringify({v:`fb.1.${Date.now()}.${v}`,t:Date.now()}));}catch(_){}})();
 
 /* tarjouspyyntölomake */
@@ -926,6 +948,8 @@ const api = mountKartoitus({
   goTo: (name) => go(name),
   fbc: () => window.tkFbc && window.tkFbc(),
   fbp: () => window.tkFbp && window.tkFbp(),
+  campaign: () => window.tkCampaign && window.tkCampaign(),
+  gclid: () => window.tkGclid && window.tkGclid(),
 });
 
 /* Alaosan tarjouspyyntölomake esitäyttää tämän, ja qReset nollaa liidin. */

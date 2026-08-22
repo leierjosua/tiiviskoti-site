@@ -27,6 +27,25 @@ const TIER_HINT = 'Mitä useampi ikkuna, sitä halvempi: 5+ 85 € · 10+ 75 €
    postilaatikkomainoksen QR:stä ?src=qr-a6. Tunniste kulkee varauksen
    mukana CRM:ään ja näkyy adminissa työn kohdalla.
 
+   MIKSI USEA PARAMETRI: ?src= on meidän oma merkintämme, ja se toimii vain
+   linkeissä jotka kirjoitamme itse. Meta ja Google lisäävät klikkiin OMAT
+   parametrinsa (utm_*, fbclid, gclid) — ja ne ovat ainoat jotka näkyvät kun
+   mainos on tehty mainostyökalussa eikä kukaan muistanut liittää ?src=-osaa.
+   Elo 2026 mitattuna se koski kaikkea maksettua liikennettä: 89 kävijää
+   viikossa Facebookista ja Instagramista, joista yhdelläkään ei ollut
+   kampanjatunnistetta. Siksi luetaan kaikki neljä.
+
+   MIKSI KLIKKITUNNISTEESTA JOHDETAAN KARKEA ARVO: pelkkä fbclid kertoo että
+   kävijä tuli Metan mainoksesta vaikkei kerro mistä niistä. `meta-ads` on
+   raportissa äärettömän paljon parempi kuin tyhjä — ja tarkan kampanjan saa
+   lisäämällä mainokseen utm_campaign-parametrin.
+
+   Sama tunnistus on kolmessa paikassa (tässä, `_analytics.js` ja
+   `taloyhtio.html`) koska ne latautuvat eri tavoin eikä yksikään saa riippua
+   toisesta: `_analytics.js` on mainosestojen kohde ja se estetään usein,
+   eikä kaupan attribuutio saa kaatua siihen. Jos muutat sääntöä, muuta se
+   kaikkiin kolmeen.
+
    MIKSI localStorage EIKÄ sessionStorage: painomainoksen nähnyt harkitsee
    tyypillisesti päiviä ennen varaamista, ja istunto katkeaa siinä välissä.
    sessionStorage riittää yhden sivulatauksen ketjuun (varaa -> ajanvaraus),
@@ -141,12 +160,37 @@ function readCampaign(){
   }catch(_){ return undefined; }
 }
 
+/* Mainostyökalujen kampanjanimissä on välilyöntejä, isoja kirjaimia ja
+   putkimerkkejä ("Taloyhtiö | Uusimaa"). Ne eivät kelpaa sellaisenaan, mutta
+   niiden hylkääminen hukkaisi juuri sen tiedon jota ollaan hakemassa —
+   siivotaan siis muotoon jonka kanta hyväksyy. */
+function normalizeCampaign(raw){
+  const v = String(raw || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/^[-._]+/, '')
+    .slice(0, 60);
+  return CAMPAIGN_RE.test(v) ? v : undefined;
+}
+
+/* Kampanja osoiterivistä. Palauttaa undefined jos mitään tunnistettavaa ei
+   ole. Ei kosketa tallennustilaan — sen tekee captureCampaign. */
+function campaignFromUrl(){
+  let q;
+  try{ q = new URLSearchParams(location.search); }catch(_){ return undefined; }
+  const named = q.get('src') || q.get('utm_campaign') || q.get('utm_source');
+  if(named) return normalizeCampaign(named);
+  /* Nimetöntä klikkiä ei jätetä tunnistamattomaksi: alusta tiedetään silti. */
+  if(q.get('fbclid')) return 'meta-ads';
+  if(q.get('gclid') || q.get('wbraid') || q.get('gbraid')) return 'google-ads';
+  return undefined;
+}
+
 (function captureCampaign(){
-  let v;
-  try{ v = new URLSearchParams(location.search).get('src'); }catch(_){ return; }
   /* Arvo tulee osoiterivistä, jota kuka tahansa voi muokata. Kelpaamaton
      hylätään tässä, jottei sitä tarvitse siivota myöhemmin ketjussa. */
-  if(!v || !CAMPAIGN_RE.test(v)) return;
+  const v = campaignFromUrl();
+  if(!v) return;
   if(readCampaign()) return;
   try{ localStorage.setItem(CAMPAIGN_KEY, JSON.stringify({ v, t: Date.now() })); }catch(_){}
 })();
@@ -1107,6 +1151,7 @@ if(document.getElementById('tabKoti')){
       goTo: (name)=>goStep('y-'+name),
       rootPrefix: (yhtioGo.dataset.root||''),
       fbc: ()=>readFbc(), fbp: ()=>readFbp(),
+      campaign: ()=>readCampaign(), gclid: ()=>readGclid(),
     });
     yhtioGo.addEventListener('click',(e)=>{
       e.preventDefault();
