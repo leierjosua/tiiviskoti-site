@@ -1054,6 +1054,32 @@ if(document.getElementById('tabKoti')){
   tabKoti.addEventListener('click', ()=>pickPath(true));
   tabYhtio.addEventListener('click', ()=>pickPath(false));
 
+  /* Taloyhtiön postinumero kuljetetaan taloyhtio.html:lle ?pn=-parametrina,
+     jottei sitä tarvitse syöttää kahdesti — sama tapa kuin varaa.html →
+     etusivu. Kalenteria EI kahdenneta tänne: se elää taloyhtio.html:ssä
+     omine askeleineen, ja kaksi kopiota samasta varausputkesta erkanisi
+     toisistaan ensimmäisessä muutoksessa.
+
+     Polku luetaan napin omasta hrefistä eikä kirjoiteta tähän kiinteästi:
+     aluesivuilla se on "../taloyhtio.html", koska build-alueet.mjs korjaa
+     linkit alikansiota varten. */
+  const yhtioPostal=document.getElementById('fPostalYhtio');
+  const yhtioGo=document.getElementById('gYhtioGo');
+  if(yhtioPostal && yhtioGo){
+    const base=(yhtioGo.getAttribute('href')||'taloyhtio.html#varaa').split('?')[0].split('#')[0];
+    const syncYhtioLink=()=>{
+      const pn=yhtioPostal.value.replace(/\D/g,'').slice(0,5);
+      yhtioPostal.value=pn;
+      yhtioGo.setAttribute('href', pn.length===5 ? `${base}?pn=${pn}#varaa` : `${base}#varaa`);
+    };
+    yhtioPostal.addEventListener('input', syncYhtioLink);
+    /* Enter kentässä = napin painallus, jottei lomake tunnu jumittavan. */
+    yhtioPostal.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter'){ e.preventDefault(); syncYhtioLink(); yhtioGo.click(); }
+    });
+    syncYhtioLink();
+  }
+
   /* Kortin hinta tulee laskurin valinnasta. Ilman valintaa ei näytetä
      summaa vaan ohjataan laskuriin — emme tee ilmaisia kartoituskäyntejä,
      joten varaus ilman kohteita ei ole mahdollinen. */

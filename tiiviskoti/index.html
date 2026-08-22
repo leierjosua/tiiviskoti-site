@@ -853,7 +853,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
           <b>Yksi koti</b>
         </button>
         <button type="button" class="gate-tab" id="tabYhtio" role="tab" aria-selected="false">
-          <b>Naapurit / taloyhtiö</b><span>sopimushinta</span>
+          <b>Taloyhtiöt</b><span>ilmainen kartoitus</span>
         </button>
       </div>
 
@@ -888,23 +888,33 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
         </details>
       </div>
 
-      <!-- Taloyhtiölle ei varata aikaa verkosta: hinta muodostuu kohteen
-           laajuudesta, joten polku vie kartoituspyyntöön. -->
+      <!-- Taloyhtiö varaa veloituksettoman KARTOITUSKÄYNNIN, ei työtä: työn
+           hinta muodostuu kohteen laajuudesta ja lyödään lukkoon vasta
+           käynnin jälkeen. Kalenteri itse on taloyhtio.html:ssä; tästä
+           lähtee mukaan vain postinumero (?pn=). -->
       <div id="gateYhtio" hidden>
         <p class="gate-lead">
           Rappukäytävät ja yhteistilat kerralla kuntoon <b>sopimushinnalla</b>.
-          Mitä useampi ovi, sitä edullisempi kappalehinta.
+          Kartoituskäynti on veloitukseton eikä sido mihinkään.
         </p>
+        <div class="gate-field">
+          <label for="fPostalYhtio">
+            <span class="gate-step">1</span>
+            Taloyhtiön postinumero
+          </label>
+          <span class="gate-hint">
+            Syötä <b>taloyhtiön postinumero</b> — näytämme vapaat ajat
+            veloituksettomalle kartoituskäynnille.
+          </span>
+          <input class="bk-input gate-postal" id="fPostalYhtio" inputmode="numeric" maxlength="5"
+                 placeholder="00100" autocomplete="postal-code" />
+        </div>
+        <a class="btn btn-p gate-cta" id="gYhtioGo" href="taloyhtio.html#varaa">Varaa ilmainen kartoituskäynti</a>
         <div class="gate-ticks col">
-          <span>✓ Veloitukseton kartoituskäynti ja lämpökamerakuvaus</span>
-          <span>✓ Kirjallinen tarjous kartoituksen jälkeen</span>
+          <span>✓ Kartoituskäynti 0 €, noin 20 min</span>
+          <span>✓ Kirjallinen sopimushinta hallitukselle</span>
           <span>✓ Työ tehdään mahdollisimman vähällä häiriöllä</span>
         </div>
-        <a class="btn btn-p gate-cta" href="taloyhtio.html">Pyydä tarjous taloyhtiölle</a>
-        <p class="gate-note">
-          Taloyhtiölle ei varata aikaa verkosta, koska hinta muodostuu kohteen
-          laajuudesta. Kartoitus on maksuton eikä sido mihinkään.
-        </p>
       </div>
     </div>
 

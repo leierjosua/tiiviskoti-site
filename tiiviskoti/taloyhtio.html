@@ -1272,6 +1272,23 @@ document.getElementById('qReset').addEventListener('click',()=>{
 paintStepChrome();
 kRenderAll();
 
+/* Etusivun laskurin taloyhtiövälilehti lähettää postinumeron mukana (?pn=).
+   Silloin vaihe 1 on jo tehty, joten se ohitetaan ja siirrytään suoraan
+   kalenteriin heti kun ajat on haettu. Sama tapa kuin varaa.html →
+   ajanvaraus.html kuluttajapuolella.
+
+   Vaihetta ei vaihdeta jos aikoja ei löytynyt: silloin vaiheen 1 huomiolaatikko
+   kertoo syyn (alue ei palvelussa / kalenteri täynnä), eikä tyhjää kalenteria
+   kannata näyttää. */
+(async function kFromQuery(){
+  let pn='';
+  try{ pn=(new URLSearchParams(location.search).get('pn')||'').replace(/\D/g,'').slice(0,5); }catch(_){ return; }
+  if(pn.length!==5) return;
+  kEl('kartPostal').value=pn; kart.postal=pn;
+  await kLoadAvailability();
+  if(kart.state==='ready') goStep('cal',{noScroll:true});
+})();
+
 /* vuosi + reveal */
 document.getElementById('yr').textContent=new Date().getFullYear();
 const rvEls=[...document.querySelectorAll('.rv')];
