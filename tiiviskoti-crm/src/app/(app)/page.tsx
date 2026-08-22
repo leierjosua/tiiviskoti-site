@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { readHealthBanner, type HealthBanner } from '@/lib/health';
-import { requireStaff } from '@/lib/session';
+import { requireStaff, viewMode } from '@/lib/session';
 import { addDays, dateKeyOf, formatDateKey, formatInstant, helsinkiDateTime, timeOf } from '@/lib/time';
 import { Card, CardHeader, Empty, StatusBadge } from '@/components/ui';
 import { MarkDone } from './tyot/[id]/ui';
+import AsennusEtusivu from './asennus-etusivu';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,15 +93,17 @@ function HealthWarning({ health }: { health: HealthBanner }) {
 export default async function TodayPage() {
   const staff = await requireStaff();
 
+  /* Asennusnäkymä on oma sivunsa, ei tämän sivun ehtoja. Kun sama sivu
+     yritti palvella kumpaakin, asentajan puolesta jäi joka lisäyksen
+     kohdalle uusi `onlyMine`-haarukka — ja yhtään niistä ei nähnyt
+     toimiston näkymästä. */
+  if (await viewMode(staff) === 'asennus') return <AsennusEtusivu staff={staff} />;
+
   const today = dateKeyOf(new Date());
   const dayStart = helsinkiDateTime(today, '00:00');
   const dayEnd = helsinkiDateTime(addDays(today, 1), '00:00');
   const monthAgo = helsinkiDateTime(addDays(today, -30), '00:00');
   const weekAhead = helsinkiDateTime(addDays(today, 8), '00:00');
-
-  /* Asentaja näkee vain omat työnsä — päivänäkymä on hänelle työlista, ei
-     yrityksen tilannekuva. Tunnusluvut ovat siksi vain toimistolle. */
-  const onlyMine = staff.role === 'installer';
 
   const [jobs, stats, health] = await Promise.all([
     sql<DayJob[]>`
@@ -113,12 +116,11 @@ export default async function TodayPage() {
         left join tk.customers cu on cu.id = j.customer_id
        where j.starts_at >= ${dayStart.toISOString()} and j.starts_at < ${weekAhead.toISOString()}
          and j.status <> 'cancelled'
-         ${onlyMine ? sql`and s.id = ${staff.id}` : sql``}
        order by j.starts_at
     `,
     /* Kaikki tunnusluvut yhdellä kyselyllä: erilliset kyselyt olisivat neljä
        kanta-edestakaista matkaa siinä missä tässä riittää yksi. */
-    onlyMine ? Promise.resolve([]) : sql<{
+    sql<{
       myynti_tanaan: number; keikat_tanaan: number;
       uudet_varaukset: number; uudet_arvo: number;
       kpl_30pv: number; myynti_30pv: number;
@@ -146,9 +148,7 @@ export default async function TodayPage() {
       from tk.jobs j
       where j.status <> 'cancelled'
     `,
-    /* Asentajalle ei näytetä: hän ei voi korjata Google-tunnusta, ja
-       päivänäkymä on hänelle työlista eikä yrityksen tilannekuva. */
-    onlyMine ? Promise.resolve(null) : readHealthBanner(),
+    readHealthBanner(),
   ]);
 
   const s = stats[0];
@@ -165,18 +165,16 @@ export default async function TodayPage() {
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-[28px] leading-tight font-extrabold tracking-tight text-text">
-            {onlyMine ? 'Omat työt' : 'Yhteenveto'}
+            Yhteenveto
           </h1>
           <p className="mt-1 text-sm text-muted">
             {formatDateKey(today)} · {todayJobs.length} keikkaa tänään
           </p>
         </div>
-        {!onlyMine && (
-          <Link href="/tyot/uusi"
-                className="rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink hover:bg-[#1A6340]">
-            Uusi työ
-          </Link>
-        )}
+        <Link href="/tyot/uusi"
+              className="rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink hover:bg-[#1A6340]">
+          Uusi työ
+        </Link>
       </header>
 
       {/* Ennen tunnuslukuja: rikkoutunut vahvistusketju on tärkeämpi tieto
@@ -239,7 +237,7 @@ export default async function TodayPage() {
               <p className="text-sm text-muted">
                 {[job.address, job.postal_code, job.city].filter(Boolean).join(', ') || 'Ei osoitetta'}
               </p>
-              {!onlyMine && <p className="mt-1 text-xs text-faint">{job.staff_name}</p>}
+              <p className="mt-1 text-xs text-faint">{job.staff_name}</p>
 
               {job.notes && (
                 <p className="mt-2 rounded-lg border border-warn/30 bg-warn/10 px-3 py-2 text-sm text-warn">
@@ -313,7 +311,7 @@ export default async function TodayPage() {
                   <td className="max-w-[220px] truncate px-4 py-2.5 text-muted">
                     {[job.address, job.postal_code].filter(Boolean).join(', ') || '—'}
                   </td>
-                  {!onlyMine && <td className="px-4 py-2.5 text-xs text-faint">{job.staff_name}</td>}
+                  <td className="px-4 py-2.5 text-xs text-faint">{job.staff_name}</td>
                   <td className="px-4 py-2.5 text-right tabular whitespace-nowrap">
                     {eur(job.price_cents)}
                   </td>

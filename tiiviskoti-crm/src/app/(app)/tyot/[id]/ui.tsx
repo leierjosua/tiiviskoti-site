@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { deleteJob, rescheduleJob, sendOffer, sendReceipt, setJobStatus, updateJob, type ActionState } from '../actions';
+import { appendJobNote, deleteJob, rescheduleJob, sendOffer, sendReceipt, setJobStatus, updateJob, type ActionState } from '../actions';
 import { Button, ErrorNote, Field, Input, Textarea, cx } from '@/components/ui';
 import { SubmitButton } from '@/components/submit';
 import { dateKeyOf, timeOf } from '@/lib/time';
@@ -220,5 +220,25 @@ export function StatusButtons({ id, status }: { id: string; status: string }) {
         </form>
       ))}
     </div>
+  );
+}
+
+/* Sisäinen merkintä keikalle. React tyhjentää lomakkeen itse kun action
+   on funktio, joten kenttä on valmis seuraavaa merkintää varten — ja
+   seuraava merkintä on uusi merkintä, ei edellisen korjaus. */
+export function NoteForm({ id }: { id: string }) {
+  return (
+    <form action={appendJobNote} className="flex gap-2">
+      <input type="hidden" name="id" value={id} />
+      <input
+        name="note"
+        required
+        maxLength={500}
+        placeholder="Lisää muistiinpano…"
+        className="min-w-0 flex-1 rounded-lg border border-line bg-ink-800 px-3 py-2.5 text-sm
+                   placeholder:text-faint focus:border-accent focus:outline-none"
+      />
+      <SubmitButton className="text-sm" pendingLabel="Lisätään…">Lisää</SubmitButton>
+    </form>
   );
 }

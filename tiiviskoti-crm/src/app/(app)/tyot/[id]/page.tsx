@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getJob } from '@/lib/data';
-import { requireStaff } from '@/lib/session';
+import { requireStaff, viewMode } from '@/lib/session';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib/time';
 import { sql } from '@/lib/db';
 import { DeleteJob, EditJobForm, RescheduleForm, SendOffer, SendReceipt, StatusButtons } from './ui';
+import AsennusTyo from './asennus-tyo';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,11 +20,15 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireStaff();
+  const staff = await requireStaff();
   const { id } = await params;
 
   const job = await getJob(id);
   if (!job) notFound();
+
+  /* Asennusnäkymässä sama työ näytetään toisin: ei muokkauslomakkeita
+     vaan tiedot ja Viimeistele-nappi. */
+  if (await viewMode(staff) === 'asennus') return <AsennusTyo job={job} />;
 
   const dayKey = dateKeyOf(job.starts_at);
   const durationMinutes = Math.round(

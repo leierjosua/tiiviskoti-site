@@ -228,7 +228,13 @@ export async function sendReceipt(_prev: ActionState, formData: FormData): Promi
   await requireStaff();
   const id = String(formData.get('id') ?? '');
   if (!id) return { error: 'Työtä ei löytynyt.' };
+  return deliverReceipt(id);
+}
 
+/* Kuitin varsinainen tekeminen. Erillään lomakeactionista, koska
+   viimeistelyvelho lähettää kuitin osana isompaa tallennusta eikä sillä
+   ole FormDataa — eikä kuittilogiikkaa saa olla kahta versiota. */
+export async function deliverReceipt(id: string): Promise<ActionState> {
   const job = await getJob(id);
   if (!job) return { error: 'Työtä ei löytynyt.' };
   if (!job.customer_email) return { error: 'Asiakkaalla ei ole sähköpostiosoitetta — lisää se ensin.' };
@@ -385,4 +391,37 @@ export async function sendOffer(_prev: ActionState, formData: FormData): Promise
   revalidatePath(`/tyot/${id}`);
   if (sendErr) return { error: `Tarjouksen lähetys epäonnistui: ${sendErr}` };
   return { ok: `Tarjous lähetetty osoitteeseen ${job.customer_email}.` };
+}
+
+/* Sisäinen muistiinpano keikalle.
+
+   Lisätään olemassa olevaan `notes`-kenttään aikaleimallisena rivinä eikä
+   omaan tauluun: kenttä on jo kaikkialla näkyvissä (työmääräin, kalenterin
+   kortti, asentajan päivälista), joten erillinen taulu tarkoittaisi että
+   puolet merkinnöistä jäisi näkymättä sinne missä niitä luetaan.
+
+   Vanha teksti säilyy sellaisenaan — merkintä on kirjaus, ei korvaus. */
+export async function appendJobNote(formData: FormData) {
+  await requireStaff();
+
+  const id = String(formData.get('id') ?? '');
+  const text = String(formData.get('note') ?? '').trim().slice(0, 500);
+  if (!id || !text) return;
+
+  const stamp = new Date().toLocaleString('fi-FI', {
+    day: 'numeric', month: 'numeric', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Helsinki',
+  });
+
+  await sql`
+    update tk.jobs
+       set notes = case
+                     when notes is null or notes = '' then ${`${stamp} — ${text}`}
+                     else notes || ${`\n${stamp} — ${text}`}
+                   end
+     where id = ${id}
+  `;
+
+  revalidatePath(`/tyot/${id}`);
+  revalidatePath('/');
 }

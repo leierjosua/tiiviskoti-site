@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import { sql } from './db';
+import { resolveView, VIEW_COOKIE, type ViewMode } from './view';
 
 /* =========================================================
    Kirjautuminen ja käyttöoikeus.
@@ -78,6 +79,12 @@ export async function requireStaff(): Promise<Staff> {
   const staff = await currentStaff();
   if (!staff) redirect('/login');
   return staff;
+}
+
+/** Kumpaa näkymää kirjautunut henkilö juuri nyt katsoo. */
+export async function viewMode(staff: Staff): Promise<ViewMode> {
+  if (staff.role === 'installer') return 'asennus';
+  return resolveView(staff.role, (await cookies()).get(VIEW_COOKIE)?.value);
 }
 
 /** Kalentereita, työntekijöitä ja asetuksia saa muokata vain omistaja tai admin. */

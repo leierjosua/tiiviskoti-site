@@ -17,12 +17,14 @@ import { BrandMark, BrandWord } from './brand';
 
 export type NavItem = { href: string; label: string };
 
-export function Nav({ items, staffName, staffEmail, staffRole, logout }: {
+export function Nav({ items, staffName, staffEmail, staffRole, logout, viewSwitch }: {
   items: NavItem[];
   staffName: string;
   staffEmail: string;
   staffRole: string;
   logout: React.ReactNode;
+  /** Näkymän vaihto. Vain toimistolla — asentajalla ei ole mitä vaihtaa. */
+  viewSwitch?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -70,7 +72,8 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout }: {
       {/* Puhelin: yläpalkki */}
       <header className="nav-surface sticky top-0 z-30 flex items-center gap-2.5 border-b border-nav-line bg-nav px-4 py-3 md:hidden">
         <BrandMark size={24} tone="light" />
-        <span className="flex-1"><BrandWord tone="light" /></span>
+        <BrandWord tone="light" />
+        <span className="flex-1">{viewSwitch}</span>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -92,10 +95,12 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout }: {
       {/* Työpöytä: sivupalkki. Reunaviiva erottaa sen työtilasta nyt kun
           kumpikin on vaalea. */}
       <aside className="nav-surface hidden w-60 shrink-0 flex-col border-r border-nav-line bg-nav md:flex">
-        <div className="flex items-center gap-2.5 px-4 py-5">
+        <div className="flex items-center gap-2.5 px-4 pt-5 pb-3">
           <BrandMark size={28} tone="light" />
           <BrandWord tone="light" />
         </div>
+
+        {viewSwitch && <div className="px-4 pb-4">{viewSwitch}</div>}
 
         <nav className="flex-1 space-y-1 px-3">{links()}</nav>
 

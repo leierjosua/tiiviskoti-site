@@ -4,6 +4,8 @@ import {
   addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, todayKey, weekdayShort,
 } from '@/lib/time';
 import { Card, Empty } from '@/components/ui';
+import { requireStaff, viewMode } from '@/lib/session';
+import AsennusKalenteri from './asennus-kalenteri';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,8 +49,20 @@ function Metric({ label, value, sub, tone = 'plain' }: {
 
 export default async function WeekPage({
   searchParams,
-}: { searchParams: Promise<{ viikko?: string; asentaja?: string }> }) {
-  const { viikko, asentaja } = await searchParams;
+}: {
+  searchParams: Promise<{
+    viikko?: string; asentaja?: string; tila?: string; haku?: string; nakyma?: string;
+  }>;
+}) {
+  const { viikko, asentaja, tila, haku, nakyma } = await searchParams;
+  const me = await requireStaff();
+
+  /* Asennusnäkymässä kalenteri on yhden ihmisen viikko. Se ei ole tämän
+     näkymän suodatus vaan eri kysymys, joten se on oma komponenttinsa. */
+  if (await viewMode(me) === 'asennus') {
+    return <AsennusKalenteri staff={me} viikko={viikko} tila={tila} haku={haku} nakyma={nakyma} />;
+  }
+
   const today = todayKey();
   const weekParam = /^\d{4}-\d{2}-\d{2}$/.test(viikko ?? '') ? viikko! : undefined;
   const monday = mondayOf(weekParam ?? today);

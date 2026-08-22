@@ -1,14 +1,18 @@
-import { requireStaff } from '@/lib/session';
+import { requireStaff, viewMode } from '@/lib/session';
 import { logout } from '../login/actions';
-import { Button } from '@/components/ui';
 import { Nav } from '@/components/nav';
+import { ViewSwitch } from './view-switch';
 
+/* Navigaatio riippuu kahdesta asiasta: roolista (mihin on oikeus) ja
+   näkymästä (mitä juuri nyt tehdään). Toimistolainen voi katsoa asennuksen
+   näkymää ilman että hän menettää oikeuksiaan — valikko kaventuu, koska
+   asennusnäkymässä liidit ja mainoskonversiot ovat pelkkää kohinaa. */
 const NAV = [
-  { href: '/', label: 'Tänään' },
-  { href: '/kalenteri', label: 'Kalenteri' },
-  { href: '/tyot', label: 'Työt' },
+  { href: '/', label: 'Tänään', asennusLabel: 'Etusivu', asennus: true },
+  { href: '/kalenteri', label: 'Kalenteri', asennus: true },
+  { href: '/tyot', label: 'Työt', asennus: true },
   { href: '/tarjoukset', label: 'Tarjoukset', managerOnly: true },
-  { href: '/asiakkaat', label: 'Asiakkaat' },
+  { href: '/asiakkaat', label: 'Asiakkaat', asennus: true },
   { href: '/kalenterit', label: 'Työajat', managerOnly: true },
   { href: '/alueet', label: 'Palvelualueet', managerOnly: true },
   { href: '/liidit', label: 'Liidit', managerOnly: true },
@@ -29,14 +33,21 @@ const ROLE_LABELS: Record<string, string> = {
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const staff = await requireStaff();
   const isManager = staff.role !== 'installer';
+  const view = await viewMode(staff);
+  const asennus = view === 'asennus';
+
+  const items = NAV
+    .filter((i) => (isManager || !i.managerOnly) && (!asennus || i.asennus))
+    .map((i) => ({ href: i.href, label: (asennus && i.asennusLabel) || i.label }));
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       <Nav
-        items={NAV.filter((i) => isManager || !i.managerOnly).map(({ href, label }) => ({ href, label }))}
+        items={items}
         staffName={staff.fullName}
         staffEmail={staff.email}
         staffRole={ROLE_LABELS[staff.role] ?? staff.role}
+        viewSwitch={isManager ? <ViewSwitch current={view} /> : undefined}
         logout={
           <form action={logout}>
             <button
