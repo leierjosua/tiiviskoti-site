@@ -134,6 +134,7 @@ export default async function SivustoAnalytics({
 
           <div className="grid gap-4 md:grid-cols-2">
             <BarList title="Liikennelähteet" rows={a.sources} />
+            <BarList title="Kävijät kampanjoittain" rows={a.visitorCampaign} />
             <BarList title="Top landing-sivut" rows={a.landing} />
             <BarList title="Suosituimmat sivut" rows={a.topPages} />
             <BarList title="CTA-klikkaukset" rows={a.cta} />

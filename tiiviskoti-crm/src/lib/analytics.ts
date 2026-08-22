@@ -18,6 +18,7 @@ export type SiteAnalytics = {
   convRate: number;            // % (konversiot / sessiot)
   landing: Bucket[];
   sources: Bucket[];
+  visitorCampaign: Bucket[];   // kävijät kampanjoittain (ei vasta konversiot)
   topPages: Bucket[];
   devices: Bucket[];
   browsers: Bucket[];
@@ -44,6 +45,7 @@ const tally = (rows: { k: string | null; n: number }[]): Bucket[] =>
 export async function getSiteAnalytics(fromIso: string): Promise<SiteAnalytics> {
   const [
     sessionRows, totals, topPages, cta, funnel, scroll, jobsCount, jobSource, jobCampaign,
+    visitorCampaign,
   ] = await Promise.all([
     /* Sessioittaminen: uusi sessio kun sama kävijä on ollut yli 30 min hiljaa.
        Palautetaan sessiotason rivit, loput lasketaan JS:ssä. */
@@ -120,6 +122,24 @@ export async function getSiteAnalytics(fromIso: string): Promise<SiteAnalytics> 
        where created_at >= ${fromIso} and status <> 'cancelled'
        group by campaign order by n desc limit 8
     `,
+    /* Kävijät kampanjoittain — vastapari konversioille. Ilman tätä tiedetään
+       vain montako kauppaa kampanja toi, ei montako kävijää se maksoi.
+
+       Kampanja on vain laskeutumissivun sivunäytöllä: selain saa sen
+       osoiterivistä eikä `_analytics.js` säilytä sitä (se ei koske
+       tallennustilaan). Siksi kävijä yhdistetään ENSIMMÄISEEN kampanjaan
+       jonka hän näytti, ja hänen loput tapahtumansa kuuluvat samaan. */
+    sql<{ k: string | null; n: number }[]>`
+      select coalesce(c.campaign, '(ei kampanjaa)') as k, count(*)::int as n
+        from (
+          select visitor_hash,
+                 (array_agg(campaign order by ts) filter (where campaign is not null))[1] as campaign
+            from tk.web_events
+           where ts >= ${fromIso}
+           group by visitor_hash
+        ) c
+       group by 1 order by n desc limit 8
+    `,
   ]);
 
   const sessions = sessionRows.length;
@@ -148,6 +168,7 @@ export async function getSiteAnalytics(fromIso: string): Promise<SiteAnalytics> 
     convRate: sessions ? Math.round((conversions / sessions) * 1000) / 10 : 0,
     landing: group(sessionRows, 'landing').slice(0, 8),
     sources: group(sessionRows, 'source'),
+    visitorCampaign: tally(visitorCampaign),
     devices: group(sessionRows, 'device'),
     browsers: group(sessionRows, 'browser'),
     os: group(sessionRows, 'os'),

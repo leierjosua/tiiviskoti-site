@@ -50,6 +50,23 @@ const schema = z.object({
   /* Liidin viitenumero (TK-YHT-…) lomakkeelta, jotta kalenterissa oleva käynti
      ja adminin liidirivi voi yhdistää toisiinsa. Pelkkä merkintä. */
   leadRef: z.string().max(40).optional(),
+  /* Mainoskampanja ja Google Ads -klikin tunniste. Ilman näitä kartoituskäynnit
+     näkyisivät raportissa yhtenä kasana eikä mainoksittain — ja kartoitus on
+     juuri se mitä taloyhtiömainoksilla myydään, joten sen attribuutio on koko
+     mainosbudjetin mittari.
+
+     Sama puolustus kuin varausreitillä: arvo tulee julkisesta osoiterivistä,
+     joten kelvoton pudotetaan pois eikä pyyntöä hylätä. Rikkinäinen mainoslinkki
+     ei saa estää sovittua käyntiä. Muotorajaukset vastaavat kannan
+     jobs_campaign_format- ja jobs_gclid_format-rajoitteita. */
+  campaign: z.preprocess(
+    (v) => (typeof v === 'string' && /^[a-z0-9][a-z0-9._-]{0,59}$/.test(v) ? v : undefined),
+    z.string().optional(),
+  ),
+  gclid: z.preprocess(
+    (v) => (typeof v === 'string' && /^[A-Za-z0-9_-]{10,200}$/.test(v) ? v : undefined),
+    z.string().optional(),
+  ),
 });
 
 /** Vakioaikainen vertailu, jottei salaisuutta voi haarukoida vasteajasta. */
@@ -163,11 +180,13 @@ export async function POST(request: Request) {
 
       const [job] = await tx<{ id: string; job_number: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status, title,
-                             address, postal_code, city, price_cents, notes, source)
+                             address, postal_code, city, price_cents, notes, source,
+                             campaign, gclid)
         values (${customerId}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
                 ${`Kartoituskäynti: ${d.association}`},
                 ${d.address}, ${d.postalCode}, ${d.city ?? null},
-                0, ${notes}, ${KARTOITUS_SOURCE})
+                0, ${notes}, ${KARTOITUS_SOURCE},
+                ${d.campaign ?? null}, ${d.gclid ?? null})
         returning id, job_number
       `;
       return job;
