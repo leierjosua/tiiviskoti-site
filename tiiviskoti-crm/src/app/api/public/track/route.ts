@@ -58,6 +58,16 @@ function classifyRef(host: string | null): string {
 }
 
 const TYPES = new Set(['pageview', 'scroll', 'cta', 'funnel']);
+
+/* Onko tk.web_events.variant olemassa? Ei kysytä kannasta joka pyynnöllä:
+   ensimmäinen epäonnistunut lisäys kääntää tämän falseksi, ja sen jälkeen
+   mennään suoraan vanhaa polkua. Prosessin uudelleenkäynnistys (uusi deploy)
+   yrittää taas — eli migraation ajamisen jälkeen versio alkaa tallentua
+   viimeistään seuraavasta kylmästä käynnistyksestä. */
+let variantColumnExists = true;
+const isUndefinedColumn = (e: unknown) =>
+  typeof e === 'object' && e !== null && (e as { code?: string }).code === '42703';
+
 const clip = (s: unknown, n: number) => (typeof s === 'string' && s ? s.slice(0, n) : null);
 
 export async function POST(request: Request) {
@@ -86,8 +96,30 @@ export async function POST(request: Request) {
   const cta = type === 'cta' ? clip(body.cta, 60) : null;
   const step = type === 'funnel' ? clip(body.step, 40) : null;
   const campaign = clip(body.campaign, 60);
+  /* A/B-testin versio. Muotorajaus tässä eikä vain kannassa, jottei
+     roskasyöte pilaa raporttia silloinkaan kun sarake vielä puuttuu. */
+  const rawVariant = clip(body.variant, 40);
+  const variant = rawVariant && /^[a-z0-9][a-z0-9_-]{0,39}$/.test(rawVariant) ? rawVariant : null;
 
   try {
+    if (variantColumnExists) {
+      try {
+        await sql`
+          insert into tk.web_events
+            (visitor_hash, event_type, path, ref_source, ref_host, device, browser, os,
+             scroll_pct, cta, funnel_step, campaign, variant)
+          values (${hash}, ${type}, ${path}, ${refSource}, ${refHost}, ${device}, ${browser}, ${os},
+                  ${scrollPct}, ${cta}, ${step}, ${campaign}, ${variant})
+        `;
+        return new Response(null, { status: 204, headers });
+      } catch (e) {
+        /* Sarake puuttuu vielä (db/014 ajamatta): merkitään se muistiin ettei
+           jokainen tapahtuma yritä turhaan, ja kirjoitetaan ilman versiota.
+           Analytiikka ei saa katketa migraatiota odotellessa. */
+        if (isUndefinedColumn(e)) variantColumnExists = false;
+        else throw e;
+      }
+    }
     await sql`
       insert into tk.web_events
         (visitor_hash, event_type, path, ref_source, ref_host, device, browser, os,

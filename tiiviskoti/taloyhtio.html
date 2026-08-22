@@ -481,6 +481,20 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
    neljä kellonaikaa 390px leveydellä jää liian kapeaksi kosketettavaksi. */
 @media(max-width:620px){.tincl,.tform .row{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.slots{grid-template-columns:repeat(3,1fr)}}
 </style>
+<script>
+/* A/B-testin versio arvotaan TÄSSÄ eikä _analytics.js:ssä, koska se on defer
+   eikä ehtisi ennen kuin teksti on jo piirretty — versio välähtäisi.
+   Ei evästettä eikä localStoragea: arvonta on sivulatauskohtainen.
+   `?ab=a` / `?ab=b` pakottaa version testausta varten. */
+(function(){
+  var V=['a','b'], v;
+  try{ var f=new URLSearchParams(location.search).get('ab');
+       v = V.indexOf(f)>=0 ? f : V[Math.floor(Math.random()*V.length)]; }
+  catch(e){ v=V[0]; }
+  window.tkVariant=v;
+  document.documentElement.setAttribute('data-ab',v);
+})();
+</script>
 </head>
 <body>
 <nav class="top" id="nav"><div class="wrap">
@@ -880,6 +894,7 @@ function goIdx(next, opts) {
   const from = nodes[cur], to = nodes[next];
   const swap = () => {
     from.hidden = true; to.hidden = false; cur = next; paint();
+    if (window.tkTrack) window.tkTrack({ type:'funnel', step: to.dataset.step });
     if (!(opts && opts.noScroll)) {
       const y = card.getBoundingClientRect().top + scrollY - 96;
       scrollTo({ top: Math.max(0, y), behavior: reduceMotion ? 'auto' : 'smooth' });
@@ -920,6 +935,37 @@ window.tkKartoitus = {
   forgetLead: () => api.prefill({}, ''),
 };
 
+/* ---------- A/B-TESTIN TEKSTIVERSIOT ----------
+   Versio on arvottu jo <head>issä (window.tkVariant), joten teksti on oikein
+   ensimmäisestä piirrosta lähtien eikä välähdä.
+
+   Testataan VAIN varausosion otsikkoa ja pääkutsua — se on kohta jossa kävijä
+   joko aloittaa varauksen tai ei. Muu sivu pidetään identtisenä, jotta ero on
+   luettavissa yhdelle muuttujalle.
+
+   A = sivun nykyinen sanamuoto (verrokki). B = hyöty ensin.
+
+   Mittari EI ole varaus vaan eteneminen vaiheeseen 2 (`funnel`-tapahtuma).
+   Varauksia tulee liian harvoin merkitsevyyteen; etenemisiä moninkertaisesti.
+
+   Vaiheen 1 data-attribuutit päivitetään myös, koska vaihemoottori maalaa
+   otsikon niistä uudelleen joka siirtymällä — pelkkä textContent palautuisi. */
+(function(){
+  if ((window.tkVariant || 'a') !== 'b') return;   // A = sivun oma teksti
+  var T = {
+    title:  'Kartoitus maksutta — näettekö vetokohdat itse?',
+    kicker: 'Käymme läpi joka oven',
+    sub:    'Mittaamme vetokohdat ja kerromme mitä kannattaa tiivistää. '
+          + 'Käynti kestää noin 20 minuuttia eikä sido teitä mihinkään.'
+  };
+  var set = function(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt; };
+  set('varaaTitle', T.title); set('varaaKicker', T.kicker); set('varaaSub', T.sub);
+  var cta = document.getElementById('toCal');
+  if (cta) cta.textContent = 'Katso vapaat ajat';
+  var s1 = document.querySelector('[data-step="postal"]');
+  if (s1) { s1.dataset.title=T.title; s1.dataset.kicker=T.kicker; s1.dataset.sub=T.sub; }
+})();
+
 paint();
 
 /* Etusivun laskurin taloyhtiövälilehti lähettää postinumeron mukana (?pn=).
@@ -932,6 +978,7 @@ paint();
   if (await api.setPostal(pn)) go('cal', { noScroll: true });
 })();
 </script>
+<script defer src="_analytics.js"></script>
 <script type="module" src="_mcta.js"></script>
 <script src="_chat.js" defer></script>
 </body>

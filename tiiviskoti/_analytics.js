@@ -12,8 +12,39 @@
   var campaign = null;
   try { campaign = new URLSearchParams(location.search).get('src'); } catch (e) { /* ei väliä */ }
 
+  /* ---------- A/B-testi ----------
+     Versio arvotaan KERRAN SIVULATAUSTA KOHTI ja pidetään muistissa. Ei
+     evästettä eikä localStoragea — tämä sivusto ei koske käyttäjän laitteen
+     tallennustilaan, ja se lupaus pidetään myös testin takia.
+
+     Sivulatauskohtaisuus riittää, koska koko varausputki (postinumero → aika
+     → tiedot) tapahtuu yhden sivulatauksen sisällä vaihtuvana korttina.
+     Kaikki saman latauksen tapahtumat kantavat siis samaa versiota, eikä
+     kävijä näe kesken putken vaihtuvaa tekstiä.
+
+     Rajoitus jonka kanssa on elettävä: sama ihminen voi saada eri version jos
+     hän lataa sivun uudelleen. Raportti mittaa siis sivulatauksia, ei
+     yksilöitä. Se on tarkoituksella: yksilön seuraaminen vaatisi tunnisteen
+     tallentamisen selaimeen.
+
+     `?ab=`-parametrilla version voi pakottaa testausta varten. */
+  var VARIANTS = ['a', 'b'];
+  var variant = window.tkVariant;
+  if (VARIANTS.indexOf(variant) < 0) {
+    /* Sivuilla joilla on tekstiversioita arvonta on tehty jo <head>issä, jotta
+       teksti ei ehdi välähtää. Tänne päädytään vain muilla sivuilla. */
+    try {
+      var forced = new URLSearchParams(location.search).get('ab');
+      variant = VARIANTS.indexOf(forced) >= 0 ? forced
+        : VARIANTS[Math.floor(Math.random() * VARIANTS.length)];
+    } catch (e) { variant = VARIANTS[0]; }
+    window.tkVariant = variant;
+    document.documentElement.setAttribute('data-ab', variant);
+  }
+
   function send(o) {
     if (!o.path) o.path = location.pathname;
+    if (!o.variant) o.variant = variant;
     var data = JSON.stringify(o);
     try {
       var blob = new Blob([data], { type: 'text/plain' });
