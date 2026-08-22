@@ -204,7 +204,7 @@
     <div class="stepdots" id="stepDots" aria-hidden="true"></div>
 
     <!-- VAIHE 1: hintalaskuri -->
-    <div class="step calc-wrap" data-step="calc" data-wide="1" hidden
+    <div class="step calc-wrap" data-step="calc" data-path="koti" data-wide="1" hidden
          data-kicker="Hintalaskuri" data-title="Laske hintasi Pornaisissa" data-tag="Vaihe 2/4"
          data-back="Takaisin postinumeroon"
          data-sub="Valitse Pornaisten kotisi ovet ja ikkunat — kiinteä hinta päivittyy heti.">
@@ -230,7 +230,7 @@
 
     <!-- VAIHE 2: postinumero ja polku -->
     <div class="step" data-step="postal"
-         data-kicker="Varaus" data-title="Missä kohde on?" data-tag="Vaihe 1/4"
+         data-kicker="Varaus" data-title="Missä kohde on?" data-tag="Vaihe 1/4" data-tag-yhtio="Vaihe 1/3"
          data-focus="fPostal"
          data-sub="Tarkistetaan ensin, että palvelemme alueellasi.">
       <div class="gate-tabs" role="tablist">
@@ -294,7 +294,8 @@
           <input class="bk-input gate-postal" id="fPostalYhtio" inputmode="numeric" maxlength="5"
                  placeholder="00100" autocomplete="postal-code" />
         </div>
-        <a class="btn btn-p gate-cta" id="gYhtioGo" href="../taloyhtio.html#varaa">Varaa ilmainen kartoituskäynti</a>
+        <div class="area-note" id="yhtioNote" style="margin-top:14px"></div>
+        <button type="button" class="btn btn-p gate-cta" id="gYhtioGo" data-root="../" disabled>Näytä vapaat ajat</button>
         <div class="gate-ticks col">
           <span>✓ Kartoituskäynti 0 €, noin 20 min</span>
           <span>✓ Kirjallinen sopimushinta hallitukselle</span>
@@ -304,7 +305,7 @@
     </div>
 
     <!-- VAIHE 3: vapaan ajan valinta -->
-    <div class="step bcal" data-step="cal" hidden
+    <div class="step bcal" data-step="cal" data-path="koti" hidden
          data-kicker="Varaus" data-title="Valitse vapaa aika" data-tag="Vaihe 3/4"
          data-back="Takaisin laskuriin"
          data-sub="Näytämme vain ne ajat, jotka ovat vapaana alueellasi.">
@@ -323,7 +324,7 @@
     </div>
 
     <!-- VAIHE 4: yhteystiedot -->
-    <aside class="step bside" data-step="form" hidden
+    <aside class="step bside" data-step="form" data-path="koti" hidden
            data-kicker="Varaus" data-title="Täytä yhteystiedot" data-tag="Vaihe 4/4"
            data-back="Takaisin kalenteriin" data-focus="fName">
       <div id="bookForm">
@@ -351,14 +352,37 @@
     </aside>
 
     <!-- VAIHE 5: kuittaus -->
-    <div class="step book-done" data-step="done" hidden
+    <div class="step book-done" data-step="done" data-path="koti" hidden
          data-kicker="Varaus" data-title="Kiitos varauksesta" data-tag="Valmis">
       <div class="ok"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h3>Varaus vastaanotettu</h3><div class="refno" id="bRef">TK-000000</div><p class="bsub" id="bDoneText" style="margin-top:8px"></p>
       <button class="btn btn-o" style="margin-top:16px" id="bReset">Tee uusi varaus</button>
     </div>
+
+    <!-- TALOYHTIÖPOLKU. Sisältö renderöidään `_kartoitus.js`:stä — samasta
+         moduulista jota taloyhtio.html käyttää, jottei kalenteria ja lomaketta
+         ole kahtena kopiona. Vaiheet ovat kortin omia askeleita, joten
+         vaihelaskuri näyttää 1/3 eikä kuluttajapolun 1/4. -->
+    <div class="step bcal" data-step="y-cal" data-path="yhtio" hidden
+         data-kicker="Vapaat ajat" data-title="Valitkaa sopiva aika" data-tag="Vaihe 2/3"
+         data-back="Muuta postinumeroa"
+         data-sub="Näytämme vain ne ajat, jotka ovat oikeasti vapaana kartoituskalenterissa."
+         id="yCal"></div>
+
+    <div class="step" data-step="y-form" data-path="yhtio" hidden
+         data-kicker="Viimeinen askel" data-title="Taloyhtiön tiedot" data-tag="Vaihe 3/3"
+         data-back="Takaisin kalenteriin"
+         data-sub="Vahvistamme ajan heti sähköpostilla."
+         id="yForm"></div>
+
+    <div class="step book-done" data-step="y-done" data-path="yhtio" hidden
+         data-kicker="Kiitos" data-title="Kartoituskäynti vahvistettu" data-tag="Valmis"
+         data-sub="Lähetimme vahvistuksen sähköpostiinne."
+         id="yDone"></div>
    </div>
-  </div>
+  
+
+</div>
 </div></section>
 
 <section class="sec alt"><div class="wrap">

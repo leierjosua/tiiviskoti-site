@@ -348,6 +348,9 @@ if(faqEl){
    näytti asiakkaalle saatavuutta jolla ei ollut mitään tekemistä sen
    kanssa oliko kalenterissa tilaa. Älä palauta arvontaa: jos rajapinta ei
    vastaa, näytetään puhelinnumero eikä keksittyjä aikoja. */
+import { mountKartoitus } from './_kartoitus.js';
+let kartoitusApi = null;
+
 const CRM_BASE = 'https://tiiviskoti-crm.vercel.app';
 const MONTHS = ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu','heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu'];
 function pad(n){return String(n).padStart(2,'0');}
@@ -609,20 +612,50 @@ if(stepCard){
    lyhyemmän polun ilman erillistä koodia. Kukin vaihe kertoo itse otsikkonsa,
    paluulinkkinsä ja tarvitseeko se leveän kortin. */
 const stepNodes = stepCard ? [...stepCard.children].filter(n=>n.hasAttribute('data-step')) : [];
-const stepIdx = name => stepNodes.findIndex(n=>n.dataset.step===name);
-let curIdx = Math.max(0, stepNodes.findIndex(n=>!n.hidden));
+
+/* KAKSI POLKUA SAMASSA KORTISSA.
+
+   Kuluttaja: postinumero → laskuri → aika → tiedot → valmis.
+   Taloyhtiö: postinumero → aika → tiedot → valmis (veloitukseton kartoitus).
+
+   Postinumerovaihe on jaettu — välilehdet ovat siinä. Muut vaiheet kertovat
+   `data-path`-attribuutilla kummalle polulle ne kuuluvat, ja `seq()` palauttaa
+   vain aktiivisen polun vaiheet. Näin kortissa on aina yksi vaihelaskuri
+   kerrallaan eikä kuluttajan "1/4" näy taloyhtiön polulla. */
+let stepPath = 'koti';
+const seq = () => stepNodes.filter(n => !n.dataset.path || n.dataset.path === stepPath);
+const stepIdx = name => seq().findIndex(n=>n.dataset.step===name);
+let curIdx = 0;
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-if(stepCard){
+/* Pisteet vastaavat aktiivista polkua, joten ne rakennetaan uudelleen kun
+   polku vaihtuu. Valmis-vaihe ei ole oma askeleensa: se on lopputulos. */
+function buildDots(){
   const dots=document.getElementById('stepDots');
-  if(dots && !dots.children.length){
-    stepNodes.forEach(()=>dots.appendChild(document.createElement('i')));
-  }
+  if(!dots) return;
+  dots.innerHTML='';
+  seq().filter(n=>!/done$/.test(n.dataset.step)).forEach(()=>dots.appendChild(document.createElement('i')));
+}
+if(stepCard) buildDots();
+
+/* Polun vaihto: piilotetaan nykyinen vaihe, vaihdetaan polku ja palataan
+   jaettuun postinumerovaiheeseen. Kutsutaan välilehtiä painettaessa. */
+function setStepPath(path){
+  if(path===stepPath) return;
+  const cur=seq()[curIdx];
+  if(cur) cur.hidden=true;
+  stepPath=path;
+  curIdx=0;
+  const first=seq()[0];
+  if(first) first.hidden=false;
+  buildDots();
+  paintStepChrome();
 }
 
 function paintStepChrome(){
   if(!stepNodes.length) return;
-  const cur=stepNodes[curIdx];
+  const cur=seq()[curIdx];
+  if(!cur) return;
   const back=document.getElementById('stepBack'), tag=document.getElementById('stepTag');
   const dots=document.getElementById('stepDots');
   const head=stepCard.closest('section');
@@ -635,7 +668,9 @@ function paintStepChrome(){
     back.hidden=!label;
     const span=back.querySelector('span'); if(span && label) span.textContent=label;
   }
-  if(tag) tag.textContent = cur.dataset.tag || '';
+  /* Jaettu postinumerovaihe kuuluu molempiin polkuihin, mutta vaiheiden
+     kokonaismäärä eroaa (4 vs 3). Polkukohtainen tagi voittaa. */
+  if(tag) tag.textContent = cur.dataset['tag'+stepPath.charAt(0).toUpperCase()+stepPath.slice(1)] || cur.dataset.tag || '';
   if(dots) [...dots.children].forEach((d,i)=>{
     d.className = i===curIdx ? 'on' : (i<curIdx ? 'done' : '');
   });
@@ -656,8 +691,9 @@ function paintStepChrome(){
    mitat animoidaan uusiin. Leveys animoidaan koska laskuri tarvitsee kaksi
    saraketta ja loput vaiheet ovat kapeita — ilman sitä kortti hyppäisi. */
 function goStepIdx(next, opts){
-  if(!stepNodes.length || next<0 || next>=stepNodes.length || next===curIdx) return;
-  const from=stepNodes[curIdx], to=stepNodes[next];
+  const nodes=seq();
+  if(!nodes.length || next<0 || next>=nodes.length || next===curIdx) return;
+  const from=nodes[curIdx], to=nodes[next];
   const swap=()=>{
     from.hidden=true; to.hidden=false; curIdx=next; paintStepChrome();
     if(window.tkTrack) window.tkTrack({type:'funnel', step:to.dataset.step});
@@ -1051,33 +1087,31 @@ if(document.getElementById('tabKoti')){
        taloyhtiötä, eikä auki jäänyt kalenteri saa jäädä harhauttamaan. */
     if(!koti && bookWrap) bookWrap.hidden = true;
   }
-  tabKoti.addEventListener('click', ()=>pickPath(true));
-  tabYhtio.addEventListener('click', ()=>pickPath(false));
+  tabKoti.addEventListener('click', ()=>{ pickPath(true); setStepPath('koti'); });
+  tabYhtio.addEventListener('click', ()=>{ pickPath(false); setStepPath('yhtio'); });
 
-  /* Taloyhtiön postinumero kuljetetaan taloyhtio.html:lle ?pn=-parametrina,
-     jottei sitä tarvitse syöttää kahdesti — sama tapa kuin varaa.html →
-     etusivu. Kalenteria EI kahdenneta tänne: se elää taloyhtio.html:ssä
-     omine askeleineen, ja kaksi kopiota samasta varausputkesta erkanisi
-     toisistaan ensimmäisessä muutoksessa.
-
-     Polku luetaan napin omasta hrefistä eikä kirjoiteta tähän kiinteästi:
-     aluesivuilla se on "../taloyhtio.html", koska build-alueet.mjs korjaa
-     linkit alikansiota varten. */
+  /* Taloyhtiön varaus on nyt SAMASSA kortissa, ei erillisellä sivulla:
+     kalenteri ja lomake tulevat `_kartoitus.js`:stä, samasta moduulista jota
+     taloyhtio.html käyttää. Aiemmin tästä lähdettiin taloyhtio.html:lle
+     ?pn=-parametrilla — se kierros jää pois. */
   const yhtioPostal=document.getElementById('fPostalYhtio');
   const yhtioGo=document.getElementById('gYhtioGo');
-  if(yhtioPostal && yhtioGo){
-    const base=(yhtioGo.getAttribute('href')||'taloyhtio.html#varaa').split('?')[0].split('#')[0];
-    const syncYhtioLink=()=>{
-      const pn=yhtioPostal.value.replace(/\D/g,'').slice(0,5);
-      yhtioPostal.value=pn;
-      yhtioGo.setAttribute('href', pn.length===5 ? `${base}?pn=${pn}#varaa` : `${base}#varaa`);
-    };
-    yhtioPostal.addEventListener('input', syncYhtioLink);
-    /* Enter kentässä = napin painallus, jottei lomake tunnu jumittavan. */
-    yhtioPostal.addEventListener('keydown', (e)=>{
-      if(e.key==='Enter'){ e.preventDefault(); syncYhtioLink(); yhtioGo.click(); }
+  if(yhtioPostal && yhtioGo && document.getElementById('yCal')){
+    kartoitusApi = mountKartoitus({
+      noteEl: document.getElementById('yhtioNote'),
+      calEl: document.getElementById('yCal'),
+      formEl: document.getElementById('yForm'),
+      doneEl: document.getElementById('yDone'),
+      postalEl: yhtioPostal,
+      continueEl: yhtioGo,
+      goTo: (name)=>goStep('y-'+name),
+      rootPrefix: (yhtioGo.dataset.root||''),
+      fbc: ()=>readFbc(), fbp: ()=>readFbp(),
     });
-    syncYhtioLink();
+    yhtioGo.addEventListener('click',(e)=>{
+      e.preventDefault();
+      if(kartoitusApi.state()==='ready') goStep('y-cal');
+    });
   }
 
   /* Kortin hinta tulee laskurin valinnasta. Ilman valintaa ei näytetä
@@ -1222,5 +1256,5 @@ render(); renderCal(); renderSlots(); syncBookingSummary();
 if(document.getElementById('stepCard')){
   paintStepChrome();
   /* Funnelin ensimmäinen vaihe (näkyvissä jo latauksessa) analytiikkaan. */
-  if(window.tkTrack && stepNodes[curIdx]) window.tkTrack({type:'funnel', step:stepNodes[curIdx].dataset.step});
+  if(window.tkTrack && seq()[curIdx]) window.tkTrack({type:'funnel', step:seq()[curIdx].dataset.step});
 }

@@ -122,6 +122,9 @@ function laskuriOsio(R, a) {
 
   /* Osion sisäiset linkit ovat juuren suhteen; aluesivu on alikansiossa. */
   sec = sec.replace(/(href=")(taloyhtio\.html|kayttoehdot\.html|tietosuoja\.html)/g, `$1${R}$2`);
+  /* `_kartoitus.js` renderöi tietosuojalinkin vasta ajossa, joten generaattori
+     ei voi korjata sitä. Etuliite annetaan moduulille data-attribuuttina. */
+  sec = sec.replace(/data-root=""/g, `data-root="${R}"`);
 
   /* Kuntakohtainen otsikko geneerisen tilalle.
 
