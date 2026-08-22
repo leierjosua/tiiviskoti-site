@@ -54,3 +54,23 @@ Kaikki 4:5-kuvat toimivat Feedissä. Stories/Reels (9:16) tehdään erikseen jos
   Veto pois — tai tulemme uudestaan veloituksetta. Ovien ja ikkunoiden tiivistys kahden
   vuoden takuulla, kiinteä hinta ilman yllätyksiä. Koko Uusimaa.
   👉 Varaa aika: tiiviskoti.fi
+
+---
+
+## URL-parametrit (kampanjan mittaus)
+
+Jokaiseen **uuteen** mainokseen kuuluu Ads Managerin *URL-parametrit*-kenttään
+(tai `publish.mjs`:n `URL_TAGS`-vakio, joka tekee sen automaattisesti):
+
+```
+utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}
+```
+
+Ilman tätä sivusto tunnistaa `fbclid`istä että kävijä tuli Metasta ja kirjaa
+kampanjaksi `meta-ads`, mutta **ei mistä mainoksesta** — kaikki Meta-liikenne
+menee yhteen kasaan adminin "Kävijät kampanjoittain" -raportissa.
+
+**Älä lisää tätä käynnissä olevaan mainokseen.** `url_tags` on osa creativea,
+eikä olemassa olevaa creativea voi muokata: sekä Ads Manager että API luovat
+muutoksesta uuden creativen, mikä nollaa mainoksen oppimisvaiheen ja sotkee
+käynnissä olevan split-testin. Lisää parametrit kun teet seuraavat mainokset.

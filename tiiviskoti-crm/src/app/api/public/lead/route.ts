@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { sql } from '@/lib/db';
 import { areaForPostal } from '@/lib/data';
 import { json, preflight } from '../cors';
+import { insertLead, campaignPreprocess, gclidPreprocess } from '../lead-insert';
 
 /* POST /api/public/lead
 
@@ -25,6 +25,11 @@ const schema = z.object({
   postal: z.string().regex(/^\d{5}$/),
   city: z.string().max(100).optional(),
   message: z.string().max(2000).optional(),
+  /* Mainoskampanja ja Google Ads -klikin tunniste sivuston osoiterivistä.
+     Laajentumisalueen liidi on mainoksen tulos siinä missä varauskin — ja
+     juuri se kertoo mihin kaupunkiin kannattaa laajentua seuraavaksi. */
+  campaign: z.preprocess(campaignPreprocess, z.string().optional()),
+  gclid: z.preprocess(gclidPreprocess, z.string().optional()),
 });
 
 export async function POST(request: Request) {
@@ -53,11 +58,16 @@ export async function POST(request: Request) {
     return json({ error: 'area_is_served', area: area.name }, { status: 409, origin });
   }
 
-  await sql`
-    insert into tk.leads (full_name, email, phone, postal_code, city, message)
-    values (${d.name}, ${d.email || null}, ${d.phone}, ${d.postal},
-            ${d.city ?? null}, ${d.message ?? null})
-  `;
+  await insertLead({
+    full_name: d.name,
+    email: d.email || null,
+    phone: d.phone,
+    postal_code: d.postal,
+    city: d.city ?? null,
+    message: d.message ?? null,
+    campaign: d.campaign ?? null,
+    gclid: d.gclid ?? null,
+  });
 
   return json({ ok: true }, { origin });
 }

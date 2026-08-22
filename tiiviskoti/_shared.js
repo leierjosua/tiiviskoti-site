@@ -583,7 +583,10 @@ function renderLeadForm(){
     try{
       const r = await fetch(`${CRM_BASE}/api/public/lead`,{
         method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ name, phone, email, postal:avail.postal }),
+        body:JSON.stringify({ name, phone, email, postal:avail.postal,
+          /* Laajentumisalueen liidi on mainoksen tulos siinä missä varauskin —
+             ja juuri se kertoo mihin kaupunkiin kannattaa laajentua. */
+          campaign: readCampaign(), gclid: readGclid() }),
       });
       if(!r.ok) throw new Error('HTTP '+r.status);
       msg.textContent='Kiitos! Otamme yhteyttä kun palvelemme alueellasi.';

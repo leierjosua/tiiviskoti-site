@@ -14,6 +14,22 @@ const PAGE = '556560117546812';
 const ADSET = '120247794086480132';
 const g = (p) => `https://graph.facebook.com/${V}/${p}`;
 
+/* URL-parametrit jotka Meta liittää jokaiseen klikkiin. ILMAN NÄITÄ kaikki
+   Meta-liikenne kirjautuu sivustolla yhtenä `meta-ads`-kasana eikä
+   mainoskohtaisesti — sivusto osaa kyllä tunnistaa fbclidistä että kävijä
+   tuli Metasta, mutta ei mistä mainoksesta.
+
+   {{campaign.name}} ja {{ad.name}} ovat Metan omia paikanvaraajia, jotka se
+   korvaa klikkihetkellä. Sivusto siivoaa nimen muotoon jonka kanta hyväksyy
+   ("Taloyhtiö | Uusimaa" → taloyhti-uusimaa), joten välilyönnit ja isot
+   kirjaimet nimissä eivät haittaa.
+
+   HUOM: url_tags on osa creativea, eikä olemassa olevan mainoksen creativea
+   voi muokata — Ads Managerissa tehty muutos luo uuden creativen ja nollaa
+   mainoksen oppimisvaiheen. Siksi tämä lisätään uusiin mainoksiin täällä
+   eikä käydä koskemassa käynnissä oleviin. */
+const URL_TAGS = 'utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}';
+
 const BOOK = 'https://tiiviskoti.fi/varaa.html';
 const TALO = 'https://tiiviskoti.fi/taloyhtio.html';
 
@@ -61,7 +77,7 @@ for (const a of ADS) {
   try {
     const hash = await uploadImage(a.file);
     const oss = { page_id: PAGE, instagram_user_id: '17841437143913657', link_data: { image_hash: hash, link: a.link, message: a.message, name: a.headline, call_to_action: { type: a.cta, value: { link: a.link } } } };
-    const cr = await post(g(`${ACT}/adcreatives`), { name: a.adName + ' — creative', object_story_spec: JSON.stringify(oss) });
+    const cr = await post(g(`${ACT}/adcreatives`), { name: a.adName + ' — creative', object_story_spec: JSON.stringify(oss), url_tags: URL_TAGS });
     const ad = await post(g(`${ACT}/ads`), { name: a.adName, adset_id: ADSET, creative: JSON.stringify({ creative_id: cr.id }), status: 'ACTIVE' });
     results.push(`✓ ${a.adName}  → ad ${ad.id} (creative ${cr.id})`);
   } catch (e) {

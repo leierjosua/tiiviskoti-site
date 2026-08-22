@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { sql } from '@/lib/db';
 import { json, preflight } from '../cors';
+import { insertLead, campaignPreprocess, gclidPreprocess } from '../lead-insert';
 
 /* POST /api/public/taloyhtio-lead
 
@@ -23,6 +23,12 @@ const schema = z.object({
   postal_code: z.string().regex(/^\d{5}$/).optional().or(z.literal('')),
   city: z.string().max(100).optional().or(z.literal('')),
   message: z.string().max(4000).optional().or(z.literal('')),
+  /* Mainoskampanja ja Google Ads -klikin tunniste, välitettynä sivuston
+     `create-lead.mjs`:stä. Taloyhtiökauppa alkaa liidistä ja työ syntyy
+     kuukausia myöhemmin — ilman tätä taloyhtiömainosten tuotto näkyisi
+     raportissa vasta kaupan jälkeen. */
+  campaign: z.preprocess(campaignPreprocess, z.string().optional()),
+  gclid: z.preprocess(gclidPreprocess, z.string().optional()),
 });
 
 export async function POST(request: Request) {
@@ -45,11 +51,16 @@ export async function POST(request: Request) {
 
   const d = parsed.data;
 
-  await sql`
-    insert into tk.leads (full_name, email, phone, postal_code, city, message)
-    values (${d.full_name}, ${d.email || null}, ${d.phone}, ${d.postal_code || null},
-            ${d.city || null}, ${d.message || null})
-  `;
+  await insertLead({
+    full_name: d.full_name,
+    email: d.email || null,
+    phone: d.phone,
+    postal_code: d.postal_code || null,
+    city: d.city || null,
+    message: d.message || null,
+    campaign: d.campaign ?? null,
+    gclid: d.gclid ?? null,
+  });
 
   return json({ ok: true }, { origin });
 }

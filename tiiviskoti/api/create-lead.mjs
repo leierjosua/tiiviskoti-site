@@ -96,6 +96,8 @@ async function mirrorToCrmLeads(f) {
         phone: f.phone,
         postal_code: f.postalCode || '',
         message: ['Taloyhtiö-tarjouspyyntö', f.message, extra].filter(Boolean).join('\n'),
+        campaign: f.campaign || undefined,
+        gclid: f.gclid || undefined,
       }),
     });
   } catch (e) {
@@ -134,6 +136,18 @@ export default async function handler(req, res) {
     const message = clean(body.message, 4000);
     const pageUrl = clean(body.pageUrl, 500);
 
+    // Mainoskampanja ja Google Ads -klikin tunniste osoiterivistä. Sama
+    // muotorajaus kuin varausreitillä ja kannan rajoitteissa. Kelvoton
+    // pudotetaan pois eikä liidiä hylätä: arvo tulee julkisesta
+    // osoiterivistä, eikä rikkinäinen mainoslinkki saa hukata yhteydenottoa.
+    const campaignRaw = /^[a-z0-9][a-z0-9._-]{0,59}$/.test(clean(body.campaign, 60))
+      ? clean(body.campaign, 60)
+      : '';
+    const gclid = /^[A-Za-z0-9_-]{10,200}$/.test(clean(body.gclid, 200))
+      ? clean(body.gclid, 200)
+      : '';
+    const campaign = campaignRaw || (gclid ? 'google-ads' : '');
+
     const fields = [];
     if (!yhtio) fields.push('yhtio');
     if (!contact) fields.push('contact');
@@ -162,6 +176,9 @@ export default async function handler(req, res) {
           osoite: addr,
           ovien_maara_arvio: doors || null,
           aikataulutoive: when || null,
+          // Kampanja mahtuu payloadiin sellaisenaan — jsonb, ei migraatiota.
+          kampanja: campaign || null,
+          gclid: gclid || null,
         },
         status: 'new',
       }),
@@ -177,7 +194,7 @@ export default async function handler(req, res) {
     // Peilaa CRM:n Liidit-sivulle (tk.leads) — sinne minne admin oikeasti katsoo.
     await mirrorToCrmLeads({
       contact, email, phone, role, yhtio, addr, doors, when, message,
-      postalCode: postalFrom(addr),
+      postalCode: postalFrom(addr), campaign, gclid,
     });
 
     /* Meta CAPI: taloyhtiön tarjouspyyntö on liidi (Lead). Sama periaate kuin

@@ -278,6 +278,7 @@ export function mountKartoitus(o) {
           addr:`${f.addr}, ${st.postal}`, doors:f.doors,
           message:'Varasi kartoituskäynnin verkosta.',
           pageUrl: location.href, fbc: fbc(), fbp: fbp(),
+          campaign: campaign(), gclid: gclid(),
         }),
       });
       const d = await r.json().catch(() => ({}));
