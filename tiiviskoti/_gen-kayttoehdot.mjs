@@ -156,8 +156,7 @@ const body = `
     <h2>8. Takuu</h2>
     <dl class="kv">
       <div><dt>Materiaalitakuu (tiivisteet)</dt><dd>2 vuotta</dd></div>
-      <div><dt>Asennustyön takuu, yksityisasiakkaat</dt><dd>2 vuotta</dd></div>
-      <div><dt>Asennustyön takuu, yritykset ja yhteisöt</dt><dd>1 vuosi</dd></div>
+      <div><dt>Asennustyön takuu</dt><dd>2 vuotta</dd></div>
     </dl>
     <p style="margin-top:18px">Takuu edellyttää, että ovea käytetään ja huolletaan normaalisti.
       Takuu ei kata vikoja, jotka johtuvat:</p>

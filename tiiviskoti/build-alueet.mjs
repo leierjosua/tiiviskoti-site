@@ -495,7 +495,7 @@ function meistaSivu() {
       alkukirjaimet: 'DS',
       name: 'Daniel',
       role: 'Puheenjohtaja &amp; asentaja',
-      bio: 'Tekee kartoitukset ja tiivisteasennukset itse työmaalla. Sinua palvelee sama henkilö alusta loppuun.',
+      bio: 'Tekee kartoitukset ja tiivisteasennukset itse työmaalla. Työn hoitaa oma porukkamme alusta loppuun.',
     },
   ];
 
