@@ -100,6 +100,15 @@ export default async function handler(req, res) {
       ? body.gclid
       : undefined;
 
+    /* Kumpi Googlen klikkitunnisteista `gclid` on: tavallinen gclid vai
+       iOS-liikenteen wbraid/gbraid. Arvot näyttävät samalta, mutta Adsin
+       rajapinnassa kullakin on oma kenttänsä — väärässä kentässä konversio
+       hylätään. Tuntematon arvo tulkitaan gclidiksi, koska se on niistä
+       ylivoimaisesti yleisin. */
+    const gclidKind = ['gclid', 'wbraid', 'gbraid'].includes(body.gclidKind)
+      ? body.gclidKind
+      : 'gclid';
+
     /* CRM näyttää `campaign`-arvon työn "Lähde"-kenttänä, ja ilman sitä siinä
        lukee vain "Verkkosivu". Mainoksesta tullut varaus merkitään siksi
        kampanjaksi `google-ads`, jotta sen näkee työstä yhdellä silmäyksellä
@@ -173,6 +182,7 @@ export default async function handler(req, res) {
       discountCode,
       campaign,
       gclid,
+      gclidKind,
       workCents,
       title: `Tiivistys: ${quote.count} kohdetta`,
       // Rivit sellaisenaan pricing.mjs:stä: CRM tallentaa ne työn riveiksi ja

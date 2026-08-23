@@ -78,26 +78,52 @@ const GCLID_KEY = 'tk_gclid';
 const GCLID_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const GCLID_RE = /^[A-Za-z0-9_-]{10,200}$/;
 
-function readGclid(){
+/* Tunnisteen tyyppi talletetaan arvon rinnalle (kenttä `k`).
+
+   MIKSI: Adsin rajapinnassa gclid, wbraid ja gbraid ovat KOLME ERI KENTTÄÄ,
+   eikä arvosta voi päätellä kumpi on kumpi — ne näyttävät samalta. Jos
+   wbraid lähetetään gclidinä, Ads hylkää konversion. Tyyppi on siis
+   tiedossa vain tässä, talteenoton hetkellä, ja se on kuljetettava mukana.
+
+   Vanhat tallennukset ovat ilman `k`-kenttää. Ne ovat käytännössä
+   gclideja, joten sitä käytetään oletuksena. */
+const GCLID_KINDS = ['gclid', 'wbraid', 'gbraid'];
+
+function readGclidEntry(){
   try{
     const s = JSON.parse(localStorage.getItem(GCLID_KEY) || 'null');
     if(!s || !GCLID_RE.test(s.v || '')) return undefined;
     if(Date.now() - (s.t || 0) > GCLID_MAX_AGE_MS) return undefined;
-    return s.v;
+    return s;
   }catch(_){ return undefined; }
 }
 
+function readGclid(){
+  const s = readGclidEntry();
+  return s ? s.v : undefined;
+}
+
+function readGclidKind(){
+  const s = readGclidEntry();
+  if(!s) return undefined;
+  return GCLID_KINDS.includes(s.k) ? s.k : 'gclid';
+}
+
 (function captureGclid(){
-  let v;
+  let v, k;
   try{
     const q = new URLSearchParams(location.search);
-    /* wbraid ja gbraid ovat iOS:n vastineet gclidille. Ne kelpaavat Adsin
-       konversiotuontiin samalla tavalla, joten talletetaan mikä tahansa. */
-    v = q.get('gclid') || q.get('wbraid') || q.get('gbraid');
+    /* wbraid ja gbraid ovat iOS:n vastineet gclidille silloin kun selaimen
+       seurantaa on rajoitettu. Talletetaan mikä tahansa niistä — mutta
+       muistiin myös KUMPI, koska rajapinta erottelee ne. */
+    for(const kind of GCLID_KINDS){
+      const got = q.get(kind);
+      if(got){ v = got; k = kind; break; }
+    }
   }catch(_){ return; }
   if(!v || !GCLID_RE.test(v)) return;
   if(readGclid()) return;
-  try{ localStorage.setItem(GCLID_KEY, JSON.stringify({ v, t: Date.now() })); }catch(_){}
+  try{ localStorage.setItem(GCLID_KEY, JSON.stringify({ v, k, t: Date.now() })); }catch(_){}
 })();
 
 /* ---------- Meta-klikin tunnisteet (fbclid → _fbc, _fbp) ----------
@@ -1009,6 +1035,9 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
        työn kentäksi CRM:ään, josta se viedään Adsiin konversiona. Peruttu
        varaus vie gclidin mukanaan — peruttua kauppaa ei raportoida. */
     gclid: readGclid(),
+    /* Kumpi Googlen tunnisteista yllä on. Ilman tätä iOS:n wbraid
+       lähtisi Adsille gclidinä ja konversio hylättäisiin. */
+    gclidKind: readGclidKind(),
     /* Meta-klikin tunnisteet CAPIa varten, jos kävijä tuli Facebook/Instagram
        -mainoksesta. Sama logiikka kuin gclidillä: pelkkä tunniste, lähetetään
        vain toteutuneen varauksen mukana. */

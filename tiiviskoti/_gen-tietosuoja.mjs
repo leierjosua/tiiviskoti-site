@@ -156,7 +156,8 @@ const body = `
         profilointiin eikä sinun tunnistamiseesi.</li>
     </ul>
     <p><b>Jos teet varauksen mainoslinkistä tultuasi</b>, ilmoitamme Google Adsille että kyseinen
-      mainosklikki johti kauppaan. Ilmoitus sisältää mainosklikin tunnisteen, ajankohdan ja kaupan arvon —
+      mainosklikki johti kauppaan. Ilmoitus sisältää mainosklikin tunnisteen, ajankohdan, kaupan arvon
+      sekä sisäisen työnumeromme —
       <b>ei nimeäsi, yhteystietojasi eikä osoitettasi</b>. Käsittelyn perusteena on oikeutettu etu (oman
       mainontamme tuloksellisuuden mittaaminen). Jos et tee varausta, Googlelle ei ilmoiteta mitään.
       Voit estää tämän tyhjentämällä selaimesi paikallisen muiston tai käyttämällä sivustoa ilman

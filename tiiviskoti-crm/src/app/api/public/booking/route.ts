@@ -89,6 +89,14 @@ const schema = z.object({
     (v) => (typeof v === 'string' && /^[A-Za-z0-9_-]{10,200}$/.test(v) ? v : undefined),
     z.string().optional(),
   ),
+  /* Kumpi Googlen kolmesta klikkitunnisteesta `gclid`-kentässä on. Adsin
+     rajapinnassa niillä on omat kenttänsä eikä arvoista voi päätellä
+     tyyppiä, joten se on kuljetettava sivustolta asti. Puuttuva tai outo
+     arvo tulkitaan gclidiksi — sama oletus kuin kannan sarakkeella. */
+  gclidKind: z.preprocess(
+    (v) => (v === 'wbraid' || v === 'gbraid' ? v : 'gclid'),
+    z.enum(['gclid', 'wbraid', 'gbraid']),
+  ),
 });
 
 /* Kelpaamaton alennuskoodi keskeyttää varauksen. Vaihtoehto olisi kirjata
@@ -259,6 +267,26 @@ export async function POST(request: Request) {
     };
 
     const totalCents = created.totalCents;
+
+    /* Klikkitunnisteen tyyppi omana kirjoituksenaan varauksen jälkeen.
+
+       MIKSI EI SAMASSA INSERTISSÄ: sarake tulee migraatiosta 017, jota ei
+       voi ajaa sovelluksen roolilla. Jos insert viittaisi sarakkeeseen jota
+       tuotannossa ei vielä ole, JOKAINEN varaus kaatuisi migraation
+       odottelun ajan — mittaustieto veisi mennessään kaupan. Nyt pahin
+       seuraus on että konversio lähtee Adsille väärässä kentässä ja Ads
+       hylkää sen näkyvästi.
+
+       Vain kun tyyppi poikkeaa oletuksesta: sarakkeen oletusarvo on
+       'gclid', joten tavallisesta klikistä ei tarvitse kirjoittaa mitään. */
+    if (d.gclid && d.gclidKind !== 'gclid') {
+      try {
+        await sql`update tk.jobs set ads_click_kind = ${d.gclidKind} where id = ${created.id}::uuid`;
+      } catch (e) {
+        // 42703 = saraketta ei ole (017 ajamatta). Muut viat kuuluvat esiin.
+        if (!(typeof e === 'object' && e !== null && (e as { code?: string }).code === '42703')) throw e;
+      }
+    }
 
     // --- jälkitoimet: rivit, vahvistusposti, kalenteritapahtuma ---
     // Aika on nyt varattu ja työ kannassa. Mikään tästä eteenpäin ei saa

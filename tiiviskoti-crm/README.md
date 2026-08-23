@@ -102,6 +102,40 @@ kytketään tähän, hinta lasketaan edelleen `tiiviskoti/pricing.mjs`:ssä.
 
 Päällekkäinen aika → `409 { "error": "slot_taken" }`.
 
+## Google Ads -konversiot
+
+Sivustolla ei ole gtag.js:ää, joten Google ei näe varauksia selaimessa.
+Mainosklikin tunniste kulkee varauksen mukana kantaan (`tk.jobs.gclid`), ja
+kauppa ilmoitetaan Adsille palvelimelta.
+
+* Yöajo `/api/cron/ads-conversions` (klo 6 UTC) vie lähettämättömät.
+* `/ads` näyttää tilan ja tarjoaa napin "Lähetä Adsiin" heti.
+* CSV-lataus `/ads/csv` on varatie, jos rajapinta on poissa käytöstä.
+
+Konversio lähtee tunnin kuluttua varauksesta: pian peruttu varaus ei ole
+kauppa. Yli 90 vrk vanha klikki merkitään vanhentuneeksi — Ads ei ota niitä.
+
+Vaatii migraation `db/017_ads_conversions.sql` (postgres-rooli, Supabasen
+SQL-editori) ja nämä ympäristömuuttujat:
+
+```
+GOOGLE_ADS_DEVELOPER_TOKEN       # Ads → Työkalut → API Center
+GOOGLE_ADS_CUSTOMER_ID           # mainostilin id, väliviivat sallittu
+GOOGLE_ADS_CONVERSION_ACTION_ID  # konversiotapahtuman numero-osa
+GOOGLE_ADS_LOGIN_CUSTOMER_ID     # vain jos tili on MCC:n alla
+GOOGLE_ADS_OAUTH_REFRESH_TOKEN   # node scripts/google-ads-oauth.mjs <ID> <SECRET>
+GOOGLE_ADS_OAUTH_CLIENT_ID
+GOOGLE_ADS_OAUTH_CLIENT_SECRET
+GOOGLE_ADS_API_VERSION           # valinnainen, oletus v21
+```
+
+Konversiotapahtuman **numero-osan** saa Adsista: Tavoitteet → Konversiot →
+valitse tapahtuma → osoiterivin `ctId=`-parametri. Nimen (`Varaus verkosta`)
+on täsmättävä `src/app/(app)/ads/csv/format.ts`:ään vain CSV-latausta varten;
+rajapinta tunnistaa tapahtuman numerolla.
+
+Ilman asetuksia mikään ei kaadu: `/ads` kertoo mitä puuttuu ja CSV toimii.
+
 ## Vielä tekemättä
 
 Google-kalenterisynkronointi, vahvistussähköpostit, hinnoittelu ja

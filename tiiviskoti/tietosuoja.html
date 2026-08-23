@@ -251,9 +251,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .mname{font-weight:800;font-size:19px;color:var(--ink);text-transform:capitalize}
 .mnav{width:36px;height:36px;border-radius:9px;border:1.5px solid var(--line2);background:var(--card);color:var(--green);cursor:pointer;display:grid;place-items:center}
 .mnav:hover{border-color:var(--green)}.mnav:disabled{opacity:.35;cursor:not-allowed}
-.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;max-width:460px;margin-inline:auto}
 .dow span{text-align:center;font-size:11.5px;font-weight:700;color:var(--mute);text-transform:uppercase}
-.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:460px;margin-inline:auto}
 .day{aspect-ratio:1;border-radius:9px;border:1.5px solid transparent;background:var(--alt);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:relative}
 .day.empty{background:transparent;cursor:default}
 .day.off{background:transparent;color:var(--line2);cursor:not-allowed}
@@ -383,6 +383,60 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .mf-brand{grid-column:1/-1}
 }
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
+/* --- Vaihekortti: sama moottori kuin etusivulla (laskuri → postinumero → aika →
+   yhteystiedot → kuittaus). Sivu ei vaihdu, kortin sisältö vaihtuu paikallaan. --- */
+.order-note{display:none;font-size:12px;line-height:1.5;color:var(--mute);padding:12px 14px;border-top:1px solid var(--line)}
+.book-wrap{display:block;grid-template-columns:none;margin:clamp(28px,3.5vw,42px) auto 0}
+.stepcard{max-width:560px;margin-inline:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;box-shadow:var(--sh);overflow:hidden}
+.stepcard.wide{max-width:var(--max);background:none;border:none;box-shadow:none;padding:0;overflow:visible}
+.stepcard-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;min-height:26px}
+.stepback{display:inline-flex;align-items:center;gap:6px;background:none;border:none;padding:0;color:var(--green);font-family:inherit;font-weight:700;font-size:14.5px;cursor:pointer}
+.stepback:hover{text-decoration:underline;text-underline-offset:3px}
+.stepback[hidden]{display:none}
+.steptag{font-weight:800;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+.stepdots{display:flex;justify-content:center;gap:6px;margin-bottom:18px}
+.stepdots i{width:7px;height:7px;border-radius:99px;background:var(--line2);transition:.32s var(--ease)}
+.stepdots i.on{width:22px;background:var(--green)}
+.stepdots i.done{background:var(--green-l)}
+.step{animation:step-in .22s var(--ease) both}
+.step[hidden]{display:none}
+@keyframes step-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.stepcard.leaving .step{animation:step-out .13s var(--ease) both}
+@keyframes step-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-6px)}}
+.steprecap{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--green-soft);border:1px solid var(--line);border-radius:var(--r);padding:13px 16px;margin-bottom:18px}
+.steprecap .when{font-weight:800;font-size:15px;color:var(--ink);line-height:1.3}
+.steprecap .svc{font-size:13px;color:var(--text);margin-top:2px}
+.steprecap .chg{flex:0 0 auto;background:none;border:none;padding:0;color:var(--green);font-family:inherit;font-weight:700;font-size:13.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+/* Laskurin rivien lisätyylit (etusivun kanssa yhtenevät) */
+.wtype-tier{display:block;margin-top:3px;color:var(--green);font-weight:600}
+.wtype-price s{opacity:.55;font-weight:600}
+.cp-unit{font-size:12px;color:var(--dmute);font-weight:600}
+.extra-note{font-weight:600;font-size:11.5px;color:var(--mute)}
+.extra.extra-q{cursor:default;padding-left:51px;grid-column:1/-1;border-left:none}
+.extra-stp{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+.extra-stp .stp{width:27px;height:27px;border-radius:7px;font-size:16px}
+.extra-stp .qty{font-size:15px;min-width:18px}
+.extra.off{opacity:.4;cursor:not-allowed}
+/* Mobiili: laskuri yhteen sarakkeeseen ja yhteenveto kiinteäksi hintapalkiksi
+   navin alle (order:-1 + sticky), jotta hinta näkyy koko ajan palveluita
+   valitessa. Sama käytös kuin etusivulla. */
+@media(max-width:960px){.calc-wrap{grid-template-columns:1fr;gap:36px}.quote{position:static}}
+@media(max-width:620px){
+  .stepcard{overflow:clip}
+  .calc-wrap{gap:16px}
+  .quote{order:-1;position:sticky;top:62px;z-index:30;padding:13px 15px;border-radius:14px;display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;box-shadow:0 14px 28px -16px rgba(0,0,0,.6)}
+  .q-t,.rc-lines,.q-meta,.q-note{display:none}
+  .q-total{grid-column:1;grid-row:1;margin:0;padding:0;border-top:none}
+  .q-total .pt{font-size:10.5px}
+  .q-total .pv{font-size:28px;margin-top:1px}
+  .q-total .pv small{font-size:.44em}
+  .q-net{grid-column:1;grid-row:2;margin-top:2px;font-size:12.5px;line-height:1.3}
+  .qn-l{display:none}.qn-s{display:inline}
+  .q-btn{grid-column:2;grid-row:1/span 2;width:auto;margin-top:0;padding:13px 18px;font-size:15px;white-space:nowrap}
+  .q-btn-long{display:none}
+  .order-note{display:block}
+  .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
+}
 
 
 /* ---------- tietosuojaseloste ---------- */
@@ -523,7 +577,8 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
         profilointiin eikä sinun tunnistamiseesi.</li>
     </ul>
     <p><b>Jos teet varauksen mainoslinkistä tultuasi</b>, ilmoitamme Google Adsille että kyseinen
-      mainosklikki johti kauppaan. Ilmoitus sisältää mainosklikin tunnisteen, ajankohdan ja kaupan arvon —
+      mainosklikki johti kauppaan. Ilmoitus sisältää mainosklikin tunnisteen, ajankohdan, kaupan arvon
+      sekä sisäisen työnumeromme —
       <b>ei nimeäsi, yhteystietojasi eikä osoitettasi</b>. Käsittelyn perusteena on oikeutettu etu (oman
       mainontamme tuloksellisuuden mittaaminen). Jos et tee varausta, Googlelle ei ilmoiteta mitään.
       Voit estää tämän tyhjentämällä selaimesi paikallisen muiston tai käyttämällä sivustoa ilman
