@@ -4,6 +4,11 @@
   "outputDirectory": ".",
   "redirects": [
     {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "www.tiiviskoti.fi" }],
       "destination": "https://tiiviskoti.fi/$1",
