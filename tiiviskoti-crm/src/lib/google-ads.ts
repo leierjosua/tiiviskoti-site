@@ -24,7 +24,7 @@ import 'server-only';
      GOOGLE_ADS_CONVERSION_ACTION_ID  — konversiotapahtuman numero-osa
      GOOGLE_ADS_LOGIN_CUSTOMER_ID     — (valinnainen) hallinnointitili, jos tili on MCC:n alla
      GOOGLE_ADS_OAUTH_REFRESH_TOKEN   — (valinnainen) oma token; ilman tätä käytetään Gmailin/Calendarin tokenia
-     GOOGLE_ADS_API_VERSION           — (valinnainen) oletus v21
+     GOOGLE_ADS_API_VERSION           — (valinnainen) oletus v25
 
    MIKSI OMAT OAUTH-TUNNUKSET OVAT MAHDOLLISIA: Ads vaatii `adwords`-
    oikeuden, jota Gmail/Calendar-tokenissa ei ole. Sen voi lisätä samaan
@@ -38,8 +38,11 @@ const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 /* Rajapinnan versio vanhenee noin vuodessa. Ympäristömuuttujana, jotta
    sunsetin osuessa kohdalle riittää muuttaa arvo Verceliin — ei uutta
-   julkaisua vain siksi että Google poisti version käytöstä. */
-const API_VERSION = process.env.GOOGLE_ADS_API_VERSION || 'v21';
+   julkaisua vain siksi että Google poisti version käytöstä.
+
+   v25 todennettu toimivaksi 2026-08-23 (listAccessibleCustomers → 200).
+   Vanhemmat v18–v21 vastaavat 404:llä eivätkä ole enää olemassa. */
+const API_VERSION = process.env.GOOGLE_ADS_API_VERSION || 'v25';
 
 /* Tilitunnukset kirjoitetaan Adsissa muodossa 123-456-7890, mutta
    rajapinta ottaa vastaan vain numerot. Siivotaan tässä, jotta

@@ -126,7 +126,7 @@ GOOGLE_ADS_LOGIN_CUSTOMER_ID     # vain jos tili on MCC:n alla
 GOOGLE_ADS_OAUTH_REFRESH_TOKEN   # node scripts/google-ads-oauth.mjs <ID> <SECRET>
 GOOGLE_ADS_OAUTH_CLIENT_ID
 GOOGLE_ADS_OAUTH_CLIENT_SECRET
-GOOGLE_ADS_API_VERSION           # valinnainen, oletus v21
+GOOGLE_ADS_API_VERSION           # valinnainen, oletus v25
 ```
 
 Konversiotapahtuman **numero-osan** saa Adsista: Tavoitteet → Konversiot →
