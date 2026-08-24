@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
 import { areaForPostal, type OfferLine } from '@/lib/data';
-import { computePricing, TYPES, EXTRAS } from '@/lib/pricing';
+import { computePricing, TYPES, EXTRAS, type CustomLine } from '@/lib/pricing';
 import { generateOfferPdf } from '@/lib/offer-pdf';
 import { sendMail } from '@/lib/google';
 import { offerEmailSubject, offerEmailHtml, offerEmailText } from '@/lib/mail-templates';
@@ -15,7 +15,13 @@ export type ActionState = { error?: string; ok?: string };
 const OFFER_VALID_DAYS = 14;
 const eurToCents = (e: number) => Math.round(e * 100);
 
+/* Vapaita rivejä luetaan kiinteä määrä. Raja on lomakkeen puolella sama;
+   ilman rajaa selaimelta voisi lähettää mielivaltaisen määrän rivejä. */
+const MAX_CUSTOM_LINES = 12;
+
 const schema = z.object({
+  kind: z.enum(['asiakas', 'taloyhtio']),
+  contactName: z.string().optional(),
   customerName: z.string().min(1, 'Asiakkaan nimi puuttuu'),
   email: z.string().email('Tarkista sähköposti'),
   phone: z.string().optional(),
@@ -39,6 +45,21 @@ function readCounts(formData: FormData) {
   return { counts, extras };
 }
 
+/** Vapaat rivit lomakkeelta: custom_name_0, custom_qty_0, custom_unit_0, … */
+function readCustomLines(formData: FormData): CustomLine[] {
+  const out: CustomLine[] = [];
+  for (let i = 0; i < MAX_CUSTOM_LINES; i++) {
+    const name = String(formData.get(`custom_name_${i}`) ?? '').trim();
+    if (!name) continue;
+    out.push({
+      name: name.slice(0, 120),
+      qty: Number(formData.get(`custom_qty_${i}`) ?? 0),
+      unit: Number(String(formData.get(`custom_unit_${i}`) ?? '0').replace(',', '.')) || 0,
+    });
+  }
+  return out;
+}
+
 /** Matkalisä postinumerosta (senteissä) — käytetään laskurin esikatselussa. */
 export async function lookupTravelFee(postal: string): Promise<{ cents: number; area: string | null }> {
   if (!/^\d{5}$/.test(postal)) return { cents: 0, area: null };
@@ -51,6 +72,8 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   await requireManager();
 
   const parsed = schema.safeParse({
+    kind: String(formData.get('kind') ?? 'asiakas'),
+    contactName: String(formData.get('contactName') ?? '').trim() || undefined,
     customerName: String(formData.get('customerName') ?? '').trim(),
     email: String(formData.get('email') ?? '').trim(),
     phone: String(formData.get('phone') ?? '').trim() || undefined,
@@ -67,9 +90,10 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   const travelFee = (area?.travelFeeCents ?? 0) / 100;
   const discount = Math.max(0, Number(formData.get('discount')) || 0);
   const discountLabel = String(formData.get('discountLabel') ?? '').trim() || undefined;
-  const pricing = computePricing(counts, extras, { travelFee, discount, discountLabel });
+  const custom = readCustomLines(formData);
+  const pricing = computePricing(counts, extras, { travelFee, discount, discountLabel, custom });
 
-  if (pricing.total <= 0) return { error: 'Valitse vähintään yksi palvelu tarjoukseen.' };
+  if (pricing.total <= 0) return { error: 'Lisää vähintään yksi palvelu tai vapaa rivi tarjoukseen.' };
 
   const lines: OfferLine[] = pricing.lines.map((l) => ({
     name: l.name,
@@ -83,10 +107,11 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   // Rivi ensin, jotta saadaan juokseva tarjousnumero PDF:ää ja sähköpostia varten.
   const [offer] = await sql<{ id: string; offer_number: string }[]>`
     insert into tk.offers
-      (customer_name, email, phone, address, postal_code, city, lines,
+      (kind, contact_name, customer_name, email, phone, address, postal_code, city, lines,
        total_cents, travel_fee_cents, notes, valid_until)
     values
-      (${d.customerName}, ${d.email}, ${d.phone ?? null}, ${d.address ?? null},
+      (${d.kind}, ${d.contactName ?? null},
+       ${d.customerName}, ${d.email}, ${d.phone ?? null}, ${d.address ?? null},
        ${d.postalCode || null}, ${d.city ?? null}, ${sql.json(lines)},
        ${totalCents}, ${travelCents}, ${d.notes ?? null}, ${validUntil})
     returning id, offer_number
@@ -98,7 +123,9 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
       jobNumber: offer.offer_number,
       createdAt: new Date(),
       customer: {
-        name: d.customerName,
+        /* Taloyhtiöllä paperille tulee taloyhtiön nimi ja sen alle
+           yhteyshenkilö — se on se rivi jonka hallitus tunnistaa. */
+        name: d.contactName ? `${d.customerName} — ${d.contactName}` : d.customerName,
         address: d.address,
         postalCode: d.postalCode || null,
         city: d.city,
@@ -115,7 +142,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
 
   const mailData = {
     jobNumber: offer.offer_number,
-    customerName: d.customerName,
+    customerName: d.contactName || d.customerName,
     lines: lines.map((l) => ({
       name: l.name,
       qty: l.quantity,

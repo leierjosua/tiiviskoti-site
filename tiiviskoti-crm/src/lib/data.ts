@@ -287,9 +287,14 @@ export async function availability(opts: {
 
 export type OfferLine = { name: string; quantity: number; unit_price_cents: number };
 
+export type OfferKind = 'asiakas' | 'taloyhtio';
+
 export type OfferRow = {
   id: string;
   offer_number: string;
+  kind: OfferKind;
+  /* Taloyhtiöllä yhteyshenkilö; kuluttajalla null. */
+  contact_name: string | null;
   customer_name: string;
   email: string;
   phone: string | null;
@@ -310,18 +315,18 @@ export type OfferRow = {
 
 export async function listOffers(): Promise<OfferRow[]> {
   return sql<OfferRow[]>`
-    select id, offer_number, customer_name, email, phone, address, postal_code, city,
-           lines, total_cents, travel_fee_cents, notes, status, valid_until,
-           provider_id, error, sent_at, created_at
+    select id, offer_number, kind, contact_name, customer_name, email, phone, address,
+           postal_code, city, lines, total_cents, travel_fee_cents, notes, status,
+           valid_until, provider_id, error, sent_at, created_at
       from tk.offers order by created_at desc
   `;
 }
 
 export async function getOffer(id: string): Promise<OfferRow | null> {
   const [row] = await sql<OfferRow[]>`
-    select id, offer_number, customer_name, email, phone, address, postal_code, city,
-           lines, total_cents, travel_fee_cents, notes, status, valid_until,
-           provider_id, error, sent_at, created_at
+    select id, offer_number, kind, contact_name, customer_name, email, phone, address,
+           postal_code, city, lines, total_cents, travel_fee_cents, notes, status,
+           valid_until, provider_id, error, sent_at, created_at
       from tk.offers where id = ${id}
   `;
   return row ?? null;

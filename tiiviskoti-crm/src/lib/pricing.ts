@@ -56,8 +56,15 @@ export const EXTRAS: OfferExtra[] = [
   { id: 'kahva', name: 'Kahvan vaihto',                         price: 29, per: 'kpl',    unit: 'kpl',    min: 15, note: '+ osa' },
 ];
 
+/* Vapaa rivi: admin kirjoittaa itse nimen, kappalemäärän ja yksikköhinnan.
+   Tarvitaan siihen mitä katalogissa ei ole — esim. "Rappukäytävän ulko-ovet,
+   3 rappua" tai kertaluontoinen erikoistyö. Työaikaa ei arvioida, koska
+   riviä ei voi tunnistaa: minutes jää nollaksi eikä kalenterivaraus veny
+   väärin. */
+export type CustomLine = { name: string; qty: number; unit: number };
+
 export type PricingLine = {
-  kind: 'type' | 'extra' | 'min' | 'travel' | 'discount';
+  kind: 'type' | 'extra' | 'min' | 'travel' | 'discount' | 'custom';
   id: string;
   name: string;
   qty: number;
@@ -105,7 +112,7 @@ function extraQtyFor(extra: OfferExtra, counts: Record<string, unknown>, totalIt
 export function computePricing(
   counts: Record<string, number> = {},
   extras: Record<string, boolean> = {},
-  opts: { travelFee?: number; discount?: number; discountLabel?: string } = {},
+  opts: { travelFee?: number; discount?: number; discountLabel?: string; custom?: CustomLine[] } = {},
 ): Pricing {
   const travelFee = Math.max(0, Number(opts.travelFee) || 0);
   const c = counts || {};
@@ -135,6 +142,19 @@ export function computePricing(
     subtotal += sum;
     minutes += (e.min || 0) * qty;
     lines.push({ kind: 'extra', id: e.id, name: e.name, qty, unit: e.price, unitName: e.unit || 'kpl', sum, min: e.min || 0, note: e.note });
+  }
+
+  /* Vapaat rivit. Tyhjä nimi tai nollamäärä ohitetaan, jotta lomakkeen
+     tyhjät rivit eivät päädy tarjoukseen. Negatiivinen yksikköhinta on
+     sallittu — sillä saa hyvityksen omalle riville. */
+  for (const [i, cl] of (opts.custom ?? []).entries()) {
+    const name = String(cl?.name ?? '').trim();
+    const qty = int(cl?.qty);
+    const unit = Number(cl?.unit) || 0;
+    if (!name || qty <= 0) continue;
+    const sum = unit * qty;
+    subtotal += sum;
+    lines.push({ kind: 'custom', id: `custom_${i}`, name, qty, unit, unitName: 'kpl', sum, min: 0 });
   }
 
   if (subtotal <= 0) {

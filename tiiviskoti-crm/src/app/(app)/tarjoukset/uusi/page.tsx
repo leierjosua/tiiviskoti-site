@@ -8,7 +8,7 @@ export default async function NewOfferPage() {
   return (
     <div className="space-y-6">
       <PageHead
-        title="Uusi tarjous"
+        title="Uusi asiakastarjous"
         sub={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
       />
       <OfferBuilder />

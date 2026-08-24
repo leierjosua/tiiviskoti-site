@@ -17,21 +17,32 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const offer = await getOffer(id);
   if (!offer) notFound();
+  const talo = offer.kind === 'taloyhtio';
 
   return (
     <div className="space-y-6">
       <PageHead
         title={`Tarjous ${offer.offer_number}`}
         sub={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
-        action={<OfferStatusChip status={offer.error ? 'error' : offer.status} label={offer.error ? 'Lähetys epäonnistui' : OFFER_STATUS[offer.status]} />}
+        action={
+          <div className="flex items-center gap-2">
+            {/* Tyyppi näkyviin: sama tarjousnumerosarja palvelee molempia,
+                joten pelkästä numerosta ei näe kummasta on kyse. */}
+            <span className="inline-flex items-center rounded-full border border-line bg-ink-700 px-2.5 py-1 text-[12px] font-bold whitespace-nowrap text-muted">
+              {talo ? 'Taloyhtiö' : 'Asiakas'}
+            </span>
+            <OfferStatusChip status={offer.error ? 'error' : offer.status} label={offer.error ? 'Lähetys epäonnistui' : OFFER_STATUS[offer.status]} />
+          </div>
+        }
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader title="Asiakas" />
+          <CardHeader title={talo ? 'Taloyhtiö' : 'Asiakas'} />
           <dl className="divide-y divide-line-soft text-sm">
             {[
-              ['Nimi', offer.customer_name],
+              [talo ? 'Taloyhtiö' : 'Nimi', offer.customer_name],
+              ...(talo ? [['Yhteyshenkilö', offer.contact_name ?? '—'] as [string, string]] : []),
               ['Sähköposti', offer.email],
               ['Puhelin', offer.phone ?? '—'],
               ['Osoite', [offer.address, offer.postal_code, offer.city].filter(Boolean).join(', ') || '—'],
