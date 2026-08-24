@@ -193,8 +193,16 @@ function readCampaign(){
 function normalizeCampaign(raw){
   const v = String(raw || '')
     .toLowerCase()
+    /* Skandit ennen siivousta, muuten "kipukärki" -> "kipuk-rki" ja
+       "Taloyhtiö (pää)" -> "taloyhti-p". Mainosten nimissä on ääkkösiä. */
+    .replace(/[äàáâã]/g,'a').replace(/[öòóôõ]/g,'o').replace(/å/g,'a').replace(/ü/g,'u').replace(/[éèêë]/g,'e')
     .replace(/[^a-z0-9._-]+/g, '-')
+    /* " - " tuottaa kolme viivaa: välilyönnit muuttuvat viivoiksi mutta itse
+       viiva on sallittu merkki. Tiivistetään, muuten mainosnimet näyttävät
+       raportissa muodossa "tk26---video-ikkunakoukku". */
+    .replace(/-{2,}/g, '-')
     .replace(/^[-._]+/, '')
+    .replace(/[-._]+$/, '')
     .slice(0, 60);
   return CAMPAIGN_RE.test(v) ? v : undefined;
 }
@@ -204,7 +212,11 @@ function normalizeCampaign(raw){
 function campaignFromUrl(){
   let q;
   try{ q = new URLSearchParams(location.search); }catch(_){ return undefined; }
-  const named = q.get('src') || q.get('utm_campaign') || q.get('utm_source');
+  /* utm_content ENNEN utm_campaignia: Meta täyttää sen mainoksen nimellä ja
+     campaignin kampanjan nimellä. Kampanjoita on kaksi, mainoksia 13 — jos
+     luetaan kampanja, raporttiin syntyy kaksi arvoa eikä näy mikä mainos toi
+     kävijän. Juuri sitä varten url_tags alun perin lisättiin. */
+  const named = q.get('src') || q.get('utm_content') || q.get('utm_campaign') || q.get('utm_source');
   if(named) return normalizeCampaign(named);
   /* Nimetöntä klikkiä ei jätetä tunnistamattomaksi: alusta tiedetään silti. */
   if(q.get('fbclid')) return 'meta-ads';

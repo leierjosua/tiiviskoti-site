@@ -29,11 +29,16 @@
   var campaign = null;
   try {
     var q = new URLSearchParams(location.search);
-    var named = q.get('src') || q.get('utm_campaign') || q.get('utm_source');
+    /* utm_content ennen utm_campaignia — mainoksen nimi on se joka erottaa,
+       kampanjan nimi ei. Ks. sama perustelu _shared.js:ssä. */
+    var named = q.get('src') || q.get('utm_content') || q.get('utm_campaign') || q.get('utm_source');
     if (named) {
       /* Mainostyökalujen nimissä on välilyöntejä ja isoja kirjaimia. */
-      var v = String(named).toLowerCase().replace(/[^a-z0-9._-]+/g, '-')
-        .replace(/^[-._]+/, '').slice(0, 60);
+      /* Skandit ensin, muuten ääkköset katoavat ja nimi menee tunnistamattomaksi. */
+      var v = String(named).toLowerCase().replace(/[äàáâã]/g,'a').replace(/[öòóôõ]/g,'o').replace(/å/g,'a').replace(/ü/g,'u').replace(/[éèêë]/g,'e')
+        .replace(/[^a-z0-9._-]+/g, '-')
+        .replace(/-{2,}/g, '-').replace(/^[-._]+/, '').replace(/[-._]+$/, '')
+        .slice(0, 60);
       campaign = CAMPAIGN_RE.test(v) ? v : null;
     } else if (q.get('fbclid')) campaign = 'meta-ads';
     else if (q.get('gclid') || q.get('wbraid') || q.get('gbraid')) campaign = 'google-ads';

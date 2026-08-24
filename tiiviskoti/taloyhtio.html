@@ -789,9 +789,9 @@ function tkFbp(){return tkCookie('_fbp');}
    ja _analytics.js:ssä; jos muutat sitä, muuta kaikkiin kolmeen. */
 function tkCampaign(){
   let q; try{ q=new URLSearchParams(location.search); }catch(_){ return undefined; }
-  const named=q.get('src')||q.get('utm_campaign')||q.get('utm_source');
+  const named=q.get('src')||q.get('utm_content')||q.get('utm_campaign')||q.get('utm_source');
   if(named){
-    const v=String(named).toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^[-._]+/,'').slice(0,60);
+    const v=String(named).toLowerCase().replace(/[äàáâã]/g,'a').replace(/[öòóôõ]/g,'o').replace(/å/g,'a').replace(/ü/g,'u').replace(/[éèêë]/g,'e').replace(/[^a-z0-9._-]+/g,'-').replace(/-{2,}/g,'-').replace(/^[-._]+/,'').replace(/[-._]+$/,'').slice(0,60);
     return /^[a-z0-9][a-z0-9._-]{0,59}$/.test(v)?v:undefined;
   }
   if(q.get('fbclid')) return 'meta-ads';
