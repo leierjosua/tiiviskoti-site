@@ -483,7 +483,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     <h1 class="title" style="font-size:clamp(30px,4vw,44px);margin-bottom:16px">Tietosuojaseloste</h1>
     <p class="lead">Tämä seloste kertoo, miten TiivisKoti käsittelee henkilötietoja tiiviskoti.fi-sivustolla ja
       asiakassuhteissa. Noudatamme EU:n yleistä tietosuoja-asetusta (GDPR) ja Suomen tietosuojalakia.</p>
-    <span class="upd">Päivitetty 26.7.2026</span>
+    <span class="upd">Päivitetty 24.8.2026</span>
 
     <h2>1. Rekisterinpitäjä</h2>
     <div class="box">
@@ -564,8 +564,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
       Tämä ei käytä evästeitä eikä tallenna mitään selaimesi muistiin. Kävijästä muodostetaan palvelimella
       <b>päivittäin vaihtuva satunnaistunniste</b> (johdettu selaimen tiedoista), josta ei voi palata
       sinuun — <b>IP-osoitettasi ei tallenneta</b>. Tietoja käytetään vain sivuston ja palvelun
-      kehittämiseen, ei profilointiin, eikä niitä luovuteta kolmansille. Käsittelyn perusteena on
-      oikeutettu etu.</p>
+      kehittämiseen ja mainontamme osuvuuden mittaamiseen, ei profilointiin. Mittaustietoja ei
+      luovuteta kolmansille; ainoa poikkeus on alla kuvattu ilmoitus toteutuneesta kaupasta
+      mainosalustalle. Käsittelyn perusteena on oikeutettu etu.</p>
     <p>Selaimen muistiin tallennetaan seuraavat tiedot. Mitään niistä ei lähetetä kolmansille sivustolla
       käynnin aikana:</p>
     <ul>
@@ -575,14 +576,31 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
       <li><code>tk_campaign</code> ja <code>tk_gclid</code> (paikallinen muisti, 30 vrk) — merkintä siitä,
         mistä mainoksesta tulit sivustolle. Tallennetaan vain jos saavuit mainoslinkistä. Näitä ei käytetä
         profilointiin eikä sinun tunnistamiseesi.</li>
+      <li><code>tk_fbc</code> (paikallinen muisti, 7 vrk) — Facebook- tai Instagram-mainoksen klikin
+        tunniste, jonka Meta itse liittää mainoslinkkiin. Tallennetaan vain jos saavuit Metan
+        mainoksesta. Käytetään ainoastaan siihen, että toteutunut kauppa osataan yhdistää oikeaan
+        mainokseen.</li>
     </ul>
-    <p><b>Jos teet varauksen mainoslinkistä tultuasi</b>, ilmoitamme Google Adsille että kyseinen
-      mainosklikki johti kauppaan. Ilmoitus sisältää mainosklikin tunnisteen, ajankohdan, kaupan arvon
-      sekä sisäisen työnumeromme —
-      <b>ei nimeäsi, yhteystietojasi eikä osoitettasi</b>. Käsittelyn perusteena on oikeutettu etu (oman
-      mainontamme tuloksellisuuden mittaaminen). Jos et tee varausta, Googlelle ei ilmoiteta mitään.
-      Voit estää tämän tyhjentämällä selaimesi paikallisen muiston tai käyttämällä sivustoa ilman
-      mainoslinkkiä.</p>
+    <p><b>Jos teet varauksen, jätät tarjouspyynnön tai varaat kartoituskäynnin mainoslinkistä
+      tultuasi</b>, ilmoitamme mainosalustalle että kyseinen mainosklikki johti kauppaan. Ilmoitus
+      lähetetään <b>vain toteutuneesta tapahtumasta</b> ja vasta kun se on tapahtunut. Pelkästä
+      sivuston selaamisesta ei ilmoiteta mainosalustoille mitään.</p>
+    <p><b>Google Ads.</b> Ilmoitus sisältää mainosklikin tunnisteen, ajankohdan, kaupan arvon sekä
+      sisäisen työnumeromme — <b>ei nimeäsi, yhteystietojasi eikä osoitettasi</b>.</p>
+    <p><b>Meta (Facebook ja Instagram).</b> Käytämme Metan Conversions API -rajapintaa, joka toimii
+      palvelimeltamme — selaimeesi ei ladata Metan seurantaskriptiä eikä aseteta Metan evästeitä.
+      Ilmoitus on tässä laajempi kuin Googlelle, ja siksi se kuvataan tarkasti: se sisältää
+      <b>nimesi, sähköpostiosoitteesi, puhelinnumerosi sekä postinumerosi ja -toimipaikkasi
+      tiivisteinä</b> (SHA-256-yksisuuntainen muunnos, jota Meta käyttää tunnistaakseen onko
+      kyseessä sen oma käyttäjä), Metan oman mainosklikin tunnisteen, tapahtuman arvon ja
+      sisäisen tunnisteemme sekä <b>IP-osoitteesi ja selaintyyppisi</b>. Tiiviste ei ole
+      luettavaa tekstiä, mutta se ei ole myöskään anonyymi: se on tarkoitettu juuri sinun
+      tunnistamiseesi Metan käyttäjien joukosta. Käsittelyn perusteena on oikeutettu etu (oman
+      mainontamme tuloksellisuuden mittaaminen).</p>
+    <p>Voit estää mainonnan mittaamisen tyhjentämällä selaimesi paikallisen muistin tai käyttämällä
+      sivustoa ilman mainoslinkkiä. Jos haluat, ettemme ilmoita tapahtumaasi mainosalustalle,
+      kerro siitä yhteydenoton yhteydessä tai ota yhteyttä
+      <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a> — poistamme tiedon.</p>
 
     <h2>8. Oikeutesi</h2>
     <p>Sinulla on oikeus:</p>
