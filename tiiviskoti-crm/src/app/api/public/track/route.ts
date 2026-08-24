@@ -1,5 +1,5 @@
-import { createHash } from 'node:crypto';
 import { sql } from '@/lib/db';
+import { visitorHash } from '@/lib/visitor';
 import { corsHeaders, preflight } from '../cors';
 
 /* =========================================================
@@ -16,14 +16,6 @@ export const runtime = 'nodejs';
 
 export const OPTIONS = preflight;
 
-/* Anonyymi kävijähash. Saltiksi BOOKING_SECRET (palvelinpuolen salaisuus),
-   joten hashista ei voi palata IP:hen ilman sitä — eikä sittenkään, koska
-   se vaihtuu joka päivä. */
-function visitorHash(ip: string, ua: string): string {
-  const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date());
-  const salt = process.env.BOOKING_SECRET ?? 'tk-analytics';
-  return createHash('sha256').update(`${ip}|${ua}|${day}|${salt}`).digest('hex').slice(0, 32);
-}
 
 function parseUA(ua: string): { device: string; browser: string; os: string } {
   const u = ua.toLowerCase();

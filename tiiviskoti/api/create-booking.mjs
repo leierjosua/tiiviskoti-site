@@ -31,13 +31,25 @@ const BOOKING_SECRET = process.env.BOOKING_SECRET;
 // julkaistu ja sen omistaa CRM. Näin kantalogiikka pysyy yhdessä paikassa
 // eikä markkinointisivun funktio tarvitse kantayhteyttä lainkaan.
 // ─────────────────────────────────────────────────────────────
-async function reserveCrmJob(payload) {
+async function reserveCrmJob(payload, client) {
   if (!CRM_BASE_URL || !BOOKING_SECRET) {
     return { misconfigured: true, reason: 'CRM_BASE_URL / BOOKING_SECRET puuttuu' };
   }
+  /* Kävijän oma IP ja selain mukaan. Tämä kutsu on palvelimelta palvelimelle,
+     joten CRM näkisi muuten TÄMÄN funktion — ei asiakasta. CRM tarvitsee ne
+     laskeakseen saman anonyymin kävijähashin kuin analytiikka, jotta varaus
+     löytää kampanjansa kävijän omasta käynnistä silloin kun selaimen
+     tallennustila ei säilynyt (Instagramin ja Facebookin sovellusselaimet).
+     CRM hashaa arvot heti eikä talleta niitä. Kanava on jaetulla salaisuudella
+     suojattu, joten otsakkeisiin voi luottaa. */
   const r = await fetch(`${CRM_BASE_URL}/api/public/booking`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-tk-secret': BOOKING_SECRET },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-tk-secret': BOOKING_SECRET,
+      ...(client?.ip ? { 'x-tk-client-ip': client.ip } : {}),
+      ...(client?.ua ? { 'x-tk-client-ua': client.ua } : {}),
+    },
     body: JSON.stringify(payload),
   });
   const data = await r.json().catch(() => ({}));
@@ -191,6 +203,9 @@ export default async function handler(req, res) {
         name: l.name, qty: l.qty, unit: l.unit, sum: l.sum,
         unitName: l.unitName, note: l.note,
       })),
+    }, {
+      ip: (req.headers['x-forwarded-for'] || '').split(',')[0].trim(),
+      ua: req.headers['user-agent'] || '',
     });
 
     if (reservation.conflict) {
