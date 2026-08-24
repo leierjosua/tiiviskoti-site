@@ -252,7 +252,11 @@ export default async function handler(req, res) {
       eventSourceUrl: req.headers?.referer || 'https://tiiviskoti.fi/varaa.html',
       userData: buildUserData({
         email, phone, name, postal,
-        fbc: typeof body.fbc === 'string' ? body.fbc : undefined,
+        /* Selaimen oma fbc voittaa; jos tallennustila ei säilynyt
+           (Instagramin/Facebookin sovellusselaimet), käytetään CRM:n
+           kävijäketjusta löytämää. Ilman klikkitunnistetta Meta ei osaa
+           liittää kauppaa mainokseen. */
+        fbc: (typeof body.fbc === 'string' ? body.fbc : undefined) || reservation.fbc || undefined,
         fbp: typeof body.fbp === 'string' ? body.fbp : undefined,
         req,
       }),

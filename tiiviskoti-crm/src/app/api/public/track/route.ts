@@ -56,7 +56,12 @@ const TYPES = new Set(['pageview', 'scroll', 'cta', 'funnel']);
    mennään suoraan vanhaa polkua. Prosessin uudelleenkäynnistys (uusi deploy)
    yrittää taas — eli migraation ajamisen jälkeen versio alkaa tallentua
    viimeistään seuraavasta kylmästä käynnistyksestä. */
+/* Valinnaiset sarakkeet: migraatio voi olla ajamatta (db/014 variant,
+   db/019 fbc). Analytiikka ei saa katketa sitä odotellessa, joten puuttuva
+   sarake vain merkitään muistiin eikä sitä yritetä uudelleen joka
+   tapahtumalla. Liput nollautuvat deployssa. */
 let variantColumnExists = true;
+let fbcColumnExists = true;
 const isUndefinedColumn = (e: unknown) =>
   typeof e === 'object' && e !== null && (e as { code?: string }).code === '42703';
 
@@ -93,32 +98,39 @@ export async function POST(request: Request) {
   const rawVariant = clip(body.variant, 40);
   const variant = rawVariant && /^[a-z0-9][a-z0-9_-]{0,39}$/.test(rawVariant) ? rawVariant : null;
 
+  /* Metan klikkitunniste laskeutumisen osoiterivistä (`fb.1.<ms>.<fbclid>`).
+     Sama muotorajaus kuin kannan web_events_fbc_format-rajoitteessa: arvo
+     tulee julkisesta osoiterivistä, joten kelvoton pudotetaan tyhjäksi eikä
+     pyyntöä hylätä — analytiikka ei saa kaatua rikkinäiseen mainoslinkkiin. */
+  const rawFbc = clip(body.fbc, 300);
+  const fbc = rawFbc && /^fb\.[0-9]\.[0-9]{10,16}\.[A-Za-z0-9_-]{1,255}$/.test(rawFbc) ? rawFbc : null;
+
+  /* Rivi kootaan sarakkeista jotka tiedetään olemassa oleviksi. Käsin
+     kirjoitetut vaihtoehdot olisivat kahdella valinnaisella sarakkeella jo
+     neljä lähes identtistä INSERTiä. */
+  const buildRow = () => {
+    const row: Record<string, unknown> = {
+      visitor_hash: hash, event_type: type, path, ref_source: refSource,
+      ref_host: refHost, device, browser, os,
+      scroll_pct: scrollPct, cta, funnel_step: step, campaign,
+    };
+    if (variantColumnExists) row.variant = variant;
+    if (fbcColumnExists) row.fbc = fbc;
+    return row;
+  };
+
   try {
-    if (variantColumnExists) {
-      try {
-        await sql`
-          insert into tk.web_events
-            (visitor_hash, event_type, path, ref_source, ref_host, device, browser, os,
-             scroll_pct, cta, funnel_step, campaign, variant)
-          values (${hash}, ${type}, ${path}, ${refSource}, ${refHost}, ${device}, ${browser}, ${os},
-                  ${scrollPct}, ${cta}, ${step}, ${campaign}, ${variant})
-        `;
-        return new Response(null, { status: 204, headers });
-      } catch (e) {
-        /* Sarake puuttuu vielä (db/014 ajamatta): merkitään se muistiin ettei
-           jokainen tapahtuma yritä turhaan, ja kirjoitetaan ilman versiota.
-           Analytiikka ei saa katketa migraatiota odotellessa. */
-        if (isUndefinedColumn(e)) variantColumnExists = false;
-        else throw e;
-      }
+    try {
+      await sql`insert into tk.web_events ${sql(buildRow())}`;
+    } catch (e) {
+      if (!isUndefinedColumn(e)) throw e;
+      /* Kumpi puuttui? Virheilmoitus nimeää sarakkeen. Merkitään se pois ja
+         yritetään kerran uudelleen — muuten tapahtuma menetettäisiin. */
+      const msg = String((e as { message?: string }).message ?? '');
+      if (msg.includes('"fbc"')) fbcColumnExists = false;
+      if (msg.includes('"variant"')) variantColumnExists = false;
+      await sql`insert into tk.web_events ${sql(buildRow())}`;
     }
-    await sql`
-      insert into tk.web_events
-        (visitor_hash, event_type, path, ref_source, ref_host, device, browser, os,
-         scroll_pct, cta, funnel_step, campaign)
-      values (${hash}, ${type}, ${path}, ${refSource}, ${refHost}, ${device}, ${browser}, ${os},
-              ${scrollPct}, ${cta}, ${step}, ${campaign})
-    `;
   } catch {
     /* Analytiikka ei saa koskaan kaataa mitään — virhe niellään. */
   }

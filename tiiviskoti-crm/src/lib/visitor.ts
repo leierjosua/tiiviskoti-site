@@ -81,3 +81,33 @@ export async function campaignFromVisitorTrail(request: Request): Promise<string
     return null;
   }
 }
+
+/* Metan klikkitunniste kävijän tapahtumaketjusta.
+
+   Sama ongelma ja sama ratkaisu kuin kampanjalla yllä, mutta eri vastaanottaja:
+   tätä ei tallenneta työlle vaan se palautetaan sivuston funktiolle, joka
+   liittää sen Metan CAPI-tapahtumaan. Ilman `fbc`:tä Meta ei osaa liittää
+   ostosta oikeaan mainokseen, jolloin Purchase-optimointi ajaa sokkona.
+
+   TUOREIN VOITTAA, toisin kuin kampanjalla: kampanjassa kunnia kuuluu
+   ensimmäiselle kosketukselle, mutta `fbc` on tekninen klikkitunniste ja Meta
+   odottaa sen vastaavan sitä klikkiä josta kauppa syntyi. Sama sääntö kuin
+   selaimessa (`_shared.js`: "TUOREIN klikki voittaa").
+
+   Palauttaa null jos saraketta ei vielä ole (db/019 ajamatta) — silloin
+   toimitaan kuten ennenkin eikä mikään huuda. */
+export async function fbcFromVisitorTrail(request: Request): Promise<string | null> {
+  try {
+    const { ip, ua } = clientIdentity(request);
+    if (ip === 'x' && !ua) return null;
+    const [row] = await sql<{ fbc: string | null }[]>`
+      select fbc from tk.web_events
+       where visitor_hash = ${visitorHash(ip, ua)} and fbc is not null
+       order by ts desc limit 1
+    `;
+    return row?.fbc ?? null;
+  } catch (e) {
+    console.error('fbc:n haku kävijäketjusta epäonnistui', e);
+    return null;
+  }
+}

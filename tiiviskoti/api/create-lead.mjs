@@ -90,7 +90,7 @@ async function mirrorToCrmLeads(f, client) {
       f.doors ? `Ovien määrä (arvio): ${f.doors}` : null,
       f.when ? `Aikataulutoive: ${f.when}` : null,
     ].filter(Boolean).join(' · ');
-    await fetch(CRM_LEAD_URL, {
+    const r = await fetch(CRM_LEAD_URL, {
       method: 'POST',
       /* Kävijän IP ja selain mukaan, jotta CRM löytää kampanjan kävijän omasta
          käynnistä kun selaimen tallennustila ei säilynyt. Jaettu salaisuus on
@@ -112,8 +112,13 @@ async function mirrorToCrmLeads(f, client) {
         gclid: f.gclid || undefined,
       }),
     });
+    /* Vastauksesta tarvitaan vain `fbc` Metan CAPIa varten. Peilaus on silti
+       edelleen "ei saa kaataa liidiä" -kutsu: rikki mennyt vastaus palauttaa
+       nullin eikä heitä. */
+    return await r.json().catch(() => null);
   } catch (e) {
     console.error('create-lead: CRM-peilaus epäonnistui:', e);
+    return null;
   }
 }
 
@@ -204,7 +209,7 @@ export default async function handler(req, res) {
     });
 
     // Peilaa CRM:n Liidit-sivulle (tk.leads) — sinne minne admin oikeasti katsoo.
-    await mirrorToCrmLeads({
+    const mirrored = await mirrorToCrmLeads({
       contact, email, phone, role, yhtio, addr, doors, when, message,
       postalCode: postalFrom(addr), campaign, gclid,
     }, {
@@ -220,7 +225,9 @@ export default async function handler(req, res) {
       eventSourceUrl: pageUrl || req.headers?.referer || 'https://tiiviskoti.fi/taloyhtio.html',
       userData: buildUserData({
         email, phone, name: contact, postal: postalFrom(addr),
-        fbc: typeof body.fbc === 'string' ? body.fbc : undefined,
+        /* Selaimen oma fbc voittaa; jos tallennustila ei säilynyt, käytetään
+           CRM:n kävijäketjusta löytämää. Ks. create-booking.mjs. */
+        fbc: (typeof body.fbc === 'string' ? body.fbc : undefined) || mirrored?.fbc || undefined,
         fbp: typeof body.fbp === 'string' ? body.fbp : undefined,
         req,
       }),

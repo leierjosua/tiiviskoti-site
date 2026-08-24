@@ -184,7 +184,7 @@ export default async function handler(req, res) {
       eventSourceUrl: req.headers?.referer || 'https://tiiviskoti.fi/taloyhtio.html',
       userData: buildUserData({
         email, phone, name: contactName, postal,
-        fbc: typeof body.fbc === 'string' ? body.fbc : undefined,
+        fbc: (typeof body.fbc === 'string' ? body.fbc : undefined) || reservation.fbc || undefined,
         fbp: typeof body.fbp === 'string' ? body.fbp : undefined,
         req,
       }),

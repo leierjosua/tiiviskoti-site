@@ -44,6 +44,26 @@
     else if (q.get('gclid') || q.get('wbraid') || q.get('gbraid')) campaign = 'google-ads';
   } catch (e) { /* ei väliä */ }
 
+  /* ---------- Meta-klikin tunniste (fbc) ----------
+     MIKSI TÄÄLLÄ: `_shared.js` säilöö tämän `tk_fbc`-avaimeen ja lähettää
+     varauksen mukana Metan CAPIin, mutta tallennustila ei säily Instagramin
+     ja Facebookin sovellusselaimissa — eli juuri siellä mistä mainosklikit
+     tulevat. Ilman tunnistetta Meta ei osaa liittää kauppaa mainokseen.
+     Tämä tiedosto ei nojaa tallennustilaan lainkaan, joten arvo kulkee
+     palvelimelle laskeutumisen yhteydessä ja haetaan sieltä varausta
+     lähetettäessä.
+
+     EI RIKO TÄMÄN TIEDOSTON LUPAUSTA: luetaan vain osoiterivi eikä
+     kirjoiteta mitään selaimen muistiin — sama sääntö kuin kampanjalla.
+
+     Metan kaava: fb.1.<ms>.<fbclid>. Aikaleima on tämä sivulataus, eli
+     klikin hetki riittävällä tarkkuudella. */
+  var fbc = null;
+  try {
+    var fbclid = new URLSearchParams(location.search).get('fbclid');
+    if (fbclid && /^[A-Za-z0-9_-]{1,255}$/.test(fbclid)) fbc = 'fb.1.' + Date.now() + '.' + fbclid;
+  } catch (e) { /* ei väliä */ }
+
   /* ---------- A/B-testi ----------
      Versio arvotaan KERRAN SIVULATAUSTA KOHTI ja pidetään muistissa. Ei
      evästettä eikä localStoragea — tämä sivusto ei koske käyttäjän laitteen
@@ -91,7 +111,7 @@
   window.tkTrack = function (o) { if (o && o.type) send(o); };
 
   /* Sivunäyttö heti. */
-  send({ type: 'pageview', ref: document.referrer || '', campaign: campaign });
+  send({ type: 'pageview', ref: document.referrer || '', campaign: campaign, fbc: fbc });
 
   /* Scroll-syvyys: seurataan suurinta saavutettua %:a, lähetetään kerran
      kun sivulta poistutaan. */

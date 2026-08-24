@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { KARTOITUS_MINUTES } from '@/lib/availability';
 import { areaForPostal, kartoitusCalendarId, purgeExpiredHolds } from '@/lib/data';
-import { campaignFromVisitorTrail } from '@/lib/visitor';
+import { campaignFromVisitorTrail, fbcFromVisitorTrail } from '@/lib/visitor';
 import { deliverKartoitus, removeCalendarEventForJob } from '@/lib/deliver';
 
 /* =========================================================
@@ -154,6 +154,7 @@ export async function POST(request: Request) {
      päivän tapahtumaketjusta. Haku on transaktion ULKOPUOLELLA, jottei
      mittari pidennä varauksen lukitusta. Sama sääntö kuin varauksessa. */
   const campaign = d.campaign ?? (await campaignFromVisitorTrail(request));
+  const trailFbc = await fbcFromVisitorTrail(request);
 
   try {
     const created = await sql.begin(async (tx) => {
@@ -227,6 +228,8 @@ export async function POST(request: Request) {
       endsAt: ends.toISOString(),
       durationMinutes: KARTOITUS_MINUTES,
       area: area.name,
+      /* Metan CAPIa varten, jos selaimen oma fbc puuttui. Ks. booking-reitti. */
+      fbc: trailFbc,
       mailSent: delivery.mail.ok,
       workOrderSent: delivery.workOrder.ok,
       calendarCreated: delivery.calendar.ok,

@@ -5,7 +5,7 @@ import { areaForPostal, purgeExpiredHolds } from '@/lib/data';
 import { deliverBooking, saveJobLines } from '@/lib/deliver';
 import { removeCalendarEventForJob } from '@/lib/deliver';
 import { normalizeCode, resolveDiscount, type DiscountError } from '@/lib/discounts';
-import { campaignFromVisitorTrail } from '@/lib/visitor';
+import { campaignFromVisitorTrail, fbcFromVisitorTrail } from '@/lib/visitor';
 
 /* =========================================================
    Varauksen kirjaus — SISÄINEN rajapinta.
@@ -200,6 +200,11 @@ export async function POST(request: Request) {
      mittari pidennä varauksen lukitusta. */
   const campaign = d.campaign ?? (await campaignFromVisitorTrail(request));
 
+  /* Metan klikkitunniste kävijän ketjusta, jos selain ei sitä kertonut.
+     Tätä ei talleteta työlle vaan palautetaan sivuston funktiolle, joka
+     lähettää Metan CAPI-tapahtuman. Ks. `fbcFromVisitorTrail`. */
+  const trailFbc = await fbcFromVisitorTrail(request);
+
   try {
     const created = await sql.begin(async (tx) => {
       // Sama asiakas voi varata uudelleen: etsitään ensin sähköpostilla,
@@ -368,6 +373,9 @@ export async function POST(request: Request) {
       discountCents: created.discountCents,
       discountCode: created.discountCode,
       area: area.name,
+      /* Sivuston funktio käyttää tätä Metan CAPI-tapahtumassa jos selaimen
+         oma `fbc` puuttui. Ei henkilötietoa: Metan oma klikkitunniste. */
+      fbc: trailFbc,
       mailSent: delivery.mail.ok,
       workOrderSent: delivery.workOrder.ok,
       calendarCreated: delivery.calendar.ok,

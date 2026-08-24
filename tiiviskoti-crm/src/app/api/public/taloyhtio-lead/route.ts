@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { json, preflight } from '../cors';
 import { insertLead, campaignPreprocess, gclidPreprocess } from '../lead-insert';
-import { campaignFromVisitorTrail } from '@/lib/visitor';
+import { campaignFromVisitorTrail, fbcFromVisitorTrail } from '@/lib/visitor';
 
 /* POST /api/public/taloyhtio-lead
 
@@ -63,5 +63,8 @@ export async function POST(request: Request) {
     gclid: d.gclid ?? null,
   });
 
-  return json({ ok: true }, { origin });
+  /* Sivuston funktio käyttää tätä Metan Lead-tapahtumassa jos selaimen oma
+     fbc puuttui. Taloyhtiöliidi on arvokkain konversio, joten juuri sen
+     attribuutio kannattaa saada kohdalleen. */
+  return json({ ok: true, fbc: await fbcFromVisitorTrail(request) }, { origin });
 }
