@@ -27,11 +27,11 @@ const TELH = '+358458755996';
 /* Kuvat kierrätetään listasta, jotta vierekkäiset aluesivut eivät näytä
    identtisiltä. Sama kuva toistuu vasta viiden kunnan välein. */
 const KUVAT = [
-  ['hero-entrance.webp', 'Punainen puutalo, jonka valkoiset ikkunanpuitteet on juuri tiivistetty'],
-  ['ikkunat.webp',       'Asentaja uusii ikkunan karmitiivistettä'],
-  ['ulko-ovet.webp',     'Uusi tiiviste asennettuna ulko-oven karmiin'],
-  ['taloyhtiot.webp',    'Kerrostalon julkisivu ja parvekeovet'],
-  ['miksi-tyo.webp',     'TiivisKodin asentaja työssä'],
+  ['hero-entrance.webp', 'TiivisKodin asentajat vaalean puutalon pihassa työvälineineen'],
+  ['ikkunat.webp',       'Puutalon ikkuna ulkoa, valkoiset puitteet ja karmit'],
+  ['ulko-ovet.webp',     'Puutalon valkoinen ulko-ovi ja katettu kuisti'],
+  ['taloyhtiot.webp',    'TiivisKodin asentaja kävelee työvälineineen kohti taloa'],
+  ['miksi-tyo.webp',     'TiivisKodin asentaja kävelee tiivistetarvikkeineen kohti puutaloa'],
 ];
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -250,7 +250,7 @@ function kuntaSivu(a, i) {
 <meta property="og:url" content="${url}" />
 <meta property="og:title" content="${esc(title)}" />
 <meta property="og:description" content="${esc(desc)}" />
-<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg" />
+<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg?v=3" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -283,7 +283,7 @@ ${nav(R)}
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta heti · kotitalousvähennys −40 % · ei tarjouspyyntöjä</p>
   </div>
   <div class="hero-card rv">
-    <img src="${R}img/${kuva}" alt="${esc(alt)}" width="1100" height="880" fetchpriority="high">
+    <img src="${R}img/${kuva}?v=3" alt="${esc(alt)}" width="1100" height="880" fetchpriority="high">
   </div>
 </div></header>
 
@@ -402,7 +402,7 @@ function hubSivu() {
 <meta property="og:url" content="${url}" />
 <meta property="og:title" content="${esc(title)}" />
 <meta property="og:description" content="${esc(desc)}" />
-<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg" />
+<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg?v=3" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -489,21 +489,21 @@ function meistaSivu() {
      vastuuhenkilöt, ja siksi otsikko on "Vastuuhenkilöt" eikä "Tiimi". */
   const tiimi = [
     {
-      alkukirjaimet: 'JL',
+      kuva: 'meista-josua.jpg',
       name: 'Josua',
       role: 'Omistaja &amp; asentaja',
       bio: 'Vastaa yrityksestä ja hinnoittelusta — ja siitä että jokainen käynti hoidetaan juuri niin kuin on luvattu.',
     },
     {
-      alkukirjaimet: 'DS',
+      kuva: 'meista-daniel.jpg',
       name: 'Daniel',
       role: 'Puheenjohtaja &amp; asentaja',
       bio: 'Tekee kartoitukset ja tiivisteasennukset itse työmaalla. Työn hoitaa oma porukkamme alusta loppuun.',
     },
   ];
 
-  /* Kuvien tilalle mitattavia lupauksia: taloyhtiön hallitus arvioi
-     toimittajaa näillä, ei kasvokuvilla. */
+  /* Kasvokuvien rinnalle mitattavia lupauksia: taloyhtiön hallitus arvioi
+     toimittajaa myös näillä. */
   const faktat = [
     { iso: 'Y-tunnus', pieni: '3414418-4 · rekisteröity yritys' },
     { iso: 'Vastuu&shy;vakuutettu', pieni: 'voimassa oleva vastuuvakuutus' },
@@ -525,7 +525,7 @@ function meistaSivu() {
 <meta property="og:url" content="${url}" />
 <meta property="og:title" content="${esc(title)}" />
 <meta property="og:description" content="${esc(desc)}" />
-<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg" />
+<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg?v=3" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -552,12 +552,16 @@ ${nav(R)}
   <p class="sub" style="max-width:60ch">Meidät tapaat myös työmaalla: oma porukkamme vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ei myyntimiehiä eikä alihankintaa — siksi hinta on kiinteä ja vastuu selvä.</p>
 </div></header>
 
+<div class="wrap" style="padding-top:clamp(18px,2.6vw,26px)">
+  <img class="rv" src="img/meista-porukka.webp?v=3" alt="TiivisKodin asentajat työvälineineen asiakkaan pihassa" width="1100" height="619" loading="lazy" style="width:100%;max-width:820px;height:auto;display:block;border-radius:20px;border:1px solid var(--line)">
+</div>
+
 <section class="sec" style="padding-top:clamp(20px,3vw,32px)"><div class="wrap">
   <h2 class="rv" style="font-size:clamp(22px,2.6vw,28px);max-width:24ch;margin-bottom:6px">Vastuuhenkilöt</h2>
   <p class="rv" style="font-size:15px;color:var(--mute);max-width:56ch;margin-bottom:20px">Heidät tavoitat koko projektin ajan ja he vastaavat siitä että työ etenee sovitusti. Asennukset tekee oma porukkamme — emme käytä alihankkijoita.</p>
   <div class="rv" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;max-width:720px">
     ${tiimi.map((t) => `<figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;gap:16px;align-items:flex-start;padding:20px">
-      <span aria-hidden="true" style="flex:0 0 auto;width:56px;height:56px;border-radius:14px;background:var(--green-soft);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:19px;letter-spacing:.02em;color:var(--green-d)">${t.alkukirjaimet}</span>
+      <img src="img/${t.kuva}" alt="${t.name}, ${t.role.replace(/&amp;/g, 'ja').toLowerCase()}" width="104" height="130" loading="lazy" style="flex:0 0 auto;width:104px;height:130px;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:var(--green-soft)">
       <figcaption style="min-width:0">
         <b style="display:block;font-size:18px;color:var(--ink)">${t.name}</b>
         <span style="display:block;margin-top:2px;font-size:14px;font-weight:700;color:var(--green)">${t.role}</span>
