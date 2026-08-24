@@ -1,4 +1,5 @@
 import { sql } from '@/lib/db';
+import { kartoitusCalendarId } from '@/lib/data';
 import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty } from '@/components/ui';
 import { AreaRow, CreateAreaForm, DeleteArea } from './ui';
@@ -25,13 +26,26 @@ export default async function AreasPage() {
      order by a.active desc, a.name
   `;
 
-  const orphanCalendars = await sql<{ name: string; staff_name: string }[]>`
-    select c.name, s.full_name as staff_name
+  const allOrphans = await sql<{ id: string; name: string; staff_name: string }[]>`
+    select c.id, c.name, s.full_name as staff_name
       from tk.calendars c
       join tk.staff s on s.id = c.staff_id
      where c.active and s.active
        and not exists (select 1 from tk.calendar_areas ca where ca.calendar_id = c.id)
   `;
+
+  /* Kartoituskalenteri EI KUULU tähän varoitukseen. Alueen puuttuminen on sen
+     kohdalla tarkoitus eikä puute: se on koko mekanismi joka pitää
+     kartoituskäynnit erossa kuluttajan varauskalenterista (ks. lib/data.ts →
+     kartoitusCalendarId). Kartoitusreitti löytää kalenterin tunnuksella, ei
+     alueen kautta, joten aikoja voi varata verkosta ilman aluetta.
+
+     MIKSI TÄMÄ ON TÄRKEÄÄ: varoitus kehotti liittämään alueen, ja juuri se
+     tehtiin 24.8.2026 — jolloin maksava keikka varautui kartoituskalenteriin.
+     Väärä neuvo hallintapaneelissa on pahempi kuin puuttuva neuvo. */
+  const kartoitusId = kartoitusCalendarId()?.toLowerCase() ?? null;
+  const orphanCalendars = allOrphans.filter((c) => c.id.toLowerCase() !== kartoitusId);
+  const kartoitusCal = allOrphans.find((c) => c.id.toLowerCase() === kartoitusId);
 
   return (
     <div className="space-y-6">
@@ -51,6 +65,18 @@ export default async function AreasPage() {
           <span className="mt-1 block text-warn/80">
             {orphanCalendars.map((c) => `${c.staff_name} — ${c.name}`).join(', ')}.
             Näihin ei voi varata aikaa verkosta ennen kuin alue on liitetty (kohdasta Työajat).
+          </span>
+        </div>
+      )}
+
+      {kartoitusCal && (
+        <div className="rounded-lg border border-info/40 bg-info/10 px-4 py-3 text-sm text-info">
+          <b>{kartoitusCal.staff_name} — {kartoitusCal.name}</b>
+          <span className="mt-1 block text-info/80">
+            Tälle kalenterille <b>ei liitetä aluetta</b>, eikä se ole puute: juuri siksi
+            kartoituskäynnit pysyvät erossa tavallisesta varauskalenterista. Ajat varataan
+            taloyhtiösivun omalta reitiltä, joka löytää kalenterin tunnuksella. Jos liität
+            alueen, kartoitusajat alkavat näkyä myös tavallisessa varauksessa.
           </span>
         </div>
       )}
