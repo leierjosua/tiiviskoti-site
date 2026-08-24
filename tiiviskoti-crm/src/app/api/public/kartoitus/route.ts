@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { KARTOITUS_MINUTES } from '@/lib/availability';
 import { areaForPostal, kartoitusCalendarId, purgeExpiredHolds } from '@/lib/data';
+import { campaignFromVisitorTrail } from '@/lib/visitor';
 import { deliverKartoitus, removeCalendarEventForJob } from '@/lib/deliver';
 
 /* =========================================================
@@ -149,6 +150,11 @@ export async function POST(request: Request) {
     d.notes ? `\nAsiakkaan lisätiedot:\n${d.notes}` : null,
   ].filter(Boolean).join('\n');
 
+  /* Selaimen kertoma kampanja voittaa; vain jos se puuttuu, katsotaan saman
+     päivän tapahtumaketjusta. Haku on transaktion ULKOPUOLELLA, jottei
+     mittari pidennä varauksen lukitusta. Sama sääntö kuin varauksessa. */
+  const campaign = d.campaign ?? (await campaignFromVisitorTrail(request));
+
   try {
     const created = await sql.begin(async (tx) => {
       const [existing] = await tx<{ id: string }[]>`
@@ -186,7 +192,7 @@ export async function POST(request: Request) {
                 ${`Kartoituskäynti: ${d.association}`},
                 ${d.address}, ${d.postalCode}, ${d.city ?? null},
                 0, ${notes}, ${KARTOITUS_SOURCE},
-                ${d.campaign ?? null}, ${d.gclid ?? null})
+                ${campaign}, ${d.gclid ?? null})
         returning id, job_number
       `;
       return job;

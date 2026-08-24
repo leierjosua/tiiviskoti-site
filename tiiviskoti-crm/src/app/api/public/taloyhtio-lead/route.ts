@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { json, preflight } from '../cors';
 import { insertLead, campaignPreprocess, gclidPreprocess } from '../lead-insert';
+import { campaignFromVisitorTrail } from '@/lib/visitor';
 
 /* POST /api/public/taloyhtio-lead
 
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
     postal_code: d.postal_code || null,
     city: d.city || null,
     message: d.message || null,
-    campaign: d.campaign ?? null,
+    campaign: d.campaign ?? (await campaignFromVisitorTrail(request)),
     gclid: d.gclid ?? null,
   });
 

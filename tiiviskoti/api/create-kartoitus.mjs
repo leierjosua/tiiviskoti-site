@@ -20,13 +20,24 @@ import { sendMetaEvent, buildUserData } from '../meta-capi.mjs';
 const CRM_BASE_URL = process.env.CRM_BASE_URL;
 const BOOKING_SECRET = process.env.BOOKING_SECRET;
 
-async function reserveKartoitus(payload) {
+async function reserveKartoitus(payload, client) {
   if (!CRM_BASE_URL || !BOOKING_SECRET) {
     return { misconfigured: true, reason: 'CRM_BASE_URL / BOOKING_SECRET puuttuu' };
   }
+    /* Kävijän oma IP ja selain mukaan: tämä kutsu on palvelimelta
+       palvelimelle, joten CRM näkisi muuten TÄMÄN funktion — ei asiakasta.
+       CRM laskee niistä saman anonyymin kävijähashin kuin analytiikka ja
+       löytää kampanjan kävijän omasta käynnistä silloin kun selaimen
+       tallennustila ei säilynyt (Instagramin ja Facebookin sovellusselaimet).
+       CRM hashaa arvot heti eikä talleta niitä. */
   const r = await fetch(`${CRM_BASE_URL}/api/public/kartoitus`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-tk-secret': BOOKING_SECRET },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-tk-secret': BOOKING_SECRET,
+      ...(client?.ip ? { 'x-tk-client-ip': client.ip } : {}),
+      ...(client?.ua ? { 'x-tk-client-ua': client.ua } : {}),
+    },
     body: JSON.stringify(payload),
   });
   const data = await r.json().catch(() => ({}));
@@ -127,6 +138,9 @@ export default async function handler(req, res) {
       leadRef: leadRef || undefined,
       campaign,
       gclid,
+    }, {
+      ip: (req.headers['x-forwarded-for'] || '').split(',')[0].trim(),
+      ua: req.headers['user-agent'] || '',
     });
 
     if (reservation.conflict) {

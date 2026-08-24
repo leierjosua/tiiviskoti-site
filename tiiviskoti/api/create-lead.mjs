@@ -79,7 +79,10 @@ async function queueLeadNotification(submissionId, f) {
 // puolen kutsu CRM:n avoimeen endpointtiin; try/catch — ei saa kaataa liidin
 // tallennusta jos CRM on hetkellisesti nurin.
 const CRM_LEAD_URL = process.env.CRM_LEAD_URL || 'https://admin.tiiviskoti.fi/api/public/taloyhtio-lead';
-async function mirrorToCrmLeads(f) {
+const BOOKING_SECRET = process.env.BOOKING_SECRET;
+async function mirrorToCrmLeads(f, client) {
+  const clientIp = client?.ip;
+  const clientUa = client?.ua;
   try {
     const extra = [
       f.role ? `Rooli: ${f.role}` : null,
@@ -89,7 +92,16 @@ async function mirrorToCrmLeads(f) {
     ].filter(Boolean).join(' · ');
     await fetch(CRM_LEAD_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      /* Kävijän IP ja selain mukaan, jotta CRM löytää kampanjan kävijän omasta
+         käynnistä kun selaimen tallennustila ei säilynyt. Jaettu salaisuus on
+         mukana koska CRM luottaa näihin otsakkeisiin VAIN sen kanssa — reitti
+         on julkinen, eikä kuka tahansa saa syöttää kampanjaa toisen piikkiin. */
+      headers: {
+        'Content-Type': 'application/json',
+        ...(BOOKING_SECRET ? { 'x-tk-secret': BOOKING_SECRET } : {}),
+        ...(clientIp ? { 'x-tk-client-ip': clientIp } : {}),
+        ...(clientUa ? { 'x-tk-client-ua': clientUa } : {}),
+      },
       body: JSON.stringify({
         full_name: `${f.yhtio} — ${f.contact}`,
         email: f.email || '',
@@ -195,6 +207,9 @@ export default async function handler(req, res) {
     await mirrorToCrmLeads({
       contact, email, phone, role, yhtio, addr, doors, when, message,
       postalCode: postalFrom(addr), campaign, gclid,
+    }, {
+      ip: (req.headers['x-forwarded-for'] || '').split(',')[0].trim(),
+      ua: req.headers['user-agent'] || '',
     });
 
     /* Meta CAPI: taloyhtiön tarjouspyyntö on liidi (Lead). Sama periaate kuin

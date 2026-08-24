@@ -5,51 +5,7 @@ import { areaForPostal, purgeExpiredHolds } from '@/lib/data';
 import { deliverBooking, saveJobLines } from '@/lib/deliver';
 import { removeCalendarEventForJob } from '@/lib/deliver';
 import { normalizeCode, resolveDiscount, type DiscountError } from '@/lib/discounts';
-import { clientIdentity, visitorHash } from '@/lib/visitor';
-
-/* ---------------------------------------------------------------
-   Kampanja kävijän omasta tapahtumaketjusta, kun selain ei kertonut sitä.
-
-   MIKSI TÄMÄ ON OLEMASSA: sivusto poimii kampanjan osoiterivistä ja
-   säilöö sen `localStorage`iin (`_shared.js`), josta se lähtee varauksen
-   mukana. Se pettää hiljaa selaimissa joissa tallennustila ei säily —
-   käytännössä Instagramin ja Facebookin sovellusselaimissa. Tulos: juuri
-   MAINOKSESTA tulleet varaukset menettävät kampanjansa, eli ne joita
-   varten koko mittari on. Todettu 24.8.2026 (työ 1044): analytiikka näki
-   `tk26-video-olohuonekoukku`, varaus tallentui ilman kampanjaa.
-
-   Analytiikka ei nojaa tallennustilaan lainkaan — se lukee kampanjan
-   osoiterivistä joka sivulatauksella ja lähettää sen palvelimelle. Sama
-   kävijähash (IP + selain + päivä + salt) syntyy uudelleen tässä, joten
-   varaus voidaan yhdistää kävijän omaan käyntiin ilman evästeitä.
-
-   ENSIMMÄINEN VOITTAA, sama sääntö kuin selaimessa: kaupan ansaitsee se
-   mainos joka toi kävijän sivustolle.
-
-   RAJAT, jotka on hyvä tietää lukuja katsoessa:
-   - Hash vaihtuu keskiyöllä, joten tämä kattaa vain saman päivän. Useamman
-     päivän harkinta jää `localStorage`in varaan, kuten ennenkin.
-   - Jos kävijä on estänyt `_analytics.js`:n, tapahtumia ei ole eikä
-     varakeinoa. Silloin kampanja jää tyhjäksi kuten ennenkin.
-   Kumpikaan ei ole regressio: ilman tätä tulos olisi tyhjä joka kerta.
---------------------------------------------------------------- */
-async function campaignFromVisitorTrail(request: Request): Promise<string | null> {
-  try {
-    const { ip, ua } = clientIdentity(request);
-    if (ip === 'x' && !ua) return null;
-    const [row] = await sql<{ campaign: string | null }[]>`
-      select campaign from tk.web_events
-       where visitor_hash = ${visitorHash(ip, ua)} and campaign is not null
-       order by ts asc limit 1
-    `;
-    return row?.campaign ?? null;
-  } catch (e) {
-    /* Mittari ei saa koskaan kaataa varausta — sama periaate kuin
-       gclidillä ja Meta CAPIlla. Kirjataan ja jatketaan ilman kampanjaa. */
-    console.error('booking: kampanjan haku kävijäketjusta epäonnistui', e);
-    return null;
-  }
-}
+import { campaignFromVisitorTrail } from '@/lib/visitor';
 
 /* =========================================================
    Varauksen kirjaus — SISÄINEN rajapinta.
