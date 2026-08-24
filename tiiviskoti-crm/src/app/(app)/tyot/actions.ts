@@ -10,6 +10,7 @@ import { getJob } from '@/lib/data';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
 import { generateOfferPdf } from '@/lib/offer-pdf';
 import { sendMail } from '@/lib/google';
+import { helsinkiDateTime } from '@/lib/time';
 import { receiptEmailSubject, receiptEmailHtml, receiptEmailText, offerEmailSubject, offerEmailHtml, offerEmailText } from '@/lib/mail-templates';
 
 const OFFER_VALID_DAYS = 14;
@@ -17,6 +18,22 @@ const OFFER_VALID_DAYS = 14;
 export type ActionState = { error?: string; ok?: string };
 
 const SLOT_TAKEN = 'Aika meni juuri varatuksi. Valitse toinen aika.';
+
+/**
+ * `datetime-local` -kentän arvo ('YYYY-MM-DDTHH:MM') Suomen aikana hetkeksi.
+ *
+ * MIKSI EI `new Date(arvo)`: kentän arvossa ei ole aikavyöhykettä, joten JS
+ * tulkitsee sen AJOYMPÄRISTÖN paikallisena aikana. Vercelissä se on UTC, joten
+ * kello 9:30 tallentui hetkeksi 09:30Z eli 12:30 Suomen aikaa — kolme tuntia
+ * myöhemmäksi, ja joka tallennus siirsi ajan uudelleen. Lomake NÄYTTÄÄ Suomen
+ * aikaa (`toLocalInput` käyttää `dateKeyOf`/`timeOf`), joten myös luennan on
+ * oltava Suomen aikaa. Sama muunnos kuin varausputkessa.
+ */
+function parseLocalInput(value: string): Date {
+  const [dateKey, time] = value.split('T');
+  if (!dateKey || !time) return new Date(NaN);
+  return helsinkiDateTime(dateKey, time.slice(0, 5));
+}
 
 const createSchema = z.object({
   calendarId: z.string().uuid('Valitse kalenteri'),
@@ -51,7 +68,7 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot' };
 
   const d = parsed.data;
-  const starts = new Date(d.startsAt);
+  const starts = parseLocalInput(d.startsAt);
   if (Number.isNaN(starts.getTime())) return { error: 'Aika ei kelpaa.' };
   const ends = new Date(starts.getTime() + d.durationMinutes * 60_000);
 
@@ -93,7 +110,7 @@ export async function rescheduleJob(_prev: ActionState, formData: FormData): Pro
   const startsAt = String(formData.get('startsAt') ?? '');
   const durationMinutes = Number(formData.get('durationMinutes') ?? 0);
 
-  const starts = new Date(startsAt);
+  const starts = parseLocalInput(startsAt);
   if (Number.isNaN(starts.getTime())) return { error: 'Aika ei kelpaa.' };
   if (!Number.isFinite(durationMinutes) || durationMinutes < 15) return { error: 'Tarkista kesto.' };
   const ends = new Date(starts.getTime() + durationMinutes * 60_000);
