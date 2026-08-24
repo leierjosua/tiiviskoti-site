@@ -32,3 +32,9 @@ tiiviskoti-admin/
 
 # koneen paikalliset Claude-asetukset — sisältää hyväksyttyjä komentoja, joissa voi olla tokeneita
 .claude/settings.local.json
+
+# Shorts-videot: 50 MB renderöityjä mp4-tiedostoja. Ne ovat toistettavissa
+# putkella (tiiviskoti/mainokset/video/LUE-MINUT.md) ja lopulliset kappaleet
+# ovat työpöydällä kansiossa tiiviskoti-shorts/. Lähdemateriaali on Drivessa.
+# Repo on jo 198 MB, eikä binäärejä kannata kasvattaa.
+tiiviskoti/mainokset/out/*.mp4
