@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+/* CTA-arvo on BOOK_TRAVEL eikä BOOK_NOW, vaikka jälkimmäinen näyttää
+   oikealta nimeltä. Meta HYVÄKSYY BOOK_NOWin rajapinnassa mutta ei renderöi
+   sitä linkkimainoksessa: painikkeeksi tulee "Lue lisää". Ads Managerin
+   valikon "Varaa nyt" kirjoittaa nimenomaan BOOK_TRAVELin — se on tämän
+   painikkeen oikea tunnus.
+
+   Todettu 24.8.2026: 11 skriptillä julkaistua mainosta näytti "Lue lisää",
+   kun taas Ads Managerissa tehdyt ABT-mainokset näyttivät "Varaa nyt".
+   Ainoa ero oli tämä arvo. ÄLÄ vaihda takaisin BOOK_NOWiin. */
+
 /* Julkaisee 3 lisämainosta: 2 taloyhtiötä (Traffic-setti) + 1 syksy (Purchase-setti). */
 import fs from 'fs';
 import path from 'path';
@@ -22,7 +32,7 @@ const ADS = [
     message: 'Taloyhtiön lämpölasku kuriin. Vetävät ovet ja ikkunat nostavat lämmityskuluja — tiivistys pienentää hukkaa koko kiinteistössä. Kiinteä tarjous, vastuuvakuutettu ammattityö, asennustyön takuu.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
   { file: 'mainos-taloyhtio-helppo.png', adset: TALO_ADSET, adName: 'TK25 - Taloyhtiö (helppous)', headline: 'Yksi yhteyshenkilö, ei remonttia', link: TALO, cta: 'GET_QUOTE',
     message: 'Taloyhtiön ovet ja ikkunat kuntoon ilman remonttia. Yksi yhteyshenkilö, kiinteä tarjous, siisti jälki ja vastuuvakuutettu ammattityö — tiivistys sovittuna päivänä.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
-  { file: 'mainos-syksy.png', adset: PURCHASE_ADSET, adName: 'TK25 - Syksy (ennen pakkasia)', headline: 'Tiivistä ennen pakkasia · alk. 65 €', link: BOOK, cta: 'BOOK_NOW',
+  { file: 'mainos-syksy.png', adset: PURCHASE_ADSET, adName: 'TK25 - Syksy (ennen pakkasia)', headline: 'Tiivistä ennen pakkasia · alk. 65 €', link: BOOK, cta: 'BOOK_TRAVEL',
     message: 'Tiivistä ovet ja ikkunat ennen pakkasia. 🍂 Vetävät ovet ja ikkunat tulevat talvella kalliiksi — kiinteä hinta, lämpökamerakuvaus sisältyy, ammattiasennus samana päivänä. Ikkuna alk. 65 €, kotitalousvähennys −40 %.\n\n👉 Varaa aika: tiiviskoti.fi' },
 ];
 

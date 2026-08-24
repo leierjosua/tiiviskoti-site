@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+/* CTA-arvo on BOOK_TRAVEL eikä BOOK_NOW, vaikka jälkimmäinen näyttää
+   oikealta nimeltä. Meta HYVÄKSYY BOOK_NOWin rajapinnassa mutta ei renderöi
+   sitä linkkimainoksessa: painikkeeksi tulee "Lue lisää". Ads Managerin
+   valikon "Varaa nyt" kirjoittaa nimenomaan BOOK_TRAVELin — se on tämän
+   painikkeen oikea tunnus.
+
+   Todettu 24.8.2026: 11 skriptillä julkaistua mainosta näytti "Lue lisää",
+   kun taas Ads Managerissa tehdyt ABT-mainokset näyttivät "Varaa nyt".
+   Ainoa ero oli tämä arvo. ÄLÄ vaihda takaisin BOOK_NOWiin. */
+
 /* Julkaisee 24.8.2026 uudistetun mainoskuvaston Metaan (Marketing API).
  *
  * OTSIKOT JA KUVAUKSET: jokaisessa mainoksessa lukee otsikossa JA kuvauksessa
@@ -185,7 +195,7 @@ try {
   for (const a of VIDEOS) {
     try {
       const [video_id, thumb_hash] = [await uploadVideo(a.file), await uploadImage(a.thumb)];
-      const id = await makeAd(a, setVideo.id, 'ACTIVE', BOOK, 'BOOK_NOW', { video_id, thumb_hash });
+      const id = await makeAd(a, setVideo.id, 'ACTIVE', BOOK, 'BOOK_TRAVEL', { video_id, thumb_hash });
       log.push(`✓ VIDEO ${a.adName} → ad ${id}`);
     } catch (e) { log.push(`✗ VIDEO ${a.adName}: ${e.message}`); }
   }
@@ -194,7 +204,7 @@ try {
   for (const a of KUVAT) {
     try {
       const image_hash = await uploadImage(a.file);
-      const id = await makeAd(a, setKuva.id, 'PAUSED', BOOK, 'BOOK_NOW', { image_hash });
+      const id = await makeAd(a, setKuva.id, 'PAUSED', BOOK, 'BOOK_TRAVEL', { image_hash });
       log.push(`✓ KUVA ${a.adName} → ad ${id}`);
     } catch (e) { log.push(`✗ KUVA ${a.adName}: ${e.message}`); }
   }

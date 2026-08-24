@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+/* CTA-arvo on BOOK_TRAVEL eikä BOOK_NOW, vaikka jälkimmäinen näyttää
+   oikealta nimeltä. Meta HYVÄKSYY BOOK_NOWin rajapinnassa mutta ei renderöi
+   sitä linkkimainoksessa: painikkeeksi tulee "Lue lisää". Ads Managerin
+   valikon "Varaa nyt" kirjoittaa nimenomaan BOOK_TRAVELin — se on tämän
+   painikkeen oikea tunnus.
+
+   Todettu 24.8.2026: 11 skriptillä julkaistua mainosta näytti "Lue lisää",
+   kun taas Ads Managerissa tehdyt ABT-mainokset näyttivät "Varaa nyt".
+   Ainoa ero oli tämä arvo. ÄLÄ vaihda takaisin BOOK_NOWiin. */
+
 /* Pinnaa @tiiviskoti-Instagramin KAIKKIIN uusiin mainoksiin (oli defaultannut Flowihin).
  * Creativea ei voi muokata → luodaan uusi creative IG-identiteetillä ja päivitetään ad. */
 import fs from 'fs';
@@ -17,15 +27,15 @@ const BOOK = 'https://tiiviskoti.fi/varaa.html';
 const TALO = 'https://tiiviskoti.fi/taloyhtio.html';
 
 const ADS = [
-  { ad: '120247811466530132', file: 'mainos-veto.png', link: BOOK, cta: 'BOOK_NOW', name: 'Kiinteä hinta · lämpökamera sisältyy',
+  { ad: '120247811466530132', file: 'mainos-veto.png', link: BOOK, cta: 'BOOK_TRAVEL', name: 'Kiinteä hinta · lämpökamera sisältyy',
     msg: 'Vetääkö ulko-ovista tai ikkunoista? 🥶 Usein pieni tiivistys — ei kallis remontti — säästää eniten lämmityksessä. Kiinteä hinta heti, lämpökamerakuvaus sisältyy, 2 vuoden takuu. Koko Uusimaa.\n\n👉 Varaa aika: tiiviskoti.fi' },
-  { ad: '120247811467730132', file: 'mainos-hinta.png', link: BOOK, cta: 'BOOK_NOW', name: 'Ikkuna alk. 65 € · ulko-ovi 119 €',
+  { ad: '120247811467730132', file: 'mainos-hinta.png', link: BOOK, cta: 'BOOK_TRAVEL', name: 'Ikkuna alk. 65 € · ulko-ovi 119 €',
     msg: 'Ovien ja ikkunoiden tiivistys kiinteään hintaan — ei arviolaskuria, näet summan heti. Ikkuna alk. 65 €, ulko-ovi 119 €, pienin käynti 149 € (sis. lämpökamerakuvauksen). Kotitalousvähennys −40 %.\n\n👉 Katso hinnat: tiiviskoti.fi' },
-  { ad: '120247811469080132', file: 'mainos-asentaja.png', link: BOOK, cta: 'BOOK_NOW', name: 'Ammattiasennus samana päivänä',
+  { ad: '120247811469080132', file: 'mainos-asentaja.png', link: BOOK, cta: 'BOOK_TRAVEL', name: 'Ammattiasennus samana päivänä',
     msg: 'Ammattiasennus samana päivänä. Ovien ja ikkunoiden tiivisteiden vaihto, oven käynnin säätö ja lämpökamerakuvaus — kiinteään hintaan, ei arvioita. 2 vuoden takuu, koko Uusimaa.\n\n👉 Varaa aika: tiiviskoti.fi' },
-  { ad: '120247811471300132', file: 'mainos-lupaus.png', link: BOOK, cta: 'BOOK_NOW', name: '2 vuoden takuu — veto pois',
+  { ad: '120247811471300132', file: 'mainos-lupaus.png', link: BOOK, cta: 'BOOK_TRAVEL', name: '2 vuoden takuu — veto pois',
     msg: 'Veto pois — tai tulemme uudestaan veloituksetta. Ovien ja ikkunoiden tiivistys kahden vuoden takuulla, kiinteä hinta ilman yllätyksiä. Koko Uusimaa.\n\n👉 Varaa aika: tiiviskoti.fi' },
-  { ad: '120247811664080132', file: 'mainos-syksy.png', link: BOOK, cta: 'BOOK_NOW', name: 'Tiivistä ennen pakkasia · alk. 65 €',
+  { ad: '120247811664080132', file: 'mainos-syksy.png', link: BOOK, cta: 'BOOK_TRAVEL', name: 'Tiivistä ennen pakkasia · alk. 65 €',
     msg: 'Tiivistä ovet ja ikkunat ennen pakkasia. 🍂 Vetävät ovet ja ikkunat tulevat talvella kalliiksi — kiinteä hinta, lämpökamerakuvaus sisältyy, ammattiasennus samana päivänä. Ikkuna alk. 65 €, kotitalousvähennys −40 %.\n\n👉 Varaa aika: tiiviskoti.fi' },
   { ad: '120247811534650132', file: 'mainos-taloyhtio.png', link: TALO, cta: 'GET_QUOTE', name: 'Taloyhtiön ovet & ikkunat kuntoon',
     msg: 'Taloyhtiön ovet ja ikkunat kuntoon — vähemmän vetoa ja lämpöhukkaa koko kiinteistössä. Kiinteä tarjous, yksi yhteyshenkilö, vastuuvakuutettu ammattityö.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
