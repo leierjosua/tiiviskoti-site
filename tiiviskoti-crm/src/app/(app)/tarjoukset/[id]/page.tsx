@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { requireManager } from '@/lib/session';
 import { getOffer } from '@/lib/data';
 import { Card, CardHeader, PageHead } from '@/components/ui';
-import { OFFER_STATUS, OfferStatusButtons, OfferStatusChip } from '../ui';
+import { OFFER_STATUS, OfferStatusButtons, OfferStatusChip, SendDraftButton } from '../ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -91,12 +91,41 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
         </Card>
       </div>
 
-      <Card className="h-fit">
-        <CardHeader title="Tila" />
-        <div className="p-4">
-          <OfferStatusButtons id={offer.id} status={offer.status} />
-        </div>
-      </Card>
+      <div className="h-fit space-y-6">
+        <Card>
+          <CardHeader title="PDF" />
+          <div className="space-y-2 p-4">
+            {/* Sama PDF jonka asiakas saa liitteenä — syntyy tästä rivistä
+                joka latauksella, joten se ei voi vanhentua. */}
+            <a
+              href={`/tarjoukset/${offer.id}/pdf`}
+              className="block w-full rounded-lg border border-line bg-ink-800 px-4 py-2 text-center text-sm font-semibold text-text hover:border-[#D2D9CE] hover:bg-ink-700"
+            >
+              Lataa tarjous PDF:nä
+            </a>
+            <p className="text-xs text-faint">Tallentuu koneellesi. Voit tulostaa sen tai lähettää itse.</p>
+          </div>
+        </Card>
+
+        {offer.status === 'draft' && (
+          <Card>
+            <CardHeader title="Luonnos" />
+            <div className="space-y-3 p-4">
+              <p className="text-sm text-muted">
+                Tätä tarjousta ei ole lähetetty asiakkaalle.
+              </p>
+              <SendDraftButton id={offer.id} email={offer.email} />
+            </div>
+          </Card>
+        )}
+
+        <Card>
+          <CardHeader title="Tila" />
+          <div className="p-4">
+            <OfferStatusButtons id={offer.id} status={offer.status} />
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }

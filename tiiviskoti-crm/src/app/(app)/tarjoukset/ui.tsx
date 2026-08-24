@@ -2,9 +2,11 @@
 
 import { useActionState } from 'react';
 import { Button, ErrorNote, OkNote, cx } from '@/components/ui';
-import { setOfferStatus, type ActionState } from './actions';
+import { SubmitButton } from '@/components/submit';
+import { sendSavedOffer, setOfferStatus, type ActionState } from './actions';
 
 export const OFFER_STATUS: Record<string, string> = {
+  draft: 'Luonnos',
   sent: 'Lähetetty',
   accepted: 'Hyväksytty',
   declined: 'Hylätty',
@@ -12,6 +14,7 @@ export const OFFER_STATUS: Record<string, string> = {
 };
 
 const CHIP: Record<string, string> = {
+  draft: 'border-line bg-ink-700 text-muted',
   sent: 'border-info/35 bg-info/12 text-info',
   accepted: 'border-accent/35 bg-accent-dim text-accent',
   declined: 'border-line bg-ink-700 text-muted line-through',
@@ -56,5 +59,25 @@ export function OfferStatusButtons({ id, status }: { id: string; status: string 
       {state.error && <ErrorNote>{state.error}</ErrorNote>}
       {state.ok && <OkNote>{state.ok}</OkNote>}
     </div>
+  );
+}
+
+/* Luonnoksen lähetys. Oma komponentti eikä osa OfferStatusButtonsia: tilan
+   vaihtaminen käsin ja tarjouksen oikea lähettäminen ovat eri asioita, ja
+   vierekkäin ne sekoittuisivat — "Lähetetty"-nappi ei lähetä mitään. */
+export function SendDraftButton({ id, email }: { id: string; email: string | null }) {
+  const [state, action] = useActionState<ActionState, FormData>(sendSavedOffer, {});
+  return (
+    <form action={action} className="space-y-2">
+      <input type="hidden" name="id" value={id} />
+      <SubmitButton className="w-full" pendingLabel="Lähetetään…" disabled={!email}>
+        Lähetä asiakkaalle sähköpostilla
+      </SubmitButton>
+      {email
+        ? <p className="text-xs text-faint">Menee osoitteeseen {email}. PDF liitteenä.</p>
+        : <p className="text-xs text-faint">Tarjouksella ei ole sähköpostiosoitetta.</p>}
+      {state.error && <ErrorNote>{state.error}</ErrorNote>}
+      {state.ok && <OkNote>{state.ok}</OkNote>}
+    </form>
   );
 }

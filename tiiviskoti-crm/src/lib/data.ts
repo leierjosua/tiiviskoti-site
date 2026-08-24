@@ -309,7 +309,8 @@ export type OfferRow = {
   /* Vapaa sana: asiakkaalle näkynyt saateteksti PDF:ssä ja sähköpostissa.
      undefined = db/020 ajamatta, null = ei kirjoitettu. */
   customer_note?: string | null;
-  status: 'sent' | 'accepted' | 'declined' | 'expired';
+  /* 'draft' = tallennettu mutta EI lähetetty (db/021). */
+  status: 'draft' | 'sent' | 'accepted' | 'declined' | 'expired';
   valid_until: string | null;
   provider_id: string | null;
   error: string | null;

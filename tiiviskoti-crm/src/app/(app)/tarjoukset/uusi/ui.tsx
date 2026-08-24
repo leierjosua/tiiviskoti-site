@@ -249,9 +249,22 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
           </div>
           <p className="text-xs text-faint">Sis. ALV 25,5 %. Työn osuus eritellään PDF:ssä kotitalousvähennystä varten. Voimassa 14 pv.</p>
 
-          <SubmitButton className="w-full" pendingLabel="Lähetetään…" disabled={pricing.total <= 0}>
+          <SubmitButton className="w-full" pendingLabel="Lähetetään…" disabled={pricing.total <= 0}
+            name="mode" value="send">
             Lähetä tarjous sähköpostilla
           </SubmitButton>
+
+          {/* Sama lomake, sama hinnoittelu — vain loppu eroaa. `mode` kulkee
+              napin omana arvona, joten kentän arvo ratkeaa siitä kumpaa
+              painetaan eikä erillistä tilaa tarvita. */}
+          <SubmitButton className="w-full" variant="outline" pendingLabel="Tallennetaan…"
+            disabled={pricing.total <= 0} name="mode" value="draft">
+            Tallenna luonnoksena ja lataa PDF
+          </SubmitButton>
+          <p className="text-xs text-faint">
+            Luonnosta ei lähetetä asiakkaalle. Se tallentuu Tarjoukset-listaan, PDF:n voi ladata
+            ja tarjouksen lähettää myöhemmin.
+          </p>
           {state.error && <ErrorNote>{state.error}</ErrorNote>}
           {state.ok && <OkNote>{state.ok}</OkNote>}
         </div>

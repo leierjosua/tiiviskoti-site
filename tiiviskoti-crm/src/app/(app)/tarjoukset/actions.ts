@@ -1,10 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
-import { areaForPostal, type OfferLine } from '@/lib/data';
+import { areaForPostal, getOffer, type OfferLine } from '@/lib/data';
 import { computePricing, TYPES, EXTRAS, type CustomLine } from '@/lib/pricing';
 import { generateOfferPdf } from '@/lib/offer-pdf';
 import { sendMail } from '@/lib/google';
@@ -32,6 +33,11 @@ const schema = z.object({
   /* Asiakkaalle näkyvä saateteksti. Sama pituusrajoite kuin kannan
      offers_customer_note_len -rajoitteessa. */
   customerNote: z.string().max(2000).optional(),
+  /* 'send' = luo, tallenna ja lähetä sähköpostilla.
+     'draft' = luo ja tallenna luonnoksena; PDF ladataan tarjouksen sivulta.
+     Sama toiminto molemmille, koska tarjouksen luonti ja hinnoittelu ovat
+     identtiset — ero on vain lopussa. */
+  mode: z.enum(['send', 'draft']).default('send'),
 });
 
 /* Rakentaa laskurin syötteet lomakkeen kentistä. Määrät tulevat `qty_<id>`
@@ -91,6 +97,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
     city: String(formData.get('city') ?? '').trim() || undefined,
     notes: String(formData.get('notes') ?? '').trim() || undefined,
     customerNote: String(formData.get('customerNote') ?? '').trim() || undefined,
+    mode: String(formData.get('mode') ?? 'send'),
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot.' };
   const d = parsed.data;
@@ -123,13 +130,14 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   const insertOffer = (withNote: boolean) => sql<{ id: string; offer_number: string }[]>`
     insert into tk.offers
       (kind, contact_name, customer_name, email, phone, address, postal_code, city, lines,
-       total_cents, travel_fee_cents, notes, valid_until
+       total_cents, travel_fee_cents, notes, valid_until, status
        ${withNote ? sql`, customer_note` : sql``})
     values
       (${d.kind}, ${d.contactName ?? null},
        ${d.customerName}, ${d.email}, ${d.phone ?? null}, ${d.address ?? null},
        ${d.postalCode || null}, ${d.city ?? null}, ${sql.json(lines)},
-       ${totalCents}, ${travelCents}, ${d.notes ?? null}, ${validUntil}
+       ${totalCents}, ${travelCents}, ${d.notes ?? null}, ${validUntil},
+       ${d.mode === 'draft' ? 'draft' : 'sent'}::tk.offer_status
        ${withNote ? sql`, ${d.customerNote ?? null}` : sql``})
     returning id, offer_number
   `;
@@ -138,6 +146,12 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   try {
     [offer] = await insertOffer(customerNoteColumnExists);
   } catch (e) {
+    /* 22P02 = enumissa ei ole 'draft'-arvoa (db/021 ajamatta). Kerrotaan se
+       suoraan eikä anneta kaatua tuntemattomaan virheeseen: käyttäjä ei voi
+       arvata että kyse on ajamattomasta migraatiosta. */
+    if (typeof e === 'object' && e !== null && (e as { code?: string }).code === '22P02') {
+      return { error: 'Luonnoksena tallennus vaatii migraation db/021_offer_status_draft.sql. Aja se Supabasen SQL-editorissa, tai lähetä tarjous sähköpostilla.' };
+    }
     if (!isUndefinedColumn(e)) throw e;
     console.error('tarjous: tk.offers.customer_note puuttuu — aja db/020. Tarjous tallennetaan ilman vapaata sanaa.');
     customerNoteColumnExists = false;
@@ -182,6 +196,14 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
     customerNote: d.customerNote ?? null,
   };
 
+  /* Luonnos: rivi on tallessa ja PDF ladattavissa tarjouksen sivulta.
+     Sähköpostia ei lähetetä eikä sent_at aseteta — tarjous ei ole mennyt
+     kenellekään, ja se ero on koko luonnostilan tarkoitus. */
+  if (d.mode === 'draft') {
+    revalidatePath('/tarjoukset');
+    redirect(`/tarjoukset/${offer.id}?ladattu=1`);
+  }
+
   let providerId: string | null = null;
   let sendErr: string | null = null;
   try {
@@ -220,4 +242,78 @@ export async function setOfferStatus(_prev: ActionState, formData: FormData): Pr
   revalidatePath('/tarjoukset');
   revalidatePath(`/tarjoukset/${id}`);
   return { ok: 'Tila päivitetty.' };
+}
+
+/**
+ * Lähetä JO TALLENNETTU tarjous asiakkaalle.
+ *
+ * Tätä tarvitaan luonnoksille: ilman sitä luonnos olisi umpikuja, ja tarjous
+ * pitäisi näpytellä uudestaan pelkän lähettämisen vuoksi. PDF syntyy samasta
+ * rivistä kuin latauskin, joten asiakas saa täsmälleen sen mitä sivulla näkyy.
+ */
+export async function sendSavedOffer(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireManager();
+  const id = String(formData.get('id') ?? '');
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return { error: 'Virheellinen tarjous.' };
+
+  const offer = await getOffer(id);
+  if (!offer) return { error: 'Tarjousta ei löytynyt.' };
+  if (!offer.email) return { error: 'Tarjouksella ei ole sähköpostiosoitetta.' };
+
+  let pdf: Uint8Array;
+  try {
+    pdf = await generateOfferPdf({
+      jobNumber: offer.offer_number,
+      createdAt: offer.created_at,
+      customer: {
+        name: offer.contact_name ? `${offer.customer_name} — ${offer.contact_name}` : offer.customer_name,
+        address: offer.address, postalCode: offer.postal_code, city: offer.city,
+        email: offer.email, phone: offer.phone,
+      },
+      lines: offer.lines.map((l) => ({ name: l.name, quantity: l.quantity, unitPriceCents: l.unit_price_cents })),
+      totalIncVatCents: offer.total_cents,
+      customerNote: offer.customer_note ?? null,
+    });
+  } catch (e) {
+    return { error: `PDF:n luonti epäonnistui: ${(e as Error).message}` };
+  }
+
+  const mailData = {
+    jobNumber: offer.offer_number,
+    customerName: offer.contact_name || offer.customer_name,
+    lines: offer.lines.map((l) => ({
+      name: l.name, qty: l.quantity, unit: l.unit_price_cents / 100,
+      sum: (l.unit_price_cents * l.quantity) / 100,
+    })),
+    totalCents: offer.total_cents,
+    validDays: OFFER_VALID_DAYS,
+    customerNote: offer.customer_note ?? null,
+  };
+
+  try {
+    const r = await sendMail({
+      to: offer.email,
+      subject: offerEmailSubject(mailData),
+      html: offerEmailHtml(mailData),
+      text: offerEmailText(mailData),
+      attachment: { filename: `tarjous-${offer.offer_number}.pdf`, mimeType: 'application/pdf', content: pdf },
+    });
+    /* Tila vaihtuu vasta onnistuneen lähetyksen jälkeen: epäonnistunut
+       lähetys jättää luonnoksen luonnokseksi, jotta sen näkee yrittää
+       uudelleen eikä se katoa "lähetettyjen" joukkoon. */
+    await sql`
+      update tk.offers
+         set status = 'sent', sent_at = now(), provider_id = ${r.id}, error = null
+       where id = ${id}
+    `;
+  } catch (e) {
+    const msg = (e as Error).message;
+    await sql`update tk.offers set error = ${msg} where id = ${id}`;
+    revalidatePath(`/tarjoukset/${id}`);
+    return { error: `Lähetys epäonnistui: ${msg}` };
+  }
+
+  revalidatePath('/tarjoukset');
+  revalidatePath(`/tarjoukset/${id}`);
+  return { ok: `Tarjous ${offer.offer_number} lähetetty osoitteeseen ${offer.email}.` };
 }

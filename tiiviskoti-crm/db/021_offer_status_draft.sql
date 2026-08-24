@@ -1,0 +1,27 @@
+-- =============================================================
+-- Tarjouksen luonnostila: tallennettu mutta EI lähetetty.
+--
+-- MIKSI: tarjouksen voi nyt ladata PDF:nä ja antaa asiakkaalle itse —
+-- tulostettuna, omasta sähköpostista tai käynnillä. Tarjouksesta pitää silti
+-- jäädä jäännös CRM:ään: ilman sitä ei jälkikäteen tiedä mitä asiakkaalle
+-- luvattiin, ja juuri se tieto tarvitaan kun asiakas soittaa takaisin.
+--
+-- MIKSI OMA TILA EIKÄ `sent`: `sent` tarkoittaa että viesti lähti. Luonnosta
+-- ei ole lähetetty kenellekään, ja jos ne näkyisivät samassa tilassa, listalta
+-- ei erottaisi mitä asiakas on oikeasti saanut. `sent_at` on jo nyt null myös
+-- epäonnistuneella lähetyksellä, joten senkään varaan ei voi laskea.
+--
+-- ENUMIIN LISÄYS VAATII postgres-ROOLIN: tyypin `tk.offer_status` omistaa
+-- postgres, eikä `tk_app` voi ajaa ALTER TYPEä ("must be owner of type").
+-- Sama seikka kuin tk.mail_kind-enumissa aiemmin.
+--
+-- HUOM: `ADD VALUE` ei toimi transaktiolohkon sisällä vanhemmissa
+-- Postgreseissä. Supabasen SQL-editori ajaa tämän omana lauseenaan, joten
+-- aja tämä tiedosto SELLAISENAAN äläkä kääri sitä BEGIN/COMMITiin.
+--
+-- Koodi toimii myös ILMAN tätä arvoa: luonnoksen tallennus huomaa
+-- kelpaamattoman enum-arvon (22P02) ja kertoo että migraatio puuttuu, eikä
+-- kirjoita puolikasta riviä. Aja se.
+-- =============================================================
+
+alter type tk.offer_status add value if not exists 'draft';
