@@ -480,6 +480,16 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 /* Aikapainikkeet kolmeen sarakkeeseen puhelimessa, kuten varaa.html:ssä —
    neljä kellonaikaa 390px leveydellä jää liian kapeaksi kosketettavaksi. */
 @media(max-width:620px){.tincl,.tform .row{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.slots{grid-template-columns:repeat(3,1fr)}}
+
+/* ---------- A/B-TESTI: TALOYHTIÖKUVA ----------
+   A = oman kuvauksen kuva (24.8.2026), B = aiempi kuvapankin kerrostalokuva.
+   Kumpi tuottaa enemmän etenemisiä taloyhtiöpolulla? Molemmat <img>:t ovat
+   DOM:ssa ja toinen piilotetaan, koska versio on tiedossa jo <head>issä —
+   näin kuva on oikein ensimmäisestä piirrosta eikä vaihdu kesken.
+   Oletus ilman data-ab:tä on A, jotta sivu ei jää kuvattomaksi jos JS estyy. */
+.ab-b{display:none}
+html[data-ab="b"] .ab-a{display:none}
+html[data-ab="b"] .ab-b{display:block}
 </style>
 <script>
 /* A/B-testin versio arvotaan TÄSSÄ eikä _analytics.js:ssä, koska se on defer
@@ -520,7 +530,8 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä sopimushinta · kartoitus veloituksetta · työ mahdollisimman vähällä häiriöllä</p>
   </div>
   <div class="hero-card rv">
-    <img src="img/taloyhtio-hero.webp?v=3" alt="TiivisKodin asentajat talon pihassa kartoituskäynnillä" width="1100" height="880" fetchpriority="high">
+    <img class="ab-a" src="img/taloyhtio-hero.webp?v=3" alt="TiivisKodin asentajat talon pihassa kartoituskäynnillä" width="1100" height="880" fetchpriority="high">
+    <img class="ab-b" src="img/taloyhtio-hero-b.webp?v=3" alt="Taloyhtiön valoisa julkisivu ja parvekkeet" width="1100" height="1191" fetchpriority="high">
   </div>
 </div></header>
 
@@ -961,36 +972,21 @@ window.tkKartoitus = {
   forgetLead: () => api.prefill({}, ''),
 };
 
-/* ---------- A/B-TESTIN TEKSTIVERSIOT ----------
-   Versio on arvottu jo <head>issä (window.tkVariant), joten teksti on oikein
-   ensimmäisestä piirrosta lähtien eikä välähdä.
+/* ---------- A/B-TESTIN TEKSTIVERSIOT — POISTETTU 24.8.2026 ----------
+   Tällä sivulla testattiin varausosion otsikkoa ja pääkutsua. Testi
+   lopetettiin kahdesta syystä:
 
-   Testataan VAIN varausosion otsikkoa ja pääkutsua — se on kohta jossa kävijä
-   joko aloittaa varauksen tai ei. Muu sivu pidetään identtisenä, jotta ero on
-   luettavissa yhdelle muuttujalle.
+   1. Se ei olisi koskaan ratkennut. Sivulla käy noin 7 kävijää viikossa,
+      eikä etenemisiä kerry merkitsevyyteen järkevässä ajassa.
+   2. Tilalle tuli kuvatesti (kerrostalon kuvapankkikuva vs. oman kuvauksen
+      kuva), joka käyttää samaa `variant`-arvoa. Kaksi yhtaikaista testiä
+      samalla muuttujalla tekisi kummastakin lukukelvottoman.
 
-   A = sivun nykyinen sanamuoto (verrokki). B = hyöty ensin.
-
-   Mittari EI ole varaus vaan eteneminen vaiheeseen 2 (`funnel`-tapahtuma).
-   Varauksia tulee liian harvoin merkitsevyyteen; etenemisiä moninkertaisesti.
-
-   Vaiheen 1 data-attribuutit päivitetään myös, koska vaihemoottori maalaa
-   otsikon niistä uudelleen joka siirtymällä — pelkkä textContent palautuisi. */
-(function(){
-  if ((window.tkVariant || 'a') !== 'b') return;   // A = sivun oma teksti
-  var T = {
-    title:  'Kartoitus maksutta — näettekö vetokohdat itse?',
-    kicker: 'Käymme läpi joka oven',
-    sub:    'Mittaamme vetokohdat ja kerromme mitä kannattaa tiivistää. '
-          + 'Käynti kestää noin 20 minuuttia eikä sido teitä mihinkään.'
-  };
-  var set = function(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt; };
-  set('varaaTitle', T.title); set('varaaKicker', T.kicker); set('varaaSub', T.sub);
-  var cta = document.getElementById('toCal');
-  if (cta) cta.textContent = 'Katso vapaat ajat';
-  var s1 = document.querySelector('[data-step="postal"]');
-  if (s1) { s1.dataset.title=T.title; s1.dataset.kicker=T.kicker; s1.dataset.sub=T.sub; }
-})();
+   Sivun teksti on nyt sama molemmille versioille — versio erottaa enää
+   herokuvan. Jos tekstitesti halutaan takaisin, se vaatii oman muuttujan
+   ja oman sarakkeen tk.web_events-tauluun. Vanha sanamuoto talteen:
+   "Kartoitus maksutta — näettekö vetokohdat itse?" / "Käymme läpi joka oven"
+   / CTA "Katso vapaat ajat". */
 
 paint();
 

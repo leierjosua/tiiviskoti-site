@@ -536,6 +536,16 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .mcta{display:flex}
 }
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
+
+/* ---------- A/B-TESTI: TALOYHTIÖKUVA ----------
+   A = oman kuvauksen kuva (24.8.2026), B = aiempi kuvapankin kerrostalokuva.
+   Kumpi tuottaa enemmän etenemisiä taloyhtiöpolulla? Molemmat <img>:t ovat
+   DOM:ssa ja toinen piilotetaan, koska versio on tiedossa jo <head>issä —
+   näin kuva on oikein ensimmäisestä piirrosta eikä vaihdu kesken.
+   Oletus ilman data-ab:tä on A, jotta sivu ei jää kuvattomaksi jos JS estyy. */
+.ab-b{display:none}
+html[data-ab="b"] .ab-a{display:none}
+html[data-ab="b"] .ab-b{display:block}
 </style>
 <script type="application/ld+json">
 {
@@ -731,6 +741,20 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 }
 </script>
 <!-- ukk-schema:loppu -->
+<script>
+/* A/B-testin versio arvotaan TÄSSÄ eikä _analytics.js:ssä, koska se on defer
+   eikä ehtisi ennen ensimmäistä piirtoa — kuva välähtäisi.
+   Ei evästettä eikä localStoragea: arvonta on sivulatauskohtainen.
+   `?ab=a` / `?ab=b` pakottaa version testausta varten. */
+(function(){
+  var V=['a','b'], v;
+  try{ var f=new URLSearchParams(location.search).get('ab');
+       v = V.indexOf(f)>=0 ? f : V[Math.floor(Math.random()*V.length)]; }
+  catch(e){ v=V[0]; }
+  window.tkVariant=v;
+  document.documentElement.setAttribute('data-ab',v);
+})();
+</script>
 </head>
 <body>
 <nav class="top" id="nav"><div class="wrap">
@@ -790,7 +814,8 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
     </div>
     <div class="card rv">
       <div class="card-fig">
-        <img class="pic" src="img/taloyhtiot.webp?v=3" alt="TiivisKodin asentaja kävelee työvälineineen kohti taloa" width="900" height="563" loading="lazy">
+        <img class="pic ab-a" src="img/taloyhtiot.webp?v=3" alt="TiivisKodin asentaja kävelee työvälineineen kohti taloa" width="900" height="563" loading="lazy">
+        <img class="pic ab-b" src="img/taloyhtiot-b.webp?v=3" alt="Taloyhtiön julkisivu ja parvekkeet" width="900" height="665" loading="lazy">
         <span class="tag">Kartoitus 0 €</span>
       </div>
       <div class="card-body"><h3>Taloyhtiöt</h3><p>Rappukäytävät ja yhteistilat kerralla kuntoon sopimushinnalla. Kartoituskäynti on veloitukseton.</p><a href="taloyhtio.html#varaa" class="lnk">Varaa ilmainen kartoitus <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
