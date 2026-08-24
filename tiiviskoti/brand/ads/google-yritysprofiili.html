@@ -11,13 +11,12 @@
     Vaatii dev-palvelimen: cd tiiviskoti && node _serve.mjs
     Tuottaa: brand/google-kansikuva-1200x675.png
 
-  MIKSI EI VALOKUVAA
-    TiivisKoti on palvelualueyritys ilman toimitilaa, joten julkisivukuvaa
-    "meidän toimipisteestä" ei ole olemassa. Sivuston kuvituskuvat
-    (hero-entrance.jpg jne.) esittävät taloja jotka eivät ole meidän eivätkä
-    työkohteitamme — verkkosivulla se on tavallista kuvitusta, mutta Googlen
-    yritysprofiilissa kuvan pitää esittää yritystä aidosti. Siksi kansikuva on
-    puhdas brändikuva: se ei väitä mitään mitä ei ole.
+  VALOKUVA (muutettu 24.8.2026)
+    Aiemmin kansikuva oli pelkkä brändigrafiikka, koska sivuston kuvat olivat
+    kuvapankista: ne esittivät taloja jotka eivät olleet meidän eivätkä
+    työkohteitamme, eikä sellaista voi laittaa yritysprofiiliin. 24.8.2026
+    kuvattu oma materiaali poistaa esteen — kuvassa on oma porukka omissa
+    työvaatteissa oikeassa kohteessa, joten se esittää yritystä aidosti.
 
   KESKITETTY LAYOUT
     Google rajaa kansikuvaa eri suhteisiin eri paikoissa (haku, Maps, mobiili).
@@ -29,9 +28,8 @@
     ja aukioloajat tulevat profiilin omista kentistä — niitä ei toisteta kuvaan,
     koska ne vanhenevat kuvassa eivätkä profiilissa.
 
-  LOGO (720 × 720) EI TULE TÄSTÄ
-    Yritysprofiilin logoruutuun käy sellaisenaan jo olemassa oleva
-    brand/fb-profiilikuva-1080.png — se on neliö ja pelkkä merkki.
+  LOGO (720 × 720)
+    Renderöityy samalla ajolla: #google-logo → brand/google-logo-720.png.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,13 +41,24 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;
-  padding:36px;display:flex;align-items:flex-start}
+  padding:36px;display:flex;flex-direction:column;align-items:flex-start}
 
 #google-kansikuva{
   width:1200px;height:675px;flex:none;position:relative;overflow:hidden;
   background:var(--deep);
   display:flex;align-items:center;justify-content:center;
 }
+#google-kansikuva .photo{position:absolute;inset:0;z-index:0}
+#google-kansikuva .photo img{width:100%;height:100%;object-fit:cover;object-position:50% 46%;display:block}
+/* Tumma kalvo: teksti on valkoista, ja hakutuloksissa kuva näkyy pienenä.
+   Ilman kalvoa vaalea julkisivu söisi otsikon luettavuuden. */
+#google-kansikuva .scrim{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(22,58,40,.82) 0%,rgba(22,58,40,.74) 46%,rgba(22,58,40,.90) 100%)}
+
+/* LOGORUUTU 720 × 720 — yritysprofiilin pyöreä logopaikka */
+#google-logo{width:720px;height:720px;flex:none;background:var(--green);
+  display:flex;align-items:center;justify-content:center;margin-top:36px}
+#google-logo svg{width:400px;height:400px;display:block}
 
 /* Pehmeä valo ylävasemmalta: pelkkä tasainen vihreä näyttää pienennettynä
    litteältä, tämä antaa syvyyttä ilman että mikään vie huomiota tekstiltä. */
@@ -84,7 +93,9 @@ body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;
 
 <!-- ============ GOOGLEN KANSIKUVA 1200 × 675 ============ -->
 <div id="google-kansikuva">
-  <div class="glow"></div>
+  <div class="photo"><img src="../kuvat/google-kansi-photo.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="glow" style="opacity:.5"></div>
   <div class="safe">
     <div class="lockup">
       <svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#2E9E63"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg>
@@ -94,6 +105,15 @@ body{background:#8f9a92;font-family:Manrope,system-ui,sans-serif;
     <div class="rule"></div>
     <p class="tag">Uusimaa<span class="dot">·</span>alkaen <b>149 €</b></p>
   </div>
+</div>
+
+<!-- ============ LOGORUUTU 720 × 720 ============ -->
+<div id="google-logo">
+  <svg viewBox="0 0 100 100" aria-hidden="true">
+    <rect x="14" y="14" width="72" height="72" rx="18" fill="none" stroke="#F6F7F3" stroke-width="6"/>
+    <rect x="34" y="30" width="32" height="40" rx="2.5" fill="none" stroke="#F6F7F3" stroke-width="5"/>
+    <rect x="37.5" y="30" width="3.4" height="40" fill="#F6F7F3"/>
+  </svg>
 </div>
 
 </body>

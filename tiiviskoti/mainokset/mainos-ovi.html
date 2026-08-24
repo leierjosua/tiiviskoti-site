@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fi"><head>
+<meta charset="utf-8">
+<title>TiivisKoti — mainos: oven lähikuva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="_ad.css" rel="stylesheet">
+<style>
+  /* Korvasi mainos-hinnan 24.8.2026 (Josua ei pitänyt siitä eikä sen kuvasta).
+     Muoto seuraa mitattua voittajaa: itse kohde lähikuvana, vähän elementtejä.
+     Elokuun ad-tason datassa parhaat CTR:t olivat juuri tällaisissa (3,0–3,2 %),
+     eivät talo- tai asentajakuvissa. Ovi on vaalea, joten kalvo on tavallista
+     vahvempi alaosassa — muuten valkoinen otsikko katoaa oveen. */
+  .scrim.tb{background:linear-gradient(180deg,
+    rgba(18,53,40,.50) 0%, rgba(18,53,40,.16) 20%,
+    rgba(18,53,40,.34) 38%, rgba(18,53,40,.80) 52%,
+    rgba(18,53,40,.95) 70%, rgba(18,53,40,.99) 100%)}
+  /* Ovi on vaalea juuri kickerin korkeudella, eikä mintunvihreä erotu siitä.
+     Tällä yhdellä mainoksella kicker on siksi valkoinen ja varjostettu. */
+  .kicker{color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.55)}
+  .display{font-size:104px}
+  .badges{display:flex;flex-wrap:wrap;gap:16px;margin-top:32px}
+  .badge{display:inline-flex;align-items:center;gap:12px;font-size:25px;font-weight:700;color:#fff;
+    background:rgba(22,58,40,.42);border:1px solid rgba(255,255,255,.24);
+    padding:14px 22px;border-radius:999px}
+  .badge svg{width:22px;height:22px;flex:none}
+</style>
+</head>
+<body class="on-dark">
+  <div class="photo"><img src="kuvat/ad-ovi.jpg" alt=""></div>
+  <div class="scrim tb"></div>
+  <div class="grain"></div>
+
+  <div class="canvas pad">
+    <div class="layer">
+      <div class="brandrow">
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="22" fill="#217A4E"/>
+            <rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/>
+            <rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/>
+          </svg>
+          <div class="wordmark"><span class="d">Tiivis</span><span class="b">Koti</span></div>
+        </div>
+        <span class="pill glass-pill">Koko Uusimaa</span>
+      </div>
+
+      <div class="grow"></div>
+
+      <div class="kicker">Ovien &amp; ikkunoiden tiivistys</div>
+      <h1 class="display mt-s">Veto tulee<br>tästä raosta.</h1>
+      <p class="lead mt-s">Ulko-oven karmitiiviste ja kynnyskumi ovat halvin kohta korjata
+        ja yleisin syy vetoon. Vaihto kestää tunnin, hinnan näet ennen varausta.</p>
+
+      <div class="badges">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#8FD3AC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Ulko-ovi 119 €</span>
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#8FD3AC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Ikkuna 95 €</span>
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#8FD3AC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Lämpökamera sisältyy</span>
+      </div>
+
+      <a class="cta mt-l">Katso hinta &amp; varaa
+        <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h12M12 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <div class="divider mt-l"></div>
+      <div class="foot" style="margin-top:26px">
+        <div class="url">tiiviskoti.fi</div>
+        <div class="fineprint">Kiinteä hinta · ei arviolaskuria<br>Kotitalousvähennys −40 %</div>
+      </div>
+    </div>
+  </div>
+</body></html>

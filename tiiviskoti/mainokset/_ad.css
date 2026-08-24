@@ -61,7 +61,7 @@ body{
 .pill svg{width:19px;height:19px}
 
 /* ---- typografia --------------------------------------------------------- */
-.kicker{font-weight:800;font-size:25px;letter-spacing:.18em;
+.kicker{font-weight:800;font-size:31px;letter-spacing:.14em;
   text-transform:uppercase;display:flex;align-items:center;gap:16px;color:var(--green)}
 .kicker::before{content:"";width:40px;height:3px;background:currentColor;border-radius:2px;flex:none}
 

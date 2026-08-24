@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fi"><head>
+<meta charset="utf-8">
+<title>TiivisKoti — mainos: oma porukka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="_ad.css" rel="stylesheet">
+<style>
+  /* Korvasi mainos-lupauksen 24.8.2026. Takuu ei saa olla mainoskärki, ja
+     lupausmainos rakentui kokonaan sen varaan. Tilalle sama luottamuskulma
+     ilman takuulupausta: työn tekee oma porukka, ei alihankkija. */
+  .scrim.tb{background:linear-gradient(180deg,
+    rgba(18,53,40,.62) 0%, rgba(18,53,40,.34) 20%,
+    rgba(18,53,40,.40) 42%, rgba(18,53,40,.62) 56%,
+    rgba(18,53,40,.90) 76%, rgba(18,53,40,.98) 100%)}
+  .display{font-size:96px}
+  .proof{margin-top:36px}
+  .badges{display:flex;flex-wrap:wrap;gap:16px;margin-top:30px}
+  .badge{display:inline-flex;align-items:center;gap:12px;font-size:25px;font-weight:700;color:#fff;
+    background:rgba(22,58,40,.42);border:1px solid rgba(255,255,255,.24);
+    padding:14px 22px;border-radius:999px}
+  .badge svg{width:22px;height:22px;flex:none}
+</style>
+</head>
+<body class="on-dark">
+  <div class="photo"><img src="kuvat/ad-porukka.jpg" alt=""></div>
+  <div class="scrim tb"></div>
+  <div class="grain"></div>
+
+  <div class="canvas pad">
+    <div class="layer">
+      <div class="brandrow">
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="22" fill="#217A4E"/>
+            <rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/>
+            <rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/>
+          </svg>
+          <div class="wordmark"><span class="d">Tiivis</span><span class="b">Koti</span></div>
+        </div>
+        <span class="pill glass-pill">Koko Uusimaa</span>
+      </div>
+
+      <div class="grow"></div>
+
+      <div class="kicker">Ovien &amp; ikkunoiden tiivistys</div>
+      <h1 class="display mt-s">Tiivisteet vaihtaa<br>oma porukka.</h1>
+      <p class="lead mt-s">Sama porukka vastaa puhelimeen, tekee kartoituksen ja asentaa tiivisteet.
+        Ei myyntimiehiä eikä alihankintaa — siksi hinta on kiinteä ja vastuu selvä.</p>
+
+      <div class="badges">
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#8FD3AC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Kiinteä hinta heti</span>
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#8FD3AC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Lämpökamera sisältyy</span>
+        <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#8FD3AC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Vastuuvakuutettu</span>
+      </div>
+
+      <a class="cta mt-l">Varaa aika verkossa
+        <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h12M12 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <div class="divider mt-l"></div>
+      <div class="foot" style="margin-top:26px">
+        <div class="url">tiiviskoti.fi</div>
+        <div class="fineprint">Ikkuna 95 € · ulko-ovi 119 €<br>Kotitalousvähennys −40 %</div>
+      </div>
+    </div>
+  </div>
+</body></html>

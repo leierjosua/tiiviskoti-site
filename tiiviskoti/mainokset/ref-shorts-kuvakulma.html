@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fi"><head>
+<meta charset="utf-8">
+<title>TiivisKoti — Shorts-referenssi: perusrajaus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="_ad.css" rel="stylesheet">
+<style>
+  /* 9:16 pystyvideo — _ad.css:n 1080×1350 ohitetaan tässä. */
+  html,body{width:1080px;height:1920px}
+  body{background:#0E1F17}
+
+  .frame{position:absolute;inset:0;overflow:hidden}
+  /* Rajattu käteen ja tiivisteeseen (lähde 1536×2048, kohta 62 % / 26 %).
+     object-fit:cover asetti haarukan lippikselle — siksi suora asemointi. */
+  .frame img{position:absolute;width:2918px;height:3891px;left:-1269px;top:-231px;display:block}
+  .dim{position:absolute;inset:0;background:linear-gradient(180deg,
+    rgba(10,26,19,.74) 0%, rgba(10,26,19,.16) 26%,
+    rgba(10,26,19,.24) 56%, rgba(10,26,19,.92) 100%)}
+  /* Vasen alakulma tummennetaan, jottei lippis vie huomiota kohteesta. */
+  .dim2{position:absolute;left:0;bottom:0;width:78%;height:52%;
+    background:radial-gradient(120% 100% at 10% 100%, rgba(10,26,19,.80) 0%, rgba(10,26,19,0) 68%)}
+
+  /* kolmanneslinjat */
+  .thirds{position:absolute;inset:0}
+  .thirds i{position:absolute;background:rgba(255,255,255,.22)}
+  .thirds .v{top:0;bottom:0;width:2px}
+  .thirds .h{left:0;right:0;height:2px}
+
+  /* tarkennushaarukka kohteen päällä */
+  .bracket{position:absolute;left:262px;top:502px;width:556px;height:556px}
+  .bracket span{position:absolute;width:76px;height:76px;border:5px solid var(--mint)}
+  .bracket .tl{left:0;top:0;border-right:0;border-bottom:0}
+  .bracket .tr{right:0;top:0;border-left:0;border-bottom:0}
+  .bracket .bl{left:0;bottom:0;border-right:0;border-top:0}
+  .bracket .br{right:0;bottom:0;border-left:0;border-top:0}
+  .bracket em{position:absolute;left:50%;bottom:-56px;transform:translateX(-50%);
+    font-style:normal;font-weight:800;font-size:23px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--mint);white-space:nowrap}
+
+  .hdr{position:absolute;top:0;left:0;right:0;padding:66px 74px 0}
+  .tag{display:inline-flex;align-items:center;gap:13px;font-weight:800;font-size:22px;
+    letter-spacing:.17em;text-transform:uppercase;color:var(--mint)}
+  .tag::before{content:"";width:34px;height:3px;background:var(--mint);border-radius:2px}
+  .hdr h1{margin-top:20px;color:#fff;font-size:66px;line-height:1.04;font-weight:800;letter-spacing:-.02em}
+  .hdr p{margin-top:16px;color:#CFE0D6;font-size:27px;line-height:1.42;max-width:20ch;font-weight:500}
+  .src{margin-top:22px;display:inline-block;max-width:26ch;color:#0E1F17;background:var(--mint);
+    border-radius:12px;padding:13px 18px;font-size:21px;font-weight:700;line-height:1.34}
+
+  /* sivun huomiot */
+  .note{position:absolute;display:flex;align-items:flex-start;gap:14px;max-width:340px}
+  .note b{display:block;color:#fff;font-size:25px;font-weight:800;line-height:1.2}
+  .note small{display:block;margin-top:6px;color:#BCD2C4;font-size:20px;line-height:1.38;font-weight:500}
+  .dot{flex:none;width:19px;height:19px;border-radius:50%;background:var(--mint);
+    box-shadow:0 0 0 7px rgba(143,211,172,.24);margin-top:5px}
+  .n1{left:74px;top:1310px}
+  .n2{right:74px;top:1310px;text-align:right;flex-direction:row-reverse}
+
+  .specs{position:absolute;left:0;right:0;bottom:0;padding:0 74px 66px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;
+    border-top:2px solid rgba(255,255,255,.20);padding-top:30px}
+  .spec b{display:block;color:var(--mint);font-size:19px;font-weight:800;
+    letter-spacing:.13em;text-transform:uppercase}
+  .spec span{display:block;margin-top:6px;color:#fff;font-size:26px;font-weight:600;line-height:1.3}
+  .no{margin-top:26px;display:flex;align-items:flex-start;gap:13px;
+    background:rgba(214,92,74,.18);border:2px solid rgba(226,120,100,.55);
+    border-radius:16px;padding:20px 22px}
+  .no b{color:#FFC7BB;font-size:22px;font-weight:800;letter-spacing:.05em}
+  .no span{display:block;margin-top:5px;color:#F1D6D0;font-size:21px;line-height:1.4;font-weight:500}
+</style>
+</head>
+<body>
+  <div class="frame">
+    <img src="../img/tyo-tiivisteen-asennus.jpg" alt="">
+    <div class="dim"></div>
+    <div class="dim2"></div>
+  </div>
+
+  <div class="thirds">
+    <i class="v" style="left:360px"></i>
+    <i class="v" style="left:720px"></i>
+    <i class="h" style="top:640px"></i>
+    <i class="h" style="top:1280px"></i>
+  </div>
+
+  <div class="bracket">
+    <em>tarkennus tähän · tiiviste + käsi</em>
+    <span class="tl"></span><span class="tr"></span>
+    <span class="bl"></span><span class="br"></span>
+  </div>
+
+  <div class="hdr">
+    <div class="tag">Referenssi 1 / 2 · perusrajaus</div>
+    <h1>Kädet ja tiiviste,<br>ei puhuvaa päätä</h1>
+    <p>Tämä rajaus on jokaisen Shortsin ensimmäinen sekunti.</p>
+    <div class="src">Alla oma kuvasi rajattuna — juuri tätä lähikuvaa ei vielä ole. Se on kuvattava.</div>
+  </div>
+
+  <div class="note n1">
+    <i class="dot"></i>
+    <div><b>Kohde 1/3-linjalla</b>
+      <small>Tiiviste hieman keskeltä alas — ylin kolmannes jää tekstille.</small></div>
+  </div>
+  <div class="note n2">
+    <i class="dot"></i>
+    <div><b>Liike kuvassa</b>
+      <small>Käsi työntää tiivistettä uraan. Aina jotain liikkuu.</small></div>
+  </div>
+
+  <div class="specs">
+    <div class="grid">
+      <div class="spec"><b>Rajaus</b><span>Makro, 30–50 cm kohteesta</span></div>
+      <div class="spec"><b>Kamera</b><span>Pysty 9:16 · 1080×1920 · 30 fps</span></div>
+      <div class="spec"><b>Korkeus</b><span>Kohteen tasolla, ei ylhäältä</span></div>
+      <div class="spec"><b>Valo</b><span>Pehmeä sivuvalo · uran varjo näkyviin</span></div>
+      <div class="spec"><b>Syväterävyys</b><span>Matala — tausta pehmeäksi</span></div>
+      <div class="spec"><b>Ääni</b><span>Aito lähiääni: tiiviste, ovi, kynnys</span></div>
+    </div>
+    <div class="no">
+      <div><b>ÄLÄ KUVAA NÄITÄ</b>
+        <span>Ei laveita huonekuvia, ei kasvoja ensimmäisessä sekunnissa,
+          ei kättelyä, ei pakettiautoa. Ne on jo testattu — ne eivät pysäytä.</span></div>
+    </div>
+  </div>
+</body></html>
