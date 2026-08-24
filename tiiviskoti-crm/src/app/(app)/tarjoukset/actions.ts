@@ -29,6 +29,9 @@ const schema = z.object({
   postalCode: z.string().regex(/^\d{5}$/, 'Postinumero on 5 numeroa').or(z.literal('')),
   city: z.string().optional(),
   notes: z.string().optional(),
+  /* Asiakkaalle näkyvä saateteksti. Sama pituusrajoite kuin kannan
+     offers_customer_note_len -rajoitteessa. */
+  customerNote: z.string().max(2000).optional(),
 });
 
 /* Rakentaa laskurin syötteet lomakkeen kentistä. Määrät tulevat `qty_<id>`
@@ -68,6 +71,12 @@ export async function lookupTravelFee(postal: string): Promise<{ cents: number; 
 }
 
 /** Luo tarjous, lähetä se PDF:nä sähköpostilla ja tallenna tk.offers:iin. */
+/* Onko db/020 ajettu. Vasta epäonnistunut kirjoitus kertoo sen, joten
+   oletetaan kyllä ja korjataan kerran ajossa. */
+let customerNoteColumnExists = true;
+const isUndefinedColumn = (e: unknown) =>
+  typeof e === 'object' && e !== null && (e as { code?: string }).code === '42703';
+
 export async function sendProspectOffer(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requireManager();
 
@@ -81,6 +90,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
     postalCode: String(formData.get('postalCode') ?? '').trim(),
     city: String(formData.get('city') ?? '').trim() || undefined,
     notes: String(formData.get('notes') ?? '').trim() || undefined,
+    customerNote: String(formData.get('customerNote') ?? '').trim() || undefined,
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot.' };
   const d = parsed.data;
@@ -104,18 +114,35 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   const travelCents = eurToCents(pricing.travelFee);
   const validUntil = new Date(Date.now() + OFFER_VALID_DAYS * 24 * 60 * 60 * 1000);
 
-  // Rivi ensin, jotta saadaan juokseva tarjousnumero PDF:ää ja sähköpostia varten.
-  const [offer] = await sql<{ id: string; offer_number: string }[]>`
+  /* Rivi ensin, jotta saadaan juokseva tarjousnumero PDF:ää ja sähköpostia
+     varten.
+
+     `customer_note` kirjoitetaan vain jos sarake on olemassa: db/020 ajetaan
+     käsin postgres-roolilla, ja tarjous on tärkeämpi kuin sen saateteksti.
+     Sama varautuminen kuin lead-insert.ts:ssä. Lippu nollautuu deployssa. */
+  const insertOffer = (withNote: boolean) => sql<{ id: string; offer_number: string }[]>`
     insert into tk.offers
       (kind, contact_name, customer_name, email, phone, address, postal_code, city, lines,
-       total_cents, travel_fee_cents, notes, valid_until)
+       total_cents, travel_fee_cents, notes, valid_until
+       ${withNote ? sql`, customer_note` : sql``})
     values
       (${d.kind}, ${d.contactName ?? null},
        ${d.customerName}, ${d.email}, ${d.phone ?? null}, ${d.address ?? null},
        ${d.postalCode || null}, ${d.city ?? null}, ${sql.json(lines)},
-       ${totalCents}, ${travelCents}, ${d.notes ?? null}, ${validUntil})
+       ${totalCents}, ${travelCents}, ${d.notes ?? null}, ${validUntil}
+       ${withNote ? sql`, ${d.customerNote ?? null}` : sql``})
     returning id, offer_number
   `;
+
+  let offer: { id: string; offer_number: string };
+  try {
+    [offer] = await insertOffer(customerNoteColumnExists);
+  } catch (e) {
+    if (!isUndefinedColumn(e)) throw e;
+    console.error('tarjous: tk.offers.customer_note puuttuu — aja db/020. Tarjous tallennetaan ilman vapaata sanaa.');
+    customerNoteColumnExists = false;
+    [offer] = await insertOffer(false);
+  }
 
   let pdf: Uint8Array;
   try {
@@ -134,6 +161,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
       },
       lines: lines.map((l) => ({ name: l.name, quantity: l.quantity, unitPriceCents: l.unit_price_cents })),
       totalIncVatCents: totalCents,
+      customerNote: d.customerNote ?? null,
     });
   } catch (e) {
     await sql`update tk.offers set error = ${(e as Error).message} where id = ${offer.id}`;
@@ -151,6 +179,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
     })),
     totalCents,
     validDays: OFFER_VALID_DAYS,
+    customerNote: d.customerNote ?? null,
   };
 
   let providerId: string | null = null;

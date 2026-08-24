@@ -304,7 +304,11 @@ export type OfferRow = {
   lines: OfferLine[];
   total_cents: number;
   travel_fee_cents: number;
+  /* Sisäinen muistiinpano — EI näy asiakkaalle. */
   notes: string | null;
+  /* Vapaa sana: asiakkaalle näkynyt saateteksti PDF:ssä ja sähköpostissa.
+     undefined = db/020 ajamatta, null = ei kirjoitettu. */
+  customer_note?: string | null;
   status: 'sent' | 'accepted' | 'declined' | 'expired';
   valid_until: string | null;
   provider_id: string | null;
@@ -322,12 +326,29 @@ export async function listOffers(): Promise<OfferRow[]> {
   `;
 }
 
+/* Onko db/020 ajettu. Kysely kertoo sen vasta epäonnistuessaan, joten
+   oletetaan kyllä ja korjataan kerran ajossa. Lippu nollautuu deployssa. */
+let offerCustomerNoteExists = true;
+
 export async function getOffer(id: string): Promise<OfferRow | null> {
-  const [row] = await sql<OfferRow[]>`
+  const run = (withNote: boolean) => sql<OfferRow[]>`
     select id, offer_number, kind, contact_name, customer_name, email, phone, address,
            postal_code, city, lines, total_cents, travel_fee_cents, notes, status,
            valid_until, provider_id, error, sent_at, created_at
+           ${withNote ? sql`, customer_note` : sql``}
       from tk.offers where id = ${id}
   `;
-  return row ?? null;
+  try {
+    const [row] = await run(offerCustomerNoteExists);
+    return row ?? null;
+  } catch (e) {
+    /* Sarake puuttuu (db/020 ajamatta): tarjous on tärkeämpi kuin sen
+       saateteksti, joten näytetään tarjous ilman sitä. */
+    if (typeof e === 'object' && e !== null && (e as { code?: string }).code === '42703') {
+      offerCustomerNoteExists = false;
+      const [row] = await run(false);
+      return row ?? null;
+    }
+    throw e;
+  }
 }

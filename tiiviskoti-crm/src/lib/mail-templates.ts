@@ -429,6 +429,8 @@ export type OfferEmailData = {
   lines: MailLine[];
   totalCents: number;
   validDays: number;
+  /** Vapaa sana: asiakkaalle kirjoitettu saateteksti. Sama teksti kuin PDF:ssä. */
+  customerNote?: string | null;
 };
 
 export function offerEmailSubject(data: OfferEmailData): string {
@@ -484,6 +486,10 @@ export function offerEmailHtml(data: OfferEmailData): string {
     </table>
   </td></tr>
 
+  ${data.customerNote ? `<tr><td style="padding:22px 28px 0">
+    <div style="background:${CREAM};border-radius:10px;padding:16px 18px;color:${INK};font-size:15px;line-height:1.7;white-space:pre-line">${esc(data.customerNote)}</div>
+  </td></tr>` : ''}
+
   <tr><td style="padding:24px 28px 28px">
     <div style="border-top:1px solid #E6E2DA;padding-top:18px;color:${MUTED};font-size:14px;line-height:1.7">
       Kysyttävää tarjouksesta? Soita
@@ -510,6 +516,7 @@ export function offerEmailText(data: OfferEmailData): string {
     '',
     `Liitteenä tarjous ${data.jobNumber}, yhteensä ${eur(data.totalCents)} (sis. ALV 25,5 %).`,
     `Tarjous on voimassa ${data.validDays} päivää. Työn osuus on eritelty kotitalousvähennystä varten.`,
+    ...(data.customerNote ? ['', data.customerNote] : []),
     'Hyväksy tarjous vastaamalla tähän viestiin tai soittamalla.',
     '',
     `${COMPANY} · Y-tunnus ${BUSINESS_ID}`,

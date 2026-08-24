@@ -55,7 +55,18 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
               </div>
             ))}
           </dl>
-          {offer.notes && <p className="border-t border-line px-4 py-3 text-sm text-muted">{offer.notes}</p>}
+          {offer.customer_note && (
+            <div className="border-t border-line px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-faint">Vapaa sana — näkyi asiakkaalle</p>
+              <p className="mt-1 whitespace-pre-line text-sm text-text">{offer.customer_note}</p>
+            </div>
+          )}
+          {offer.notes && (
+            <div className="border-t border-line px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-faint">Sisäinen muistiinpano</p>
+              <p className="mt-1 text-sm text-muted">{offer.notes}</p>
+            </div>
+          )}
           {offer.error && <p className="border-t border-line px-4 py-3 text-sm text-danger">Lähetysvirhe: {offer.error}</p>}
         </Card>
 

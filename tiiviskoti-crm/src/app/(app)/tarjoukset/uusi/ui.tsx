@@ -211,9 +211,18 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
         <Card>
           <CardHeader title="Lisätiedot" />
           <div className="p-4">
-            <Field label="Sisäinen muistiinpano" hint="Vapaaehtoinen — tallentuu tarjoukselle, ei näy asiakkaalle.">
-              <Textarea name="notes" rows={3} placeholder="Esim. sovittu alennus, erityistoiveet…" />
+            <Field
+              label="Vapaa sana asiakkaalle"
+              hint="NÄKYY ASIAKKAALLE — tulee tarjouksen PDF:ään ja sähköpostiin rivien alle."
+            >
+              <Textarea name="customerNote" rows={4} maxLength={2000}
+                placeholder="Esim. mitä sovittiin puhelimessa, miten työ etenee, mitä hinta kattaa…" />
             </Field>
+            <div className="mt-4">
+              <Field label="Sisäinen muistiinpano" hint="Vapaaehtoinen — tallentuu tarjoukselle, ei näy asiakkaalle.">
+                <Textarea name="notes" rows={3} placeholder="Esim. sovittu alennus, erityistoiveet…" />
+              </Field>
+            </div>
           </div>
         </Card>
       </div>

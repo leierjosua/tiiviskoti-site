@@ -24,11 +24,40 @@ export interface OfferInput {
   customer: { name: string; address?: string | null; postalCode?: string | null; city?: string | null; email?: string | null; phone?: string | null };
   lines: { name: string; quantity: number; unitPriceCents: number }[];
   totalIncVatCents: number;
+  /** Vapaa sana: asiakkaalle näkyvä saateteksti rivien alla. */
+  customerNote?: string | null;
 }
 
 const fmtCents = (c: number) => (c / 100).toFixed(2).replace('.', ',');
 const fmtDate = (d: Date) =>
   new Intl.DateTimeFormat('fi-FI', { timeZone: 'Europe/Helsinki', day: 'numeric', month: 'numeric', year: 'numeric' }).format(d);
+
+/* pdf-lib HEITTÄÄ jos merkkiä ei voi esittää WinAnsi-koodauksessa — koko
+   tarjouksen lähetys kaatuisi yhteen emojiin. "Vapaa sana" on kenttä johon
+   asiakkaalle kirjoitetaan vapaasti, ja juuri sinne liitetään hymiöitä ja
+   nuolia. Todettu: 😊 (0x1f60a) ja → (0x2192) kaatoivat generoinnin.
+
+   Yleiset merkit korvataan luettavalla vastineella, loput pudotetaan. Tämä
+   on `text()`-apurissa eikä vain vapaassa sanassa, koska sama riski koskee
+   jokaista käsin kirjoitettua kenttää (asiakkaan nimi, vapaiden rivien
+   nimet). Puuttuva merkki on aina parempi kuin lähettämättä jäänyt tarjous. */
+const WINANSI_FIXES: [RegExp, string][] = [
+  [/[\u2192\u21d2]/g, '->'], [/[\u2190\u21d0]/g, '<-'],
+  [/[\u2713\u2714]/g, '+'], [/[\u00a0\u2007\u202f]/g, ' '],
+  [/\t/g, '  '],
+];
+
+export function toWinAnsi(input: string): string {
+  let s = input;
+  for (const [re, rep] of WINANSI_FIXES) s = s.replace(re, rep);
+  /* WinAnsi kattaa Latin-1:n plus joukon typografisia merkkejä. Loput pois. */
+  const EXTRA = '\u20ac\u201a\u0192\u201e\u2026\u2020\u2021\u02c6\u2030\u0160\u2039\u0152\u017d'
+    + '\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u02dc\u2122\u0161\u203a\u0153\u017e\u0178';
+  return [...s].filter((ch) => {
+    const c = ch.codePointAt(0)!;
+    return (c >= 0x20 && c <= 0x7e) || (c >= 0xa0 && c <= 0xff) || EXTRA.includes(ch) || ch === '\n';
+  }).join('');
+}
 
 export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
   const validUntil = new Date(input.createdAt.getTime() + VALID_DAYS * 24 * 60 * 60 * 1000);
@@ -42,7 +71,7 @@ export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
   let y = height - margin;
 
   const text = (s: string, x: number, yy: number, o: { font?: typeof font; size?: number; color?: typeof BRAND_DARK } = {}) =>
-    page.drawText(s, { x, y: yy, size: o.size ?? 10, font: o.font ?? font, color: o.color ?? BRAND_DARK });
+    page.drawText(toWinAnsi(s), { x, y: yy, size: o.size ?? 10, font: o.font ?? font, color: o.color ?? BRAND_DARK });
   const rightX = (s: string, f: typeof font, size: number, rx: number) => rx - f.widthOfTextAtSize(s, size);
   const line = (x1: number, yy: number, x2: number, color = LIGHT_GRAY) =>
     page.drawLine({ start: { x: x1, y: yy }, end: { x: x2, y: yy }, thickness: 0.5, color });
@@ -147,6 +176,35 @@ export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
   const gt = `${fmtCents(total)} €`;
   text(gt, rightX(gt, bold, 12, vx), y, { font: bold, size: 12, color: rgb(1, 1, 1) });
   y -= 50;
+
+  /* Vapaa sana ennen vakioehtoja: se on tälle tarjoukselle kirjoitettu
+     viesti, ja vakiotekstin alle jäädessään se luettaisiin pikkupränttinä.
+     Rivitys on tehtävä itse — pdf-lib ei katkaise tekstiä, vaan piirtäisi
+     yhden rivin sivun reunan yli. */
+  if (input.customerNote) {
+    const maxWidth = width - margin * 2;
+    const wrapped: string[] = [];
+    for (const para of toWinAnsi(input.customerNote).split(/\r?\n/)) {
+      if (!para.trim()) { wrapped.push(''); continue; }
+      let line = '';
+      for (const word of para.split(/\s+/)) {
+        const test = line ? `${line} ${word}` : word;
+        if (font.widthOfTextAtSize(test, 10) > maxWidth && line) { wrapped.push(line); line = word; }
+        else line = test;
+      }
+      if (line) wrapped.push(line);
+    }
+    /* Katkaistaan jos teksti ei mahdu: mieluummin lyhennetty tarjous kuin
+       alalaidan yli valuva. 2000 merkin raja tekee tästä harvinaisen. */
+    const MAX_LINES = 12;
+    const shown = wrapped.slice(0, MAX_LINES);
+    if (wrapped.length > MAX_LINES) shown[MAX_LINES - 1] = shown[MAX_LINES - 1].slice(0, 80) + '…';
+
+    text('Terveisin:', margin, y, { font: bold, size: 10, color: BRAND_DARK });
+    y -= 15;
+    for (const l of shown) { text(l, margin, y, { size: 10 }); y -= 13; }
+    y -= 12;
+  }
 
   text(`Tarjous on voimassa ${fmtDate(validUntil)} asti. Hinnat sisältävät ALV 25,5 %.`, margin, y, { size: 10, color: GRAY });
   y -= 14;
