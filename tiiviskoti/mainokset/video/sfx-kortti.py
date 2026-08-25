@@ -150,6 +150,37 @@ def build_lampo(out):
     write_wav(out, np.stack([tr, tr], 1), SR)
     print(f'\u2713 {out}  {dur:.2f} s  l\u00e4mp\u00f6tilakontrasti')
 
+def build_saasto(out):
+    """Säästöarviovideo. Ajastus vastaa Saasto.tsx:n S-vakioita:
+    intro 8, pct 30, example 88, bar 104, leakLabel 132, leakNum 142,
+    note 190, seal 218, heal0 226, payoff 282, brand 328."""
+    dur = 16.0
+    tr = np.zeros(int(SR * dur))
+    f = lambda fr: fr / FPS
+
+    tr += bed(dur) * 0.028
+    place(tr, whoosh(0.5, 200, 1300, seed=13), f(6), 0.12)
+    place(tr, tone(600, 0.09, (1.0, 0.3), 10), f(30), 0.075)            # prosentti esiin
+    place(tr, tone(520, 0.08, (1.0, 0.3), 11), f(88), 0.06)             # esimerkkirivi
+    place(tr, whoosh(0.3, 300, 1000, seed=9), f(104), 0.075)            # palkki piirtyy
+    # Euroluku rullaa: naksutus seuraa rullausta, ei tasaista tikitystä.
+    for k in range(9):
+        place(tr, tone(1500 + k * 55, 0.02, (1.0,), 20), f(144 + k * 3.6), 0.024)
+    place(tr, riser(1.1, 220, 3200, seed=17), f(218) - 1.1, 0.08)       # riser iskuun
+    place(tr, tone(96, 0.42, (1.0, 0.55, 0.28), 3.2), f(218), 0.19)     # isku
+    place(tr, tone(1750, 0.05, (1.0, 0.3), 15), f(218) + 0.01, 0.095)
+    place(tr, tone(2600, 0.20, (1.0, 0.35), 7), f(218) + 0.04, 0.05)
+    for k, fr in enumerate((228, 240, 252)):                            # vuoto lakkaa
+        place(tr, tone(523 * (1.26 ** k), 0.28, (1.0, 0.3), 5), f(fr), 0.05)
+    place(tr, tone(660, 0.10, (1.0, 0.35), 9), f(282), 0.07)            # lupaus
+    place(tr, tone(2400, 0.18, (1.0, 0.4), 7), f(328), 0.045)           # tunnus
+
+    peak = np.abs(tr).max()
+    if peak > 0:
+        tr = tr / peak * 0.17
+    write_wav(out, np.stack([tr, tr], 1), SR)
+    print(f'\u2713 {out}  {dur:.2f} s  s\u00e4\u00e4st\u00f6arvio')
+
 VIDEOT = [
     ('kortti-koti', 4),
     ('kortti-veto', 4),
@@ -165,3 +196,4 @@ if __name__ == '__main__':
     for name, n in VIDEOT:
         build(n, f'sfx/{name}.wav')
     build_lampo('sfx/kortti-lampotila.wav')
+    build_saasto('sfx/kortti-saasto-arvio.wav')

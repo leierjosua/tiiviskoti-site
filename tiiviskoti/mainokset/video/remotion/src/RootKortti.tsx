@@ -2,6 +2,7 @@ import React from 'react';
 import { Composition } from 'remotion';
 import { Kortti, totalFrames, KorttiProps } from './Kortti';
 import { Lampotila, LAMPO_FRAMES } from './Lampotila';
+import { Saasto, SAASTO_FRAMES } from './Saasto';
 import { W, H } from './brand';
 
 /* OMA juuri korttivideoille. Root.tsx tuo Short.tsx:n, joka importtaa
@@ -150,6 +151,11 @@ export const KorttiRoot: React.FC = () => (
     <Composition
       id="kortti-lampotila" component={Lampotila}
       durationInFrames={LAMPO_FRAMES}
+      fps={FPS} width={W} height={H}
+    />
+    <Composition
+      id="kortti-saasto-arvio" component={Saasto}
+      durationInFrames={SAASTO_FRAMES}
       fps={FPS} width={W} height={H}
     />
   </>
