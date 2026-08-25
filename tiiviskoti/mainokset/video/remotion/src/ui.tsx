@@ -34,10 +34,15 @@ export const Roll: React.FC<{
 }> = ({ v, fs, color, digits = 2, blur = 0 }) => {
   const h = Math.round(fs * 1.02);
   const av = Math.abs(v);
-  const cols: number[] = [];
+  const cols: Array<{ pos: number; hidden: boolean }> = [];
   for (let d = digits - 1; d >= 0; d--) {
     const unit = Math.pow(10, d);
-    cols.push(d === digits - 1 ? Math.min(Math.floor(av / unit), 9) : (av / unit) % 10);
+    const pos = d === digits - 1 ? Math.min(Math.floor(av / unit), 9) : (av / unit) % 10;
+    /* Etunollat piilotetaan LEVEYS nollaamalla, ei opacityllä: opacity jättäisi
+       aukon ja keskitetty luku näyttäisi olevan väärässä kohdassa. Näin luku
+       kasvaa keskeltä ulos kun numeroita tulee lisää — eikä ruudulle jää
+       lepäämään "000 €", joka näytti rikkinäiseltä. */
+    cols.push({ pos, hidden: d > 0 && Math.floor(av) < unit });
   }
   return (
     <span style={{
@@ -45,9 +50,12 @@ export const Roll: React.FC<{
       fontVariantNumeric: 'tabular-nums', display: 'inline-flex', alignItems: 'flex-start',
       filter: blur > 0.4 ? `blur(${Math.min(blur, 7)}px)` : undefined,
     }}>
-      {cols.map((pos, i) => (
-        <span key={i} style={{ display: 'inline-block', height: h, overflow: 'hidden', verticalAlign: 'top' }}>
-          <span style={{ display: 'block', transform: `translateY(${-pos * h}px)` }}>
+      {cols.map((c, i) => (
+        <span key={i} style={{
+          display: 'inline-block', height: h, overflow: 'hidden', verticalAlign: 'top',
+          width: c.hidden ? 0 : undefined,
+        }}>
+          <span style={{ display: 'block', transform: `translateY(${-c.pos * h}px)` }}>
             {DIGITS.map((d, k) => (
               <span key={k} style={{ display: 'block', height: h, lineHeight: `${h}px` }}>{d}</span>
             ))}
@@ -76,3 +84,24 @@ export const Vignette: React.FC<{ strength?: number }> = ({ strength = 0.5 }) =>
     boxShadow: `inset 0 0 340px 100px rgba(4,14,9,${strength})`, pointerEvents: 'none',
   }} />
 );
+
+/* 4. Kohtaus: sisään, pito, ULOS. Tämä puuttui ensimmäisistä versioista ja
+      se oli koko sotkun syy — elementit vain kasautuivat ruudulle eivätkä
+      poistuneet, ja lopussa katsottavaa oli kahdeksassa paikassa yhtä aikaa.
+      Kohtaus vie yhden ajatuksen kerrallaan. */
+export const Scene: React.FC<{
+  from: number; to: number; children: React.ReactNode; style?: React.CSSProperties;
+}> = ({ from, to, children, style }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  if (frame < from - 2 || frame > to + 14) return null;
+  const inS = spring({ frame: frame - from, fps, config: { damping: 200 }, durationInFrames: 24 });
+  const outS = spring({ frame: frame - to, fps, config: { damping: 200 }, durationInFrames: 16 });
+  return (
+    <div style={{
+      ...style,
+      opacity: inS * (1 - outS),
+      transform: `translateY(${interpolate(inS, [0, 1], [34, 0]) - outS * 30}px)`,
+    }}>{children}</div>
+  );
+};

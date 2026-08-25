@@ -188,11 +188,6 @@ export const Lampotila: React.FC = () => {
           background: 'linear-gradient(180deg, #12293E 0%, #1B4364 40%, #245879 74%, #2B6A8F 100%)',
           clipPath: `inset(${interpolate(coldIn, [0, 1], [100, 0])}% 0 0 0)`,
         }} />
-        {/* kylmä valo ylhäältä */}
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: SEAL_Y, opacity: coldIn * 0.85,
-          background: 'radial-gradient(ellipse 62% 52% at 50% 6%, rgba(173,214,244,.34) 0%, rgba(173,214,244,0) 70%)',
-        }} />
 
         {/* ---------- lämmin sisäpuoli ---------- */}
         <div style={{
@@ -224,9 +219,8 @@ export const Lampotila: React.FC = () => {
             <clipPath id="coldClip"><rect x="0" y="0" width={W} height={SEAL_Y} /></clipPath>
             <clipPath id="warmClip"><rect x="0" y={SEAL_Y} width={W} height={H - SEAL_Y} /></clipPath>
           </defs>
-          <g clipPath="url(#coldClip)" opacity={coldIn}><Snow n={54} /></g>
-          <g clipPath="url(#warmClip)" opacity={warmIn}><Motes n={26} /></g>
-          {new Array(9).fill(0).map((_, i) => (
+          <g clipPath="url(#coldClip)" opacity={coldIn}><Snow n={22} /></g>
+          {new Array(4).fill(0).map((_, i) => (
             <Leak key={i} i={i} sealed={sealed} intensity={intensity} />
           ))}
         </svg>
@@ -266,12 +260,6 @@ export const Lampotila: React.FC = () => {
             }} />
           </div>
         )}
-        <div style={{
-          position: 'absolute', top: SEAL_Y - 13, left: 0, right: 0, height: 26,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 21, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase',
-          color: '#0E3323', opacity: interpolate(sealS, [0.6, 1], [0, 1], { extrapolateLeft: 'clamp' }),
-        }}>Uusi tiiviste</div>
 
         {/* ---------- valkoinen välähdys ---------- */}
         {wash > 0 && (
@@ -331,8 +319,8 @@ export const Lampotila: React.FC = () => {
           fontSize: 46, fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.22, color: '#fff',
           opacity: payoff, transform: `translateY(${interpolate(payoff, [0, 1], [26, 0])}px)`,
         }}>
-          Pidä lämpö sisällä —<br />
-          <span style={{ color: C.mint }}>tiivistä ovet ja ikkunat.</span>
+          Pidä lämpö sisällä.<br />
+          <span style={{ color: C.mint }}>Tiivistä ovet ja ikkunat.</span>
         </div>
 
         <div style={{
@@ -344,7 +332,7 @@ export const Lampotila: React.FC = () => {
             <span style={{ fontWeight: 800, fontSize: 38, letterSpacing: '-0.03em', color: '#fff' }}>TiivisKoti</span>
           </div>
           <span style={{ fontSize: 26, fontWeight: 700, color: 'rgba(255,255,255,.68)' }}>
-            tiiviskoti.fi · ikkuna 95 € · ulko-ovi 119 €
+            tiiviskoti.fi
           </span>
         </div>
       </div>
