@@ -479,9 +479,11 @@ function meistaSivu() {
      juuri väärä signaali. Tilalle nimikirjainmerkki brändin väreissä — se
      kestää katsoa, skaalautuu joka kokoon eikä vanhene.
 
-     Henkilöt itse jäävät sivulle: "oma porukka, ei alihankintaa" on koko
+     Henkilöt itse jäävät sivulle: "oma porukka alusta loppuun" on koko
      sivun myyntiargumentti, joten nimet, roolit ja vastuut ovat edelleen
-     esillä. Vain valokuva on poissa. Todisteet siirretään kuvien sijaan
+     esillä. Vain valokuva on poissa. Sana "alihankinta" poistettiin
+     25.8.2026 Josuan pyynnöstä — argumentti sanotaan nyt myönteisenä
+     (mitä teemme) eikä kiellon kautta (mitä emme teetä). Todisteet siirretään kuvien sijaan
      konkreettisiin faktoihin (Y-tunnus, vakuutus, takuu) alle.
 
      ÄLÄ kirjoita tähän henkilömäärää ("kaksi tekijää", "kahden hengen").
@@ -497,7 +499,7 @@ function meistaSivu() {
     {
       kuva: 'meista-daniel.jpg',
       name: 'Daniel',
-      role: 'Puheenjohtaja &amp; asentaja',
+      role: 'Omistaja &amp; asentaja',
       bio: 'Tekee kartoitukset ja tiivisteasennukset itse työmaalla. Työn hoitaa oma porukkamme alusta loppuun.',
     },
   ];
@@ -548,8 +550,8 @@ ${nav(R)}
 
 <header class="sec" style="padding-bottom:0"><div class="wrap">
   <div class="kicker">Meistä</div>
-  <h1 style="font-size:clamp(34px,4.8vw,54px);max-width:18ch">Oma porukka, ei alihankintaa</h1>
-  <p class="sub" style="max-width:60ch">Meidät tapaat myös työmaalla: oma porukkamme vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ei myyntimiehiä eikä alihankintaa — siksi hinta on kiinteä ja vastuu selvä.</p>
+  <h1 style="font-size:clamp(34px,4.8vw,54px);max-width:18ch">Oma porukka alusta loppuun</h1>
+  <p class="sub" style="max-width:60ch">Meidät tapaat myös työmaalla: oma porukkamme vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ei myyntimiehiä — siksi hinta on kiinteä ja vastuu selvä.</p>
 </div></header>
 
 <div class="wrap" style="padding-top:clamp(18px,2.6vw,26px)">
