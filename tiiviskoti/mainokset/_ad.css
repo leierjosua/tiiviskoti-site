@@ -69,7 +69,8 @@ body{
 .display .hl{color:var(--green)}
 .display .g{color:var(--green)}
 
-.lead{font-size:32px;line-height:1.45;font-weight:500;max-width:840px;color:var(--text)}
+/* 32 px oli syötteessä n. 11,5 pt — rajatapaus. 36 px = n. 13 pt. */
+.lead{font-size:36px;line-height:1.42;font-weight:500;max-width:860px;color:var(--text)}
 
 /* ---- todiste-/lukupaneeli ---------------------------------------------- */
 .proof{display:flex;gap:20px}

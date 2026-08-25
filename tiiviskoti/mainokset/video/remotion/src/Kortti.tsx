@@ -11,6 +11,11 @@ import './font';
    Josua huomautti kahdesti että stilleistä ei käynyt ilmi mitä myydään; kun
    katsoja voi tulla mukaan kesken toiston, sen ei saa olla vain alussa. */
 
+/* Tekstikoot nostettu 25.8. esikatselun perusteella: Reels näkyy puhelimessa
+   n. 390 pt leveänä eli 1080 px skaalautuu 0,36-kertaiseksi. Vanha 20 px
+   alarivi oli ruudulla 7 pt — lukukelvoton. Nyt 28 px = n. 10 pt ja otsikko
+   40 px = n. 14 pt. Kortti myös 760 → 900 px, koska se täytti vain
+   keskikolmanneksen ruudusta. */
 export type Step = { tag: string; title: string; sub: string };
 export type KorttiProps = {
   chip: string;
@@ -157,25 +162,25 @@ export const Kortti: React.FC<KorttiProps> = ({ chip, l1, l2, l3, lead, steps, c
         pointerEvents: 'none',
       }}>
         <div style={{
-          width: 760, background: C.card, borderRadius: 34, padding: '30px 32px 32px',
+          width: 900, background: C.card, borderRadius: 38, padding: '34px 36px 36px',
           boxShadow: '0 34px 90px -26px rgba(8,28,18,.66)',
         }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 16,
             paddingBottom: 22, borderBottom: `2px solid ${C.line}`,
           }}>
-            <Mark size={54} />
+            <Mark size={64} />
             <div>
-              <div style={{ fontSize: 32, fontWeight: 800, color: C.ink, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+              <div style={{ fontSize: 40, fontWeight: 800, color: C.ink, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
                 {cardTitle}
               </div>
-              <div style={{ fontSize: 21, fontWeight: 700, color: C.mute, marginTop: 3 }}>
+              <div style={{ fontSize: 26, fontWeight: 700, color: C.mute, marginTop: 4 }}>
                 tiiviskoti.fi · ei tarjouspyyntöä
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 13, marginTop: 22 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 15, marginTop: 26 }}>
             {steps.map((st, i) => {
               const at = stepsStart + i * STEP_F;
               const on = spring({ frame: frame - at, fps, config: { damping: 15, mass: 0.45 } });
@@ -187,32 +192,32 @@ export const Kortti: React.FC<KorttiProps> = ({ chip, l1, l2, l3, lead, steps, c
               return (
                 <div key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 18,
-                  padding: '15px 16px', borderRadius: 18,
+                  padding: '19px 20px', borderRadius: 20,
                   background: on > 0.2 ? C.softOn : C.soft,
                   border: `2px solid ${active > 0.15 ? C.greenL : 'transparent'}`,
                   transform: `translateX(${interpolate(on, [0, 1], [-16, 0])}px)`,
                   opacity: interpolate(on, [0, 1], [0.32, 1]),
                 }}>
                   <span style={{
-                    width: 50, height: 50, flex: 'none', borderRadius: 15,
-                    display: 'grid', placeItems: 'center', fontSize: 26, fontWeight: 800,
+                    width: 60, height: 60, flex: 'none', borderRadius: 18,
+                    display: 'grid', placeItems: 'center', fontSize: 31, fontWeight: 800,
                     background: done > 0.05 ? C.greenL : on > 0.3 ? C.green : '#DDE6DB',
                     color: on > 0.3 ? '#fff' : C.mute,
                   }}>
-                    {done > 0.05 ? <Tick p={Math.min(1, done)} size={28} /> : i + 1}
+                    {done > 0.05 ? <Tick p={Math.min(1, done)} size={34} /> : i + 1}
                   </span>
                   <span style={{ display: 'block' }}>
                     <span style={{
-                      display: 'block', fontSize: 28, fontWeight: 800, lineHeight: 1.16,
+                      display: 'block', fontSize: 40, fontWeight: 800, lineHeight: 1.14,
                       letterSpacing: '-0.01em', color: on > 0.3 ? C.ink : C.mute,
                     }}>{st.title}</span>
                     <span style={{
-                      display: 'block', fontSize: 20, fontWeight: 500, marginTop: 3,
+                      display: 'block', fontSize: 28, fontWeight: 500, marginTop: 5,
                       color: C.mute, opacity: interpolate(on, [0.3, 1], [0, 1], { extrapolateLeft: 'clamp' }),
                     }}>{st.sub}</span>
                   </span>
                   <span style={{
-                    marginLeft: 'auto', fontSize: 18, fontWeight: 700, color: C.mute,
+                    marginLeft: 'auto', fontSize: 22, fontWeight: 700, color: C.mute,
                     opacity: interpolate(on, [0.3, 1], [0, 0.85], { extrapolateLeft: 'clamp' }),
                     whiteSpace: 'nowrap',
                   }}>{st.tag}</span>

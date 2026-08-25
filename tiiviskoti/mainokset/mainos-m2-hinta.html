@@ -7,6 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="_ad.css" rel="stylesheet">
 <style>
+  /* Esikatselu 25.8. paljasti että syötteessä kuva näkyy n. 390 pt leveänä,
+     eli 1080 px skaalautuu 0,36-kertaiseksi. Merkit (25 px -> 9 pt) ja
+     pikkupräntti (22 px -> 8 pt) olivat lukukelvottomia. Molemmat poistettu,
+     ja jäljelle jäävä teksti nostettu luettavaan kokoon. */
 /* Tämän sarjan kuvat ovat vaaleita (harmaa lautaseinä, valkoiset karmit),
      joten kalvo on vahvempi kuin _ad.css:n oletus ja kicker valkoinen —
      mintunvihreä katoaisi vaaleaan seinään. Sama ratkaisu kuin mainos-ovi. */
@@ -34,8 +38,8 @@
   .prow{display:flex;align-items:baseline;justify-content:space-between;gap:24px;
     padding:16px 26px;border-radius:18px;
     background:rgba(22,58,40,.38);border:1px solid rgba(255,255,255,.20)}
-  .prow span{font-size:29px;font-weight:600;color:#D7E4DB}
-  .prow b{font-size:38px;font-weight:800;color:#8FD3AC;letter-spacing:-.02em;white-space:nowrap}
+  .prow span{font-size:34px;font-weight:600;color:#D7E4DB}
+  .prow b{font-size:46px;font-weight:800;color:#8FD3AC;letter-spacing:-.02em;white-space:nowrap}
 </style>
 </head>
 <body class="on-dark">
@@ -67,7 +71,6 @@
       <div class="divider mt-l"></div>
       <div class="foot" style="margin-top:26px">
         <div class="url">tiiviskoti.fi</div>
-        <div class="fineprint">Lämpökamerakuvaus sisältyy<br>Kotitalousvähennys −40 %</div>
       </div>
   </div></div>
 </body></html>
