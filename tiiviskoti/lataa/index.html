@@ -4,41 +4,517 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>TiivisKoti — mainosaineistot</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Manrope,system-ui,sans-serif;background:#F2F5F0;color:#13201A;
-    padding:22px 16px 60px;line-height:1.5}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#F2F5F0;
+    color:#13201A;padding:22px 16px 60px;line-height:1.5}
   .wrap{max-width:640px;margin:0 auto}
   h1{font-size:26px;letter-spacing:-.02em;margin-bottom:6px}
-  .lead{font-size:15px;color:#5C6B62;margin-bottom:8px}
-  .tip{font-size:14px;color:#5C6B62;background:#E7EFE6;border:1px solid #D8E3D6;
+  .lead{font-size:15px;color:#5C6B62}
+  .tip{font-size:14px;color:#3D4B43;background:#E7EFE6;border:1px solid #D8E3D6;
     border-radius:12px;padding:12px 14px;margin:16px 0 26px}
-  h2{font-size:15px;text-transform:uppercase;letter-spacing:.13em;color:#5C6B62;
-    margin:30px 0 12px}
-  .item{display:flex;align-items:center;gap:13px;background:#fff;border:1px solid #DCE3D9;
-    border-radius:14px;padding:10px;margin-bottom:10px;text-decoration:none;color:inherit}
+  h2{font-size:14px;text-transform:uppercase;letter-spacing:.13em;color:#5C6B62;margin:30px 0 12px}
+  .card{background:#fff;border:1px solid #DCE3D9;border-radius:14px;margin-bottom:10px;overflow:hidden}
+  .item{display:flex;align-items:center;gap:13px;padding:10px;text-decoration:none;color:inherit}
   .item:active{background:#EFF4EE}
   .thumb{width:64px;height:80px;border-radius:9px;overflow:hidden;flex:none;background:#12301F}
-  .thumb.v{height:80px}
   .thumb img,.thumb video{width:100%;height:100%;object-fit:cover;display:block}
   .txt{flex:1;min-width:0}
-  .txt b{display:block;font-size:15px;font-weight:800;letter-spacing:-.01em}
+  .txt b{display:block;font-size:15px;font-weight:700;letter-spacing:-.01em}
   .txt span{display:block;font-size:13px;color:#6B7A70;margin-top:2px}
   .dl{font-size:22px;color:#1D6E46;font-weight:800;padding:0 6px}
+  details{border-top:1px solid #E7ECE4;padding:0 10px 10px}
+  summary{cursor:pointer;font-size:14px;font-weight:700;color:#1D6E46;padding:10px 0}
+  textarea{width:100%;font:14px/1.5 system-ui,sans-serif;color:#13201A;border:1px solid #DCE3D9;
+    border-radius:10px;padding:10px;background:#FAFCF9;resize:vertical;-webkit-user-select:text;user-select:text}
+  .copy{margin-top:8px;width:100%;padding:12px;border:0;border-radius:10px;background:#1D6E46;
+    color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+  .copy.ok{background:#3E9A6C}
 </style>
 </head>
 <body><div class="wrap">
   <h1>Mainosaineistot</h1>
-  <p class="lead">11 videota ja 16 kuvaa. Valmiita someen sellaisenaan.</p>
-  <p class="tip"><b>Puhelimessa:</b> paina riviä ja valitse <b>Lataa</b> tai <b>Tallenna</b>.
-  Jos video aukeaa soittimeen, paina jakokuvaketta → Tallenna videoihin.
-  Videot ovat 1080×1920 (Reels/Stories/Shorts), kuvat 1080×1350 tai 1080×1920.</p>
-
+  <p class="lead">11 videota ja 16 kuvaa, valmiita someen. Jokaisella oma kuvateksti.</p>
+  <p class="tip"><b>iPhone:</b> lataus menee Tiedostot-appiin. Video Kuviin: Tiedostot → paina videota →
+  jakokuvake → <b>Tallenna videoihin</b>. Kuvan saa myös suoraan: paina esikatselua pitkään → <b>Lisää kuvat</b>.<br>
+  <b>Android:</b> lataus menee suoraan galleriaan.<br>
+  Kuvateksteissä ei ole linkkejä — laita osoite biosta.</p>
   <h2>Videot</h2>
+  <div class="card">
+    <a class="item" href="/lataa/dl/video-kortti-veto.mp4" download>
+      <div class="thumb"><video src="video-kortti-veto.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Vetokohdat</b><span>Kortti · 16,6 s · 1.0 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Vetääkö kotona?
 
+Lämpökamerakuvaus näyttää mistä kohdista lämpö karkaa. Karmit ja kynnykset käydään läpi, vanhat tiivisteet vaihdetaan ja oven käynti säädetään — kaikki samalla käynnillä.
+
+Ikkuna 95 €, ulko-ovi 119 €. Pienin käynti 149 €, ja siihen sisältyy matkat, kartoitus ja lämpökamerakuvaus.
+
+Varaa aika profiilista.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/video-kortti-hinta.mp4" download>
+      <div class="thumb"><video src="video-kortti-hinta.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Hinta ennen varausta</b><span>Kortti · 16,6 s · 1.0 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Hinta ennen varausta.
+
+Ei arviolaskuria eikä tarjouspyyntöä. Valitset ovet ja ikkunat, näet kiinteän summan heti ja varaat ajan samasta näkymästä. Sama hinta on myös laskussa.
+
+Ikkuna 95 €, ulko-ovi 119 €, pienin käynti 149 €. Useampi kohde samalla käynnillä laskee kappalehintaa.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/video-kortti-saasto.mp4" download>
+      <div class="thumb"><video src="video-kortti-saasto.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Veto loppuu yhdellä käynnillä</b><span>Kortti · 16,6 s · 1.0 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Veto loppuu yhdellä käynnillä.
+
+Asentaja tulee sovittuna aikana, vuotokohdat katsotaan lämpökameralla, tiivisteet vaihdetaan ja ulko-oveen tulee myös kynnyskumi. Jäljet siivotaan lähtiessä.
+
+Ovet ja ikkunat kannattaa hoitaa samalla kertaa — se on halvempaa kuin erilliset käynnit.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/video-kortti-koti.mp4" download>
+      <div class="thumb"><video src="video-kortti-koti.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Näin varaat verkossa</b><span>Kortti · 16,6 s · 1.0 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Näin varaat tiivistyksen verkossa.
+
+1. Postinumero — näet heti palvelemmeko alueellasi
+2. Valitse ovet ja ikkunat — kiinteä hinta päivittyy
+3. Poimi vapaa aika kalenterista
+4. Yhteystiedot, ja vahvistus tulee sähköpostiin
+
+Ei soittokierrosta eikä tarjouspyyntöä. Koko Uusimaa.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/video-kortti-lampotila.mp4" download>
+      <div class="thumb"><video src="video-kortti-lampotila.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Lämpötilakontrasti −15 / +21</b><span>Konsepti · 16 s · 3.0 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Pakkasta ulkona, lämmin sisällä — tiiviste on se raja niiden välissä.
+
+Kun tiiviste on kulunut, lämpö karkaa raosta ja lämmityskulu nousee. Tiivisteiden vaihto on tunnin homma, ei remontti.
+
+Ikkuna 95 €, ulko-ovi 119 €. Lämpökamerakuvaus sisältyy joka käyntiin.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/video-kortti-saasto-arvio.mp4" download>
+      <div class="thumb"><video src="video-kortti-saasto-arvio.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>10–15 % lämmityskulusta</b><span>Konsepti · 14 s · 2.2 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Vetävä ovi ja ikkuna nostavat lämmityskulua tyypillisesti 10–15 %.
+
+2 000 euron vuosikulusta se on noin 300 € — mutta tämä on esimerkki, ei lupaus. Emme lupaa tiettyä säästöä etukäteen, koska lopputulos riippuu talosta, lämmitystavasta ja siitä kuinka moni kohta vuotaa.
+
+Sen sijaan kuvaamme kohteen lämpökameralla, jolloin näet omat vuotokohtasi.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/video-kortti-taloyhtio.mp4" download>
+      <div class="thumb"><video src="video-kortti-taloyhtio.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Tiivistykset taloyhtiöön</b><span>Taloyhtiö · 14,6 s · 952 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Asutko taloyhtiössä?
+
+Kartoituskäynti on veloitukseton ja sen voi varata verkosta. Käymme ovet ja ikkunat läpi, mittaamme vetokohdat ja annamme kiinteän hinnan kirjallisena ennen työn aloitusta.
+
+Yksi yhteyshenkilö koko urakan ajan. Vie tämä hallitukselle.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/video-kortti-taloyhtio-kartoitus.mp4" download>
+      <div class="thumb"><video src="video-kortti-taloyhtio-kartoitus.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Kartoitus taloyhtiössä</b><span>Taloyhtiö · 16,6 s · 1.1 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Taloyhtiön hallitukselle: näin kartoitus etenee.
+
+1. Varaatte ajan verkosta, alle minuutissa
+2. Kartoituskäynti veloituksetta — mittaamme vetokohdat ja käymme ovet läpi
+3. Kiinteä hinta kirjallisena ennen työn aloitusta
+4. Asennus sovittuna päivänä, yksi yhteyshenkilö
+
+Ei sitoumuksia kartoituksesta.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/tiiviskoti-shorts-1.mp4" download>
+      <div class="thumb"><video src="tiiviskoti-shorts-1.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Shorts 1 — ikkunakoukku</b><span>Puhuva pää · 8.9 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Vetikö sun ikkunat viime talvena?
+
+Karmi- ja puitetiivisteiden vaihto kestää tunnin eikä vaadi remonttia. Ikkuna 95 €, ulko-ovi 119 €.
+
+Lämpökamerakuvaus sisältyy — näet mistä kohdista juuri sinun kodissasi vuotaa.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/tiiviskoti-shorts-2.mp4" download>
+      <div class="thumb"><video src="tiiviskoti-shorts-2.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Shorts 2 — jalkakoukku</b><span>Puhuva pää · 8.2 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Paleliko pikkuvarpaat viime talvena?
+
+Veto tulee useimmiten ulko-oven karmitiivisteestä ja kynnyskumista. Ne ovat halvin kohta korjata ja yleisin syy vetoon.
+
+Ulko-ovi 119 €, ikkuna 95 €. Pienin käynti 149 €.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/tiiviskoti-shorts-3.mp4" download>
+      <div class="thumb"><video src="tiiviskoti-shorts-3.mp4" muted playsinline preload="metadata"></video></div>
+      <div class="txt"><b>Shorts 3 — olohuonekoukku</b><span>Puhuva pää · 10.3 MB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Oliko peitto päällä olohuoneessa viime talvena?
+
+Ei tarvitse ensi talvena. Tiivistämme ovet ja ikkunat kiinteään hintaan, ja ajan varaat verkosta alle minuutissa.
+
+Koko Uusimaa. Kotitalousvähennys pienentää työn osuutta.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
   <h2>Kuvat</h2>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-niukka-lampo.jpg" download>
+      <div class="thumb"><img src="kuva-niukka-lampo.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Pidä lämpö sisällä</b><span>4:5 · 250 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Pidä lämpö sisällä tänä talvena.
 
-</div></body></html>
+Ovien ja ikkunoiden tiivistys kiinteään hintaan. Ikkuna 95 €, ulko-ovi 119 €, pienin käynti 149 € — ja siihen sisältyy matkat, kartoitus ja lämpökamerakuvaus.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-niukka-veto.jpg" download>
+      <div class="thumb"><img src="kuva-niukka-veto.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Vetävä ovi tuntuu joka päivä</b><span>4:5 · 231 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Vetävä ovi tuntuu joka päivä.
+
+Karmitiiviste ja kynnyskumi ovat halvin kohta korjata ja yleisin syy vetoon. Vaihto kestää tunnin. Ulko-ovi 119 €, ikkuna 95 €.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-niukka-hinta.jpg" download>
+      <div class="thumb"><img src="kuva-niukka-hinta.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Hinta ennen varausta</b><span>4:5 · 212 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Hinta ennen varausta.
+
+Ei arviolaskuria eikä tarjouspyyntöä — valitset ovet ja ikkunat ja näet kiinteän summan heti. Useampi kohde samalla käynnillä laskee kappalehintaa.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-niukka-syksy.jpg" download>
+      <div class="thumb"><img src="kuva-niukka-syksy.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Ennen ensimmäisiä pakkasia</b><span>4:5 · 230 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Ennen ensimmäisiä pakkasia.
+
+Tiivisteet kannattaa vaihtaa kun ulkona on vielä lämmintä: kumi asettuu paikalleen, eikä ensimmäinen pakkasyö yllätä. Vapaita aikoja koko Uudellamaalla.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-niukka-taloyhtio.jpg" download>
+      <div class="thumb"><img src="kuva-niukka-taloyhtio.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Koko taloyhtiö kerralla</b><span>4:5 · 240 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Koko taloyhtiö kerralla.
+
+Kartoituskäynti 0 € ja sen voi varata verkosta. Kiinteä hinta kirjallisena ennen työn aloitusta, yksi yhteyshenkilö koko urakan ajan.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-t1-rako.jpg" download>
+      <div class="thumb"><img src="kuva-t1-rako.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Talvi tulee tästä raosta</b><span>4:5 · 234 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Talvi tulee tästä raosta.
+
+Karmin ja puitteen väliin jäänyt rako on se kohta josta vetää. Tiivisteiden vaihto ei vaadi remonttia. Ikkuna 95 €, ulko-ovi 119 €.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-t2-lampo.jpg" download>
+      <div class="thumb"><img src="kuva-t2-lampo.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Vetävä ikkuna maksaa joka kuu</b><span>4:5 · 234 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Vetävä ikkuna maksaa joka kuu.
+
+Vetävä ovi tai ikkuna nostaa lämmityskulua tyypillisesti 10–15 %. Emme lupaa tiettyä säästöä — talo, lämmitystapa ja vuotokohdat ratkaisevat. Lämpökamera näyttää omasi.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-m1-korjaa.jpg" download>
+      <div class="thumb"><img src="kuva-m1-korjaa.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Älä vaihda ovea</b><span>4:5 · 229 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Älä vaihda ovea. Vaihda tiiviste.
+
+Uusi ulko-ovi asennettuna maksaa 2 200–4 900 €. Tiivisteiden vaihto ja käynnin säätö 119 €. Jos ovilehti ja karmi ovat suorassa, tiivistys riittää lähes aina — ja sanomme paikan päällä jos ei riitä.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-m2-hinta.jpg" download>
+      <div class="thumb"><img src="kuva-m2-hinta.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Hinta ennen varausta</b><span>4:5 · 215 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Hinta ennen varausta.
+
+Ei arviolaskuria eikä tarjouspyyntöä — valitset ovet ja ikkunat ja näet kiinteän summan heti. Useampi kohde samalla käynnillä laskee kappalehintaa.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-b1-varaa.jpg" download>
+      <div class="thumb"><img src="kuva-b1-varaa.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Varaa aika verkossa</b><span>4:5 · 202 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Varaa aika verkossa, alle minuutissa.
+
+Ei tarjouspyyntöä eikä soittokierrosta. Valitset ovet ja ikkunat, näet kiinteän hinnan ja poimit vapaan ajan kalenterista.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-b2-syksy.jpg" download>
+      <div class="thumb"><img src="kuva-b2-syksy.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Ennen ensimmäisiä pakkasia</b><span>4:5 · 213 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Ennen ensimmäisiä pakkasia.
+
+Tiivisteet kannattaa vaihtaa kun ulkona on vielä lämmintä: kumi asettuu paikalleen, eikä ensimmäinen pakkasyö yllätä. Vapaita aikoja koko Uudellamaalla.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-kortti-veto.jpg" download>
+      <div class="thumb"><img src="kuva-kortti-veto.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Näin löydät vetokohdat</b><span>9:16 · 106 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Vetävä ovi tuntuu joka päivä.
+
+Karmitiiviste ja kynnyskumi ovat halvin kohta korjata ja yleisin syy vetoon. Vaihto kestää tunnin. Ulko-ovi 119 €, ikkuna 95 €.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-kortti-hinta.jpg" download>
+      <div class="thumb"><img src="kuva-kortti-hinta.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Näin näet kiinteän hinnan</b><span>9:16 · 112 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Hinta ennen varausta.
+
+Ei arviolaskuria eikä tarjouspyyntöä — valitset ovet ja ikkunat ja näet kiinteän summan heti. Useampi kohde samalla käynnillä laskee kappalehintaa.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-kortti-saasto.jpg" download>
+      <div class="thumb"><img src="kuva-kortti-saasto.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Näin veto loppuu</b><span>9:16 · 107 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Pidä lämpö sisällä tänä talvena.
+
+Ovien ja ikkunoiden tiivistys kiinteään hintaan. Ikkuna 95 €, ulko-ovi 119 €, pienin käynti 149 € — ja siihen sisältyy matkat, kartoitus ja lämpökamerakuvaus.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-kortti-taloyhtio.jpg" download>
+      <div class="thumb"><img src="kuva-kortti-taloyhtio.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Näin saat tiivistykset taloyhtiöön</b><span>9:16 · 107 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Koko taloyhtiö kerralla.
+
+Kartoituskäynti 0 € ja sen voi varata verkosta. Kiinteä hinta kirjallisena ennen työn aloitusta, yksi yhteyshenkilö koko urakan ajan.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+  <div class="card">
+    <a class="item" href="/lataa/dl/kuva-kortti-taloyhtio-kartoitus.jpg" download>
+      <div class="thumb"><img src="kuva-kortti-taloyhtio-kartoitus.jpg" alt="" loading="lazy"></div>
+      <div class="txt"><b>Näin kartoitus etenee</b><span>9:16 · 111 kB</span></div>
+      <div class="dl">↓</div>
+    </a>
+    <details>
+      <summary>Kuvateksti</summary>
+      <textarea readonly rows="9">Koko taloyhtiö kerralla.
+
+Kartoituskäynti 0 € ja sen voi varata verkosta. Kiinteä hinta kirjallisena ennen työn aloitusta, yksi yhteyshenkilö koko urakan ajan.
+
+#tiiviskoti #ovientiivistys #ikkunoidentiivistys #veto #lämmityskulut #kotitalousvähennys #uusimaa #omakotitalo #taloyhtiö</textarea>
+      <button type="button" class="copy">Kopioi teksti</button>
+    </details>
+  </div>
+</div>
+<script>
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.copy'); if (!b) return;
+    var ta = b.parentElement.querySelector('textarea');
+    var done = function () { b.textContent = 'Kopioitu ✓'; b.classList.add('ok');
+      setTimeout(function () { b.textContent = 'Kopioi teksti'; b.classList.remove('ok'); }, 1600); };
+    /* Klassinen select+execCommand on tässä varmempi kuin clipboard API:
+       se toimii myös vanhemmissa mobiiliselaimissa ja ilman lupakyselyä. */
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); document.execCommand('copy'); done(); });
+    } else { ta.select(); ta.setSelectionRange(0, 99999); document.execCommand('copy'); done(); }
+  });
+</script>
+</body></html>
