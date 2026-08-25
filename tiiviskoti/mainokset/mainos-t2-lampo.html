@@ -14,7 +14,16 @@
     rgba(18,53,40,.50) 0%, rgba(18,53,40,.16) 20%,
     rgba(18,53,40,.44) 36%, rgba(18,53,40,.88) 52%,
     rgba(18,53,40,.96) 70%, rgba(18,53,40,.99) 100%)}
-  .kicker{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.75)}
+  /* Palvelun nimi EI saa nojata pelkkään tekstiin: valkoinen kicker hukkui
+     vaaleaan lautaseinään, ja kolmesta mainoksesta ei käynyt lainkaan ilmi
+     mitä myydään (Josua 25.8.). Kicker on nyt umpinainen pilleri, ja sama
+     rivi "Ovien & ikkunoiden tiivistys" on kaikissa kuudessa. Vaiheen oma
+     sanoma siirtyi merkkeihin ja leipätekstiin. */
+  .kicker{align-self:flex-start;color:#fff;text-shadow:none;
+    font-size:27px;letter-spacing:.10em;
+    background:rgba(12,38,26,.86);border:1px solid rgba(255,255,255,.26);
+    padding:13px 26px;border-radius:999px}
+  .kicker::before{display:none}
   .badges{display:flex;flex-wrap:wrap;gap:16px;margin-top:32px}
   .badge{display:inline-flex;align-items:center;gap:12px;font-size:25px;font-weight:700;color:#fff;
     background:rgba(22,58,40,.42);border:1px solid rgba(255,255,255,.24);
