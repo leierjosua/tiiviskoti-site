@@ -5,4 +5,7 @@ Allow: /
 # ovat ohutta sisältöä eivätkä kuulu hakutuloksiin.
 Disallow: /brand/
 
+# Latauskansio on oma aineistolinkki puhelimeen, ei hakutuloksiin.
+Disallow: /lataa/
+
 Sitemap: https://tiiviskoti.fi/sitemap.xml
