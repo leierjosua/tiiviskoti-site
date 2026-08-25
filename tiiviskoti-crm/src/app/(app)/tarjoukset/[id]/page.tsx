@@ -61,6 +61,16 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
               <p className="mt-1 whitespace-pre-line text-sm text-text">{offer.customer_note}</p>
             </div>
           )}
+          {offer.inclusions?.length ? (
+            <div className="border-t border-line px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-faint">Työhön sisältyy — näkyi asiakkaalle</p>
+              <ul className="mt-1.5 space-y-1 text-sm text-text">
+                {offer.inclusions.map((i, n) => (
+                  <li key={n} className="flex gap-2"><span className="text-accent">•</span><span>{i}</span></li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           {offer.notes && (
             <div className="border-t border-line px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-faint">Sisäinen muistiinpano</p>

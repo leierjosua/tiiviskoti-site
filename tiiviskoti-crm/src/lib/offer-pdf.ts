@@ -26,6 +26,8 @@ export interface OfferInput {
   totalIncVatCents: number;
   /** Vapaa sana: asiakkaalle näkyvä saateteksti rivien alla. */
   customerNote?: string | null;
+  /** "Työhön sisältyy" -rivit. Tyhjä tai puuttuva jättää osion kokonaan pois. */
+  inclusions?: string[] | null;
 }
 
 const fmtCents = (c: number) => (c / 100).toFixed(2).replace('.', ',');
@@ -63,7 +65,7 @@ export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
   const validUntil = new Date(input.createdAt.getTime() + VALID_DAYS * 24 * 60 * 60 * 1000);
 
   const doc = await PDFDocument.create();
-  const page = doc.addPage([595.28, 841.89]); // A4
+  let page = doc.addPage([595.28, 841.89]); // A4
   const { width, height } = page.getSize();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -75,6 +77,35 @@ export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
   const rightX = (s: string, f: typeof font, size: number, rx: number) => rx - f.widthOfTextAtSize(s, size);
   const line = (x1: number, yy: number, x2: number, color = LIGHT_GRAY) =>
     page.drawLine({ start: { x: x1, y: yy }, end: { x: x2, y: yy }, thickness: 0.5, color });
+
+  /* Rivitys on tehtävä itse — pdf-lib ei katkaise tekstiä, vaan piirtäisi
+     yhden rivin sivun reunan yli. */
+  const wrap = (s: string, f: typeof font, size: number, maxWidth: number): string[] => {
+    const out: string[] = [];
+    for (const para of toWinAnsi(s).split(/\r?\n/)) {
+      if (!para.trim()) { out.push(''); continue; }
+      let cur = '';
+      for (const word of para.split(/\s+/)) {
+        const test = cur ? `${cur} ${word}` : word;
+        if (f.widthOfTextAtSize(test, size) > maxWidth && cur) { out.push(cur); cur = word; }
+        else cur = test;
+      }
+      if (cur) out.push(cur);
+    }
+    return out;
+  };
+
+  /* Tilanvaraus: sisältyy-lista ja vapaa sana venyvät tarjouksen mukana,
+     eikä yksi A4 riitä pitkälle riviluettelolle. Ilman tätä ylivuoto ei
+     näkyisi virheenä vaan tekstinä joka piirtyy sivun alalaidan ALLE —
+     tarjouksesta katoaisi rivejä eikä kukaan huomaisi. Uusi sivu saa saman
+     ylapalkin, jotta se näyttää samalta paperilta. */
+  const ensure = (needed: number) => {
+    if (y - needed >= 80) return;
+    page = doc.addPage([595.28, 841.89]);
+    page.drawRectangle({ x: 0, y: height - 6, width, height: 6, color: BRAND_GREEN });
+    y = height - margin;
+  };
 
   // ylapalkki
   page.drawRectangle({ x: 0, y: height - 6, width, height: 6, color: BRAND_GREEN });
@@ -137,6 +168,7 @@ export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
   y -= 16;
 
   for (const it of input.lines) {
+    ensure(20);
     const tot = it.unitPriceCents * it.quantity;
     text(it.name, c1, y, { size: 10 });
     text(String(it.quantity), c2 + 10, y, { size: 10 });
@@ -177,35 +209,48 @@ export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
   text(gt, rightX(gt, bold, 12, vx), y, { font: bold, size: 12, color: rgb(1, 1, 1) });
   y -= 50;
 
-  /* Vapaa sana ennen vakioehtoja: se on tälle tarjoukselle kirjoitettu
-     viesti, ja vakiotekstin alle jäädessään se luettaisiin pikkupränttinä.
-     Rivitys on tehtävä itse — pdf-lib ei katkaise tekstiä, vaan piirtäisi
-     yhden rivin sivun reunan yli. */
-  if (input.customerNote) {
-    const maxWidth = width - margin * 2;
-    const wrapped: string[] = [];
-    for (const para of toWinAnsi(input.customerNote).split(/\r?\n/)) {
-      if (!para.trim()) { wrapped.push(''); continue; }
-      let line = '';
-      for (const word of para.split(/\s+/)) {
-        const test = line ? `${line} ${word}` : word;
-        if (font.widthOfTextAtSize(test, 10) > maxWidth && line) { wrapped.push(line); line = word; }
-        else line = test;
-      }
-      if (line) wrapped.push(line);
+  /* "Työhön sisältyy" heti summan alla: se on vastaus kysymykseen jonka
+     hinta juuri herätti. Vapaan sanan alle jäädessään se luettaisiin
+     pikkupränttinä — ja juuri tämä lista on se mistä tarjouksen hinta
+     muodostuu. Rivit tulevat tarjoukselta, ei koodista, joten vanhan
+     tarjouksen PDF lupaa yhä sen mitä lähetyshetkellä luvattiin. */
+  const inclusions = (input.inclusions ?? []).filter((i) => i.trim());
+  if (inclusions.length) {
+    const maxWidth = width - margin * 2 - 14;
+    ensure(46);
+    text('TYÖHÖN SISÄLTYY', margin, y, { font: bold, size: 10, color: BRAND_GREEN });
+    y -= 6;
+    line(margin, y, width - margin);
+    y -= 16;
+    for (const item of inclusions) {
+      const rows = wrap(item, font, 9.5, maxWidth);
+      ensure(rows.length * 13 + 4);
+      text('\u2022', margin + 2, y, { size: 9.5, color: BRAND_GREEN });
+      for (const r of rows) { text(r, margin + 14, y, { size: 9.5 }); y -= 13; }
+      y -= 3;
     }
-    /* Katkaistaan jos teksti ei mahdu: mieluummin lyhennetty tarjous kuin
-       alalaidan yli valuva. 2000 merkin raja tekee tästä harvinaisen. */
+    y -= 18;
+  }
+
+  /* Vapaa sana ennen vakioehtoja: se on tälle tarjoukselle kirjoitettu
+     viesti, ja vakiotekstin alle jäädessään se luettaisiin pikkupränttinä. */
+  if (input.customerNote) {
+    const wrapped = wrap(input.customerNote, font, 10, width - margin * 2);
+    /* Katkaistaan jos teksti ei mahdu: mieluummin lyhennetty saateteksti
+       kuin tarjous jonka rivit työntyvät toiselle sivulle saatteen alta.
+       2000 merkin raja tekee tästä harvinaisen. */
     const MAX_LINES = 12;
     const shown = wrapped.slice(0, MAX_LINES);
     if (wrapped.length > MAX_LINES) shown[MAX_LINES - 1] = shown[MAX_LINES - 1].slice(0, 80) + '…';
 
+    ensure(shown.length * 13 + 27);
     text('Terveisin:', margin, y, { font: bold, size: 10, color: BRAND_DARK });
     y -= 15;
     for (const l of shown) { text(l, margin, y, { size: 10 }); y -= 13; }
     y -= 12;
   }
 
+  ensure(42);
   text(`Tarjous on voimassa ${fmtDate(validUntil)} asti. Hinnat sisältävät ALV 25,5 %.`, margin, y, { size: 10, color: GRAY });
   y -= 14;
   text('Työn osuudesta voi saada kotitalousvähennystä — osuus on eritelty yllä.', margin, y, { size: 9, color: GRAY });

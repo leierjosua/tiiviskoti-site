@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState } from 'react';
 import { Button, Card, CardHeader, ErrorNote, Field, Input, OkNote, Textarea, cx } from '@/components/ui';
 import { SubmitButton } from '@/components/submit';
 import { TYPES, EXTRAS, computePricing, type CustomLine } from '@/lib/pricing';
+import { DEFAULT_INCLUSIONS, MAX_INCLUSIONS, MAX_INCLUSION_LEN } from '@/lib/inclusions';
 import { sendProspectOffer, lookupTravelFee, type ActionState } from '../actions';
 
 const eur = (n: number) => n.toLocaleString('fi-FI', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €';
@@ -34,6 +35,11 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
   const talo = kind === 'taloyhtio';
   const [state, action] = useActionState<ActionState, FormData>(sendProspectOffer, {});
   const [custom, setCustom] = useState<CustomLine[]>([{ name: '', qty: 1, unit: 0 }]);
+  /* Vakiolista tarjouksen mukana: nämä kuuluvat jokaiseen tiivistykseen,
+     mutta rivejä voi muokata, poistaa ja lisätä — jokainen kohde on vähän
+     erilainen, ja tarjoukseen kirjoitettu lupaus on juuri se mitä
+     kohteessa tehdään. */
+  const [inclusions, setInclusions] = useState<string[]>([...DEFAULT_INCLUSIONS]);
 
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [extras, setExtras] = useState<Record<string, boolean>>({});
@@ -205,6 +211,57 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
               <Input name="discountLabel" value={discountLabel}
                 onChange={(e) => setDiscountLabel(e.target.value)} placeholder="Alennus" />
             </Field>
+          </div>
+        </Card>
+
+        <Card>
+          <CardHeader
+            title="Työhön sisältyy"
+            action={
+              <button
+                type="button"
+                onClick={() => setInclusions([...DEFAULT_INCLUSIONS])}
+                className="text-xs text-muted hover:text-text"
+              >
+                Palauta oletukset
+              </button>
+            }
+          />
+          <div className="p-4">
+            <p className="mb-3 text-xs text-faint">
+              NÄKYY ASIAKKAALLE — tulee tarjouksen PDF:ään ja sähköpostiin summan alle.
+              Muokkaa, poista tai lisää rivejä tämän kohteen mukaan.
+            </p>
+            <div className="space-y-2">
+              {inclusions.map((row, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span aria-hidden className="text-accent">•</span>
+                  <Input
+                    name={`inclusion_${i}`} value={row} maxLength={MAX_INCLUSION_LEN}
+                    aria-label={`Sisältyy-rivi ${i + 1}`}
+                    onChange={(e) => setInclusions((r) => r.map((v, n) => (n === i ? e.target.value : v)))}
+                    placeholder="Esim. Vanhojen tiivisteiden poisto ja pintojen puhdistus" />
+                  <button
+                    type="button" aria-label={`Poista sisältyy-rivi ${i + 1}`}
+                    onClick={() => setInclusions((r) => r.filter((_, n) => n !== i))}
+                    className="h-8 w-8 shrink-0 rounded-lg border border-line text-muted hover:text-danger">×</button>
+                </div>
+              ))}
+              {inclusions.length === 0 && (
+                <p className="text-sm text-muted">Osio jätetään pois tarjouksesta.</p>
+              )}
+            </div>
+            <div className="mt-3">
+              <Button
+                type="button" variant="outline" className="text-xs"
+                disabled={inclusions.length >= MAX_INCLUSIONS}
+                onClick={() => setInclusions((r) => [...r, ''])}>
+                + Lisää rivi
+              </Button>
+              {inclusions.length >= MAX_INCLUSIONS && (
+                <span className="ml-3 text-xs text-faint">Enintään {MAX_INCLUSIONS} riviä.</span>
+              )}
+            </div>
           </div>
         </Card>
 

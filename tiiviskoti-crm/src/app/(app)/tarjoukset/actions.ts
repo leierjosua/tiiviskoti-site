@@ -8,6 +8,7 @@ import { requireManager } from '@/lib/session';
 import { areaForPostal, getOffer, type OfferLine } from '@/lib/data';
 import { computePricing, TYPES, EXTRAS, type CustomLine } from '@/lib/pricing';
 import { generateOfferPdf } from '@/lib/offer-pdf';
+import { MAX_INCLUSIONS, cleanInclusions } from '@/lib/inclusions';
 import { sendMail } from '@/lib/google';
 import { offerEmailSubject, offerEmailHtml, offerEmailText } from '@/lib/mail-templates';
 
@@ -69,6 +70,13 @@ function readCustomLines(formData: FormData): CustomLine[] {
   return out;
 }
 
+/** "Työhön sisältyy" -rivit lomakkeelta: inclusion_0, inclusion_1, … */
+function readInclusions(formData: FormData): string[] {
+  const rows: string[] = [];
+  for (let i = 0; i < MAX_INCLUSIONS; i++) rows.push(String(formData.get(`inclusion_${i}`) ?? ''));
+  return cleanInclusions(rows);
+}
+
 /** Matkalisä postinumerosta (senteissä) — käytetään laskurin esikatselussa. */
 export async function lookupTravelFee(postal: string): Promise<{ cents: number; area: string | null }> {
   if (!/^\d{5}$/.test(postal)) return { cents: 0, area: null };
@@ -77,11 +85,17 @@ export async function lookupTravelFee(postal: string): Promise<{ cents: number; 
 }
 
 /** Luo tarjous, lähetä se PDF:nä sähköpostilla ja tallenna tk.offers:iin. */
-/* Onko db/020 ajettu. Vasta epäonnistunut kirjoitus kertoo sen, joten
-   oletetaan kyllä ja korjataan kerran ajossa. */
+/* Onko db/020 ja db/022 ajettu. Vasta epäonnistunut kirjoitus kertoo sen,
+   joten oletetaan kyllä ja korjataan kerran ajossa. */
 let customerNoteColumnExists = true;
-const isUndefinedColumn = (e: unknown) =>
-  typeof e === 'object' && e !== null && (e as { code?: string }).code === '42703';
+let inclusionsColumnExists = true;
+
+/** Puuttuvan sarakkeen (42703) virheteksti — siitä selviää MIKÄ puuttui. */
+const undefinedColumn = (e: unknown): string | null => {
+  if (typeof e !== 'object' || e === null) return null;
+  const err = e as { code?: string; message?: string };
+  return err.code === '42703' ? (err.message ?? '') : null;
+};
 
 export async function sendProspectOffer(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requireManager();
@@ -108,6 +122,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   const discount = Math.max(0, Number(formData.get('discount')) || 0);
   const discountLabel = String(formData.get('discountLabel') ?? '').trim() || undefined;
   const custom = readCustomLines(formData);
+  const inclusions = readInclusions(formData);
   const pricing = computePricing(counts, extras, { travelFee, discount, discountLabel, custom });
 
   if (pricing.total <= 0) return { error: 'Lisää vähintään yksi palvelu tai vapaa rivi tarjoukseen.' };
@@ -127,35 +142,47 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
      `customer_note` kirjoitetaan vain jos sarake on olemassa: db/020 ajetaan
      käsin postgres-roolilla, ja tarjous on tärkeämpi kuin sen saateteksti.
      Sama varautuminen kuin lead-insert.ts:ssä. Lippu nollautuu deployssa. */
-  const insertOffer = (withNote: boolean) => sql<{ id: string; offer_number: string }[]>`
+  const insertOffer = (withNote: boolean, withInclusions: boolean) => sql<{ id: string; offer_number: string }[]>`
     insert into tk.offers
       (kind, contact_name, customer_name, email, phone, address, postal_code, city, lines,
        total_cents, travel_fee_cents, notes, valid_until, status
-       ${withNote ? sql`, customer_note` : sql``})
+       ${withNote ? sql`, customer_note` : sql``}
+       ${withInclusions ? sql`, inclusions` : sql``})
     values
       (${d.kind}, ${d.contactName ?? null},
        ${d.customerName}, ${d.email}, ${d.phone ?? null}, ${d.address ?? null},
        ${d.postalCode || null}, ${d.city ?? null}, ${sql.json(lines)},
        ${totalCents}, ${travelCents}, ${d.notes ?? null}, ${validUntil},
        ${d.mode === 'draft' ? 'draft' : 'sent'}::tk.offer_status
-       ${withNote ? sql`, ${d.customerNote ?? null}` : sql``})
+       ${withNote ? sql`, ${d.customerNote ?? null}` : sql``}
+       ${withInclusions ? sql`, ${inclusions}` : sql``})
     returning id, offer_number
   `;
 
-  let offer: { id: string; offer_number: string };
-  try {
-    [offer] = await insertOffer(customerNoteColumnExists);
-  } catch (e) {
-    /* 22P02 = enumissa ei ole 'draft'-arvoa (db/021 ajamatta). Kerrotaan se
-       suoraan eikä anneta kaatua tuntemattomaan virheeseen: käyttäjä ei voi
-       arvata että kyse on ajamattomasta migraatiosta. */
-    if (typeof e === 'object' && e !== null && (e as { code?: string }).code === '22P02') {
-      return { error: 'Luonnoksena tallennus vaatii migraation db/021_offer_status_draft.sql. Aja se Supabasen SQL-editorissa, tai lähetä tarjous sähköpostilla.' };
+  /* Sarake voi puuttua molemmista lisäyksistä (db/020, db/022), joten
+     yritetään uudelleen kunnes kirjoitus menee läpi — kumpi puuttui,
+     selviää vain virheen tekstistä. Tarjous on aina tärkeämpi kuin sen
+     saateteksti tai sisältyy-lista. */
+  let offer: { id: string; offer_number: string } | undefined;
+  for (let attempt = 0; !offer; attempt++) {
+    try {
+      [offer] = await insertOffer(customerNoteColumnExists, inclusionsColumnExists);
+    } catch (e) {
+      /* 22P02 = enumissa ei ole 'draft'-arvoa (db/021 ajamatta). Kerrotaan se
+         suoraan eikä anneta kaatua tuntemattomaan virheeseen: käyttäjä ei voi
+         arvata että kyse on ajamattomasta migraatiosta. */
+      if (typeof e === 'object' && e !== null && (e as { code?: string }).code === '22P02') {
+        return { error: 'Luonnoksena tallennus vaatii migraation db/021_offer_status_draft.sql. Aja se Supabasen SQL-editorissa, tai lähetä tarjous sähköpostilla.' };
+      }
+      const missing = attempt < 2 ? undefinedColumn(e) : null;
+      if (missing?.includes('inclusions')) {
+        console.error('tarjous: tk.offers.inclusions puuttuu — aja db/022. Tarjous tallennetaan ilman sisältyy-listaa.');
+        inclusionsColumnExists = false;
+      } else if (missing?.includes('customer_note')) {
+        console.error('tarjous: tk.offers.customer_note puuttuu — aja db/020. Tarjous tallennetaan ilman vapaata sanaa.');
+        customerNoteColumnExists = false;
+      } else throw e;
     }
-    if (!isUndefinedColumn(e)) throw e;
-    console.error('tarjous: tk.offers.customer_note puuttuu — aja db/020. Tarjous tallennetaan ilman vapaata sanaa.');
-    customerNoteColumnExists = false;
-    [offer] = await insertOffer(false);
   }
 
   let pdf: Uint8Array;
@@ -176,6 +203,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
       lines: lines.map((l) => ({ name: l.name, quantity: l.quantity, unitPriceCents: l.unit_price_cents })),
       totalIncVatCents: totalCents,
       customerNote: d.customerNote ?? null,
+      inclusions,
     });
   } catch (e) {
     await sql`update tk.offers set error = ${(e as Error).message} where id = ${offer.id}`;
@@ -194,6 +222,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
     totalCents,
     validDays: OFFER_VALID_DAYS,
     customerNote: d.customerNote ?? null,
+    inclusions,
   };
 
   /* Luonnos: rivi on tallessa ja PDF ladattavissa tarjouksen sivulta.
@@ -273,6 +302,7 @@ export async function sendSavedOffer(_prev: ActionState, formData: FormData): Pr
       lines: offer.lines.map((l) => ({ name: l.name, quantity: l.quantity, unitPriceCents: l.unit_price_cents })),
       totalIncVatCents: offer.total_cents,
       customerNote: offer.customer_note ?? null,
+      inclusions: offer.inclusions ?? null,
     });
   } catch (e) {
     return { error: `PDF:n luonti epäonnistui: ${(e as Error).message}` };
@@ -288,6 +318,7 @@ export async function sendSavedOffer(_prev: ActionState, formData: FormData): Pr
     totalCents: offer.total_cents,
     validDays: OFFER_VALID_DAYS,
     customerNote: offer.customer_note ?? null,
+    inclusions: offer.inclusions ?? null,
   };
 
   try {

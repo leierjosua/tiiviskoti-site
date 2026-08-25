@@ -431,6 +431,8 @@ export type OfferEmailData = {
   validDays: number;
   /** Vapaa sana: asiakkaalle kirjoitettu saateteksti. Sama teksti kuin PDF:ssä. */
   customerNote?: string | null;
+  /** "Työhön sisältyy" -rivit. Sama lista kuin PDF:ssä; tyhjä jättää osion pois. */
+  inclusions?: string[] | null;
 };
 
 export function offerEmailSubject(data: OfferEmailData): string {
@@ -439,6 +441,7 @@ export function offerEmailSubject(data: OfferEmailData): string {
 
 export function offerEmailHtml(data: OfferEmailData): string {
   const workCents = Math.round(data.totalCents * 0.9);
+  const inclusions = (data.inclusions ?? []).filter((i) => i.trim());
   const rows = data.lines.map((l) => `
     <tr>
       <td style="padding:9px 0;border-bottom:1px solid #E6E2DA;color:${INK};font-size:15px">
@@ -486,6 +489,19 @@ export function offerEmailHtml(data: OfferEmailData): string {
     </table>
   </td></tr>
 
+  ${inclusions.length ? `<tr><td style="padding:22px 28px 0">
+    <div style="border:1px solid #E6E2DA;border-radius:10px;padding:16px 18px">
+      <div style="color:${GREEN};font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Työhön sisältyy</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px">
+        ${inclusions.map((i) => `
+        <tr>
+          <td width="16" valign="top" style="color:${GREEN};font-size:15px;line-height:1.6">&bull;</td>
+          <td style="color:${INK};font-size:14px;line-height:1.6;padding-bottom:4px">${esc(i)}</td>
+        </tr>`).join('')}
+      </table>
+    </div>
+  </td></tr>` : ''}
+
   ${data.customerNote ? `<tr><td style="padding:22px 28px 0">
     <div style="background:${CREAM};border-radius:10px;padding:16px 18px;color:${INK};font-size:15px;line-height:1.7;white-space:pre-line">${esc(data.customerNote)}</div>
   </td></tr>` : ''}
@@ -511,11 +527,13 @@ export function offerEmailHtml(data: OfferEmailData): string {
 }
 
 export function offerEmailText(data: OfferEmailData): string {
+  const inclusions = (data.inclusions ?? []).filter((i) => i.trim());
   return [
     `Kiitos yhteydenotosta, ${firstName(data.customerName)}!`,
     '',
     `Liitteenä tarjous ${data.jobNumber}, yhteensä ${eur(data.totalCents)} (sis. ALV 25,5 %).`,
     `Tarjous on voimassa ${data.validDays} päivää. Työn osuus on eritelty kotitalousvähennystä varten.`,
+    ...(inclusions.length ? ['', 'Työhön sisältyy:', ...inclusions.map((i) => `- ${i}`)] : []),
     ...(data.customerNote ? ['', data.customerNote] : []),
     'Hyväksy tarjous vastaamalla tähän viestiin tai soittamalla.',
     '',

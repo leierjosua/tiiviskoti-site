@@ -41,6 +41,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     })),
     totalIncVatCents: offer.total_cents,
     customerNote: offer.customer_note ?? null,
+    inclusions: offer.inclusions ?? null,
   });
 
   return new Response(Buffer.from(pdf), {

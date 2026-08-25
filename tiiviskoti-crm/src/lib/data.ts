@@ -309,6 +309,10 @@ export type OfferRow = {
   /* Vapaa sana: asiakkaalle näkynyt saateteksti PDF:ssä ja sähköpostissa.
      undefined = db/020 ajamatta, null = ei kirjoitettu. */
   customer_note?: string | null;
+  /* "Työhön sisältyy" -rivit sellaisina kuin ne lähtivät asiakkaalle.
+     undefined = db/022 ajamatta, null = tarjous tehty ennen saraketta,
+     tyhjä lista = osio jätetty tietoisesti pois. */
+  inclusions?: string[] | null;
   /* 'draft' = tallennettu mutta EI lähetetty (db/021). */
   status: 'draft' | 'sent' | 'accepted' | 'declined' | 'expired';
   valid_until: string | null;
@@ -327,29 +331,41 @@ export async function listOffers(): Promise<OfferRow[]> {
   `;
 }
 
-/* Onko db/020 ajettu. Kysely kertoo sen vasta epäonnistuessaan, joten
-   oletetaan kyllä ja korjataan kerran ajossa. Lippu nollautuu deployssa. */
+/** Puuttuvan sarakkeen (42703) virheteksti, muuten null. */
+function undefinedColumn(e: unknown): string | null {
+  if (typeof e !== 'object' || e === null) return null;
+  const err = e as { code?: string; message?: string };
+  return err.code === '42703' ? (err.message ?? '') : null;
+}
+
+/* Onko db/020 / db/022 ajettu. Kysely kertoo sen vasta epäonnistuessaan,
+   joten oletetaan kyllä ja korjataan kerran ajossa. Liput nollautuvat
+   deployssa. */
 let offerCustomerNoteExists = true;
+let offerInclusionsExists = true;
 
 export async function getOffer(id: string): Promise<OfferRow | null> {
-  const run = (withNote: boolean) => sql<OfferRow[]>`
+  const run = (withNote: boolean, withInclusions: boolean) => sql<OfferRow[]>`
     select id, offer_number, kind, contact_name, customer_name, email, phone, address,
            postal_code, city, lines, total_cents, travel_fee_cents, notes, status,
            valid_until, provider_id, error, sent_at, created_at
            ${withNote ? sql`, customer_note` : sql``}
+           ${withInclusions ? sql`, inclusions` : sql``}
       from tk.offers where id = ${id}
   `;
-  try {
-    const [row] = await run(offerCustomerNoteExists);
-    return row ?? null;
-  } catch (e) {
-    /* Sarake puuttuu (db/020 ajamatta): tarjous on tärkeämpi kuin sen
-       saateteksti, joten näytetään tarjous ilman sitä. */
-    if (typeof e === 'object' && e !== null && (e as { code?: string }).code === '42703') {
-      offerCustomerNoteExists = false;
-      const [row] = await run(false);
+  /* Sarake puuttuu (migraatio ajamatta): tarjous on tärkeämpi kuin sen
+     saateteksti tai sisältyy-lista, joten näytetään tarjous ilman niitä.
+     Kumpi sarake puuttui, selviää vain virheen tekstistä — ja molemmat
+     voivat puuttua, joten yritetään uudelleen kunnes kysely menee läpi. */
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const [row] = await run(offerCustomerNoteExists, offerInclusionsExists);
       return row ?? null;
+    } catch (e) {
+      const missing = attempt < 2 ? undefinedColumn(e) : null;
+      if (missing?.includes('inclusions')) offerInclusionsExists = false;
+      else if (missing?.includes('customer_note')) offerCustomerNoteExists = false;
+      else throw e;
     }
-    throw e;
   }
 }
