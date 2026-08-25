@@ -190,8 +190,21 @@ function readCampaign(){
    putkimerkkejä ("Taloyhtiö | Uusimaa"). Ne eivät kelpaa sellaisenaan, mutta
    niiden hylkääminen hukkaisi juuri sen tiedon jota ollaan hakemassa —
    siivotaan siis muotoon jonka kanta hyväksyy. */
+/* Meta koodaa {{campaign.name}}-makron arvon kertaalleen itse, ja osoiterivi
+   koodaa sen toistamiseen. URLSearchParams purkaa vain yhden kerroksen, joten
+   "Taloyhtiöt" saapuu tänne muodossa "Taloyhti%C3%B6t" ja siivous tekisi siitä
+   "taloyhti-c3-b6t". Puretaan jäljelle jäänyt kerros ennen siivousta. */
+function decodeCampaign(raw){
+  let v = String(raw || '');
+  for(let i=0; i<2 && /%[0-9a-fA-F]{2}/.test(v); i++){
+    try{ const d = decodeURIComponent(v); if(d === v) break; v = d; }
+    catch(_){ break; } /* vajaa %-jono: parempi siivota kuin hylätä koko nimi */
+  }
+  return v;
+}
+
 function normalizeCampaign(raw){
-  const v = String(raw || '')
+  const v = decodeCampaign(raw)
     .toLowerCase()
     /* Skandit ennen siivousta, muuten "kipukärki" -> "kipuk-rki" ja
        "Taloyhtiö (pää)" -> "taloyhti-p". Mainosten nimissä on ääkkösiä. */

@@ -35,7 +35,14 @@
     if (named) {
       /* Mainostyökalujen nimissä on välilyöntejä ja isoja kirjaimia. */
       /* Skandit ensin, muuten ääkköset katoavat ja nimi menee tunnistamattomaksi. */
-      var v = String(named).toLowerCase().replace(/[äàáâã]/g,'a').replace(/[öòóôõ]/g,'o').replace(/å/g,'a').replace(/ü/g,'u').replace(/[éèêë]/g,'e')
+      /* Meta koodaa makron arvon kahdesti; URLSearchParams purkaa vain yhden
+         kerroksen. Ks. decodeCampaign _shared.js:ssä. */
+      var dec = String(named);
+      for (var i = 0; i < 2 && /%[0-9a-fA-F]{2}/.test(dec); i++) {
+        try { var d = decodeURIComponent(dec); if (d === dec) break; dec = d; }
+        catch (e2) { break; }
+      }
+      var v = dec.toLowerCase().replace(/[äàáâã]/g,'a').replace(/[öòóôõ]/g,'o').replace(/å/g,'a').replace(/ü/g,'u').replace(/[éèêë]/g,'e')
         .replace(/[^a-z0-9._-]+/g, '-')
         .replace(/-{2,}/g, '-').replace(/^[-._]+/, '').replace(/[-._]+$/, '')
         .slice(0, 60);
