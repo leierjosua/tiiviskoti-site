@@ -1,0 +1,5 @@
+# Renderöinnin välituotteet: mykkä video ja syntetisoitu ääni syntyvät
+# uudelleen komennoilla, valmis muksattu tiedosto riittää versionhallintaan.
+remotion/out/*.mp4
+!remotion/out/*-valmis.mp4
+sfx/*.wav
