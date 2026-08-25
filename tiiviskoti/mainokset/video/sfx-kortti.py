@@ -74,33 +74,81 @@ def build(n_steps, out):
     print(f'✓ {out}  {dur:.2f} s  {n_steps} askelta')
 
 
+def bed(dur, seed=77):
+    """Jatkuva pohja: ulkona tuulen huminaa, tiivisteen jälkeen huoneen hiljaisuus.
+    Ilman pohjaa isku putoaa tyhjyyteen ja koko raita kuulostaa halvalta —
+    kalliissa videossa on aina jotain taustalla."""
+    n = int(SR * dur)
+    x = np.random.RandomState(seed).normal(0, 1, n)
+    # kaksi alipäästöä peräkkäin → pehmeä humina, ei sihinää
+    y = np.zeros(n); p1 = p2 = 0.0
+    a = 1 - np.exp(-2 * np.pi * 420 / SR)
+    for i in range(n):
+        p1 += a * (x[i] - p1)
+        p2 += a * (p1 - p2)
+        y[i] = p2
+    # Huippunormalisointi tekisi pohjasta lähes kuulumattoman: kaksi
+    # alipäästöä pudottaa RMS:n murto-osaan huipusta. Normalisoidaan siksi
+    # TEHOLLISARVON mukaan, jolloin pohja on oikeasti läsnä.
+    y /= (np.sqrt((y ** 2).mean()) or 1)
+    t = np.arange(n) / SR
+    # hidas aaltoilu, ettei pohja ole kuollut
+    y *= 0.75 + 0.25 * np.sin(2 * np.pi * 0.11 * t)
+    # tiiviste framella 205 = 8,2 s: ulkoilma vaimenee selvästi
+    seal = 205 / FPS
+    duck = np.clip(np.interp(t, [seal - 0.1, seal + 0.5], [1.0, 0.38]), 0.38, 1.0)
+    return y * duck
+
+def riser(dur, f0=140, f1=3000, seed=21):
+    """Nouseva kohina ennen iskua. Tämä on se temppu joka saa iskun tuntumaan
+    isolta: korva ennakoi huipun, joten itse isku ei tule tyhjästä."""
+    n = int(SR * dur)
+    x = np.random.RandomState(seed).normal(0, 1, n)
+    sweep = np.geomspace(f0, f1, n)
+    y = np.zeros(n); prev = 0.0
+    for i in range(n):
+        alpha = 1 - np.exp(-2 * np.pi * sweep[i] / SR)
+        prev += alpha * (x[i] - prev); y[i] = prev
+    return y * np.linspace(0, 1, n) ** 2.2
+
 def build_lampo(out):
-    """Lämpötilavideo: eri rakenne kuin korteissa, ei askelia.
-    Ajastus vastaa Lampotila.tsx:n jousia (kylmä 6, lämmin 34, tiiviste 112,
-    lupaus 168, tunnus 206) — muuta molempiin jos muutat toista."""
-    dur = 14.0
+    """Lämpötilavideo. Ajastus vastaa Lampotila.tsx:n L-vakioita:
+    coldNum 14, warmIn 55, warmNum 68, leakStart 104, drop 148–196,
+    seal 205, recover 214–252, payoff 262, brand 306. Muuta molempiin."""
+    dur = 16.0
     tr = np.zeros(int(SR * dur))
     f = lambda fr: fr / FPS
 
-    place(tr, whoosh(0.42, 220, 1400, seed=11), f(6) - 0.05, 0.14)      # kylmä puoli sisään
-    place(tr, whoosh(0.40, 300, 1100, seed=5), f(34) - 0.05, 0.12)      # lämmin puoli sisään
-    # Lukujen pyöriminen: hyvin hiljainen naksutus, ei tikitystä joka sekunti.
-    for k in range(6):
-        place(tr, tone(1900 + k * 40, 0.02, (1.0,), 20), f(12 + k * 5), 0.022)
-    for k in range(6):
-        place(tr, tone(1500 + k * 40, 0.02, (1.0,), 20), f(40 + k * 5), 0.022)
-    # Tiiviste napsahtaa: matala tömäys + kirkas naps, tämä on videon käänne.
-    place(tr, tone(120, 0.30, (1.0, 0.6, 0.3), 4), f(112), 0.17)
-    place(tr, tone(1750, 0.05, (1.0, 0.3), 15), f(112) + 0.01, 0.10)
-    place(tr, tone(2500, 0.14, (1.0, 0.35), 8), f(112) + 0.05, 0.045)
-    place(tr, tone(660, 0.09, (1.0, 0.35), 9), f(168), 0.085)           # lupaus
-    place(tr, tone(2400, 0.16, (1.0, 0.4), 7), f(206), 0.05)            # tunnus
+    tr += bed(dur) * 0.030                                              # jatkuva pohja
+    place(tr, whoosh(0.5, 180, 1200, seed=11), f(2), 0.13)              # kylmä maailma
+    for k in range(7):                                                   # luku rullaa
+        place(tr, tone(1950 + k * 30, 0.018, (1.0,), 22), f(16 + k * 4), 0.020)
+    place(tr, whoosh(0.46, 260, 900, seed=5), f(55), 0.11)              # lämmin puoli
+    for k in range(7):
+        place(tr, tone(1520 + k * 30, 0.018, (1.0,), 22), f(70 + k * 4), 0.020)
+
+    # Veto voimistuu: hiljainen humina joka kasvaa kohti iskua.
+    leak = riser(f(205) - f(104), 90, 900, seed=33)
+    place(tr, leak, f(104), 0.055)
+
+    # Riser ja isku.
+    place(tr, riser(1.2, 200, 3600, seed=21), f(205) - 1.2, 0.085)
+    place(tr, tone(96, 0.44, (1.0, 0.55, 0.28), 3.2), f(205), 0.20)     # matala tömäys
+    place(tr, tone(1750, 0.05, (1.0, 0.3), 15), f(205) + 0.01, 0.10)    # naps
+    place(tr, tone(2600, 0.20, (1.0, 0.35), 7), f(205) + 0.04, 0.05)    # kimallus
+
+    # Lämpö palaa: nouseva kolmisointu.
+    for k, fr in enumerate((214, 226, 238)):
+        place(tr, tone(523 * (1.26 ** k), 0.30, (1.0, 0.3), 5), f(fr), 0.055)
+
+    place(tr, tone(660, 0.10, (1.0, 0.35), 9), f(262), 0.075)           # lupaus
+    place(tr, tone(2400, 0.18, (1.0, 0.4), 7), f(306), 0.045)           # tunnus
 
     peak = np.abs(tr).max()
     if peak > 0:
-        tr = tr / peak * 0.16
+        tr = tr / peak * 0.17
     write_wav(out, np.stack([tr, tr], 1), SR)
-    print(f'✓ {out}  {dur:.2f} s  lämpötilakontrasti')
+    print(f'\u2713 {out}  {dur:.2f} s  l\u00e4mp\u00f6tilakontrasti')
 
 VIDEOT = [
     ('kortti-koti', 4),
