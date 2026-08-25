@@ -12,7 +12,7 @@ from scipy_less import write_wav
 
 SR = 48000
 FPS = 25
-TITLE_F, STEP_F, TAIL_F, CTA_F = 92, 70, 34, 104
+TITLE_F, STEP_F, TAIL_F, CTA_F = 92, 48, 26, 104
 
 def env(n, attack, decay, curve=3.0):
     a = int(SR * attack); d = max(n - a, 1)
@@ -73,8 +73,47 @@ def build(n_steps, out):
     write_wav(out, np.stack([tr, tr], 1), SR)
     print(f'✓ {out}  {dur:.2f} s  {n_steps} askelta')
 
+
+def build_lampo(out):
+    """Lämpötilavideo: eri rakenne kuin korteissa, ei askelia.
+    Ajastus vastaa Lampotila.tsx:n jousia (kylmä 6, lämmin 34, tiiviste 112,
+    lupaus 168, tunnus 206) — muuta molempiin jos muutat toista."""
+    dur = 14.0
+    tr = np.zeros(int(SR * dur))
+    f = lambda fr: fr / FPS
+
+    place(tr, whoosh(0.42, 220, 1400, seed=11), f(6) - 0.05, 0.14)      # kylmä puoli sisään
+    place(tr, whoosh(0.40, 300, 1100, seed=5), f(34) - 0.05, 0.12)      # lämmin puoli sisään
+    # Lukujen pyöriminen: hyvin hiljainen naksutus, ei tikitystä joka sekunti.
+    for k in range(6):
+        place(tr, tone(1900 + k * 40, 0.02, (1.0,), 20), f(12 + k * 5), 0.022)
+    for k in range(6):
+        place(tr, tone(1500 + k * 40, 0.02, (1.0,), 20), f(40 + k * 5), 0.022)
+    # Tiiviste napsahtaa: matala tömäys + kirkas naps, tämä on videon käänne.
+    place(tr, tone(120, 0.30, (1.0, 0.6, 0.3), 4), f(112), 0.17)
+    place(tr, tone(1750, 0.05, (1.0, 0.3), 15), f(112) + 0.01, 0.10)
+    place(tr, tone(2500, 0.14, (1.0, 0.35), 8), f(112) + 0.05, 0.045)
+    place(tr, tone(660, 0.09, (1.0, 0.35), 9), f(168), 0.085)           # lupaus
+    place(tr, tone(2400, 0.16, (1.0, 0.4), 7), f(206), 0.05)            # tunnus
+
+    peak = np.abs(tr).max()
+    if peak > 0:
+        tr = tr / peak * 0.16
+    write_wav(out, np.stack([tr, tr], 1), SR)
+    print(f'✓ {out}  {dur:.2f} s  lämpötilakontrasti')
+
+VIDEOT = [
+    ('kortti-koti', 4),
+    ('kortti-veto', 4),
+    ('kortti-hinta', 4),
+    ('kortti-saasto', 4),
+    ('kortti-taloyhtio', 3),
+    ('kortti-taloyhtio-kartoitus', 4),
+]
+
 if __name__ == '__main__':
     import os
     os.makedirs('sfx', exist_ok=True)
-    build(4, 'sfx/kortti-koti.wav')
-    build(3, 'sfx/kortti-taloyhtio.wav')
+    for name, n in VIDEOT:
+        build(n, f'sfx/{name}.wav')
+    build_lampo('sfx/kortti-lampotila.wav')

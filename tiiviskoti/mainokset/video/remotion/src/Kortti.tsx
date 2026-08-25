@@ -29,12 +29,16 @@ const SERVICE = 'Ovien & ikkunoiden tiivistys';
 
 /* Ajastus framena, 25 fps. Vientiin lasketaan sama kaava Root.tsx:ssä. */
 export const TITLE_F = 92;
-export const STEP_F = 70;
-export const TAIL_F = 34;
+/* Askelten tahti: 70 framea (2,8 s) tuntui Josuasta liian hitaalta 25.8.
+   48 framea = 1,92 s per askel. Jousi ehtii yhä asettua, mutta rivi ei jää
+   makaamaan ruudulle. HUOM: sfx-kortti.py laskee napsahdukset näistä samoista
+   vakioista — muuta molempiin. */
+export const STEP_F = 48;
+export const TAIL_F = 26;
 export const CTA_F = 104;
 export const totalFrames = (n: number) => TITLE_F + n * STEP_F + TAIL_F + CTA_F;
 
-const Mark: React.FC<{ size: number; onDark?: boolean }> = ({ size, onDark }) => (
+export const Mark: React.FC<{ size: number; onDark?: boolean }> = ({ size, onDark }) => (
   <svg viewBox="0 0 100 100" style={{ width: size, height: size, display: 'block', flex: 'none' }}>
     <rect width="100" height="100" rx="22" fill={onDark ? '#F6F7F3' : C.green} />
     <rect x="31" y="20" width="38" height="60" rx="3" fill="none"
@@ -52,13 +56,13 @@ const Tick: React.FC<{ p: number; size: number }> = ({ p, size }) => (
   </svg>
 );
 
-const ServiceBar: React.FC = () => {
+export const ServiceBar: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const s = spring({ frame: frame - 4, fps, config: { damping: 18, mass: 0.6 } });
   return (
     <div style={{
-      position: 'absolute', top: SAFE_TOP - 74, left: 0, right: 0,
+      position: 'absolute', top: SAFE_TOP, left: 0, right: 0,
       display: 'flex', justifyContent: 'center', zIndex: 5,
       opacity: s, transform: `translateY(${interpolate(s, [0, 1], [-18, 0])}px)`,
     }}>
@@ -116,7 +120,7 @@ export const Kortti: React.FC<KorttiProps> = ({ chip, l1, l2, l3, lead, steps, c
       {/* ---------- 1. otsikkokortti ---------- */}
       <AbsoluteFill style={{
         alignItems: 'center', justifyContent: 'center',
-        paddingLeft: 76, paddingRight: 76, paddingTop: SAFE_TOP, paddingBottom: SAFE_BOTTOM,
+        paddingLeft: 76, paddingRight: 76, paddingTop: SAFE_TOP + 96, paddingBottom: SAFE_BOTTOM,
         textAlign: 'center',
         opacity: 1 - titleOut,
         transform: `translateY(${interpolate(titleOut, [0, 1], [0, -70])}px)`,
@@ -147,7 +151,7 @@ export const Kortti: React.FC<KorttiProps> = ({ chip, l1, l2, l3, lead, steps, c
       {/* ---------- 2. varausvaiheet ---------- */}
       <AbsoluteFill style={{
         alignItems: 'center', justifyContent: 'center',
-        paddingTop: SAFE_TOP, paddingBottom: SAFE_BOTTOM,
+        paddingTop: SAFE_TOP + 96, paddingBottom: SAFE_BOTTOM,
         opacity: cardS * (1 - cardOut),
         transform: `translateY(${interpolate(cardS, [0, 1], [70, 0]) - cardOut * 60}px)`,
         pointerEvents: 'none',
@@ -222,7 +226,7 @@ export const Kortti: React.FC<KorttiProps> = ({ chip, l1, l2, l3, lead, steps, c
       {/* ---------- 3. lopetus ---------- */}
       <AbsoluteFill style={{
         alignItems: 'center', justifyContent: 'center',
-        paddingLeft: 76, paddingRight: 76, paddingTop: SAFE_TOP, paddingBottom: SAFE_BOTTOM,
+        paddingLeft: 76, paddingRight: 76, paddingTop: SAFE_TOP + 96, paddingBottom: SAFE_BOTTOM,
         textAlign: 'center',
         opacity: ctaS,
         transform: `translateY(${interpolate(ctaS, [0, 1], [50, 0])}px)`,
