@@ -16,6 +16,61 @@ const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const FORM_SLUG = 'chatbot-yhteydenotto';
 
+/* Sama peilaus kuin create-lead.mjs:ssä. Ilman tätä chat-kysymys jää vain
+   `form_submissions`-tauluun ja sähköpostiin — eli näkyviin vain jos joku
+   muistaa käydä katsomassa adminin Lomakkeet-näkymää. Liidit-sivu on se
+   paikka jossa liidejä oikeasti työstetään, ja siellä on tila jonka voi
+   merkitä hoidetuksi.
+
+   Todettu tarpeelliseksi 26.8.2026: chat-kysymys 24.8. (maksetusta
+   Google Ads -klikistä) jäi kahdeksi vuorokaudeksi vastaamatta, vaikka
+   ilmoitus lähti sähköpostiin normaalisti. */
+const CRM_LEAD_URL = process.env.CRM_LEAD_URL || 'https://admin.tiiviskoti.fi/api/public/taloyhtio-lead';
+const BOOKING_SECRET = process.env.BOOKING_SECRET;
+
+/* Mainosklikin tunniste on chat-lomakkeella vain sivun osoitteessa, koska
+   widget ei lähetä sitä erikseen. Poimitaan se sieltä: kysymys on liidi
+   siinä missä varauskin, ja ilman tunnistetta se ei kohdistu mainokseen. */
+function clickIdFrom(pageUrl) {
+  try {
+    const q = new URL(pageUrl).searchParams;
+    for (const k of ['gclid', 'gbraid', 'wbraid']) {
+      const v = q.get(k);
+      if (v) return { kind: k, id: v.slice(0, 500) };
+    }
+  } catch { /* ei kelvollista osoitetta — ei tunnistetta */ }
+  return null;
+}
+
+async function mirrorToCrmLeads(f, client) {
+  try {
+    const click = clickIdFrom(f.pageUrl || '');
+    await fetch(CRM_LEAD_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(BOOKING_SECRET ? { 'x-tk-secret': BOOKING_SECRET } : {}),
+        ...(client?.ip ? { 'x-tk-client-ip': client.ip } : {}),
+        ...(client?.ua ? { 'x-tk-client-ua': client.ua } : {}),
+      },
+      body: JSON.stringify({
+        full_name: f.name,
+        email: f.email || '',
+        phone: f.phone || '',
+        postal_code: '',
+        message: ['Chat-kysymys', f.message, f.pageUrl ? `Sivu: ${f.pageUrl}` : null]
+          .filter(Boolean).join('\n'),
+        campaign: f.campaign || undefined,
+        gclid: click ? click.id : undefined,
+      }),
+    });
+  } catch (e) {
+    /* Peilaus ei saa kaataa tallennusta: kysymys on jo kannassa ja
+       ilmoitus jonossa, vaikka CRM olisi hetkellisesti nurin. */
+    console.error('ask: liidin peilaus CRM:ään epäonnistui', e);
+  }
+}
+
 async function sb(path, opts = {}) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...opts,
@@ -113,6 +168,13 @@ export default async function handler(req, res) {
 
     const row = Array.isArray(created) ? created[0] : created;
     await queueNotification(row.id, { name, email, phone, message, pageUrl });
+    await mirrorToCrmLeads(
+      { name, email, phone, message, pageUrl, campaign },
+      {
+        ip: String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || undefined,
+        ua: req.headers['user-agent'] || undefined,
+      },
+    );
 
     const ref = 'TK-KYS-' + String(row.id).replace(/-/g, '').slice(0, 6).toUpperCase();
     return res.status(200).json({ ok: true, ref });

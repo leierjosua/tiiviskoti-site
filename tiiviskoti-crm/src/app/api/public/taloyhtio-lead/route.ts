@@ -20,7 +20,12 @@ export const OPTIONS = preflight;
 const schema = z.object({
   full_name: z.string().min(1).max(300),
   email: z.string().email().max(200).optional().or(z.literal('')),
-  phone: z.string().min(1).max(60),
+  /* Puhelin ei ole pakollinen: taloyhtiölomake vaatii sen omalla
+     puolellaan, mutta samaa reittiä käyttää nyt myös chat-kysymys
+     (`api/ask.mjs`), jossa kynnys pidetään matalana eikä numeroa kysytä.
+     tk.leads sallii tyhjän puhelimen — vaatimus oli vain tässä skeemassa,
+     ja se pudotti chat-liidit hiljaisesti pois Liidit-sivulta. */
+  phone: z.string().max(60).optional().or(z.literal('')),
   postal_code: z.string().regex(/^\d{5}$/).optional().or(z.literal('')),
   city: z.string().max(100).optional().or(z.literal('')),
   message: z.string().max(4000).optional().or(z.literal('')),
@@ -55,7 +60,7 @@ export async function POST(request: Request) {
   await insertLead({
     full_name: d.full_name,
     email: d.email || null,
-    phone: d.phone,
+    phone: d.phone || '',
     postal_code: d.postal_code || null,
     city: d.city || null,
     message: d.message || null,
