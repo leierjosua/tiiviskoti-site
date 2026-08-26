@@ -616,7 +616,7 @@ html[data-ab="b"] .ab-b{display:block}
            halutaan voittavan (ja jota juuri nyt mitataan), mutta
            isännöitsijä ei aina voi luvata päivämäärää yksin — hallitus,
            huoltoyhtiön ovenavaus ja oma kalenteri tulevat väliin. -->
-      <a href="#tarjous" class="btn btn-alt gate-cta gate-alt-btn" id="toQuote">Pyydä tarjous ilman käyntiä</a>
+      <button type="button" class="btn btn-alt gate-cta gate-alt-btn" id="toQuote" disabled>Pyydä tarjous ilman käyntiä</button>
 
       <div class="gate-ticks">
         <span>✓ Veloitukseton</span><span>✓ Ei sitoumusta</span>
@@ -984,16 +984,33 @@ el('toCal').addEventListener('click', () => { if (api.state() === 'ready') go('c
    vaiheessa, joten se siirretään lomakkeen osoitekenttään — muuten sama
    tieto kysyttäisiin kaksi kertaa peräkkäin. Kirjoitetaan vain tyhjään
    kenttään, jottei käyttäjän oma teksti katoa jos hän palaa takaisin. */
-el('toQuote').addEventListener('click', () => {
-  const postal = (el('kartPostal').value || '').trim();
+/* Tarjouspyyntö aukeaa vasta postinumerolla — kahdesta syystä. Numero on
+   lomakkeen osoitekentän ensimmäinen puolisko, joten se säästää kirjoitusta.
+   Ja se kertoo meille alueen jo ennen kuin tarjouspyyntö saapuu.
+
+   Ehto on TARKOITUKSELLA löysempi kuin varausnapilla: varaus vaatii että
+   alueella on vapaita aikoja, tarjouspyyntö vain viisi numeroa. Tarjouksen
+   voi pyytää vaikka kalenteri olisi täynnä tai aluetarkistus kaatuisi —
+   juuri silloin se on ainoa jäljellä oleva tie. */
+const quoteBtn = el('toQuote');
+const kPostal = el('kartPostal');
+const syncQuoteBtn = () => {
+  quoteBtn.disabled = !/^\d{5}$/.test((kPostal.value || '').trim());
+};
+kPostal.addEventListener('input', syncQuoteBtn);
+syncQuoteBtn();
+
+quoteBtn.addEventListener('click', () => {
+  const postal = (kPostal.value || '').trim();
   const addr = el('qAddr');
+  /* Kirjoitetaan vain tyhjään kenttään, ettei käyttäjän oma teksti katoa
+     jos hän palaa takaisin ja painaa uudestaan. */
   if (addr && !addr.value && /^\d{5}$/.test(postal)) addr.value = postal;
-  /* Vieritystä EI tehdä täältä: linkki on tavallinen ankkuri, ja selain vie
-     #tarjous-osioon itse. CSS:n `scroll-behavior: smooth` hoitaa animaation
-     siellä missä se on käytössä, ja muualla hyppy on välitön — kumpikin
-     toimii. Aiempi `scrollIntoView({behavior:'smooth'})` + preventDefault
-     jätti sivun paikalleen ympäristöissä joissa pehmeä vieritys on estetty,
-     jolloin fokus siirtyi näkymän ulkopuolelle. */
+  /* Vieritys jätetään selaimelle: hash-vaihto vie #tarjous-osioon, ja CSS:n
+     `scroll-behavior: smooth` hoitaa animaation siellä missä se on käytössä.
+     Aiempi scrollIntoView({behavior:'smooth'}) jätti sivun paikalleen
+     ympäristöissä joissa pehmeä vieritys on estetty. */
+  location.hash = '#tarjous';
   setTimeout(() => el('qName')?.focus({ preventScroll: true }), 500);
 });
 
