@@ -62,7 +62,18 @@ document.addEventListener('click', (ev) => {
    alkuun eikä siihen kohtaan josta mainos lupasi. */
 window.addEventListener('load', () => {
   const id = location.hash.slice(1);
-  if (id) setTimeout(() => scrollToId(id), 60);
+  if (!id) return;
+  /* Kolme yritystä, ei yksi: sivun korkeus muuttuu vielä latauksen jälkeen
+     kun kuvat, fontit ja laskurin vaiheet asettuvat paikoilleen. Yhdellä
+     vierityksellä kävijä päätyi kohteen ohi — mitattu 1 037 px yli, kun
+     laskuriin tultiin kumppanisivun linkistä. Toistetaan kunnes kohde on
+     oikeassa kohdassa tai yritykset loppuvat. */
+  const yrita = (ms) => setTimeout(() => {
+    const t = document.getElementById(id);
+    if (!t) return;
+    if (Math.abs(t.getBoundingClientRect().top - OFFSET) > 80) scrollToId(id);
+  }, ms);
+  [60, 500, 1200].forEach(yrita);
 });
 
 window.tkScrollToId = scrollToId;
