@@ -1234,6 +1234,26 @@ if(document.getElementById('tabKoti')){
       e.preventDefault();
       if(kartoitusApi.state()==='ready') goStep('y-cal');
     });
+
+    /* Toinen polku: tarjous ilman käyntiä. Vie taloyhtiösivun lomakkeeseen,
+       koska sitä ei ole etusivulla — postinumero kulkee mukana `?pn=`:ssä ja
+       `#tarjous` kertoo perillä ettei kalenteria pidä avata.
+
+       Ehto on löysempi kuin varausnapilla: varaus vaatii vapaita aikoja,
+       tarjouspyyntö vain viisi numeroa. Tarjouksen voi siis pyytää vaikka
+       kalenteri olisi täynnä tai aluehaku kaatuisi — juuri silloin se on
+       ainoa jäljellä oleva tie. */
+    const yhtioQuote=document.getElementById('gYhtioQuote');
+    if(yhtioQuote){
+      const root=(yhtioGo.dataset.root||'');
+      const syncQuote=()=>{ yhtioQuote.disabled=!/^\d{5}$/.test((yhtioPostal.value||'').trim()); };
+      yhtioPostal.addEventListener('input',syncQuote);
+      syncQuote();
+      yhtioQuote.addEventListener('click',()=>{
+        const pn=(yhtioPostal.value||'').trim();
+        location.href=`${root}taloyhtio.html?pn=${encodeURIComponent(pn)}#tarjous`;
+      });
+    }
   }
 
   /* Kortin hinta tulee laskurin valinnasta. Ilman valintaa ei näytetä

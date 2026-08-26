@@ -1059,6 +1059,31 @@ paint();
 (async () => {
   let pn = '';
   try { pn = new URLSearchParams(location.search).get('pn') || ''; } catch (_) { return; }
+  if (!pn) return;
+
+  /* Tarjouspyyntöön saapuva EI halua kalenteria. Etusivun taloyhtiö-
+     välilehden tarjousnappi tulee osoitteella `?pn=NNNNN#tarjous`, jolloin
+     postinumero kuuluu lomakkeen osoitekenttään — ei varauksen vaiheeseen 1.
+     Ilman tätä haaraa kävijä laskeutuisi kalenteriin, eli juuri siihen mitä
+     hän painoi välttääkseen. */
+  if (location.hash === '#tarjous') {
+    const addr = el('qAddr');
+    if (addr && !addr.value && /^\d{5}$/.test(pn)) addr.value = pn;
+    el('kartPostal').value = pn;
+    /* Postinumero myös varauspolulle, jotta paluu siihen ei vaadi
+       kirjoittamista uudestaan. Aluehaku käynnistyy samalla. */
+    await api.setPostal(pn);
+    /* Vieritys vasta tässä, ei _anchors.js:n load-käsittelijän varassa:
+       saapumishetkellä varausosio on vielä ilman aluehuomiota ja kalenteria,
+       joten #tarjous on eri kohdassa kuin puoli sekuntia myöhemmin — ja
+       load-vieritys osui väärään paikkaan tai kumoutui kokonaan. */
+    setTimeout(() => {
+      if (window.tkScrollToId) window.tkScrollToId('tarjous');
+      el('qName')?.focus({ preventScroll: true });
+    }, 250);
+    return;
+  }
+
   if (await api.setPostal(pn)) go('cal', { noScroll: true });
 })();
 </script>
