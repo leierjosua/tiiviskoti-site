@@ -2,7 +2,16 @@ import 'server-only';
 
 /* =========================================================
    Google Ads -konversioiden lähetys rajapinnan kautta
-   (offline conversion import, uploadClickConversions).
+   (offline conversion import, **Data Manager API**).
+
+   MIKSI DATA MANAGER EIKÄ ADS API: Google sulki 26.8.2026 mennessä
+   `ConversionUploadService.UploadClickConversions` -polun uusilta
+   integraatioilta ("Usage ... is limited to existing users"). Basic access
+   -hyväksyntä tuli samana päivänä, mutta vanha reitti vastasi silti
+   hylkäyksellä. Korvaava rajapinta on datamanager.googleapis.com, ja se on
+   yksinkertaisempi: **developer-tokenia ei tarvita lainkaan**, pelkkä
+   OAuth-token jolla on `datamanager`-scope ja pääsy mainostilille.
+   Todennettu 26.8.2026: `validateOnly: true` → HTTP 200.
 
    MIKSI PALVELINPUOLELTA: tiiviskoti.fi:llä ei ole gtag.js:ää eikä
    seurantaevästeitä — tietosuojaseloste lupaa niin. Google ei siis näe
@@ -19,12 +28,13 @@ import 'server-only';
    tunnisteella.
 
    Ympäristömuuttujat (tiiviskoti-crm Vercel):
-     GOOGLE_ADS_DEVELOPER_TOKEN       — Ads API Centeristä (pakollinen)
+     GOOGLE_ADS_DEVELOPER_TOKEN       — EI ENÄÄ KÄYTÖSSÄ lähetyksessä (Data Manager ei vaadi sitä).
+                                       Jätetty ympäristöön: Ads API:n lukukyselyt vaativat sen yhä.
      GOOGLE_ADS_CUSTOMER_ID           — mainostilin id, väliviivat sallittu
      GOOGLE_ADS_CONVERSION_ACTION_ID  — konversiotapahtuman numero-osa
      GOOGLE_ADS_LOGIN_CUSTOMER_ID     — (valinnainen) hallinnointitili, jos tili on MCC:n alla
-     GOOGLE_ADS_OAUTH_REFRESH_TOKEN   — (valinnainen) oma token; ilman tätä käytetään Gmailin/Calendarin tokenia
-     GOOGLE_ADS_API_VERSION           — (valinnainen) oletus v25
+     GOOGLE_ADS_OAUTH_REFRESH_TOKEN   — oma token; **tarvitsee `datamanager`-scopen**
+                                       (hae: node scripts/google-ads-oauth.mjs <CLIENT_ID> <CLIENT_SECRET>)
 
    MIKSI OMAT OAUTH-TUNNUKSET OVAT MAHDOLLISIA: Ads vaatii `adwords`-
    oikeuden, jota Gmail/Calendar-tokenissa ei ole. Sen voi lisätä samaan
@@ -35,21 +45,13 @@ import 'server-only';
    ========================================================= */
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
-
-/* Rajapinnan versio vanhenee noin vuodessa. Ympäristömuuttujana, jotta
-   sunsetin osuessa kohdalle riittää muuttaa arvo Verceliin — ei uutta
-   julkaisua vain siksi että Google poisti version käytöstä.
-
-   v25 todennettu toimivaksi 2026-08-23 (listAccessibleCustomers → 200).
-   Vanhemmat v18–v21 vastaavat 404:llä eivätkä ole enää olemassa. */
-const API_VERSION = process.env.GOOGLE_ADS_API_VERSION || 'v25';
+const INGEST_URL = 'https://datamanager.googleapis.com/v1/events:ingest';
 
 /* Tilitunnukset kirjoitetaan Adsissa muodossa 123-456-7890, mutta
    rajapinta ottaa vastaan vain numerot. Siivotaan tässä, jotta
    ympäristömuuttujaan saa kopioida sen mitä ruudulla näkyy. */
 const digits = (v: string | undefined) => (v || '').replace(/\D/g, '');
 
-const DEVELOPER_TOKEN = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
 const CUSTOMER_ID = digits(process.env.GOOGLE_ADS_CUSTOMER_ID);
 const LOGIN_CUSTOMER_ID = digits(process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID);
 const CONVERSION_ACTION_ID = digits(process.env.GOOGLE_ADS_CONVERSION_ACTION_ID);
@@ -73,6 +75,8 @@ export type UploadOutcome =
 
 export type UploadResult = {
   configured: boolean;
+  /** Data Managerin erätunniste. Sillä voi kysyä erän tilan jälkikäteen. */
+  requestId?: string;
   /** Koko kutsun kaatanut virhe. Yksittäisten rivien viat ovat `outcomes`issa. */
   error?: string;
   outcomes: UploadOutcome[];
@@ -82,7 +86,8 @@ export type UploadResult = {
  *  kaikki kerralla eikä yksi kerrallaan uuden yrityksen jälkeen. */
 export function adsMissingConfig(): string[] {
   const missing: string[] = [];
-  if (!DEVELOPER_TOKEN) missing.push('GOOGLE_ADS_DEVELOPER_TOKEN');
+  /* Developer token EI ole enää pakollinen: Data Manager tunnistaa
+     oikeudet OAuth-tilin pääsystä mainostilille. */
   if (!CUSTOMER_ID) missing.push('GOOGLE_ADS_CUSTOMER_ID');
   if (!CONVERSION_ACTION_ID) missing.push('GOOGLE_ADS_CONVERSION_ACTION_ID');
   if (!refreshToken()) missing.push('GOOGLE_ADS_OAUTH_REFRESH_TOKEN tai GOOGLE_OAUTH_REFRESH_TOKEN');
@@ -146,136 +151,100 @@ async function accessToken(): Promise<string> {
   return data.access_token;
 }
 
-/* Rajapinnan aikaleima on `yyyy-MM-dd HH:mm:ss+00:00` — siirtymä
-   KAKSOISPISTEELLÄ, toisin kuin CSV-latauksessa, joka vaatii `+0000`.
-   Ero on aito ja dokumentoitu; siksi muotoilu on täällä eikä jaettu
-   csv/format.ts:n kanssa. */
-function adsApiTime(d: Date): string {
-  return `${d.toISOString().slice(0, 19).replace('T', ' ')}+00:00`;
-}
-
-type GoogleAdsError = {
-  message?: string;
-  location?: { fieldPathElements?: { fieldName?: string; index?: number }[] };
-};
-
-/** Poimii osittaisvirheestä rivikohtaiset viat: minkä konversion indeksi
- *  epäonnistui ja miksi. Ilman indeksiä virhe kohdistuisi koko erään,
- *  jolloin yksi kelvoton klikki estäisi kaikkien muiden merkitsemisen
- *  lähetetyiksi.
- *
- *  MIKSI KOHDISTAMATTOMAT PALAUTETAAN ERIKSEEN: jos virheen paikkatietoa ei
- *  osata lukea, virhe katoaisi — ja kutsuja merkitsisi rivin lähetetyksi
- *  vaikka konversio ei mennyt perille. Hiljainen väärä onnistuminen on
- *  tässä pahin mahdollinen lopputulos, koska sitä ei huomaa mistään.
- *  Kohdistamaton virhe kaataa siksi koko erän, jolloin rivit jäävät
- *  jonoon ja tulevat yritetyksi uudelleen. */
-function parsePartialFailure(partial: unknown): { byIndex: Map<number, string>; unmapped: string[] } {
-  const byIndex = new Map<number, string>();
-  const unmapped: string[] = [];
-  const details = (partial as { details?: { errors?: GoogleAdsError[] }[] } | undefined)?.details;
-  if (!Array.isArray(details)) return { byIndex, unmapped };
-
-  for (const detail of details) {
-    for (const err of detail.errors ?? []) {
-      /* Kentän nimi vaihtelee rajapinnan version mukaan (`conversions`,
-         `operations`), joten indeksi haetaan ensimmäisestä paikasta jossa
-         se on — nimestä riippumatta. */
-      const idx = err.location?.fieldPathElements?.find((e) => typeof e.index === 'number')?.index;
-      const msg = err.message || 'Tuntematon virhe';
-      if (typeof idx === 'number') byIndex.set(idx, msg);
-      else unmapped.push(msg);
-    }
-  }
-  return { byIndex, unmapped };
+/* Data Manager haluaa RFC 3339 -aikaleiman. Millisekunnit pois: ne eivät
+   tuo mitään ja tekevät lokista vaikealukuisen. */
+function eventTime(d: Date): string {
+  return d.toISOString().replace(/\.\d{3}Z$/, 'Z');
 }
 
 /**
- * Lähettää konversiot Adsiin yhtenä eränä.
+ * Lähettää konversiot Adsiin yhtenä eränä Data Manager -rajapinnalla.
  *
- * MIKSI `partialFailure`: erässä on aina rivejä joita Google ei hyväksy —
- * yli 90 vuorokautta vanha klikki, tuntematon tunniste, jo kirjattu
- * konversio. Ilman osittaisvirhettä yksi tällainen hylkäisi koko erän,
- * eivätkä kelvolliset konversiot menisi koskaan perille. Nyt kelvolliset
- * kirjautuvat ja vialliset palaavat riveittäin syineen.
+ * MIKSI `transactionId` ON TYÖN NUMERO: se on rajapinnan virallinen
+ * duplikaattiavain. Sama konversio ei kirjaudu kahdesti vaikka lähetys
+ * uusittaisiin — eikä myöskään silloin kun sama kauppa on jo viety käsin
+ * CSV:llä. Se ratkaisee myös vanhan huolen: /ads-näkymän CSV ja tämä
+ * rajapinta voivat elää rinnakkain ilman kaksoiskirjauksia.
  *
- * MIKSI `orderId` ON TYÖN NUMERO: se antaa Adsille pysyvän tunnisteen
- * kaupalle, jolloin sama konversio ei kirjaudu kahdesti jos lähetys
- * uusitaan — ja jos kauppa myöhemmin peruuntuu, se on sillä tunnisteella
- * peruttavissa Adsin puolelta.
+ * ERO VANHAAN RAJAPINTAAN — LUE TÄMÄ ENNEN KUIN MUUTAT VIRHEENKÄSITTELYÄ:
+ * `uploadClickConversions` palautti rivikohtaiset virheet heti
+ * (`partialFailure`). Data Manager ottaa erän vastaan ja käsittelee sen
+ * asynkronisesti: onnistunut vastaus sisältää vain `requestId`. HTTP 200
+ * tarkoittaa siis "otettu vastaan", ei "kirjattu". Yksittäisen tapahtuman
+ * hylkäys (esim. yli 90 vrk vanha klikki) ei siis enää näy tässä.
+ * Rakenteelliset viat saa kiinni `validateOnly`-lipulla, ja erän tilan voi
+ * kysyä jälkikäteen: GET /v1/requestStatus:retrieve?requestId=…
+ *
+ * Tämä on tietoinen huononnus jonka Google pakotti: vaihtoehto olisi jättää
+ * konversiot lähettämättä kokonaan.
  */
-export async function uploadConversions(rows: PendingConversion[]): Promise<UploadResult> {
+export async function uploadConversions(
+  rows: PendingConversion[],
+  opts: { validateOnly?: boolean } = {},
+): Promise<UploadResult> {
   const missing = adsMissingConfig();
   if (missing.length > 0) {
     return { configured: false, error: `Puuttuu: ${missing.join(', ')}`, outcomes: [] };
   }
   if (rows.length === 0) return { configured: true, outcomes: [] };
 
-  const conversionAction = `customers/${CUSTOMER_ID}/conversionActions/${CONVERSION_ACTION_ID}`;
-
-  const conversions = rows.map((r) => ({
-    /* Vain yksi näistä kolmesta saa olla mukana kerrallaan. */
-    [r.clickKind]: r.clickId,
-    conversionAction,
-    conversionDateTime: adsApiTime(r.createdAt),
-    conversionValue: r.priceCents / 100,
-    currencyCode: 'EUR',
-    orderId: r.jobNumber,
-  }));
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'developer-token': DEVELOPER_TOKEN as string,
-    Authorization: `Bearer ${await accessToken()}`,
+  const destination: Record<string, unknown> = {
+    operatingAccount: { accountType: 'GOOGLE_ADS', accountId: CUSTOMER_ID },
+    productDestinationId: CONVERSION_ACTION_ID,
   };
-  /* Vaaditaan vain jos mainostili on hallinnointitilin (MCC) alla. Väärin
-     asetettuna se aiheuttaa luvattoman, joten se jätetään kokonaan pois
-     ellei arvoa ole annettu. */
-  if (LOGIN_CUSTOMER_ID) headers['login-customer-id'] = LOGIN_CUSTOMER_ID;
+  /* Vain jos mainostili on hallinnointitilin alla. Väärin asetettuna se
+     tuottaa luvattoman, joten se jätetään pois ellei arvoa ole annettu. */
+  if (LOGIN_CUSTOMER_ID) {
+    destination.loginAccount = { accountType: 'GOOGLE_ADS', accountId: LOGIN_CUSTOMER_ID };
+  }
+
+  const body = {
+    destinations: [destination],
+    events: rows.map((r) => ({
+      /* Vain yksi kolmesta tunnisteesta kerrallaan — ks. ClickKind. */
+      adIdentifiers: { [r.clickKind]: r.clickId },
+      eventTimestamp: eventTime(r.createdAt),
+      transactionId: r.jobNumber,
+      conversionValue: r.priceCents / 100,
+      currency: 'EUR',
+      eventSource: 'WEB',
+    })),
+    validateOnly: opts.validateOnly === true,
+  };
 
   let res: Response;
-  let body: {
-    results?: unknown[];
-    partialFailureError?: unknown;
-    error?: { message?: string };
-  };
+  let text: string;
   try {
-    res = await fetch(
-      `https://googleads.googleapis.com/${API_VERSION}/customers/${CUSTOMER_ID}:uploadClickConversions`,
-      {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ conversions, partialFailure: true, validateOnly: false }),
-        cache: 'no-store',
+    res = await fetch(INGEST_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${await accessToken()}`,
       },
-    );
-    body = await res.json();
+      body: JSON.stringify(body),
+      cache: 'no-store',
+    });
+    text = await res.text();
   } catch (e) {
     return { configured: true, error: e instanceof Error ? e.message : String(e), outcomes: [] };
   }
 
   if (!res.ok) {
-    const msg = body?.error?.message || `HTTP ${res.status}`;
+    let msg = `HTTP ${res.status}`;
+    try {
+      msg = (JSON.parse(text) as { error?: { message?: string } })?.error?.message || msg;
+    } catch { /* ei-JSON vastaus: käytetään statusta */ }
     return { configured: true, error: `Ads hylkäsi pyynnön: ${msg}`, outcomes: [] };
   }
 
-  const { byIndex: failures, unmapped } = parsePartialFailure(body.partialFailureError);
-  if (unmapped.length > 0) {
-    return {
-      configured: true,
-      error: `Ads palautti virheen jota ei voitu kohdistaa riviin: ${unmapped.join('; ').slice(0, 300)}`,
-      outcomes: [],
-    };
-  }
+  let requestId: string | undefined;
+  try {
+    requestId = (JSON.parse(text) as { requestId?: string }).requestId;
+  } catch { /* vastaus ilman runkoa on silti hyväksyntä */ }
 
-  /* Onnistuneen rivin kohdalla `results` sisältää konversion tiedot ja
-     epäonnistuneen kohdalla tyhjän olion. Luotetaan silti ensisijaisesti
-     virhelistaan: se kertoo syyn, jonka voi näyttää ihmiselle. */
   return {
     configured: true,
-    outcomes: rows.map((r, i) => {
-      const err = failures.get(i);
-      return err ? { ok: false as const, jobId: r.jobId, error: err } : { ok: true as const, jobId: r.jobId };
-    }),
+    requestId,
+    outcomes: rows.map((r) => ({ ok: true as const, jobId: r.jobId })),
   };
 }

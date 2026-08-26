@@ -33,9 +33,19 @@ import { randomBytes } from 'node:crypto';
 
 const PORT = 8123;
 const REDIRECT_URI = `http://localhost:${PORT}/oauth2callback`;
-/* Vain Ads. Pyydetään mahdollisimman kapeasti: tämä token ei saa pystyä
-   lukemaan sähköposteja eikä kirjoittamaan kalenteriin. */
-const SCOPES = ['https://www.googleapis.com/auth/adwords'];
+/* Vain Ads-puoli. Pyydetään mahdollisimman kapeasti: tämä token ei saa
+   pystyä lukemaan sähköposteja eikä kirjoittamaan kalenteriin.
+
+   `datamanager` lisättiin 26.8.2026: Google sulki vanhan
+   ConversionUploadService.UploadClickConversions -polun uusilta
+   integraatioilta ("limited to existing users"), ja korvaava Data Manager
+   API vaatii oman scopensa. `adwords` jätettiin mukaan, jotta samalla
+   tokenilla voi yhä lukea tilin tietoja — uusi suostumus on käyttäjälle
+   vaivalloinen, eikä sitä kannata joutua pyytämään kahdesti. */
+const SCOPES = [
+  'https://www.googleapis.com/auth/adwords',
+  'https://www.googleapis.com/auth/datamanager',
+];
 
 const [, , CLIENT_ID, CLIENT_SECRET] = process.argv;
 
