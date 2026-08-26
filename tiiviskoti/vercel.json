@@ -94,6 +94,10 @@
   ],
   "rewrites": [
     {
+      "source": "/paivakumpu",
+      "destination": "/paivakumpu.html"
+    },
+    {
       "source": "/lataa/dl/(.*)",
       "destination": "/lataa/$1"
     }

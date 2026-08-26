@@ -575,6 +575,188 @@ ${skripti}
 `;
 }
 
+
+/* ---------- kumppanisivut (jäsenedut) ----------
+
+   Yhdistys linkittää omalta jäsensivultaan tänne, ja me ylläpidämme
+   tarjouksen sisältöä itse — juuri niin kuin Päiväkummun Omakotiyhdistys
+   ehdotti. Oma sivu on myös ainoa tapa kertoa ehdot kerralla oikein:
+   pelkkä "10 % alennus" heidän sivullaan jättäisi auki mistä alennus
+   lasketaan ja miten se otetaan käyttöön.
+
+   `noindex`: etu on jäsenille, ei hakukoneelle. Sivu ei myöskään saa
+   kilpailla omien palvelusivujen kanssa samoista hauista. Linkki toimii
+   silti normaalisti.
+
+   Alennus on oikea koodi CRM:ssä (tk.discount_codes), ei pelkkä lupaus
+   sivulla: laskuri tarkistaa sen ja vähentää summan ennen varausta. */
+
+const KUMPPANIT = [
+  {
+    slug: 'paivakumpu',
+    yhdistys: 'Päiväkummun Omakotiyhdistys ry',
+    lyhyt: 'Päiväkummun Omakotiyhdistys',
+    gen: 'Päiväkummun Omakotiyhdistyksen',
+    koodi: 'PAIVAKUMPU',
+    prosentti: 10,
+    kuva: 'hero-entrance.webp',
+    alt: 'TiivisKodin asentajat vaalean puutalon pihassa työvälineineen',
+  },
+];
+
+function kumppaniSivu(k) {
+  const R = '';
+  const url = `${SITE}/${k.slug}`;
+  const title = `${k.lyhyt}: −${k.prosentti} % ovien ja ikkunoiden tiivistyksestä — TiivisKoti`;
+  const desc = `${k.yhdistys} jäsenetu: ${k.prosentti} % alennus ovien ja ikkunoiden tiivistyksestä. Koodi ${k.koodi} varauksen yhteydessä — hinta näkyy laskurissa jo alennettuna.`;
+  const varausUrl = `/?koodi=${k.koodi}#laskuri`;
+
+  /* Esimerkit lasketaan hinnastosta, ei kirjoiteta käsin: jos hinnat
+     muuttuvat, sivu ei jää lupaamaan vanhoja lukuja. */
+  const alennettu = (e) => Math.round(e * (1 - k.prosentti / 100));
+  const esimerkit = [
+    ['1 ikkuna', MIN_PRICE, 'pienin veloitus käynniltä'],
+    ['5 ikkunaa', 5 * WINDOW_TIERS[1].price, `${WINDOW_TIERS[1].price} € / ikkuna`],
+    ['10 ikkunaa', 10 * WINDOW_TIERS[2].price, `${WINDOW_TIERS[2].price} € / ikkuna`],
+    ['Ulko-ovi + 5 ikkunaa', TYPES[1].price + 5 * WINDOW_TIERS[1].price, 'ovi ja ikkunat samalla käynnillä'],
+  ];
+
+  return `<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}" />
+<meta name="robots" content="noindex, follow" />
+<link rel="canonical" href="${url}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TiivisKoti" />
+<meta property="og:locale" content="fi_FI" />
+<meta property="og:url" content="${url}" />
+<meta property="og:title" content="${esc(title)}" />
+<meta property="og:description" content="${esc(desc)}" />
+<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg?v=3" />
+<meta name="theme-color" content="#F6F7F3" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="stylesheet" href="${R}_alueet.css" />
+</head>
+<body>
+${nav(R)}
+
+<div class="wrap crumb"><a href="/">Etusivu</a> › Jäsenetu · ${esc(k.lyhyt)}</div>
+
+<header class="hero"><div class="wrap hero-grid">
+  <div>
+    <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Jäsenetu · ${esc(k.yhdistys)}</div>
+    <h1>Jäsenetu:<br><span class="a">−${k.prosentti} % tiivistyksestä.</span></h1>
+    <p class="hero-sub">${esc(k.gen)} jäsenenä saat ${k.prosentti} % alennuksen ovien ja ikkunoiden tiivistyksestä. Alennus lasketaan koko työn hinnasta, ja näet sen laskurissa ennen varauksen vahvistamista.</p>
+    <div class="hero-cta">
+      <a href="${varausUrl}" class="btn btn-p btn-lg">Laske hinta jäsenetuhinnalla</a>
+      <a href="tel:${TELH}" class="btn btn-o btn-lg">Soita ${TEL}</a>
+    </div>
+    <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Koodi <b style="margin:0 4px">${k.koodi}</b> — täyttyy valmiiksi yllä olevasta painikkeesta</p>
+  </div>
+  <div class="hero-card rv">
+    <img src="${R}img/${k.kuva}?v=3" alt="${esc(k.alt)}" width="1100" height="880" fetchpriority="high">
+  </div>
+</div></header>
+
+<section class="wrap" style="padding-bottom:clamp(16px,3vw,32px)">
+  <div class="metrics rv">
+    <div class="metric"><b><span class="a">−${k.prosentti} %</span></b><span>koko työn hinnasta</span></div>
+    <div class="metric"><b><span class="a">−40 %</span></b><span>kotitalousvähennys päälle</span></div>
+    <div class="metric"><b><span class="a">1 käynti</span></b><span>ovet ja ikkunat kerralla</span></div>
+  </div>
+</section>
+
+<section class="sec"><div class="wrap">
+  <div class="kicker">Näin käytät</div>
+  <h2 class="title">Etu käyttöön kolmessa vaiheessa</h2>
+  <div class="osat" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:24px">
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px">
+      <b style="display:block;margin-bottom:6px">1. Laske hinta</b>
+      <span style="color:var(--mute);font-size:15px;line-height:1.6">Valitse ovet ja ikkunat laskurista. Näet kiinteän hinnan heti — ei tarjouspyyntöä.</span></div>
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px">
+      <b style="display:block;margin-bottom:6px">2. Syötä koodi ${k.koodi}</b>
+      <span style="color:var(--mute);font-size:15px;line-height:1.6">Alennuskoodin kenttä on varauksen yhteystiedoissa. Tältä sivulta tullessa se on jo täytetty.</span></div>
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px">
+      <b style="display:block;margin-bottom:6px">3. Varaa aika</b>
+      <span style="color:var(--mute);font-size:15px;line-height:1.6">Valitse sopiva aika kalenterista. Vahvistus tulee sähköpostiin heti.</span></div>
+  </div>
+</div></section>
+
+<section class="sec alt"><div class="wrap">
+  <div class="kicker">Esimerkkejä</div>
+  <h2 class="title">Mitä etu tarkoittaa euroina</h2>
+  <p class="sub">Hinnat sisältävät tiivisteet, työn ja ALV 25,5 %. Kotitalousvähennys lasketaan vielä tämän päälle.</p>
+  <div class="hinta-taulu" style="margin-top:22px">
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="text-align:left;padding:12px 8px;border-bottom:2px solid var(--green)">Kohde</th>
+        <th style="text-align:right;padding:12px 8px;border-bottom:2px solid var(--green)">Normaali</th>
+        <th style="text-align:right;padding:12px 8px;border-bottom:2px solid var(--green)">Jäsenhinta</th>
+      </tr></thead>
+      <tbody>
+        ${esimerkit.map(([nimi, hinta, selite]) => `<tr>
+          <td style="padding:12px 8px;border-bottom:1px solid var(--line)"><b>${esc(nimi)}</b><br><span style="color:var(--mute);font-size:14px">${esc(selite)}</span></td>
+          <td style="padding:12px 8px;border-bottom:1px solid var(--line);text-align:right;color:var(--mute)">${hinta} €</td>
+          <td style="padding:12px 8px;border-bottom:1px solid var(--line);text-align:right;font-weight:800;color:var(--green)">${alennettu(hinta)} €</td>
+        </tr>`).join('\n        ')}
+      </tbody>
+    </table>
+  </div>
+  <p class="sub" style="margin-top:16px;font-size:15px">Tarkka hinta riippuu kohteiden määrästä ja tyypistä — laskuri näyttää sen ennen varausta.</p>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="kicker">Työn sisältö</div>
+  <h2 class="title">Mitä työhön sisältyy</h2>
+  <p class="sub">Sama sisältö jokaisessa kohteessa — ei lisälaskuja jälkikäteen.</p>
+  <ul style="margin-top:22px;max-width:70ch;line-height:1.9;padding-left:22px">
+    ${SISALTYY.map((x) => `<li>${esc(x)}</li>`).join('\n    ')}
+  </ul>
+</div></section>
+
+<section class="sec alt"><div class="wrap">
+  <div class="kicker">Ehdot</div>
+  <h2 class="title">Edun ehdot lyhyesti</h2>
+  <ul class="sub" style="max-width:70ch;line-height:1.9;padding-left:22px;margin-top:18px">
+    <li>Etu koskee ${esc(k.yhdistys)}:n jäseniä.</li>
+    <li>Alennus ${k.prosentti} % lasketaan työn kokonaishinnasta, myös mahdollisesta matkalisästä.</li>
+    <li>Koodi <b>${k.koodi}</b> syötetään varauksen yhteydessä. Jälkikäteen sitä ei voi lisätä valmiiseen varaukseen.</li>
+    <li>Etua ei voi yhdistää muihin alennuskoodeihin.</li>
+    <li>Kotitalousvähennyksen voi hyödyntää normaalisti alennetusta hinnasta.</li>
+    <li>Voimassa toistaiseksi. Ilmoitamme yhdistykselle, jos etu muuttuu.</li>
+  </ul>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="ctaband rv">
+    <h2>Laske hinta jäsenetuhinnalla</h2>
+    <p>Valitse ovet ja ikkunat, niin näet kiinteän hinnan alennuksineen. Koodi on valmiina, ajan varaat suoraan kalenterista.</p>
+    <div class="hero-cta">
+      <a href="${varausUrl}" class="btn btn-p btn-lg">Laske hinta ja varaa aika</a>
+      <a href="tel:${TELH}" class="btn btn-o btn-lg on-deep">Soita ${TEL}</a>
+    </div>
+  </div>
+  <p class="sub" style="margin-top:30px">Lue lisää: <a href="${R}ikkunoiden-tiivistys.html" style="color:var(--green);font-weight:700">ikkunoiden tiivistys</a> · <a href="${R}ovien-tiivistys.html" style="color:var(--green);font-weight:700">ovien tiivistys</a> · <a href="${R}toiminta-alueet.html" style="color:var(--green);font-weight:700">toiminta-alueet</a></p>
+</div></section>
+
+${footer(R, k.slug)}
+${skripti}
+<script defer src="${R}_analytics.js"></script><script type="module" src="${R}_shared.js"></script>
+<script type="module" src="${R}_anchors.js"></script>
+</body>
+</html>
+`;
+}
+
 /* ---------- hub-sivu ---------- */
 
 function hubSivu() {
@@ -874,6 +1056,11 @@ for (const f of readdirSync('toiminta-alueet')) {
     unlinkSync(`toiminta-alueet/${f}`);
     console.log('✗ poistettu vanhentunut', f);
   }
+}
+
+for (const k of KUMPPANIT) {
+  writeFileSync(`${k.slug}.html`, kumppaniSivu(k));
+  console.log('✓', k.slug + '.html');
 }
 
 for (const c of PALVELUT) {

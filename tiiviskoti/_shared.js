@@ -974,6 +974,20 @@ async function checkDiscount(){
 
 const fCodeEl = document.getElementById('fCode');
 if(fCodeEl){
+  /* Koodi osoitteesta: kumppanisivut (esim. /paivakumpu) linkittävät
+     laskuriin muodossa `?koodi=PAIVAKUMPU`. Ilman tätä jäsen joutuisi
+     kopioimaan koodin käsin toiselta sivulta — ja juuri siinä kohdassa
+     etu jää käyttämättä. Tarkistus ajetaan heti, jotta kenttä kertoo
+     kelpaako koodi ennen kuin asiakas täyttää loput tiedot. */
+  try {
+    const q = new URLSearchParams(location.search);
+    const koodi = (q.get('koodi') || q.get('code') || '').trim().toUpperCase().slice(0, 24);
+    if (koodi && /^[A-Z0-9-]+$/.test(koodi)) {
+      fCodeEl.value = koodi;
+      checkDiscount();
+    }
+  } catch (_) { /* kelvoton osoite — koodi jää täyttämättä käsin */ }
+
   fCodeEl.addEventListener('input',()=>{
     /* Koodi kirjoitetaan mainoksesta käsin, joten kirjoitusasu vaihtelee.
        Näytetään se isoin kirjaimin heti — palvelin normalisoi saman. */
