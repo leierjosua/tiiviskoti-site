@@ -258,7 +258,7 @@
 
         <div class="area-note" id="areaNote" style="margin-top:14px"></div>
 
-        <button type="button" class="btn btn-p gate-cta" id="gShow">Jatka</button>
+        <button type="button" class="btn btn-p gate-cta" id="gShow">Näytä vapaat ajat</button>
 
         <div class="gate-ticks">
           <span>✓ Kiinteä hinta</span><span>✓ Maksu työn jälkeen</span>
@@ -296,6 +296,10 @@
         </div>
         <div class="area-note" id="yhtioNote" style="margin-top:14px"></div>
         <button type="button" class="btn btn-p gate-cta" id="gYhtioGo" data-root="../" disabled>Näytä vapaat ajat</button>
+        <!-- Sama toinen polku kuin taloyhtiösivulla: isännöitsijä ei aina voi
+             luvata käyntiaikaa yksin. Vie taloyhtiösivun tarjouslomakkeeseen
+             postinumero mukanaan. -->
+        <button type="button" class="btn btn-alt gate-cta gate-alt-btn" id="gYhtioQuote" disabled>Pyydä tarjous ilman käyntiä</button>
         <div class="gate-ticks col">
           <span>✓ Kartoituskäynti 0 €, noin 20 min</span>
           <span>✓ Kirjallinen sopimushinta hallitukselle</span>
@@ -440,5 +444,6 @@ if(location.hash){
 }
 </script>
 <script defer src="../_analytics.js"></script><script type="module" src="../_shared.js"></script>
+<script type="module" src="../_anchors.js"></script>
 </body>
 </html>

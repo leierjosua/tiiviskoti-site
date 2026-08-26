@@ -340,6 +340,7 @@ ${laskuriOsio(R, a)}
 ${footer(R, a.slug)}
 ${skripti}
 <script defer src="${R}_analytics.js"></script><script type="module" src="${R}_shared.js"></script>
+<script type="module" src="${R}_anchors.js"></script>
 </body>
 </html>
 `;
@@ -452,6 +453,7 @@ ${laskuriOsio(R, null)}
 ${footer(R, null)}
 ${skripti}
 <script defer src="${R}_analytics.js"></script><script type="module" src="${R}_shared.js"></script>
+<script type="module" src="${R}_anchors.js"></script>
 </body>
 </html>
 `;
@@ -618,6 +620,7 @@ ${nav(R)}
 ${footer(R, null)}
 ${skripti}
 <script defer src="${R}_analytics.js"></script><script type="module" src="${R}_shared.js"></script>
+<script type="module" src="${R}_anchors.js"></script>
 </body>
 </html>
 `;

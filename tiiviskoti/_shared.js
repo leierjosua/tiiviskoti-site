@@ -777,7 +777,12 @@ function paintStepChrome(){
   const back=document.getElementById('stepBack'), tag=document.getElementById('stepTag');
   const dots=document.getElementById('stepDots');
   const head=stepCard.closest('section');
-  const title=head && head.querySelector('h2.title');
+  /* h1 sallitaan h2:n rinnalla: varaa.html ja ajanvaraus.html ovat omia
+     sivujaan, joissa tämä on sivun ainoa otsikko — h2 ilman h1:tä on sekä
+     hakukoneelle että ruudunlukijalle rikkinäinen rakenne. Etusivulla ja
+     aluesivuilla laskuri on osio muun sisällön joukossa, joten siellä se on
+     yhä h2. */
+  const title=head && head.querySelector('h1.title, h2.title');
   const sub=head && head.querySelector('.step-sub');
   const kicker=head && head.querySelector('.kicker');
 
