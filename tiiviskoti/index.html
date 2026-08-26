@@ -72,6 +72,12 @@ h2.title{font-size:clamp(29px,3.8vw,44px);font-weight:800;max-width:18ch;letter-
 .btn-p{background:var(--green);color:#fff}.btn-p:hover{background:var(--green-d)}
 a.btn-p{color:#fff}
 .btn-o{background:var(--card);color:var(--ink);border-color:var(--line2)}.btn-o:hover{border-color:var(--green);color:var(--green)}
+/* Toissijainen kutsu joka erottuu yhtä hyvin kuin pääkutsu mutta ei kilpaile
+   sen kanssa: sama vihreä käänteisenä. Harmaa `btn-o` jää sinne missä
+   painike on aidosti sivuseikka. Sama pari kuin taloyhtiösivulla. */
+.btn-alt{background:var(--card);color:var(--green);border-color:var(--green)}
+.btn-alt:hover{background:var(--green);color:#fff}
+a.btn-alt:hover{color:#fff}
 .btn-lg{padding:16px 32px}
 .arrow{transition:transform .18s}.btn:hover .arrow{transform:translateX(3px)}
 .lnk{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--green);font-size:15px}
@@ -460,7 +466,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .hero-sub{font-size:17px;max-width:34ch}
   .hero-cta{flex-direction:column;align-items:center;gap:10px;margin-top:24px}
   .hero-cta .btn{width:100%;max-width:320px}
-  .hero-cta .btn-o{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.55)}
+  /* Mobiilissa hero on tumman kuvan päällä, jolloin vihreä teksti ei erotu.
+     Sama valkoinen käsittely kuin btn-o:lle — pääkutsu on yhä täytetty. */
+  .hero-cta .btn-o,.hero-cta .btn-alt{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.55)}
   /* Ilman tata check-ikoni jai roikkumaan kaksirivisen, keskitetyn
      hienotekstin vasempaan reunaan. */
   .hero-fine{justify-content:center;text-align:center;color:rgba(255,255,255,.82);font-size:13px;max-width:330px;margin-inline:auto;line-height:1.5}
@@ -775,7 +783,7 @@ html[data-ab="b"] .ab-b{display:block}
     <p class="hero-sub">Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan. Varaat ajan verkosta alle minuutissa.</p>
     <div class="hero-cta">
       <a href="#laskuri" class="btn btn-p btn-lg">Varaa aika</a>
-      <a href="#palvelut" class="btn btn-o btn-lg">Katso palvelut</a>
+      <a href="#palvelut" class="btn btn-alt btn-lg">Katso palvelut</a>
     </div>
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta · lämpökamerakartoitus veloituksetta · kotitalousvähennys −40 %</p>
   </div>
@@ -898,7 +906,7 @@ html[data-ab="b"] .ab-b{display:block}
 
         <div class="area-note" id="areaNote" style="margin-top:14px"></div>
 
-        <button type="button" class="btn btn-p gate-cta" id="gShow">Jatka</button>
+        <button type="button" class="btn btn-p gate-cta" id="gShow">Näytä vapaat ajat</button>
 
         <div class="gate-ticks">
           <span>✓ Kiinteä hinta</span><span>✓ Maksu työn jälkeen</span>
