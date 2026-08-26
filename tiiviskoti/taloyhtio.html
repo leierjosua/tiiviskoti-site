@@ -1006,11 +1006,12 @@ quoteBtn.addEventListener('click', () => {
   /* Kirjoitetaan vain tyhjään kenttään, ettei käyttäjän oma teksti katoa
      jos hän palaa takaisin ja painaa uudestaan. */
   if (addr && !addr.value && /^\d{5}$/.test(postal)) addr.value = postal;
-  /* Vieritys jätetään selaimelle: hash-vaihto vie #tarjous-osioon, ja CSS:n
-     `scroll-behavior: smooth` hoitaa animaation siellä missä se on käytössä.
-     Aiempi scrollIntoView({behavior:'smooth'}) jätti sivun paikalleen
-     ympäristöissä joissa pehmeä vieritys on estetty. */
-  location.hash = '#tarjous';
+  /* Vieritys jaetun apurin kautta (_anchors.js). Pelkkä hash-vaihto EI
+     riitä: jos selain ei suorita pehmeää vieritystä, se ei vieritä
+     lainkaan — sivu jää paikalleen ja nappi näyttää rikkinäiseltä. */
+  if (window.tkScrollToId) window.tkScrollToId('tarjous');
+  else location.hash = '#tarjous';
+  history.replaceState(null, '', '#tarjous');
   setTimeout(() => el('qName')?.focus({ preventScroll: true }), 500);
 });
 
@@ -1063,6 +1064,7 @@ paint();
 </script>
 <script defer src="_analytics.js"></script>
 <script type="module" src="_mcta.js"></script>
+<script type="module" src="_anchors.js"></script>
 <script src="_chat.js" defer></script>
 </body>
 </html>
