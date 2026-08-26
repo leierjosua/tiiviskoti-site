@@ -134,6 +134,13 @@ h2.title{font-size:clamp(29px,3.8vw,44px);font-weight:800;max-width:18ch;letter-
 .btn-p{background:var(--green);color:#fff}.btn-p:hover{background:var(--green-d)}
 a.btn-p{color:#fff}
 .btn-o{background:var(--card);color:var(--ink);border-color:var(--line2)}.btn-o:hover{border-color:var(--green);color:var(--green)}
+/* Toissijainen kutsu joka erottuu yhtä hyvin kuin pääkutsu, mutta ei kilpaile
+   sen kanssa: sama vihreä, käänteisenä. `btn-o` (harmaa reunus) jää
+   puhelinnapille ja muille vähemmän tärkeille — kaksi harmaata reunusta
+   vierekkäin näyttäisi siltä ettei kumpikaan ole tarjous. */
+.btn-alt{background:var(--card);color:var(--green);border-color:var(--green)}
+.btn-alt:hover{background:var(--green);color:#fff}
+a.btn-alt:hover{color:#fff}
 .btn-lg{padding:16px 32px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn:disabled:hover{background:var(--green)}
@@ -531,6 +538,10 @@ html[data-ab="b"] .ab-b{display:block}
     <p class="hero-sub">Tiivistämme rappukäytävät, yhteistilat ja ikkunat kiinteällä sopimushinnalla. Yksi kumppani ja selkeä tarjous hallitukselle.</p>
     <div class="hero-cta">
       <a href="#varaa" class="btn btn-p btn-lg">Varaa ilmainen kartoituskäynti</a>
+      <!-- Tarjouspyyntö heti hero-tasolla: isännöitsijä, joka ei voi luvata
+           käyntiaikaa ilman hallitusta, näkee oman polkunsa ennen kuin ehtii
+           päättää ettei sivu koske häntä. -->
+      <a href="#tarjous" class="btn btn-alt btn-lg">Pyydä tarjous</a>
       <a href="tel:+358458755996" class="btn btn-o btn-lg">Soita 045 875 5996</a>
     </div>
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä sopimushinta · kartoitus veloituksetta · työ mahdollisimman vähällä häiriöllä</p>
@@ -605,7 +616,7 @@ html[data-ab="b"] .ab-b{display:block}
            halutaan voittavan (ja jota juuri nyt mitataan), mutta
            isännöitsijä ei aina voi luvata päivämäärää yksin — hallitus,
            huoltoyhtiön ovenavaus ja oma kalenteri tulevat väliin. -->
-      <a href="#tarjous" class="btn btn-o gate-cta gate-alt-btn" id="toQuote">Pyydä tarjous ilman käyntiä</a>
+      <a href="#tarjous" class="btn btn-alt gate-cta gate-alt-btn" id="toQuote">Pyydä tarjous ilman käyntiä</a>
 
       <div class="gate-ticks">
         <span>✓ Veloitukseton</span><span>✓ Ei sitoumusta</span>
