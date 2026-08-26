@@ -177,6 +177,18 @@ export function mountKartoitus(o) {
       });
       st.slotsByDay = map;
       st.state = map.size ? 'ready' : 'none';
+
+      /* Sama hyppy ensimmäiseen vapaaseen päivään kuin varauskalenterissa
+         (_shared.js) — perustelu siellä. Kartoituskäynnillä tämä on jos
+         mahdollista vielä tärkeämpi: taloyhtiön yhteyshenkilö käy sivulla
+         kerran, työajan lomassa. */
+      const jumpNeeded = !selDay || !(map.get(keyOf(selDay)) || []).length;
+      if (map.size && jumpNeeded) {
+        const [y, m, dd] = [...map.keys()].sort()[0].split('-').map(Number);
+        const firstFree = new Date(y, m - 1, dd); firstFree.setHours(0, 0, 0, 0);
+        viewY = firstFree.getFullYear(); viewM = firstFree.getMonth();
+        selDay = firstFree; selSlot = null;
+      }
     } catch (_) { st.state = 'error'; }
     // Valittu aika voi kadota päivityksessä (joku ehti varata sen).
     if (selDay && selSlot && !freeSlots(selDay).some((s) => s.time === selSlot)) selSlot = null;

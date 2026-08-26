@@ -527,6 +527,26 @@ async function loadAvailability(){
     });
     avail.slotsByDay = map;
     avail.state = map.size ? 'ready' : 'none';
+
+    /* Hyppy ensimmäiseen vapaaseen päivään.
+
+       MIKSI: kalenteri avautuu kuluvaan kuukauteen, ja päivät ilman aikoja
+       ovat harmaita ja disabled. Kun seuraava vapaa aika on kahden viikon
+       päässä, kävijä näki kokonaisen kuukauden klikkaamattomia päiviä ja
+       kehotuksen "Valitse päivä" jota hän ei voinut noudattaa — ainoa tie
+       eteenpäin oli huomata kuukausinuoli. Mainosliikenteessä se on se
+       kohta josta poistutaan.
+
+       Siirto tehdään vain jos asiakas ei ole itse valinnut päivää, TAI jos
+       hänen valintansa jäi ilman aikoja (kesto kasvoi tai joku ehti varata).
+       Muuten näkymä hyppäisi hänen altaan kesken selaamisen. */
+    const jumpNeeded = !selDay || !(map.get(keyOf(selDay)) || []).length;
+    if (map.size && jumpNeeded) {
+      const [y, m, dd] = [...map.keys()].sort()[0].split('-').map(Number);
+      const firstFree = new Date(y, m - 1, dd); firstFree.setHours(0, 0, 0, 0);
+      viewY = firstFree.getFullYear(); viewM = firstFree.getMonth();
+      selDay = firstFree; selSlot = null;
+    }
   }catch(_){
     avail.state = 'error';
   }
