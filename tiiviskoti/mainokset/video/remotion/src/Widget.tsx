@@ -96,7 +96,7 @@ export const Widget: React.FC<{ startF: number; endF: number }> = ({ startF, end
               opacity: s, overflow: 'hidden',
             }}>
               <span style={{ fontSize: 27, color: '#fff' }}>tiiviskoti.fi</span>
-              <span style={{ fontSize: 18, fontWeight: 700, color: C.mint }}>Ikkuna 95 € · ulko-ovi 119 €</span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: C.mint }}>Ikkuna 95 € · ulko-ovi 99 €</span>
             </div>
           );
         })()}

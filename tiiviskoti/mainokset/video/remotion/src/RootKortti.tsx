@@ -29,7 +29,7 @@ const KOTI: KorttiProps = {
   ],
   cardTitle: 'Varaa aika verkossa',
   ctaLine1: 'Varaa aika', ctaLine2: 'verkossa',
-  ctaNote: 'Ikkuna 95 € · ulko-ovi 119 € · pienin käynti 149 €',
+  ctaNote: 'Ikkuna 95 € · ulko-ovi 99 € · pienin käynti 149 €',
 };
 
 const TALOYHTIO: KorttiProps = {
@@ -72,14 +72,14 @@ const HINTA: KorttiProps = {
   l1: 'Näin näet', l2: 'kiinteän hinnan', l3: 'ennen varausta',
   lead: 'Ei arviolaskuria eikä tarjouspyyntöä',
   steps: [
-    { tag: 'Laskurissa 1/4', title: 'Valitse ovet ja ikkunat', sub: 'Ikkuna 95 €, ulko-ovi 119 €' },
+    { tag: 'Laskurissa 1/4', title: 'Valitse ovet ja ikkunat', sub: 'Ikkuna 95 €, ulko-ovi 99 €' },
     { tag: 'Laskurissa 2/4', title: 'Hinta päivittyy heti', sub: 'Sama summa myös laskussa' },
     { tag: 'Laskurissa 3/4', title: 'Kotitalousvähennys näkyy', sub: '−40 % työn osuudesta valmiiksi laskettuna' },
     { tag: 'Laskurissa 4/4', title: 'Varaa aika samasta näkymästä', sub: 'Kalenteri aukeaa hinnan vierestä' },
   ],
   cardTitle: 'Hintalaskuri',
   ctaLine1: 'Katso hinta', ctaLine2: 'heti',
-  ctaNote: 'Ikkuna 95 € · ulko-ovi 119 € · pienin käynti 149 €',
+  ctaNote: 'Ikkuna 95 € · ulko-ovi 99 € · pienin käynti 149 €',
 };
 
 const SAASTO: KorttiProps = {
@@ -94,7 +94,7 @@ const SAASTO: KorttiProps = {
   ],
   cardTitle: 'Näin käynti etenee',
   ctaLine1: 'Varaa aika', ctaLine2: 'verkossa',
-  ctaNote: 'Ikkuna 95 € · ulko-ovi 119 € · pienin käynti 149 €',
+  ctaNote: 'Ikkuna 95 € · ulko-ovi 99 € · pienin käynti 149 €',
 };
 
 const TALOYHTIO_KARTOITUS: KorttiProps = {

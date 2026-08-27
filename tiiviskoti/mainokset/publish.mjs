@@ -46,8 +46,8 @@ const TALO = 'https://tiiviskoti.fi/taloyhtio.html';
 const ADS = [
   { file: 'mainos-veto.png', adName: 'TK25 - Veto (kipukärki)', headline: 'Kiinteä hinta · lämpökamera sisältyy', link: BOOK, cta: 'BOOK_TRAVEL',
     message: 'Vetääkö ulko-ovista tai ikkunoista? 🥶 Usein pieni tiivistys — ei kallis remontti — säästää eniten lämmityksessä. Kiinteä hinta heti, lämpökamerakuvaus sisältyy, oma porukka ilman alihankintaa. Koko Uusimaa.\n\n👉 Varaa aika: tiiviskoti.fi' },
-  { file: 'mainos-hinta.png', adName: 'TK25 - Hinta (kiinteä)', headline: 'Ikkuna alk. 65 € · ulko-ovi 119 €', link: BOOK, cta: 'BOOK_TRAVEL',
-    message: 'Ovien ja ikkunoiden tiivistys kiinteään hintaan — ei arviolaskuria, näet summan heti. Ikkuna alk. 65 €, ulko-ovi 119 €, pienin käynti 149 € (sis. lämpökamerakuvauksen). Kotitalousvähennys −40 %.\n\n👉 Katso hinnat: tiiviskoti.fi' },
+  { file: 'mainos-hinta.png', adName: 'TK25 - Hinta (kiinteä)', headline: 'Ikkuna alk. 65 € · ulko-ovi 99 €', link: BOOK, cta: 'BOOK_TRAVEL',
+    message: 'Ovien ja ikkunoiden tiivistys kiinteään hintaan — ei arviolaskuria, näet summan heti. Ikkuna alk. 65 €, ulko-ovi 99 €, pienin käynti 149 € (sis. lämpökamerakuvauksen). Kotitalousvähennys −40 %.\n\n👉 Katso hinnat: tiiviskoti.fi' },
   { file: 'mainos-asentaja.png', adName: 'TK25 - Asentaja (luottamus)', headline: 'Ammattiasennus samana päivänä', link: BOOK, cta: 'BOOK_TRAVEL',
     message: 'Ammattiasennus samana päivänä. Ovien ja ikkunoiden tiivisteiden vaihto, oven käynnin säätö ja lämpökamerakuvaus — kiinteään hintaan, ei arvioita. Oma porukka, koko Uusimaa.\n\n👉 Varaa aika: tiiviskoti.fi' },
   { file: 'mainos-taloyhtio.png', adName: 'TK25 - Taloyhtiö', headline: 'Taloyhtiön ovet & ikkunat kuntoon', link: TALO, cta: 'GET_QUOTE',

@@ -92,7 +92,7 @@ const body = `
       <div><dt>Ikkuna, 5–9 kpl</dt><dd>85 € / kpl</dd></div>
       <div><dt>Ikkuna, 10–19 kpl</dt><dd>75 € / kpl</dd></div>
       <div><dt>Ikkuna, 20 kpl tai enemmän</dt><dd>65 € / kpl</dd></div>
-      <div><dt>Ulko-ovi tai parvekeovi</dt><dd>119 € / kpl</dd></div>
+      <div><dt>Ulko-ovi tai parvekeovi</dt><dd>99 € / kpl</dd></div>
       <div><dt>Terassin liuku- tai pariovi</dt><dd>149 € / kpl</dd></div>
       <div><dt>Väli- / huoneovi</dt><dd>89 € / kpl</dd></div>
       <div><dt>Pelkkä kynnyskumi</dt><dd>45 € / kpl</dd></div>

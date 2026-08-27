@@ -179,7 +179,7 @@ export const ALUEET = [
     kulma: 'Hyvinkää on toiminta-alueemme pohjoisin kunta, joten ajomatka on pisimpiä. Se ei muuta kohteiden hintoja — ikkuna on 95 € täälläkin — mutta tekee koko talon kerralla tiivistämisestä selvästi järkevämpää kuin yhden ikkunan käynnistä.',
     osat: ['Keskusta', 'Paavola', 'Hakala', 'Martti', 'Kaukas', 'Hyvinkäänkylä', 'Vehkoja', 'Palopuro', 'Kytäjä', 'Nummenkylä'],
     faq: [
-      ['Onko Hyvinkäällä eri hinta kuin pääkaupunkiseudulla?', 'Kohteiden hinnat ovat samat: ikkuna 95 €, ulko- ja parvekeovi 119 €. Etäisyys voi tuoda postinumerokohtaisen matkalisän, joka näkyy laskurissa ennen varauksen vahvistamista.'],
+      ['Onko Hyvinkäällä eri hinta kuin pääkaupunkiseudulla?', 'Kohteiden hinnat ovat samat: ikkuna 95 €, ulko- ja parvekeovi 99 €. Etäisyys voi tuoda postinumerokohtaisen matkalisän, joka näkyy laskurissa ennen varauksen vahvistamista.'],
       ['Kuinka pitkä toimitusaika Hyvinkäälle on?', 'Vapaat ajat näet suoraan kalenterista postinumerolla. Pidemmän ajomatkan takia Hyvinkään käynnit sijoitetaan yleensä samaan päivään muiden pohjoisen alueen kohteiden kanssa, joten valikoima on hieman suppeampi kuin Keravalla.'],
     ],
   },
@@ -196,7 +196,7 @@ export const ALUEET = [
     kulma: 'Riihimäki on sisämaata, ja se erottaa sen rannikkokunnista. Helsingissä ja Sipoossa tiivisteitä kuluttaa ennen kaikkea mereltä tuleva tuulikuorma; täällä ratkaisee lämpötilaero. Pakkanen painuu talvella selvästi alemmas kuin rannikolla, jolloin kova tiivistynyt tiiviste ei enää jousta takaisin karmia vasten ja veto tuntuu heti lattianrajassa. Siksi riihimäkeläisessä talossa vetoisuus paljastuu tyypillisesti vasta ensimmäisillä oikeilla pakkasilla, ei syyskuun tuulilla.',
     osat: ['Keskusta', 'Peltosaari', 'Patastenmäki', 'Herajoki', 'Uramo', 'Hirsimäki', 'Juppala', 'Petsamo', 'Vahteristo', 'Kalmu', 'Arolampi'],
     faq: [
-      ['Palveletteko Riihimäellä, vaikka se ei kuulu Uudellemaalle?', 'Kyllä. Riihimäki on Kanta-Hämettä, mutta se kuuluu toiminta-alueeseemme siinä missä Uudenmaan kunnatkin. Kohteiden hinnat ovat samat — ikkuna 95 €, ulko- ja parvekeovi 119 € — eikä Riihimäelle tule matkalisää. Voit varmistaa asian itse syöttämällä postinumerosi laskuriin ennen varausta.'],
+      ['Palveletteko Riihimäellä, vaikka se ei kuulu Uudellemaalle?', 'Kyllä. Riihimäki on Kanta-Hämettä, mutta se kuuluu toiminta-alueeseemme siinä missä Uudenmaan kunnatkin. Kohteiden hinnat ovat samat — ikkuna 95 €, ulko- ja parvekeovi 99 € — eikä Riihimäelle tule matkalisää. Voit varmistaa asian itse syöttämällä postinumerosi laskuriin ennen varausta.'],
       ['Kannattaako 1970-luvun kerrostaloasunnossa tiivistää vain parvekeovi?', 'Usein kannattaa aloittaa siitä, koska parvekeovi on tuon ikäisessä asunnossa lähes poikkeuksetta vetoisin kohta: siinä on sekä pitkät karmitiivisteet että kynnyskumi, ja ovea käytetään päivittäin. Jos asunnossa on kuitenkin samalla julkisivulla useampi alkuperäinen ikkuna, ne kannattaa tiivistää samalla kertaa — käynti on jo maksettu, ja yksikköhinta putoaa selvästi.'],
     ],
   },

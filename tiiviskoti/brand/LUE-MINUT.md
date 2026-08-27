@@ -51,7 +51,7 @@ se vie enemmän ruudun korkeutta kuin neliö.
 |---|---|---|
 | `fb-mainos-veto-*` | Kylmä veto ei kuulu kotiin | Kylmä yleisö |
 | `fb-mainos-veto-edut-*` | Sama kuva + säästö ja kotitalousvähennys | Kylmä yleisö, A/B-pari veto-mainokselle |
-| `fb-mainos-hinta-*` | 95 € / 119 €, hinta näkyy etukäteen | Harkintavaihe |
+| `fb-mainos-hinta-*` | 95 € / 99 €, hinta näkyy etukäteen | Harkintavaihe |
 | `fb-mainos-saasto-*` | 10–15 % lämmityskuluista | "Miksi vaivautua" |
 | `fb-mainos-taloyhtio-*` | Rappukäytävät kerralla kuntoon | Taloyhtiöiden hallitukset |
 | `fb-mainos-vahennys-*` | 95 € → 68 € kotitalousvähennyksellä | Hintaherkät |

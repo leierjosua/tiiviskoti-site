@@ -57,11 +57,11 @@ const HL_TALO = 'Taloyhtiön ovet ja ikkunat tiiviiksi';
 
 const VIDEOS = [
   { file: 'tiiviskoti-shorts-1.mp4', thumb: 'thumbs/shorts-1.jpg', adName: 'TK26 - Video ikkunakoukku',
-    headline: HL_KULUTTAJA, description: 'Ikkuna 95 €, ulko-ovi 119 €. Kiinteä hinta heti.',
+    headline: HL_KULUTTAJA, description: 'Ikkuna 95 €, ulko-ovi 99 €. Kiinteä hinta heti.',
     message: 'Ovien ja ikkunoiden tiivistys kiinteään hintaan. 🥶 Vetikö sun ikkunat viime talvena? Vetävä ovi tai ikkuna nostaa lämmityskuluja jopa 15 %. Vaihdamme tiivisteet — näet summan heti, ei arviolaskuria. Lämpökamerakuvaus sisältyy, koko Uusimaa.\n\n👉 Varaa aika: tiiviskoti.fi' },
   { file: 'tiiviskoti-shorts-2.mp4', thumb: 'thumbs/shorts-2.jpg', adName: 'TK26 - Video jalkakoukku',
     headline: HL_KULUTTAJA, description: 'Yksi käynti, kiinteä hinta, koko Uusimaa.',
-    message: 'Ovien ja ikkunoiden tiivistys yhdellä käynnillä. Paleliko sun pikkuvarpaat viime talvena? Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan: ikkuna 95 €, ulko-ovi 119 €, pienin käynti 149 € (sis. lämpökamerakuvauksen). Kotitalousvähennys −40 %.\n\n👉 tiiviskoti.fi' },
+    message: 'Ovien ja ikkunoiden tiivistys yhdellä käynnillä. Paleliko sun pikkuvarpaat viime talvena? Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan: ikkuna 95 €, ulko-ovi 99 €, pienin käynti 149 € (sis. lämpökamerakuvauksen). Kotitalousvähennys −40 %.\n\n👉 tiiviskoti.fi' },
   { file: 'tiiviskoti-shorts-3.mp4', thumb: 'thumbs/shorts-3.jpg', adName: 'TK26 - Video olohuonekoukku',
     headline: HL_KULUTTAJA, description: 'Näet hinnan heti, varaat ajan alle minuutissa.',
     message: 'Ovien ja ikkunoiden tiivistys kiinteään hintaan. Oliko sulla peitto päällä viime talvella telkkarin edessä? Ei tarvitse ensi talvena. Tiivistämme ovet ja ikkunat, ja ajan varaat verkosta alle minuutissa. Koko Uusimaa.\n\n👉 tiiviskoti.fi' },
@@ -69,19 +69,19 @@ const VIDEOS = [
 
 const KUVAT = [
   { file: 'mainos-veto.png', adName: 'TK26 - Veto (kipukärki)', headline: HL_KULUTTAJA,
-    description: 'Ikkuna 95 €, ulko-ovi 119 €. Kiinteä hinta heti.',
+    description: 'Ikkuna 95 €, ulko-ovi 99 €. Kiinteä hinta heti.',
     message: 'Ovien ja ikkunoiden tiivistys kiinteään hintaan. Karkaako lämpö ulos ovista? Usein pieni tiivistys — ei kallis remontti — säästää eniten lämmityksessä. Näet hinnan heti, lämpökamerakuvaus sisältyy. Koko Uusimaa.\n\n👉 Varaa aika: tiiviskoti.fi' },
   { file: 'mainos-ovi.png', adName: 'TK26 - Ovi (lähikuva)', headline: HL_KULUTTAJA,
     description: 'Karmitiiviste ja kynnyskumi vaihtuvat tunnissa.',
-    message: 'Ovien ja ikkunoiden tiivistys kiinteään hintaan. Veto tulee ulko-oven karmitiivisteestä ja kynnyskumista — ne ovat halvin kohta korjata ja yleisin syy vetoon. Vaihto kestää tunnin, hinnan näet ennen varausta. Ulko-ovi 119 €, ikkuna 95 €.\n\n👉 tiiviskoti.fi' },
+    message: 'Ovien ja ikkunoiden tiivistys kiinteään hintaan. Veto tulee ulko-oven karmitiivisteestä ja kynnyskumista — ne ovat halvin kohta korjata ja yleisin syy vetoon. Vaihto kestää tunnin, hinnan näet ennen varausta. Ulko-ovi 99 €, ikkuna 95 €.\n\n👉 tiiviskoti.fi' },
   { file: 'mainos-asentaja.png', adName: 'TK26 - Asentaja (luottamus)', headline: HL_KULUTTAJA,
     description: 'Ammattiasennus samana päivänä, kiinteä hinta.',
     message: 'Ovien ja ikkunoiden tiivistys samana päivänä. Tiivisteiden vaihto, oven käynnin säätö ja lämpökamerakuvaus — kiinteään hintaan, ei arvioita. Koko Uusimaa.\n\n👉 Varaa aika: tiiviskoti.fi' },
   { file: 'mainos-porukka.png', adName: 'TK26 - Oma porukka', headline: HL_KULUTTAJA,
     description: 'Oma porukka, ei alihankintaa. Kiinteä hinta.',
-    message: 'Ovien ja ikkunoiden tiivisteet vaihtaa oma porukkamme. Sama porukka vastaa puhelimeen, tekee kartoituksen ja asentaa tiivisteet — ei myyntimiehiä eikä alihankintaa, siksi hinta on kiinteä ja vastuu selvä. Ikkuna 95 €, ulko-ovi 119 €.\n\n👉 tiiviskoti.fi' },
+    message: 'Ovien ja ikkunoiden tiivisteet vaihtaa oma porukkamme. Sama porukka vastaa puhelimeen, tekee kartoituksen ja asentaa tiivisteet — ei myyntimiehiä eikä alihankintaa, siksi hinta on kiinteä ja vastuu selvä. Ikkuna 95 €, ulko-ovi 99 €.\n\n👉 tiiviskoti.fi' },
   { file: 'mainos-syksy.png', adName: 'TK26 - Syksy (kausi)', headline: HL_KULUTTAJA,
-    description: 'Tiivistä ennen pakkasia. Ikkuna 95 €, ovi 119 €.',
+    description: 'Tiivistä ennen pakkasia. Ikkuna 95 €, ovi 99 €.',
     message: 'Ovien ja ikkunoiden tiivistys ennen pakkasia. Vetävät ovet ja ikkunat tulevat talvella kalliiksi. Kiinteä hinta, lämpökamerakuvaus sisältyy, ammattiasennus samana päivänä.\n\n👉 tiiviskoti.fi' },
 ];
 

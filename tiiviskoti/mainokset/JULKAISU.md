@@ -52,7 +52,7 @@ taloa eikä kasvoja.
 - **Otsikko:** Veto tulee tästä raosta
 - **Teksti:** Ulko-oven karmitiiviste ja kynnyskumi ovat halvin kohta korjata ja
   yleisin syy vetoon. Vaihto kestää tunnin, ja hinnan näet ennen varausta —
-  ei arviolaskuria. Ulko-ovi 119 €, ikkuna 95 €, lämpökamerakuvaus sisältyy.
+  ei arviolaskuria. Ulko-ovi 99 €, ikkuna 95 €, lämpökamerakuvaus sisältyy.
   👉 tiiviskoti.fi
 
 ### 3 · mainos-asentaja.png — ammattilainen / luottamus
@@ -71,7 +71,7 @@ Kuva: molemmat asentajat työvälineineen kohteessa (Kuva-2). Työkuva, ei muoto
 - **Otsikko:** Tiivisteet vaihtaa oma porukka
 - **Teksti:** Sama porukka vastaa puhelimeen, tekee kartoituksen ja asentaa
   tiivisteet. Ei myyntimiehiä eikä alihankintaa — siksi hinta on kiinteä ja vastuu
-  selvä. Ikkuna 95 €, ulko-ovi 119 €, kotitalousvähennys −40 %.
+  selvä. Ikkuna 95 €, ulko-ovi 99 €, kotitalousvähennys −40 %.
   👉 Varaa aika: tiiviskoti.fi
 
 ### 5 · mainos-syksy.png — kausikärki
