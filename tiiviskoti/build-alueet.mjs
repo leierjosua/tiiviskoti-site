@@ -19,6 +19,7 @@
    ========================================================= */
 import { writeFileSync, mkdirSync, readFileSync, readdirSync, unlinkSync } from 'node:fs';
 import { ALUEET, SITE } from './_alueet-data.mjs';
+import { ARTIKKELIT } from './_artikkelit-data.mjs';
 import { TYPES, MIN_PRICE, WINDOW_TIERS } from './pricing.mjs';
 
 const TEL = '045 875 5996';
@@ -65,7 +66,7 @@ const footer = (R, paitsi) => `<footer class="mfoot"><div class="wrap">
       <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
-    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="${R}artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:${TELH}">${TEL}</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
   <div class="mf-cities">
@@ -176,7 +177,8 @@ function kuntaSivu(a, i) {
   const url = `${SITE}/toiminta-alueet/${a.slug}.html`;
   const [kuva, alt] = KUVAT[i % KUVAT.length];
   const title = `Ovien ja ikkunoiden tiivistys ${a.ine} — TiivisKoti`;
-  const desc = `Tiivistämme ovet ja ikkunat ${a.ine} kiinteään hintaan: ikkuna ${WINDOW_TIERS[0].price} €, ulko- ja parvekeovi ${TYPES[1].price} €, pienin veloitus ${MIN_PRICE} €. Näet hinnan heti laskurista ja varaat ajan suoraan kalenterista.`;
+  /* Alle 155 merkkiä: pidempi katkeaa hakutuloksessa kesken lauseen. */
+  const desc = `Ovien ja ikkunoiden tiivistys ${a.ine} kiinteään hintaan: ikkuna ${WINDOW_TIERS[0].price} €, ovi ${TYPES[1].price} €. Näet hinnan laskurista ja varaat ajan heti.`;
 
   const faqLd = a.faq.map(([q, v]) => ({
     '@type': 'Question',
@@ -1036,10 +1038,10 @@ ${skripti}
 function hubSivu() {
   const R = '';
   const url = `${SITE}/toiminta-alueet.html`;
-  const title = 'Toiminta-alueet — TiivisKoti | Ovien ja ikkunoiden tiivistys Uudellamaalla ja Riihimäellä';
+  const title = 'Toiminta-alueet: tiivistys Uudellamaalla — TiivisKoti';
   /* "Uudellamaalla ja Riihimäellä", ei pelkkä kuntamäärä + Uusimaa: Riihimäki
      on Kanta-Hämettä, joten "N kuntaa Uudellamaalla" olisi suoraan väärin. */
-  const desc = `TiivisKoti tiivistää ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla ja Riihimäellä — Helsingistä Riihimäelle. Samat kiinteät hinnat koko alueella: ikkuna ${WINDOW_TIERS[0].price} €, ovi ${TYPES[1].price} €.`;
+  const desc = `Tiivistämme ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla ja Riihimäellä. Samat kiinteät hinnat: ikkuna ${WINDOW_TIERS[0].price} €, ovi ${TYPES[1].price} €.`;
 
   const ld = {
     '@context': 'https://schema.org',
@@ -1147,8 +1149,8 @@ ${skripti}
 function meistaSivu() {
   const R = '';
   const url = `${SITE}/meista.html`;
-  const title = 'Meistä — TiivisKoti';
-  const desc = 'TiivisKoti tekee työt omalla porukalla: sama tiimi vastaa puhelimeen, tekee maksuttoman kartoituksen ja asentaa tiivisteet. Ovien ja ikkunoiden tiivistevaihto kiinteään hintaan Uudellamaalla ja Riihimäellä.';
+  const title = 'Meistä: oma porukka, ei alihankintaa — TiivisKoti';
+  const desc = 'Sama porukka vastaa puhelimeen, kartoittaa ja asentaa. Ovien ja ikkunoiden tiivistys kiinteään hintaan Uudellamaalla ja Riihimäellä.';
 
   const ld = {
     '@context': 'https://schema.org',
@@ -1332,6 +1334,231 @@ for (const f of readdirSync('toiminta-alueet')) {
   }
 }
 
+
+/* ---------- artikkelit ---------- */
+
+/* Hintaluvut yhdestä paikasta: artikkelidata sisältää {{TOKEN}}-merkinnät,
+   jotka korvataan tässä pricing.mjs:n arvoilla. Näin artikkeli ei voi jäädä
+   lupaamaan hintaa, joka ei ole enää voimassa. */
+function hinnatTekstiin(teksti) {
+  const w = WINDOW_TIERS.map((t) => t.price);
+  const ovi = TYPES[1];
+  const arvot = {
+    IKKUNA: w[0], IKKUNA5: w[1], IKKUNA10: w[2], IKKUNA20: w[3],
+    OVI: ovi.price, OVICOMBO: ovi.combo ?? ovi.price,
+    TERASSI: TYPES[3].price, VALIOVI: TYPES[4].price,
+    MIN: MIN_PRICE,
+    ESIM5: 5 * w[1],
+    ESIM10: 10 * w[2],
+    ESIMOVI: (ovi.combo ?? ovi.price) + 5 * w[1],
+  };
+  /* Kotitalousvähennysesimerkki: 40 % työn osuudesta, omavastuu 100 €.
+     Työn osuus 90 % vastaa sitä mitä laskulle oikeasti eritellään. */
+  arvot.TYO10 = Math.round(arvot.ESIM10 * 0.9);
+  arvot.VAH10 = Math.round(arvot.TYO10 * 0.4);
+  arvot.VAHNET10 = arvot.VAH10 - 100;
+  return String(teksti).replace(/\{\{([A-Z0-9]+)\}\}/g, (koko, avain) => {
+    if (!(avain in arvot)) throw new Error(`Tuntematon hintatoken ${koko} artikkelissa`);
+    return String(arvot[avain]);
+  });
+}
+
+const artikkeliUrl = (slug) => `${SITE}/artikkelit/${slug}.html`;
+
+function artikkeliSivu(a) {
+  const R = '../';
+  const url = artikkeliUrl(a.slug);
+  const t = hinnatTekstiin;
+  const ld = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Article',
+        '@id': `${url}#article`,
+        headline: a.title,
+        description: t(a.desc),
+        datePublished: a.julkaistu,
+        dateModified: a.julkaistu,
+        inLanguage: 'fi-FI',
+        mainEntityOfPage: url,
+        image: `${SITE}/img/og-tiiviskoti.jpg?v=3`,
+        author: { '@type': 'Organization', name: 'TiivisKoti', url: `${SITE}/` },
+        publisher: { '@id': `${SITE}/#business` },
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${url}#ukk`,
+        mainEntity: a.faq.map(([q, v]) => ({
+          '@type': 'Question', name: t(q),
+          acceptedAnswer: { '@type': 'Answer', text: t(v) },
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Etusivu', item: `${SITE}/` },
+          { '@type': 'ListItem', position: 2, name: 'Artikkelit', item: `${SITE}/artikkelit.html` },
+          { '@type': 'ListItem', position: 3, name: a.title, item: url },
+        ],
+      },
+    ],
+  };
+
+  const liittyvat = a.liittyy
+    .map((slug) => ARTIKKELIT.find((x) => x.slug === slug))
+    .filter(Boolean);
+
+  return `<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(a.titleSeo ?? a.title)} — TiivisKoti</title>
+<meta name="description" content="${esc(t(a.desc))}" />
+<link rel="canonical" href="${url}" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="TiivisKoti" />
+<meta property="og:locale" content="fi_FI" />
+<meta property="og:url" content="${url}" />
+<meta property="og:title" content="${esc(a.title)}" />
+<meta property="og:description" content="${esc(t(a.desc))}" />
+<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg?v=3" />
+<meta property="article:published_time" content="${a.julkaistu}" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#F6F7F3" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="stylesheet" href="${R}_alueet.css" />
+<script type="application/ld+json">
+${JSON.stringify(ld, null, 2)}
+</script>
+</head>
+<body>
+${nav(R)}
+
+<div class="wrap crumb"><a href="/">Etusivu</a> › <a href="${R}artikkelit.html">Artikkelit</a> › ${esc(a.title)}</div>
+
+<article class="sec"><div class="wrap" style="max-width:76ch">
+  <div class="kicker">${esc(a.kicker)}</div>
+  <h1 style="font-size:clamp(30px,4.2vw,46px);line-height:1.15;margin:8px 0 18px">${esc(a.h1)}</h1>
+  <p style="font-size:19px;line-height:1.7;color:var(--mute);margin-bottom:8px">${esc(t(a.lead))}</p>
+  <p style="font-size:14px;color:var(--mute)">Päivitetty <time datetime="${a.julkaistu}">${a.julkaistu.split('-').reverse().join('.')}</time></p>
+
+  ${a.osiot.map(([otsikko, kappaleet]) => `<h2 style="font-size:clamp(22px,2.6vw,30px);margin:38px 0 14px">${esc(otsikko)}</h2>
+  ${kappaleet.length > 2 && kappaleet.every((k) => k.length < 240)
+    ? `<ul style="line-height:1.85;padding-left:22px">${kappaleet.map((k) => `<li style="margin-bottom:10px">${esc(t(k))}</li>`).join('')}</ul>`
+    : kappaleet.map((k) => `<p style="line-height:1.8;margin-bottom:14px">${esc(t(k))}</p>`).join('\n  ')}`).join('\n  ')}
+
+  <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;margin:40px 0">
+    <b style="display:block;font-size:19px;margin-bottom:8px">Laske oman kohteesi hinta</b>
+    <p style="color:var(--mute);line-height:1.7;margin-bottom:18px">Syötä ovien ja ikkunoiden määrä, niin näet kiinteän hinnan heti. Voit varata ajan samalla — tarjouspyyntöä ei tarvita.</p>
+    <a href="/#laskuri" class="btn btn-p btn-lg">Laske hinta ja varaa aika</a>
+    <a href="tel:${TELH}" class="btn btn-o btn-lg">Soita ${TEL}</a>
+  </div>
+
+  <h2 style="font-size:clamp(22px,2.6vw,30px);margin:38px 0 14px">Usein kysyttyä</h2>
+  ${a.faq.map(([q, v]) => `<details class="faq-d"><summary>${esc(t(q))}</summary><p>${esc(t(v))}</p></details>`).join('\n  ')}
+
+  ${liittyvat.length ? `<h2 style="font-size:clamp(22px,2.6vw,30px);margin:44px 0 14px">Lue myös</h2>
+  <ul style="line-height:2;padding-left:22px">
+    ${liittyvat.map((x) => `<li><a href="${R}artikkelit/${x.slug}.html" style="color:var(--green);font-weight:700">${esc(x.title)}</a></li>`).join('\n    ')}
+  </ul>` : ''}
+
+  <p style="margin-top:36px;color:var(--mute)">Tiivistämme ovet ja ikkunat <a href="${R}toiminta-alueet.html" style="color:var(--green);font-weight:700">${ALUEET.length} kunnassa</a> Uudellamaalla ja Riihimäellä. Taloyhtiöille on <a href="${R}taloyhtio.html" style="color:var(--green);font-weight:700">oma palvelunsa</a>.</p>
+</div></article>
+
+${footer(R, null)}
+${skripti}
+</body>
+</html>`;
+}
+
+function artikkelitHub() {
+  const R = '';
+  const url = `${SITE}/artikkelit.html`;
+  const title = 'Artikkelit ovien ja ikkunoiden tiivistyksestä — TiivisKoti';
+  const desc = 'Vedon syyt, tiivisteiden vaihdon hinta, kotitalousvähennys ja säästöarviot. Käytännön tietoa ovien ja ikkunoiden tiivistyksestä.';
+  const ld = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage', '@id': `${url}#page`, name: title, description: desc, inLanguage: 'fi-FI',
+        isPartOf: { '@id': `${SITE}/#website` },
+      },
+      {
+        '@type': 'ItemList', '@id': `${url}#lista`,
+        itemListElement: ARTIKKELIT.map((a, i) => ({
+          '@type': 'ListItem', position: i + 1, name: a.title, url: artikkeliUrl(a.slug),
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Etusivu', item: `${SITE}/` },
+          { '@type': 'ListItem', position: 2, name: 'Artikkelit', item: url },
+        ],
+      },
+    ],
+  };
+
+  return `<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}" />
+<link rel="canonical" href="${url}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TiivisKoti" />
+<meta property="og:locale" content="fi_FI" />
+<meta property="og:url" content="${url}" />
+<meta property="og:title" content="${esc(title)}" />
+<meta property="og:description" content="${esc(desc)}" />
+<meta property="og:image" content="${SITE}/img/og-tiiviskoti.jpg?v=3" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#F6F7F3" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="stylesheet" href="${R}_alueet.css" />
+<script type="application/ld+json">
+${JSON.stringify(ld, null, 2)}
+</script>
+</head>
+<body>
+${nav(R)}
+
+<div class="wrap crumb"><a href="/">Etusivu</a> › Artikkelit</div>
+
+<section class="sec"><div class="wrap">
+  <div class="kicker">Artikkelit</div>
+  <h1 style="font-size:clamp(32px,4.4vw,50px);max-width:22ch">Tietoa ovien ja ikkunoiden tiivistyksestä</h1>
+  <p class="sub" style="max-width:65ch">Mistä veto johtuu, mitä tiivisteiden vaihto maksaa ja paljonko se säästää. Kirjoitettu sen pohjalta mitä kohteissa oikeasti nähdään.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:34px">
+    ${ARTIKKELIT.map((a) => `<a href="${R}artikkelit/${a.slug}.html" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;text-decoration:none;color:inherit">
+      <div class="kicker" style="margin-bottom:8px">${esc(a.kicker)}</div>
+      <b style="display:block;font-size:19px;line-height:1.35;margin-bottom:10px">${esc(a.title)}</b>
+      <span style="color:var(--mute);font-size:15px;line-height:1.65">${esc(hinnatTekstiin(a.lead))}</span>
+    </a>`).join('\n    ')}
+  </div>
+</div></section>
+
+${footer(R, null)}
+${skripti}
+</body>
+</html>`;
+}
+
+
 for (const k of KUMPPANIT) {
   writeFileSync(`${k.slug}.html`, kumppaniSivu(k));
   console.log('✓', k.slug + '.html');
@@ -1352,5 +1579,52 @@ ALUEET.forEach((a, i) => {
   writeFileSync(`toiminta-alueet/${a.slug}.html`, kuntaSivu(a, i));
   console.log(`✓ toiminta-alueet/${a.slug}.html`);
 });
+
+
+/* ---------- artikkelit ---------- */
+
+mkdirSync('artikkelit', { recursive: true });
+for (const a of ARTIKKELIT) {
+  writeFileSync(`artikkelit/${a.slug}.html`, artikkeliSivu(a));
+  console.log('✓ artikkelit/' + a.slug + '.html');
+}
+writeFileSync('artikkelit.html', artikkelitHub());
+console.log('✓ artikkelit.html');
+
+/* ---------- sitemap ---------- */
+
+/* Sitemap ylläpidettiin ennen käsin, jolloin lastmod jäi kuukausia vanhaksi
+   ja uudet sivut piti muistaa lisätä erikseen. Nyt se syntyy samasta
+   lähteestä kuin sivutkin. Kumppanisivut jätetään pois: ne ovat noindex. */
+function sitemapXml() {
+  const tanaan = new Date().toISOString().slice(0, 10);
+  const sivut = [
+    { loc: `${SITE}/`, pri: '1.0', freq: 'weekly' },
+    { loc: `${SITE}/ikkunoiden-tiivistys.html`, pri: '0.9', freq: 'monthly' },
+    { loc: `${SITE}/ovien-tiivistys.html`, pri: '0.9', freq: 'monthly' },
+    { loc: `${SITE}/taloyhtio.html`, pri: '0.9', freq: 'monthly' },
+    { loc: `${SITE}/toiminta-alueet.html`, pri: '0.8', freq: 'monthly' },
+    { loc: `${SITE}/artikkelit.html`, pri: '0.8', freq: 'weekly' },
+    ...ARTIKKELIT.map((a) => ({ loc: artikkeliUrl(a.slug), pri: '0.7', freq: 'monthly', mod: a.julkaistu })),
+    ...ALUEET.map((a) => ({ loc: `${SITE}/toiminta-alueet/${a.slug}.html`, pri: '0.7', freq: 'monthly' })),
+    { loc: `${SITE}/meista.html`, pri: '0.5', freq: 'yearly' },
+    { loc: `${SITE}/varaa.html`, pri: '0.5', freq: 'monthly' },
+    { loc: `${SITE}/ajanvaraus.html`, pri: '0.5', freq: 'monthly' },
+    { loc: `${SITE}/tietosuoja.html`, pri: '0.3', freq: 'yearly' },
+    { loc: `${SITE}/kayttoehdot.html`, pri: '0.3', freq: 'yearly' },
+  ];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sivut.map((s) => `  <url>
+    <loc>${s.loc}</loc>
+    <lastmod>${s.mod ?? tanaan}</lastmod>
+    <changefreq>${s.freq}</changefreq>
+    <priority>${s.pri}</priority>
+  </url>`).join('\n')}
+</urlset>
+`;
+}
+writeFileSync('sitemap.xml', sitemapXml());
+console.log('✓ sitemap.xml');
 
 console.log(`\n${ALUEET.length} aluesivua + hub kirjoitettu.`);

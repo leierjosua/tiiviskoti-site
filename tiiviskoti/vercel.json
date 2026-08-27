@@ -226,6 +226,14 @@
       "destination": "/varaa.html"
     },
     {
+      "source": "/artikkelit",
+      "destination": "/artikkelit.html"
+    },
+    {
+      "source": "/artikkelit/([^.]+)",
+      "destination": "/artikkelit/$1.html"
+    },
+    {
       "source": "/lataa/dl/(.*)",
       "destination": "/lataa/$1"
     }
