@@ -159,6 +159,9 @@ const body = `
         tunniste, jonka Meta itse liittää mainoslinkkiin. Tallennetaan vain jos saavuit Metan
         mainoksesta. Käytetään ainoastaan siihen, että toteutunut kauppa osataan yhdistää oikeaan
         mainokseen.</li>
+      <li><code>tk_fbp</code> (paikallinen muisti) — satunnaisluku Metan käyttämässä muodossa.
+        Korvaa Metan oman seurantaevästeen, jota emme aseta. Ei sisällä mitään sinuun liittyvää
+        tietoa eikä seuraa sinua muille sivustoille.</li>
       <li><code>tk_vid</code> (paikallinen muisti) — satunnaisluku, joka ei ole johdettu mistään
         sinuun liittyvästä tiedosta eikä paljasta kuka olet. Sen ansiosta mainosalusta tunnistaa
         saman selaimen tapahtumat samaksi käynniksi eikä sama kävijä näytä monelta eri ihmiseltä.

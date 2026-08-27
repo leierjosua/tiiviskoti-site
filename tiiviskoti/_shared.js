@@ -187,7 +187,30 @@ function readFbc(){
 }
 
 // _fbp syntyy vain jos Meta Pixel on käytössä; ilman sitä palautuu undefined.
-function readFbp(){ return readCookie('_fbp'); }
+const FBP_KEY = 'tk_fbp';
+
+/* Selaintunniste Metan omassa muodossa: fb.1.<aikaleima>.<satunnaisluku>.
+
+   MIKSI ITSE TEHTY: _fbp-evästeen asettaa normaalisti Metan Pixel, jota
+   tällä sivustolla ei ole eikä oteta. Ilman sitä Metalle menee tapahtumia
+   ilman selaintunnistetta, ja Meta huomauttaa nimenomaan tästä ("low
+   coverage of fbp"). Tunniste on satunnaisluku eikä sisällä mitään
+   henkilötietoa — sama periaate kuin _fbc:llä, joka rakennetaan tässä
+   tiedostossa fbclidistä samalla tavalla.
+
+   Oikea Pixel-eväste voittaa aina, jos Pixel joskus lisätään. */
+function readFbp(){
+  const evasteesta = readCookie('_fbp');
+  if(evasteesta) return evasteesta;
+  try{
+    let v = localStorage.getItem(FBP_KEY);
+    if(!v){
+      v = 'fb.1.' + Date.now() + '.' + Math.floor(Math.random() * 1e10);
+      localStorage.setItem(FBP_KEY, v);
+    }
+    return v;
+  }catch(e){ return undefined; }
+}
 
 (function captureFbclid(){
   let v;
