@@ -210,7 +210,7 @@ export const ARTIKKELIT = [
 
   {
     slug: 'taloyhtion-tiivistys',
-    titleSeo: 'Taloyhtiön ovien ja ikkunoiden tiivistys',
+    titleSeo: 'Taloyhtiön tiivistys: opas hallitukselle',
     title: 'Taloyhtiön ovien ja ikkunoiden tiivistys: mitä hallituksen kannattaa tietää',
     desc: 'Miten taloyhtiön tiivistysurakka etenee kartoituksesta raporttiin, mikä on yhtiön ja mikä osakkaan vastuulla, ja mitä hinnoittelussa kannattaa kysyä.',
     h1: 'Taloyhtiön ovien ja ikkunoiden tiivistys: mitä hallituksen kannattaa tietää',
