@@ -31,6 +31,11 @@ const PORT = 8123;
 const REDIRECT_URI = `http://localhost:${PORT}/oauth2callback`;
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
+  /* Lukuoikeus on erikseen: `gmail.send` ei salli yhtään lukukutsua, joten
+     ilman tätä ei voi tarkistaa tuliko yhteydenottoon vastaus. Ei kuulu
+     `REQUIRED_SCOPES`-listaan (src/lib/google.ts), eli kuntotarkistus ei
+     kaadu vaikka tämä joskus puuttuisi. */
+  'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/calendar',
 ];
 
