@@ -609,7 +609,9 @@ function kumppaniSivu(k) {
   const url = `${SITE}/${k.slug}`;
   const title = `${k.lyhyt}: −${k.prosentti} % ovien ja ikkunoiden tiivistyksestä — TiivisKoti`;
   const desc = `${k.yhdistys} jäsenetu: ${k.prosentti} % alennus ovien ja ikkunoiden tiivistyksestä. Koodi ${k.koodi} varauksen yhteydessä — hinta näkyy laskurissa jo alennettuna.`;
-  const varausUrl = `/?koodi=${k.koodi}#laskuri`;
+  /* Laskuri on samalla sivulla, joten painike vie sen kohdalle eikä
+     etusivulle. Koodi tulee bodyn data-attribuutista. */
+  const varausUrl = '#laskuri';
 
   /* Esimerkit lasketaan hinnastosta, ei kirjoiteta käsin: jos hinnat
      muuttuvat, sivu ei jää lupaamaan vanhoja lukuja. */
@@ -646,7 +648,7 @@ function kumppaniSivu(k) {
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="${R}_alueet.css" />
 </head>
-<body>
+<body data-koodi="${k.koodi}">
 ${nav(R)}
 
 <div class="wrap crumb"><a href="/">Etusivu</a> › Jäsenetu · ${esc(k.lyhyt)}</div>
@@ -722,6 +724,8 @@ ${nav(R)}
     ${SISALTYY.map((x) => `<li>${esc(x)}</li>`).join('\n    ')}
   </ul>
 </div></section>
+
+${laskuriOsio(R, null)}
 
 <section class="sec alt"><div class="wrap">
   <div class="kicker">Ehdot</div>

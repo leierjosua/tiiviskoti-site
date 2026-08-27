@@ -401,8 +401,36 @@ function render(){
         const note = l.note ? ` <span class="cp-unit">${l.note}</span>` : '';
         return `<div class="cp-line"><span>${cnt}${l.name}${unit}${note}</span><b>${l.sum.toLocaleString('fi-FI')} €</b></div>`;
       }).join('');
-  tweenPrice(q.total);
-  document.getElementById('cpNet').textContent = (q.total>0?Math.round(q.total*NET_FACTOR).toLocaleString('fi-FI'):'0')+' €';
+  /* Alennuskoodi näkyy jo laskurissa, ei vasta varauksen viimeisellä
+     ruudulla. Kumppanisivuilta (esim. /paivakumpu) tullaan koodi valmiina,
+     ja jäsenetu on koko käynnin syy — jos laskuri näyttäisi täyden hinnan,
+     se kertoisi väärän luvun juuri sille kävijälle jolle etu luvattiin.
+
+     Summa haetaan palvelimelta, koska alennuksen laskenta (prosentti vai
+     euro, minimisumma, käyttökerrat) on siellä. Uusi tarkistus ajetaan vain
+     kun välisumma on oikeasti muuttunut — muuten jokainen +-painallus
+     lähettäisi oman kutsunsa. */
+  /* Kentän arvo, ei `discount.code`: ensimmäinen tarkistus sivun latauksessa
+     ohitetaan kun välisumma on 0 ("valitse ensin kohteet"), jolloin
+     `discount.code` jää tyhjäksi eikä tarkistus koskaan käynnistyisi
+     uudelleen. Kentässä koodi kuitenkin on. */
+  const koodiKentassa = (document.getElementById('fCode')?.value || '').trim();
+  if (koodiKentassa && q.total > 0) {
+    const nyt = subtotalCents();
+    if (nyt !== lastDiscountSubtotal) {
+      lastDiscountSubtotal = nyt;
+      clearTimeout(discountTimer);
+      discountTimer = setTimeout(checkDiscount, 250);
+    }
+  }
+  const ale = discount.state === 'ok' ? discount.cents / 100 : 0;
+  if (ale > 0) {
+    linesEl.insertAdjacentHTML('beforeend',
+      `<div class="cp-line" style="color:var(--green)"><span>Alennuskoodi ${discount.code}</span><b>−${ale.toLocaleString('fi-FI')} €</b></div>`);
+  }
+  const naytettava = Math.max(0, q.total - ale);
+  tweenPrice(naytettava);
+  document.getElementById('cpNet').textContent = (naytettava>0?Math.round(naytettava*NET_FACTOR).toLocaleString('fi-FI'):'0')+' €';
   document.getElementById('cpCount').textContent = q.count;
   const hrs = q.minutes/60;
   document.getElementById('cpTime').textContent = q.total===0?'0 h':(hrs<1?Math.round(q.minutes)+' min':(Math.round(hrs*2)/2).toLocaleString('fi-FI')+' h');
@@ -906,7 +934,7 @@ if(recapChangeBtn) recapChangeBtn.addEventListener('click',()=>goStep('cal'));
    summa eivät voi erota — paitsi jos koodi ehtii kulua välissä loppuun,
    jolloin varaus hylätään selvällä virheellä eikä hiljaa täydellä hinnalla. */
 const discount = { code:'', cents:0, state:'idle' };  // idle | checking | ok | bad
-let discountSeq = 0, discountTimer = null;
+let discountSeq = 0, discountTimer = null, lastDiscountSubtotal = -1;
 
 /** Summa jolle alennus lasketaan: työ + alueen matkalisä. */
 function subtotalCents(){
@@ -955,8 +983,13 @@ async function checkDiscount(){
     if(r.ok && data.ok){
       discount.code = data.code; discount.cents = data.amountCents||0; discount.state='ok';
       renderDiscountNote(`Koodi ${data.code}: −${(discount.cents/100).toLocaleString('fi-FI')} €`, 'ok');
+      /* Vastaus tulee vasta valinnan jälkeen, joten laskuri on jo piirretty
+         täydellä hinnalla. Ilman uudelleenpiirtoa alennus näkyisi vain
+         koodikentän vieressä eikä summassa — ja summa on se mitä katsotaan. */
+      render();
     } else {
       discount.code=''; discount.cents=0; discount.state='bad';
+      render();
       renderDiscountNote(
         data && data.message ? data.message
           : 'Koodin tarkistus ei onnistunut. Voit varata ilman koodia.',
@@ -981,7 +1014,8 @@ if(fCodeEl){
      kelpaako koodi ennen kuin asiakas täyttää loput tiedot. */
   try {
     const q = new URLSearchParams(location.search);
-    const koodi = (q.get('koodi') || q.get('code') || '').trim().toUpperCase().slice(0, 24);
+    const koodi = (q.get('koodi') || q.get('code') || document.body.dataset.koodi || '')
+      .trim().toUpperCase().slice(0, 24);
     if (koodi && /^[A-Z0-9-]+$/.test(koodi)) {
       fCodeEl.value = koodi;
       checkDiscount();
@@ -1291,12 +1325,15 @@ if(document.getElementById('tabKoti')){
       e.style.display='none';
       return;
     }
-    const total=q.total+fee;
+    const ale = discount.state==='ok' ? discount.cents/100 : 0;
+    const total=Math.max(0, q.total+fee-ale);
     p.textContent=`${total.toLocaleString('fi-FI')} €`;
     n.textContent=`~${Math.round(total*NET_FACTOR).toLocaleString('fi-FI')} € kotitalousväh. jälkeen`;
     const hrs=q.minutes/60;
     const kesto = hrs<1 ? Math.round(q.minutes)+' min' : (Math.round(hrs*2)/2).toLocaleString('fi-FI')+' h';
-    m.textContent = `sis. ALV 25,5 % · ${kesto}` + (fee>0 ? ` · sis. matkalisä ${fee.toLocaleString('fi-FI')} €` : '');
+    m.textContent = `sis. ALV 25,5 % · ${kesto}`
+      + (fee>0 ? ` · sis. matkalisä ${fee.toLocaleString('fi-FI')} €` : '')
+      + (ale>0 ? ` · koodi ${discount.code} −${ale.toLocaleString('fi-FI')} €` : '');
     e.style.display='';
   }
   window.__renderGatePrice = renderGatePrice;
