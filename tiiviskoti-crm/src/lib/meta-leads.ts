@@ -1,5 +1,6 @@
 import 'server-only';
 import { sql } from '@/lib/db';
+import { sendMail, SENDER_EMAIL } from '@/lib/google';
 
 /* =========================================================
    Metan liidimainosten (instant form) liidien tuonti tk.leads-tauluun.
@@ -79,6 +80,7 @@ export async function importMetaLeads(): Promise<MetaLeadsResult> {
     let fetched = 0;
     let imported = 0;
     let skipped = 0;
+    const uudet: { nimi: string; puhelin: string; email: string | null; pn: string | null; viesti: string }[] = [];
 
     for (const formId of lomakkeet) {
       const res = await graph<{ data?: MetaLead[] }>(`${formId}/leads`, {
@@ -113,8 +115,33 @@ export async function importMetaLeads(): Promise<MetaLeadsResult> {
           on conflict (external_id) do nothing
           returning id
         `;
-        if (rows.length) imported++;
-        else skipped++;
+        if (rows.length) {
+          imported++;
+          uudet.push({ nimi, puhelin: puhelin ?? '', email, pn, viesti });
+        } else skipped++;
+      }
+    }
+
+    /* Ilmoitus toimistolle. Liidi joka jää vain kantaan on käytännössä
+       menetetty: soitto samana päivänä ratkaisee kaupan. Lähetys ei saa
+       kaataa tuontia — liidi on jo tallessa, ilmoitus on lisäpalvelu. */
+    if (uudet.length) {
+      const rivit = uudet.map((u) => [
+        u.nimi,
+        u.puhelin ? `puh. ${u.puhelin}` : null,
+        u.email,
+        u.pn ? `postinumero ${u.pn}` : null,
+        u.viesti.split('\n').slice(1).join(' · '),
+      ].filter(Boolean).join(' — '));
+      try {
+        await sendMail({
+          to: SENDER_EMAIL,
+          subject: `${uudet.length} uutta liidiä Metan mainoksesta`,
+          text: `Uudet liidit näkyvät myös adminissa: https://admin.tiiviskoti.fi/liidit\n\n${rivit.join('\n')}`,
+          html: `<p>Uudet liidit näkyvät myös <a href="https://admin.tiiviskoti.fi/liidit">adminin Liidit-sivulla</a>.</p><ul>${rivit.map((r) => `<li>${r.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string))}</li>`).join('')}</ul>`,
+        });
+      } catch (e) {
+        console.error('meta-leads: ilmoituksen lähetys epäonnistui', e);
       }
     }
 
