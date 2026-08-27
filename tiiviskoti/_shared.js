@@ -935,8 +935,40 @@ const cpBtnEl=document.getElementById('cpBtn');
 if(cpBtnEl && cpBtnEl.tagName==='BUTTON'){
   cpBtnEl.addEventListener('click',()=>{
     if(!(booking.count>0 && booking.total>0)) return;
+    trackIntent();
     goStep('cal');
   });
+}
+
+/* Ostoaie Metalle: kävijä on valinnut kohteet ja nähnyt hinnan, ja siirtyy
+   valitsemaan aikaa. Tätä tapahtuu moninkertaisesti varauksiin nähden, ja
+   juuri sitä Metan optimointi tarvitsee oppiakseen ketkä ovat ostajia.
+   Lähetys menee palvelimen kautta (api/track-intent), joten mainosten
+   estäjät tai iOS eivät voi kadottaa sitä.
+
+   TUNNISTE PYSYY SAMANA saman hinta-arvion ajan: ilman sitä edestakaisin
+   liikkuva kävijä näyttäisi Metalle kymmeneltä eri ostoaikeelta ja
+   optimointi oppisi väärin. Muutos hinnassa tai määrässä on aito uusi aie. */
+let lastIntentKey = null;
+function trackIntent(){
+  try{
+    const key = booking.total + ':' + booking.count;
+    if(key === lastIntentKey) return;
+    lastIntentKey = key;
+    const pn = (document.getElementById('fPostal')||{}).value || '';
+    fetch('/api/track-intent',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      keepalive:true,
+      body: JSON.stringify({
+        totalCents: booking.total,
+        count: booking.count,
+        postal: /^\d{5}$/.test(pn.trim()) ? pn.trim() : undefined,
+        eventId: 'ic-' + key + '-' + Math.floor(Date.now()/60000),
+        fbc: readFbc(), fbp: readFbp(),
+      }),
+    }).catch(()=>{});
+  }catch(e){/* seuranta ei saa estää varausta */}
 }
 
 const toDetailsBtn=document.getElementById('toDetails');
