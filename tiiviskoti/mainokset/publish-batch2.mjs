@@ -29,9 +29,9 @@ const TALO = 'https://tiiviskoti.fi/taloyhtio.html';
 
 const ADS = [
   { file: 'mainos-taloyhtio-saasto.png', adset: TALO_ADSET, adName: 'TK25 - Taloyhtiö (säästö)', headline: 'Pienempi lämpölasku taloyhtiölle', link: TALO, cta: 'GET_QUOTE',
-    message: 'Taloyhtiön lämpölasku kuriin. Vetävät ovet ja ikkunat nostavat lämmityskuluja — tiivistys pienentää hukkaa koko kiinteistössä. Kiinteä tarjous, vastuuvakuutettu ammattityö, asennustyön takuu.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
+    message: 'Taloyhtiön lämpölasku kuriin. Vetävät ovet ja ikkunat nostavat lämmityskuluja — tiivistys pienentää hukkaa koko kiinteistössä. Kiinteä tarjous, oma porukka ilman alihankintaa.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
   { file: 'mainos-taloyhtio-helppo.png', adset: TALO_ADSET, adName: 'TK25 - Taloyhtiö (helppous)', headline: 'Yksi yhteyshenkilö, ei remonttia', link: TALO, cta: 'GET_QUOTE',
-    message: 'Taloyhtiön ovet ja ikkunat kuntoon ilman remonttia. Yksi yhteyshenkilö, kiinteä tarjous, siisti jälki ja vastuuvakuutettu ammattityö — tiivistys sovittuna päivänä.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
+    message: 'Taloyhtiön ovet ja ikkunat kuntoon ilman remonttia. Yksi yhteyshenkilö, kiinteä tarjous, siisti jälki ja oma porukka ilman alihankintaa — tiivistys sovittuna päivänä.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
   { file: 'mainos-syksy.png', adset: PURCHASE_ADSET, adName: 'TK25 - Syksy (ennen pakkasia)', headline: 'Tiivistä ennen pakkasia · alk. 65 €', link: BOOK, cta: 'BOOK_TRAVEL',
     message: 'Tiivistä ovet ja ikkunat ennen pakkasia. 🍂 Vetävät ovet ja ikkunat tulevat talvella kalliiksi — kiinteä hinta, lämpökamerakuvaus sisältyy, ammattiasennus samana päivänä. Ikkuna alk. 65 €, kotitalousvähennys −40 %.\n\n👉 Varaa aika: tiiviskoti.fi' },
 ];

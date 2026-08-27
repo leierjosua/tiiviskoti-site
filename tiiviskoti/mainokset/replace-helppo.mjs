@@ -16,7 +16,7 @@ const OLD_AD = '120247811662790132';
 const TALO = 'https://tiiviskoti.fi/taloyhtio.html';
 const g = (p) => `https://graph.facebook.com/${V}/${p}`;
 
-const message = 'Taloyhtiön ovet ja ikkunat kuntoon ilman remonttia. Yksi yhteyshenkilö, kiinteä tarjous, siisti jälki ja vastuuvakuutettu ammattityö — tiivistys sovittuna päivänä.\n\n👉 Pyydä tarjous: tiiviskoti.fi';
+const message = 'Taloyhtiön ovet ja ikkunat kuntoon ilman remonttia. Yksi yhteyshenkilö, kiinteä tarjous, siisti jälki ja oma porukka ilman alihankintaa — tiivistys sovittuna päivänä.\n\n👉 Pyydä tarjous: tiiviskoti.fi';
 const headline = 'Yksi yhteyshenkilö, ei remonttia';
 
 async function post(url, params) {

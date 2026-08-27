@@ -88,10 +88,10 @@ const KUVAT = [
 const TALOKUVAT = [
   { file: 'mainos-taloyhtio.png', adName: 'TK26 - Taloyhtiö (pää)', headline: HL_TALO,
     description: 'Kiinteä sopimushinta, yksi yhteyshenkilö.',
-    message: 'Taloyhtiön ovien ja ikkunoiden tiivistys sopimushinnalla. Vähemmän vetoa ja lämpöhukkaa koko kiinteistössä. Kiinteä tarjous, yksi yhteyshenkilö, vastuuvakuutettu ammattityö. Kartoituskäynti 0 €.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
+    message: 'Taloyhtiön ovien ja ikkunoiden tiivistys sopimushinnalla. Vähemmän vetoa ja lämpöhukkaa koko kiinteistössä. Kiinteä tarjous, yksi yhteyshenkilö, oma porukka ilman alihankintaa. Kartoituskäynti 0 €.\n\n👉 Pyydä tarjous: tiiviskoti.fi' },
   { file: 'mainos-taloyhtio-saasto.png', adName: 'TK26 - Taloyhtiö (säästö)', headline: HL_TALO,
     description: 'Vähemmän lämpöhukkaa koko kiinteistössä.',
-    message: 'Taloyhtiön ovien ja ikkunoiden tiivistys pienentää lämpöhukkaa koko kiinteistössä. Vetävät ovet ja ikkunat nostavat lämmityskuluja. Kiinteä tarjous, vastuuvakuutettu ammattityö, kartoituskäynti 0 €.\n\n👉 tiiviskoti.fi' },
+    message: 'Taloyhtiön ovien ja ikkunoiden tiivistys pienentää lämpöhukkaa koko kiinteistössä. Vetävät ovet ja ikkunat nostavat lämmityskuluja. Kiinteä tarjous, oma porukka ilman alihankintaa, kartoituskäynti 0 €.\n\n👉 tiiviskoti.fi' },
   { file: 'mainos-taloyhtio-helppo.png', adName: 'TK26 - Taloyhtiö (helppous)', headline: HL_TALO,
     description: 'Ei remonttia eikä pölyä. Kartoitus 0 €.',
     message: 'Taloyhtiön ovien ja ikkunoiden tiivistys sovittuna päivänä. Yksi yhteyshenkilö, kiinteä tarjous, siisti jälki — ei pölyistä remonttia. Kartoituskäynti on veloitukseton.\n\n👉 tiiviskoti.fi' },
