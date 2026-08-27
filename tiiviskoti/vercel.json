@@ -206,6 +206,26 @@
       "destination": "/vartio-ja-mellunkylan-omakotiyhdistys.html"
     },
     {
+      "source": "/taloyhtio",
+      "destination": "/taloyhtio.html"
+    },
+    {
+      "source": "/ajanvaraus",
+      "destination": "/ajanvaraus.html"
+    },
+    {
+      "source": "/meista",
+      "destination": "/meista.html"
+    },
+    {
+      "source": "/toiminta-alueet",
+      "destination": "/toiminta-alueet.html"
+    },
+    {
+      "source": "/varaa",
+      "destination": "/varaa.html"
+    },
+    {
       "source": "/lataa/dl/(.*)",
       "destination": "/lataa/$1"
     }
