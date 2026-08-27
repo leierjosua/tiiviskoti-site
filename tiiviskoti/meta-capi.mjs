@@ -66,7 +66,13 @@ function clientIp(req) {
 
 // Rakentaa hashatun user_data-lohkon lomakkeen kentistä + selaimen tunnisteista.
 // fbc/fbp/IP/user-agent EIVÄT ole hashattavia — Meta ottaa ne raakana.
-export function buildUserData({ email, phone, name, postal, city, fbc, fbp, req } = {}) {
+/* MIKSI external_id: Meta yhdistää tapahtumat ihmisiin niistä tiedoista
+   joita lähetämme. Ostoaikeen kohdalla nimeä tai sähköpostia ei ole vielä
+   annettu, joten ilman pysyvää tunnistetta sama kävijä näyttäisi joka
+   käynnillä eri ihmiseltä eikä Meta osaisi liittää aietta myöhempään
+   kauppaan. Tunniste on satunnaisluku selaimen muistissa — ei johdettu
+   mistään henkilötiedosta. */
+export function buildUserData({ email, phone, name, postal, city, fbc, fbp, externalId, req } = {}) {
   const { fn, ln } = splitName(name);
   const ud = {
     em: sha(email),
@@ -76,6 +82,7 @@ export function buildUserData({ email, phone, name, postal, city, fbc, fbp, req 
     zp: sha(postal),
     ct: sha(city),
     country: sha('fi'),
+    external_id: sha(externalId),
   };
   if (fbc) ud.fbc = fbc;
   if (fbp) ud.fbp = fbp;

@@ -138,6 +138,30 @@ function readGclidKind(){
    klikkiattribuution oletusikkuna; TUOREIN klikki voittaa (ei ensimmäinen),
    jotta ansio menee viimeksi klikatulle mainokselle eikä vanhalle klikille,
    joka roikkui muistissa kuukausia ja ylikirjasi kaikki myöhemmät varaukset. */
+const VID_KEY = 'tk_vid';
+
+/* Pysyvä satunnaistunniste mainonnan mittausta varten.
+
+   MIKSI: Meta yhdistää tapahtumat ihmisiin lähettämiemme tietojen
+   perusteella. Ostoaikeen kohdalla kävijä ei ole vielä antanut nimeä eikä
+   sähköpostia, joten ilman tätä sama ihminen näyttäisi joka käynnillä
+   uudelta eikä Meta osaisi liittää aietta myöhempään kauppaan — juuri se
+   yhteys tekee kohdentamisesta osuvaa.
+
+   MITÄ TÄMÄ EI OLE: tunnus ei ole johdettu mistään henkilötiedosta eikä
+   siitä voi päätellä kuka olet. Se ei seuraa sinua muille sivustoille.
+   Kuvattu tietosuojaselosteen kohdassa 7. */
+function readVid(){
+  try{
+    let v = localStorage.getItem(VID_KEY);
+    if(!v){
+      v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
+      localStorage.setItem(VID_KEY, v);
+    }
+    return v;
+  }catch(e){ return undefined; } /* privaattitila: mittaus jää pois, sivu toimii */
+}
+
 const FBC_KEY = 'tk_fbc';
 const FBCLID_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const FBCLID_RE = /^[A-Za-z0-9._-]{5,400}$/;
@@ -969,7 +993,7 @@ function trackIntent(){
         count: booking.count,
         postal: /^\d{5}$/.test(pn.trim()) ? pn.trim() : undefined,
         eventId: 'ic-' + key + '-' + Math.floor(Date.now()/60000),
-        fbc: readFbc(), fbp: readFbp(),
+        fbc: readFbc(), fbp: readFbp(), vid: readVid(),
       }),
     }).catch(()=>{});
   }catch(e){/* seuranta ei saa estää varausta */}
@@ -1204,6 +1228,9 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
        vain toteutuneen varauksen mukana. */
     fbc: readFbc(),
     fbp: readFbp(),
+    /* Sama tunniste kuin ostoaikeessa: Meta yhdistää aikeen ja kaupan
+       samaksi ihmiseksi vain jos tunniste on sama. */
+    vid: readVid(),
   };
 
   try{
@@ -1343,7 +1370,7 @@ if(document.getElementById('tabKoti')){
       continueEl: yhtioGo,
       goTo: (name)=>goStep('y-'+name),
       rootPrefix: (yhtioGo.dataset.root||''),
-      fbc: ()=>readFbc(), fbp: ()=>readFbp(),
+      fbc: ()=>readFbc(), fbp: ()=>readFbp(), vid: ()=>readVid(),
       campaign: ()=>readCampaign(), gclid: ()=>readGclid(),
     });
     yhtioGo.addEventListener('click',(e)=>{

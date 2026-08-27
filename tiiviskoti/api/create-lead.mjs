@@ -229,6 +229,7 @@ export default async function handler(req, res) {
            CRM:n kävijäketjusta löytämää. Ks. create-booking.mjs. */
         fbc: (typeof body.fbc === 'string' ? body.fbc : undefined) || mirrored?.fbc || undefined,
         fbp: typeof body.fbp === 'string' ? body.fbp : undefined,
+        externalId: typeof body.vid === 'string' && body.vid.length <= 64 ? body.vid : undefined,
         req,
       }),
       customData: { content_category: 'taloyhtio-lead' },

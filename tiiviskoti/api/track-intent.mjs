@@ -55,6 +55,7 @@ export default async function handler(req, res) {
         postal,
         fbc: typeof body.fbc === 'string' ? body.fbc : undefined,
         fbp: typeof body.fbp === 'string' ? body.fbp : undefined,
+        externalId: typeof body.vid === 'string' && body.vid.length <= 64 ? body.vid : undefined,
         req,
       }),
       customData: {

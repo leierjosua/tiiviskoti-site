@@ -258,6 +258,7 @@ export default async function handler(req, res) {
            liittää kauppaa mainokseen. */
         fbc: (typeof body.fbc === 'string' ? body.fbc : undefined) || reservation.fbc || undefined,
         fbp: typeof body.fbp === 'string' ? body.fbp : undefined,
+        externalId: typeof body.vid === 'string' && body.vid.length <= 64 ? body.vid : undefined,
         req,
       }),
       customData: {
