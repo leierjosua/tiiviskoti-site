@@ -62,7 +62,7 @@ const footer = (R, paitsi) => `<footer class="mfoot"><div class="wrap">
     <div class="mf-brand">
       <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
       <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
-      <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Vastuuvakuutettu · 2 vuoden takuu työlle</div>
+      <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
     <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
@@ -273,7 +273,7 @@ ${nav(R)}
 
 <header class="hero"><div class="wrap hero-grid">
   <div>
-    <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Vastuuvakuutettu · 2 vuoden takuu työlle</div>
+    <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     <h1>Ovien ja ikkunoiden<br>tiivistys <span class="a">${a.ine}.</span></h1>
     <p class="hero-sub">${esc(a.lead)}</p>
     <div class="hero-cta">
@@ -498,7 +498,7 @@ ${nav(R)}
 
 <header class="hero"><div class="wrap hero-grid">
   <div>
-    <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Vastuuvakuutettu · oma porukka, ei alihankintaa</div>
+    <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     <h1>${esc(c.h1a)}<br><span class="a">${esc(c.h1b)}</span></h1>
     <p class="hero-sub">${esc(c.lead)}</p>
     <div class="hero-cta">
@@ -1195,8 +1195,8 @@ function meistaSivu() {
      toimittajaa myös näillä. */
   const faktat = [
     { iso: 'Y-tunnus', pieni: '3414418-4 · rekisteröity yritys' },
-    { iso: 'Vastuu&shy;vakuutettu', pieni: 'voimassa oleva vastuuvakuutus' },
-    { iso: '2 vuotta', pieni: 'takuu asennustyölle' },
+    { iso: 'Oma porukka', pieni: 'omat asentajat, ei alihankintaa' },
+    { iso: 'Kiinteä hinta', pieni: 'näet summan ennen varausta' },
     { iso: '0 €', pieni: 'kartoituskäynti, ei sitoumusta' },
   ];
 
@@ -1279,7 +1279,7 @@ ${nav(R)}
         ['1', 'Kartoitus veloituksetta', 'Käymme kohteessa, mittaamme vetokohdat ja käymme ovet läpi yksi kerrallaan. Et maksa käynnistä mitään etkä sitoudu mihinkään.'],
         ['2', 'Kiinteä hinta kirjallisena', 'Saat hinnan ennen työn aloitusta. Se ei muutu matkan varrella — jos laajuus poikkeaa, sovimme siitä kanssasi etukäteen.'],
         ['3', 'Asennus sovittuna päivänä', 'Vanhat tiivisteet pois, pinnat puhtaaksi, uudet tiivisteet ja oven käynnin säätö. Jäljet siivotaan mennessä.'],
-        ['4', 'Takuu ja jälkihoito', 'Asennustyölle kahden vuoden takuu. Jos jokin ei toimi kuten pitää, tulemme korjaamaan sen.'],
+        ['4', 'Jälkihoito', 'Jos jokin ei toimi kuten pitää, tulemme korjaamaan sen.'],
       ].map(([n, t, d]) => `<div style="display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)">
         <span aria-hidden="true" style="flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px">${n}</span>
         <div style="min-width:0">
