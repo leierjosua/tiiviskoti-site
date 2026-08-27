@@ -8,7 +8,7 @@
    api/create-booking.mjs käyttää. Näin laskurin näyttämä ja veloitettava
    hinta lasketaan samasta koodista eivätkä voi erota toisistaan.
    ========================================================= */
-import { TYPES, EXTRAS, NET_FACTOR, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
+import { TYPES, EXTRAS, NET_FACTOR, WINDOW_TIERS, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
 
 const ico = {
   ulko:'<svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3" width="12" height="18" rx="1.5" stroke="currentColor" stroke-width="1.8"/><circle cx="14.5" cy="12" r="1.2" fill="currentColor"/></svg>',
@@ -288,7 +288,7 @@ if(typesEl && extrasEl){
     c.className='wtype'; c.dataset.id=t.id;
     c.innerHTML =
       `<div class="wtype-ic">${ico[t.id]}</div>
-       <div class="wtype-top"><div class="wtype-name">${t.name}</div><div class="wtype-desc">${t.desc}${t.tiers?`<span class="wtype-tier">${TIER_HINT}</span>`:''}</div><span class="wtype-price" data-p="${t.id}">${t.price} €/kpl</span></div>
+       <div class="wtype-top"><div class="wtype-name">${t.name}</div><div class="wtype-desc">${t.desc}${t.tiers?`<span class="wtype-tier">${TIER_HINT}</span><span class="wtype-next" data-next="${t.id}" hidden></span>`:''}</div><span class="wtype-price" data-p="${t.id}">${t.price} €/kpl</span></div>
        <div class="stepper"><div class="stepper-btns"><button class="stp minus" aria-label="Vähennä" data-a="-1" disabled>−</button><span class="qty" data-q="${t.id}">0</span><button class="stp plus" aria-label="Lisää" data-a="1">+</button></div></div>`;
     typesEl.appendChild(c);
   });
@@ -356,6 +356,33 @@ function render(){
     const u = unitInfo(t);
     el.innerHTML = (u.was?`<s>${u.was} €</s> `:'')+`${u.now} €/kpl`;
     el.classList.toggle('disc', !!u.was);
+
+    /* Seuraavan portaan vihje. Rajakustannus lasketaan oikeasta
+       hinnoittelusta, ei käsin: 9. ikkunan jälkeen kymmenes laskee
+       KOKONAISHINTAA, koska halvempi porras koskee kaikkia kappaleita.
+       Sitä ei saa esittää arvaamalla. */
+    const vihje = typesEl.querySelector(`[data-next="${t.id}"]`);
+    if(vihje && t.tiers){
+      const n = state[t.id]||0;
+      const hinta = (k)=> k*tierPriceFor(k);
+      let teksti = '';
+      if(n>0){
+        /* Ylimmän portaan upTo on Infinity, ei null — Number.isFinite
+           on ainoa ehto joka rajaa sen pois luotettavasti. */
+        const raja = WINDOW_TIERS.find(x=>Number.isFinite(x.upTo) && n<=x.upTo);
+        const seuraava = raja ? raja.upTo+1 : null;
+        if(seuraava && seuraava-n<=3){
+          const ero = hinta(seuraava)-hinta(n);
+          const puuttuu = seuraava-n;
+          const kpl = puuttuu===1 ? '1 ikkuna' : `${puuttuu} ikkunaa`;
+          teksti = ero<0
+            ? `Vielä ${kpl} lisää → kokonaishinta laskee ${Math.abs(ero)} €`
+            : `Vielä ${kpl} lisää → ${tierPriceFor(seuraava)} €/kpl kaikista (${ero} € lisää)`;
+        }
+      }
+      vihje.textContent = teksti;
+      vihje.hidden = !teksti;
+    }
   });
   if(extrasEl) EXTRAS.forEach(e=>{
     const el = extrasEl.querySelector(`.extra[data-id="${e.id}"]`); if(!el) return;

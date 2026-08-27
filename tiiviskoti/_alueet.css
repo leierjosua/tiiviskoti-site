@@ -139,6 +139,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .extra-stp .qty{font-size:15px;min-width:18px}
 .extra.off{opacity:.4;cursor:not-allowed}
 .wtype-tier{display:block;margin-top:3px;color:var(--green);font-weight:600}
+/* Seuraavan määräportaan vihje: erottuu perusselitteestä, koska se
+   muuttuu valinnan mukana ja on kehotus, ei staattinen tieto. */
+.wtype-next{display:block;margin-top:4px;padding:3px 8px;border-radius:6px;background:rgba(46,158,99,.12);color:var(--green);font-weight:700;font-size:13px;width:fit-content}
+.wtype-next[hidden]{display:none}
 .wtype-price s{opacity:.55;font-weight:600}
 .cp-unit{font-size:12px;color:var(--dmute);font-weight:600}
 .quote{position:sticky;top:88px;background:var(--deep);color:var(--dtext);border-radius:var(--r-lg);padding:26px}

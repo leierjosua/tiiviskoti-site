@@ -172,6 +172,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .extra-stp .qty{font-size:15px;min-width:18px}
 .extra.off{opacity:.4;cursor:not-allowed}
 .wtype-tier{display:block;margin-top:3px;color:var(--green);font-weight:600}
+/* Seuraavan määräportaan vihje: erottuu perusselitteestä, koska se
+   muuttuu valinnan mukana ja on kehotus, ei staattinen tieto. */
+.wtype-next{display:block;margin-top:4px;padding:3px 8px;border-radius:6px;background:rgba(46,158,99,.12);color:var(--green);font-weight:700;font-size:13px;width:fit-content}
+.wtype-next[hidden]{display:none}
 .wtype-price s{opacity:.55;font-weight:600}
 .cp-unit{font-size:12px;color:var(--dmute);font-weight:600}
 .quote{position:sticky;top:88px;background:var(--deep);color:var(--dtext);border-radius:var(--r-lg);padding:26px}
@@ -831,6 +835,34 @@ html[data-ab="b"] .ab-b{display:block}
       </div>
       <div class="card-body"><h3>Taloyhtiöt</h3><p>Rappukäytävät ja yhteistilat kerralla kuntoon sopimushinnalla. Kartoituskäynti on veloitukseton.</p><a href="taloyhtio.html#varaa" class="lnk">Varaa ilmainen kartoitus <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
+  </div>
+</div></section>
+
+<!-- HINNASTO — määräporrastus näkyviin ennen laskuria, koska moni ei avaa
+     laskuria lainkaan ellei tiedä että hinta laskee määrän mukaan. -->
+<section class="sec" id="hinnasto"><div class="wrap">
+  <div class="center rv"><div class="kicker">Hinnasto</div><h2 class="title">Mitä useampi ikkuna, sitä halvempi</h2>
+    <p class="sub">Alempi kappalehinta koskee kaikkia ikkunoita, ei vain rajan ylittäviä. Hinnat sisältävät ALV 25,5 %, tiivisteet ja työn.</p></div>
+
+  <div class="rv" style="max-width:760px;margin:30px auto 0;overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:16px">
+      <thead>
+        <tr style="text-align:left;border-bottom:2px solid var(--line)">
+          <th style="padding:12px 10px">Ikkunoita</th>
+          <th style="padding:12px 10px">Hinta / ikkuna</th>
+          <th style="padding:12px 10px">Esimerkki</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:12px 10px">1–4</td><td style="padding:12px 10px"><b>95 €</b></td><td style="padding:12px 10px;color:var(--mute)">4 ikkunaa = 380 €</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:12px 10px">5–9</td><td style="padding:12px 10px"><b>85 €</b></td><td style="padding:12px 10px;color:var(--mute)">5 ikkunaa = 425 €</td></tr>
+        <tr style="border-bottom:1px solid var(--line)"><td style="padding:12px 10px">10–19</td><td style="padding:12px 10px"><b>75 €</b></td><td style="padding:12px 10px;color:var(--mute)">10 ikkunaa = 750 €</td></tr>
+        <tr><td style="padding:12px 10px">20+</td><td style="padding:12px 10px"><b>65 €</b></td><td style="padding:12px 10px;color:var(--mute)">20 ikkunaa = 1 300 €</td></tr>
+      </tbody>
+    </table>
+    <p class="sub" style="margin-top:18px;font-size:15px">Porras kannattaa huomata: <b>kymmenes ikkuna laskee kokonaishintaa 15 €</b> ja kahdeskymmenes 125 €, koska halvempi hinta koskee taannehtivasti kaikkia. Laskuri kertoo tämän valintojesi mukaan.</p>
+    <p class="sub" style="margin-top:10px;font-size:15px">Ulko- ja parvekeovi 99 €, terassin liuku-/pariovi 149 €, väli-/huoneovi 89 €, pelkkä kynnyskumi 45 €. Pienin veloitus 149 € / käynti.</p>
+    <div style="margin-top:22px"><a href="#laskuri" class="btn btn-p btn-lg">Laske oma hintasi</a></div>
   </div>
 </div></section>
 
