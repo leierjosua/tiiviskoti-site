@@ -410,7 +410,7 @@ const PALVELUT = [
       ['Lukko takkuaa tai ovi kolisee', 'Merkki siitä että vastarauta ja tiiviste eivät ole samassa linjassa. Säätö kuuluu työhön.'],
     ],
     faq: [
-      ['Paljonko ulko-oven tiivistys maksaa?', `Ulko-ovi ja parvekeovi maksavat ${TYPES[1].price} € ovelta, ja useamman oven kohteessa ${TYPES[1].combo} € ovelta. Pelkkä kynnyskumin vaihto on ${TYPES[5].price} € ja väliovi ${TYPES[4].price} €. Pienin veloitus käynniltä on ${MIN_PRICE} €.`],
+      ['Paljonko ulko-oven tiivistys maksaa?', `Ulko-ovi ja parvekeovi maksavat ${TYPES[1].price} € ovelta riippumatta siitä, montako ovea kohteessa on. Pelkkä kynnyskumin vaihto on ${TYPES[5].price} € ja väli- tai huoneovi ${TYPES[4].price} €${TYPES[4].combo ? ` — tai ${TYPES[4].combo} €, kun samalla käynnillä on vähintään kaksi kohdetta` : ''}. Pienin veloitus käynniltä on ${MIN_PRICE} €.`],
       ['Sisältyykö kynnyskumi hintaan?', 'Kyllä. Ulko-oven hintaan kuuluvat sivutiivisteet, kynnyskumi ja oven käynnin säätö — ei erillisiä lisiä.'],
       ['Entä terassin liuku- tai pariovi?', `Iso lasiovi ja liukuovi ovat ${TYPES[3].price} €, koska niissä on enemmän tiivistettävää kehää ja kiskon huolto kuuluu työhön.`],
       ['Kuinka kauan oven tiivistys kestää?', 'Noin 30 minuuttia ovea kohti. Useampi ovi tehdään samalla käynnillä, jolloin hinta ovea kohti on edullisempi.'],
