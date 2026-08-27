@@ -87,12 +87,24 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
                 ${d.address ?? null}, ${d.postalCode ?? null}, ${d.city ?? null})
         returning id
       `;
+      /* Kampanja ja klikkitunniste siirtyvät liidiltä työlle, jotta
+         mainoksesta tullut yhteydenotto raportoituu konversiona vaikka
+         kauppa sovittaisiin puhelimessa tai sähköpostitse. Ilman tätä
+         Google näkisi klikin muttei koskaan kauppaa. */
+      const [lead] = leadId
+        ? await tx<{ campaign: string | null; gclid: string | null }[]>`
+            select campaign, gclid from tk.leads where id = ${leadId}::uuid
+          `
+        : [];
+
       const [job] = await tx<{ id: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status,
-                             title, address, postal_code, city, notes, source)
+                             title, address, postal_code, city, notes, source,
+                             campaign, gclid)
         values (${customer.id}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
                 ${d.title}, ${d.address ?? null}, ${d.postalCode ?? null},
-                ${d.city ?? null}, ${d.notes ?? null}, ${leadId ? 'liidi' : 'admin'})
+                ${d.city ?? null}, ${d.notes ?? null}, ${leadId ? 'liidi' : 'admin'},
+                ${lead?.campaign ?? null}, ${lead?.gclid ?? null})
         returning id
       `;
       /* Liidi merkitään asiakkaaksi samassa transaktiossa: muuten se jäisi
