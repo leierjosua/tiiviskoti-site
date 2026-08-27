@@ -2,6 +2,7 @@ import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty } from '@/components/ui';
 import { LeadStatus } from './ui';
+import { importMetaLeads } from '@/lib/meta-leads';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,18 @@ type Lead = {
 
 export default async function LeadsPage() {
   await requireManager();
+
+  /* Metan liidit haetaan myös sivua avattaessa, ei pelkän cronin varassa:
+     Vercelin Hobby-tili sallii vain päivittäisen ajon, ja vuorokauden
+     vanha liidi on käytännössä menetetty. Tämä on se hetki jolloin
+     liidejä oikeasti katsotaan, joten haku kannattaa tehdä tässä.
+     Virhe ei saa estää sivun näyttämistä — kannassa olevat liidit ovat
+     tärkeämpiä kuin Metan uusimmat. */
+  try {
+    await importMetaLeads();
+  } catch (e) {
+    console.error('liidit: Metan liidien haku epäonnistui', e);
+  }
 
   const leads = await sql<Lead[]>`
     select id, full_name, email, phone, postal_code, city, message, status, created_at
