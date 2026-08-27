@@ -98,6 +98,114 @@
       "destination": "/paivakumpu.html"
     },
     {
+      "source": "/korson-omakotiyhdistys",
+      "destination": "/korson-omakotiyhdistys.html"
+    },
+    {
+      "source": "/rekola-asolan-omakotiyhdistys",
+      "destination": "/rekola-asolan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/tikkurilan-omakotiyhdistys",
+      "destination": "/tikkurilan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/nikinmaen-omakotiyhdistys",
+      "destination": "/nikinmaen-omakotiyhdistys.html"
+    },
+    {
+      "source": "/keravan-omakotiyhdistys",
+      "destination": "/keravan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/keravan-jokivarren-omakotiyhdistys",
+      "destination": "/keravan-jokivarren-omakotiyhdistys.html"
+    },
+    {
+      "source": "/tuusulan-omakotiyhdistys",
+      "destination": "/tuusulan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/jarvenpaan-kiinteistoyhdistys",
+      "destination": "/jarvenpaan-kiinteistoyhdistys.html"
+    },
+    {
+      "source": "/nurmijarven-omakotiyhdistys",
+      "destination": "/nurmijarven-omakotiyhdistys.html"
+    },
+    {
+      "source": "/hyvinkaan-seudun-omakotiyhdistys",
+      "destination": "/hyvinkaan-seudun-omakotiyhdistys.html"
+    },
+    {
+      "source": "/sipoon-omakotiyhdistys",
+      "destination": "/sipoon-omakotiyhdistys.html"
+    },
+    {
+      "source": "/mantsalan-omakotiyhdistys",
+      "destination": "/mantsalan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/porvoon-omakotiyhdistys",
+      "destination": "/porvoon-omakotiyhdistys.html"
+    },
+    {
+      "source": "/askolan-omakotiyhdistys",
+      "destination": "/askolan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/myrskylan-omakotiyhdistys",
+      "destination": "/myrskylan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/loviisan-seudun-omakotiyhdistys",
+      "destination": "/loviisan-seudun-omakotiyhdistys.html"
+    },
+    {
+      "source": "/lohjan-seudun-omakotiyhdistys",
+      "destination": "/lohjan-seudun-omakotiyhdistys.html"
+    },
+    {
+      "source": "/vihdin-omakotiyhdistys",
+      "destination": "/vihdin-omakotiyhdistys.html"
+    },
+    {
+      "source": "/karkkilan-omakotiyhdistys",
+      "destination": "/karkkilan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/espoon-ja-kauniaisten-pienkiinteistot",
+      "destination": "/espoon-ja-kauniaisten-pienkiinteistot.html"
+    },
+    {
+      "source": "/lounais-espoon-omakotiyhdistys",
+      "destination": "/lounais-espoon-omakotiyhdistys.html"
+    },
+    {
+      "source": "/koillis-helsingin-omakotiyhdistys",
+      "destination": "/koillis-helsingin-omakotiyhdistys.html"
+    },
+    {
+      "source": "/malmin-seudun-omakotiyhdistys",
+      "destination": "/malmin-seudun-omakotiyhdistys.html"
+    },
+    {
+      "source": "/kaarelan-omakotiyhdistys",
+      "destination": "/kaarelan-omakotiyhdistys.html"
+    },
+    {
+      "source": "/pakilan-kiinteistonomistajain-yhdistys",
+      "destination": "/pakilan-kiinteistonomistajain-yhdistys.html"
+    },
+    {
+      "source": "/laajasalon-pienkiinteistoyhdistys",
+      "destination": "/laajasalon-pienkiinteistoyhdistys.html"
+    },
+    {
+      "source": "/vartio-ja-mellunkylan-omakotiyhdistys",
+      "destination": "/vartio-ja-mellunkylan-omakotiyhdistys.html"
+    },
+    {
       "source": "/lataa/dl/(.*)",
       "destination": "/lataa/$1"
     }
