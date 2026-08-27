@@ -68,6 +68,10 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot' };
 
   const d = parsed.data;
+  /* Liidin tunniste tulee esitäytetystä lomakkeesta. Ei skeemassa: jos se
+     on roskaa, työ syntyy silti — liidin tilan päivitys on kirjanpitoa,
+     ei ehto työn luomiselle. */
+  const leadId = String(formData.get('leadId') ?? '').trim() || null;
   const starts = parseLocalInput(d.startsAt);
   if (Number.isNaN(starts.getTime())) return { error: 'Aika ei kelpaa.' };
   const ends = new Date(starts.getTime() + d.durationMinutes * 60_000);
@@ -88,9 +92,17 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
                              title, address, postal_code, city, notes, source)
         values (${customer.id}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
                 ${d.title}, ${d.address ?? null}, ${d.postalCode ?? null},
-                ${d.city ?? null}, ${d.notes ?? null}, 'admin')
+                ${d.city ?? null}, ${d.notes ?? null}, ${leadId ? 'liidi' : 'admin'})
         returning id
       `;
+      /* Liidi merkitään asiakkaaksi samassa transaktiossa: muuten se jäisi
+         Liidit-sivulle avoimeksi ja joku soittaisi perään turhaan. */
+      if (leadId) {
+        await tx`
+          update tk.leads set status = 'converted', updated_at = now()
+           where id = ${leadId}::uuid
+        `;
+      }
       return job.id;
     }) as unknown as string;
   } catch (err) {
@@ -100,6 +112,7 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
 
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
+  if (leadId) revalidatePath('/liidit');
   redirect(`/tyot/${jobId}`);
 }
 

@@ -10,9 +10,20 @@ const DURATIONS = [60, 90, 120, 180, 240, 300];
 
 export default async function NewJobPage({
   searchParams,
-}: { searchParams: Promise<{ kalenteri?: string; kesto?: string }> }) {
+}: {
+  searchParams: Promise<{
+    kalenteri?: string; kesto?: string;
+    /* Esitäyttö liidistä. Sähköpostitse sovittu käynti jäi ennen kokonaan
+       kirjaamatta, koska tiedot piti näpytellä uudestaan — nyt liidiriviltä
+       pääsee tänne yhdellä klikkauksella ja kentät ovat valmiina. */
+    liidi?: string; nimi?: string; email?: string; puhelin?: string;
+    postinumero?: string; osoite?: string; muistiinpano?: string;
+  }>;
+}) {
   await requireStaff();
-  const { kalenteri, kesto } = await searchParams;
+  const {
+    kalenteri, kesto, liidi, nimi, email, puhelin, postinumero, osoite, muistiinpano,
+  } = await searchParams;
 
   const calendars = await listCalendars(true);
   const duration = DURATIONS.includes(Number(kesto)) ? Number(kesto) : 120;
@@ -44,13 +55,22 @@ export default async function NewJobPage({
         </Card>
       ) : (
         <Card>
-          <CardHeader title="Varaa aika" />
+          <CardHeader title={liidi ? 'Varaa aika — liidistä' : 'Varaa aika'} />
           <NewJobForm
             calendars={calendars.map((c) => ({ id: c.id, label: `${c.staff_name} — ${c.name}` }))}
             calendarId={calendarId!}
             duration={duration}
             durations={DURATIONS}
             slots={slots}
+            leadId={liidi}
+            prefill={{
+              customerName: nimi ?? '',
+              email: email ?? '',
+              phone: puhelin ?? '',
+              postalCode: postinumero ?? '',
+              address: osoite ?? '',
+              notes: muistiinpano ?? '',
+            }}
           />
         </Card>
       )}

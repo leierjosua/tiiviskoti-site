@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty } from '@/components/ui';
@@ -81,6 +82,7 @@ export default async function LeadsPage() {
                 <th className="px-4 py-2 font-medium">Sähköposti</th>
                 <th className="px-4 py-2 font-medium">Postinro</th>
                 <th className="px-4 py-2 font-medium">Tila</th>
+                <th className="px-4 py-2 font-medium" />
               </tr>
             </thead>
             <tbody className="divide-y divide-line-soft">
@@ -100,6 +102,28 @@ export default async function LeadsPage() {
                   </td>
                   <td className="px-4 py-2.5 tabular">{lead.postal_code ?? '—'}</td>
                   <td className="px-4 py-2.5"><LeadStatus id={lead.id} status={lead.status} /></td>
+                  <td className="px-4 py-2.5 whitespace-nowrap">
+                    {/* Ilman tätä linkkiä sovittu käynti jäi kirjaamatta: tiedot
+                        olisi pitänyt näpytellä uudestaan Uusi työ -lomakkeelle.
+                        Nyt liidi siirtyy kalenteriin yhdellä klikkauksella ja
+                        merkitään samalla asiakkaaksi. */}
+                    <Link
+                      href={{
+                        pathname: '/tyot/uusi',
+                        query: {
+                          liidi: lead.id,
+                          nimi: lead.full_name,
+                          ...(lead.email ? { email: lead.email } : {}),
+                          ...(lead.phone ? { puhelin: lead.phone } : {}),
+                          ...(lead.postal_code ? { postinumero: lead.postal_code } : {}),
+                          ...(lead.message ? { muistiinpano: lead.message } : {}),
+                        },
+                      }}
+                      className="rounded border border-line px-2.5 py-1 text-xs text-accent hover:bg-ink-700"
+                    >
+                      Luo työ
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

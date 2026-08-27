@@ -6,14 +6,21 @@ import { createJob, type ActionState } from '../actions';
 import { Button, ErrorNote, Field, Input, Select, Textarea, cx } from '@/components/ui';
 import { dateKeyOf, formatDateKey, isoWeekday, timeOf, weekdayShort } from '@/lib/time';
 
+type Prefill = {
+  customerName: string; email: string; phone: string;
+  postalCode: string; address: string; notes: string;
+};
+
 export function NewJobForm({
-  calendars, calendarId, duration, durations, slots,
+  calendars, calendarId, duration, durations, slots, leadId, prefill,
 }: {
   calendars: { id: string; label: string }[];
   calendarId: string;
   duration: number;
   durations: number[];
   slots: string[];
+  leadId?: string;
+  prefill?: Prefill;
 }) {
   const router = useRouter();
   const [state, action, pending] = useActionState<ActionState, FormData>(createJob, {});
@@ -22,10 +29,19 @@ export function NewJobForm({
   // Kalenterin ja keston vaihto hakee vapaat ajat uudelleen palvelimelta,
   // koska laskenta on siellä.
   const reload = (next: { kalenteri?: string; kesto?: number }) => {
+    /* Esitäyttö kulkee mukana kun kalenteri tai kesto vaihtuu — muuten
+       liidistä tulleet tiedot katoaisivat ensimmäisestä valinnasta. */
     const params = new URLSearchParams({
       kalenteri: next.kalenteri ?? calendarId,
       kesto: String(next.kesto ?? duration),
     });
+    if (leadId) params.set('liidi', leadId);
+    if (prefill?.customerName) params.set('nimi', prefill.customerName);
+    if (prefill?.email) params.set('email', prefill.email);
+    if (prefill?.phone) params.set('puhelin', prefill.phone);
+    if (prefill?.postalCode) params.set('postinumero', prefill.postalCode);
+    if (prefill?.address) params.set('osoite', prefill.address);
+    if (prefill?.notes) params.set('muistiinpano', prefill.notes);
     setSelected(null);
     router.replace(`/tyot/uusi?${params}`);
   };
@@ -43,6 +59,7 @@ export function NewJobForm({
       <input type="hidden" name="calendarId" value={calendarId} />
       <input type="hidden" name="durationMinutes" value={duration} />
       <input type="hidden" name="startsAt" value={selected ?? ''} />
+      {leadId ? <input type="hidden" name="leadId" value={leadId} /> : null}
 
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
@@ -104,29 +121,29 @@ export function NewJobForm({
           <Input name="title" defaultValue="Tiivistetyö" required />
         </Field>
         <Field label="Asiakas">
-          <Input name="customerName" required />
+          <Input name="customerName" defaultValue={prefill?.customerName} required />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Sähköposti">
-            <Input name="email" type="email" />
+            <Input name="email" defaultValue={prefill?.email} type="email" />
           </Field>
           <Field label="Puhelin">
-            <Input name="phone" type="tel" />
+            <Input name="phone" defaultValue={prefill?.phone} type="tel" />
           </Field>
         </div>
         <Field label="Osoite">
-          <Input name="address" />
+          <Input name="address" defaultValue={prefill?.address} />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Postinumero">
-            <Input name="postalCode" inputMode="numeric" />
+            <Input name="postalCode" defaultValue={prefill?.postalCode} inputMode="numeric" />
           </Field>
           <Field label="Kaupunki">
             <Input name="city" />
           </Field>
         </div>
         <Field label="Muistiinpanot">
-          <Textarea name="notes" rows={3} />
+          <Textarea name="notes" rows={3} defaultValue={prefill?.notes} />
         </Field>
 
         <Button type="submit" disabled={pending || !selected} className="w-full">
