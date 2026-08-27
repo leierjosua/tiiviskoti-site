@@ -961,7 +961,11 @@ function trackIntent(){
       headers:{'Content-Type':'application/json'},
       keepalive:true,
       body: JSON.stringify({
-        totalCents: booking.total,
+        /* booking.total on EUROINA (pricing.mjs: total = work + travelFee).
+           Palvelin jakaa sadalla, joten muunnos on tehtävä tässä — muuten
+           Metalle menisi sadasosa oikeasta arvosta ja optimointi opettelisi
+           tavoittelemaan lähes arvottomia tapahtumia. */
+        totalCents: Math.round(booking.total * 100),
         count: booking.count,
         postal: /^\d{5}$/.test(pn.trim()) ? pn.trim() : undefined,
         eventId: 'ic-' + key + '-' + Math.floor(Date.now()/60000),
