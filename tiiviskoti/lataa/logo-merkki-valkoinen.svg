@@ -1,0 +1,22 @@
+<!-- TiivisKoti — pelkkä merkki, VALKOINEN. Tämä on paidan tiedosto.
+
+     Painoturvallinen: pelkkää geometriaa, ei tekstiä eikä fonttiriippuvuutta,
+     läpinäkyvä tausta, yksi väri (#FFFFFF). Skaalautuu rintataskun kokoisesta
+     selän täyteen ilman laadun menetystä.
+
+     Neliö on ÄÄRIVIIVA eikä täyttö: valkoista mustetta menee vähemmän ja
+     kuvio pysyy kankaalla kevyenä ja hengittävänä.
+
+     Muoto on sama kuin tiiviskoti.fi:n logossa — neliö, oven ääriviiva ja
+     pystypalkki joka on tiiviste.
+
+     Jos painaja tarvitsee toisen värin, vaihda `stroke` ja `fill`. Muita
+     värejä tiedostossa ei ole. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <title>TiivisKoti-merkki</title>
+  <g fill="none" stroke="#FFFFFF" stroke-width="7">
+    <rect x="3.5" y="3.5" width="93" height="93" rx="22" />
+    <rect x="31" y="22" width="38" height="56" rx="3" stroke-width="6" />
+  </g>
+  <rect x="35" y="22" width="5" height="56" fill="#FFFFFF" />
+</svg>
