@@ -39,6 +39,13 @@ const schema = z.object({
      Sama toiminto molemmille, koska tarjouksen luonti ja hinnoittelu ovat
      identtiset — ero on vain lopussa. */
   mode: z.enum(['send', 'draft']).default('send'),
+  /* Avatun luonnoksen tunniste. Kun tämä on mukana, tallennus päivittää
+     saman rivin eikä luo uutta — muuten "jatka myöhemmin" jättäisi joka
+     tallennuksesta uuden luonnoksen listaan. */
+  offerId: z.string().uuid().optional().or(z.literal('')),
+  /* Laskurin tila JSONina, jotta luonnos aukeaa samanlaisena. Vapaamuotoinen
+     eikä validoitu kentittäin: se on käyttöliittymän muistiinpano itselleen. */
+  draftState: z.string().max(20000).optional(),
 });
 
 /* Rakentaa laskurin syötteet lomakkeen kentistä. Määrät tulevat `qty_<id>`
@@ -112,6 +119,8 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
     notes: String(formData.get('notes') ?? '').trim() || undefined,
     customerNote: String(formData.get('customerNote') ?? '').trim() || undefined,
     mode: String(formData.get('mode') ?? 'send'),
+    offerId: String(formData.get('offerId') ?? ''),
+    draftState: String(formData.get('draftState') ?? '') || undefined,
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot.' };
   const d = parsed.data;
@@ -164,6 +173,30 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
      selviää vain virheen tekstistä. Tarjous on aina tärkeämpi kuin sen
      saateteksti tai sisältyy-lista. */
   let offer: { id: string; offer_number: string } | undefined;
+
+  /* Avattu luonnos päivitetään paikallaan: numero ja luontiaika säilyvät,
+     eikä listaan jää jälkeä jokaisesta välitallennuksesta. Päivitys koskee
+     vain luonnoksia — lähetettyä tarjousta ei kirjoiteta uusiksi, koska
+     asiakkaalla on siitä jo kopio. */
+  if (d.offerId) {
+    const [paivitetty] = await sql<{ id: string; offer_number: string }[]>`
+      update tk.offers set
+        kind = ${d.kind}, contact_name = ${d.contactName ?? null},
+        customer_name = ${d.customerName}, email = ${d.email},
+        phone = ${d.phone ?? null}, address = ${d.address ?? null},
+        postal_code = ${d.postalCode || null}, city = ${d.city ?? null},
+        lines = ${sql.json(lines)}, total_cents = ${totalCents},
+        travel_fee_cents = ${travelCents}, notes = ${d.notes ?? null},
+        valid_until = ${validUntil},
+        draft_state = ${d.draftState ? sql.json(JSON.parse(d.draftState)) : null},
+        updated_at = now()
+      where id = ${d.offerId} and status = 'draft'
+      returning id, offer_number
+    `;
+    if (!paivitetty) return { error: 'Luonnosta ei löytynyt tai se on jo lähetetty.' };
+    offer = paivitetty;
+  }
+
   for (let attempt = 0; !offer; attempt++) {
     try {
       [offer] = await insertOffer(customerNoteColumnExists, inclusionsColumnExists);
@@ -182,6 +215,17 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
         console.error('tarjous: tk.offers.customer_note puuttuu — aja db/020. Tarjous tallennetaan ilman vapaata sanaa.');
         customerNoteColumnExists = false;
       } else throw e;
+    }
+  }
+
+  /* Uuden luonnoksen laskuritila talteen erillisellä kirjoituksella, jottei
+     se voi kaataa itse tarjouksen luontia jos db/024 on ajamatta. Tarjous on
+     tärkeämpi kuin mahdollisuus jatkaa sitä myöhemmin. */
+  if (d.mode === 'draft' && d.draftState && !d.offerId) {
+    try {
+      await sql`update tk.offers set draft_state = ${sql.json(JSON.parse(d.draftState))} where id = ${offer.id}`;
+    } catch (e) {
+      console.error('tarjous: draft_state ei tallentunut — aja db/024_offer_draft_state.sql', e);
     }
   }
 
@@ -230,7 +274,11 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
      kenellekään, ja se ero on koko luonnostilan tarkoitus. */
   if (d.mode === 'draft') {
     revalidatePath('/tarjoukset');
-    redirect(`/tarjoukset/${offer.id}?ladattu=1`);
+    revalidatePath(`/tarjoukset/${offer.id}`);
+    /* Ei pakotettua PDF-latausta: luonnos tallennetaan yleensä siksi että
+       työ jatkuu myöhemmin, ei siksi että se haluttaisiin heti paperille.
+       PDF on yhä ladattavissa tarjouksen sivulta. */
+    redirect(`/tarjoukset/${offer.id}?tallennettu=1`);
   }
 
   let providerId: string | null = null;

@@ -31,23 +31,50 @@ const MAX_CUSTOM_LINES = 12;
    asiakaskortissa kysytään ja miten tyhjä rivi sanoitetaan — hinnasto,
    lisätyöt ja summan laskenta ovat identtiset, koska taloyhtiö ostaa saman
    työn isompana eränä (ikkunan määräporras hoitaa alennuksen itsestään). */
-export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyhtio' }) {
+/** Laskurin tila jonka luonnos säilöö, jotta työn voi jatkaa myöhemmin. */
+export type DraftState = {
+  counts?: Record<string, number>;
+  extras?: Record<string, boolean>;
+  custom?: CustomLine[];
+  kahva?: number;
+  postal?: string;
+  discount?: number;
+  discountLabel?: string;
+  inclusions?: string[];
+  asiakas?: Record<string, string>;
+};
+
+export function OfferBuilder({ kind = 'asiakas', offerId, draft, asiakas }: {
+  kind?: 'asiakas' | 'taloyhtio';
+  /** Avatun luonnoksen tunniste — tallennus päivittää sen uuden luomisen sijaan. */
+  offerId?: string;
+  draft?: DraftState;
+  /* Asiakaskentät tulevat tarjouksen omilta sarakkeilta, ei draft_statesta:
+     ne tallentuvat sinne joka tapauksessa, eikä samaa tietoa kannata
+     säilöä kahteen paikkaan jossa ne voivat erota toisistaan. */
+  asiakas?: {
+    customerName?: string; contactName?: string; email?: string; phone?: string;
+    address?: string; city?: string; notes?: string; customerNote?: string;
+  };
+}) {
   const talo = kind === 'taloyhtio';
   const [state, action] = useActionState<ActionState, FormData>(sendProspectOffer, {});
-  const [custom, setCustom] = useState<CustomLine[]>([{ name: '', qty: 1, unit: 0 }]);
+  const [custom, setCustom] = useState<CustomLine[]>(
+    draft?.custom?.length ? draft.custom : [{ name: '', qty: 1, unit: 0 }],
+  );
   /* Vakiolista tarjouksen mukana: nämä kuuluvat jokaiseen tiivistykseen,
      mutta rivejä voi muokata, poistaa ja lisätä — jokainen kohde on vähän
      erilainen, ja tarjoukseen kirjoitettu lupaus on juuri se mitä
      kohteessa tehdään. */
-  const [inclusions, setInclusions] = useState<string[]>([...DEFAULT_INCLUSIONS]);
+  const [inclusions, setInclusions] = useState<string[]>(draft?.inclusions ?? [...DEFAULT_INCLUSIONS]);
 
-  const [counts, setCounts] = useState<Record<string, number>>({});
-  const [extras, setExtras] = useState<Record<string, boolean>>({});
-  const [kahva, setKahva] = useState(0);
-  const [postal, setPostal] = useState('');
+  const [counts, setCounts] = useState<Record<string, number>>(draft?.counts ?? {});
+  const [extras, setExtras] = useState<Record<string, boolean>>(draft?.extras ?? {});
+  const [kahva, setKahva] = useState(draft?.kahva ?? 0);
+  const [postal, setPostal] = useState(draft?.postal ?? '');
   const [travel, setTravel] = useState<{ cents: number; area: string | null }>({ cents: 0, area: null });
-  const [discount, setDiscount] = useState(0);
-  const [discountLabel, setDiscountLabel] = useState('');
+  const [discount, setDiscount] = useState(draft?.discount ?? 0);
+  const [discountLabel, setDiscountLabel] = useState(draft?.discountLabel ?? '');
 
   // Matkalisä alueesta, kun postinumero on täydellinen.
   useEffect(() => {
@@ -73,6 +100,13 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
   return (
     <form action={action} className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
       <input type="hidden" name="kind" value={kind} />
+      {offerId ? <input type="hidden" name="offerId" value={offerId} /> : null}
+      {/* Laskurin tila kulkee mukana lomakkeella, jotta luonnos aukeaa
+          samanlaisena. Lasketut rivit eivät riitä: niistä ei näe mitkä
+          kohteet oli valittu. */}
+      <input type="hidden" name="draftState" value={JSON.stringify({
+        counts, extras, custom, kahva, postal, discount, discountLabel, inclusions,
+      })} />
 
       {/* Vasen: asiakas + palvelut */}
       <div className="space-y-6">
@@ -80,21 +114,21 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
           <CardHeader title={talo ? 'Taloyhtiö' : 'Asiakas'} />
           <div className="grid gap-4 p-4 sm:grid-cols-2">
             <Field label={talo ? 'Taloyhtiön nimi' : 'Nimi'}>
-              <Input name="customerName" required placeholder={talo ? 'As Oy Esimerkkitie 5' : 'Etunimi Sukunimi'} />
+              <Input name="customerName" defaultValue={asiakas?.customerName} required placeholder={talo ? 'As Oy Esimerkkitie 5' : 'Etunimi Sukunimi'} />
             </Field>
             {talo && (
               <Field label="Yhteyshenkilö" hint="Isännöitsijä tai hallituksen puheenjohtaja — tarjous lähetetään hänelle.">
-                <Input name="contactName" placeholder="Etunimi Sukunimi" />
+                <Input name="contactName" defaultValue={asiakas?.contactName} placeholder="Etunimi Sukunimi" />
               </Field>
             )}
-            <Field label="Sähköposti"><Input name="email" type="email" required placeholder={talo ? 'isannoitsija@example.com' : 'asiakas@example.com'} /></Field>
-            <Field label="Puhelin"><Input name="phone" type="tel" placeholder="040 123 4567" /></Field>
-            <Field label={talo ? 'Kiinteistön osoite' : 'Osoite'}><Input name="address" placeholder="Katu 1" /></Field>
+            <Field label="Sähköposti"><Input name="email" defaultValue={asiakas?.email} type="email" required placeholder={talo ? 'isannoitsija@example.com' : 'asiakas@example.com'} /></Field>
+            <Field label="Puhelin"><Input name="phone" defaultValue={asiakas?.phone} type="tel" placeholder="040 123 4567" /></Field>
+            <Field label={talo ? 'Kiinteistön osoite' : 'Osoite'}><Input name="address" defaultValue={asiakas?.address} placeholder="Katu 1" /></Field>
             <Field label="Postinumero" hint={travel.area ? `Alue: ${travel.area}${travel.cents ? ` · matkalisä ${eur(travel.cents / 100)}` : ' · ei matkalisää'}` : undefined}>
               <Input name="postalCode" inputMode="numeric" maxLength={5} value={postal}
                 onChange={(e) => setPostal(e.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="04400" />
             </Field>
-            <Field label="Kaupunki"><Input name="city" placeholder="Järvenpää" /></Field>
+            <Field label="Kaupunki"><Input name="city" defaultValue={asiakas?.city} placeholder="Järvenpää" /></Field>
           </div>
         </Card>
 
@@ -272,12 +306,12 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
               label="Vapaa sana asiakkaalle"
               hint="NÄKYY ASIAKKAALLE — tulee tarjouksen PDF:ään ja sähköpostiin rivien alle."
             >
-              <Textarea name="customerNote" rows={4} maxLength={2000}
+              <Textarea name="customerNote" defaultValue={asiakas?.customerNote} rows={4} maxLength={2000}
                 placeholder="Esim. mitä sovittiin puhelimessa, miten työ etenee, mitä hinta kattaa…" />
             </Field>
             <div className="mt-4">
               <Field label="Sisäinen muistiinpano" hint="Vapaaehtoinen — tallentuu tarjoukselle, ei näy asiakkaalle.">
-                <Textarea name="notes" rows={3} placeholder="Esim. sovittu alennus, erityistoiveet…" />
+                <Textarea name="notes" defaultValue={asiakas?.notes} rows={3} placeholder="Esim. sovittu alennus, erityistoiveet…" />
               </Field>
             </div>
           </div>
@@ -308,7 +342,7 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
 
           <SubmitButton className="w-full" pendingLabel="Lähetetään…" disabled={pricing.total <= 0}
             name="mode" value="send">
-            Lähetä tarjous sähköpostilla
+            {offerId ? 'Lähetä tämä tarjous sähköpostilla' : 'Lähetä tarjous sähköpostilla'}
           </SubmitButton>
 
           {/* Sama lomake, sama hinnoittelu — vain loppu eroaa. `mode` kulkee
@@ -316,11 +350,12 @@ export function OfferBuilder({ kind = 'asiakas' }: { kind?: 'asiakas' | 'taloyht
               painetaan eikä erillistä tilaa tarvita. */}
           <SubmitButton className="w-full" variant="outline" pendingLabel="Tallennetaan…"
             disabled={pricing.total <= 0} name="mode" value="draft">
-            Tallenna luonnoksena ja lataa PDF
+            Tallenna luonnos
           </SubmitButton>
           <p className="text-xs text-faint">
-            Luonnosta ei lähetetä asiakkaalle. Se tallentuu Tarjoukset-listaan, PDF:n voi ladata
-            ja tarjouksen lähettää myöhemmin.
+            Luonnosta ei lähetetä asiakkaalle. Se tallentuu Tarjoukset-listaan, josta työtä voi
+            jatkaa myöhemmin — kaikki valinnat säilyvät. PDF:n voi ladata ja tarjouksen lähettää
+            silloin kun se on valmis.
           </p>
           {state.error && <ErrorNote>{state.error}</ErrorNote>}
           {state.ok && <OkNote>{state.ok}</OkNote>}

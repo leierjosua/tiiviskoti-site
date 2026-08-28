@@ -124,6 +124,16 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
               <p className="text-sm text-muted">
                 Tätä tarjousta ei ole lähetetty asiakkaalle.
               </p>
+              {/* Luonnos on kesken oleva työ, ei valmis tarjous: ilman tätä
+                  linkkiä siihen ei saisi riviä lisää muuten kuin
+                  näpyttelemällä koko tarjous alusta. Vain luonnos aukeaa —
+                  lähetettyä ei muuteta, koska asiakkaalla on siitä kopio. */}
+              <Link
+                href={`/tarjoukset/uusi?luonnos=${offer.id}`}
+                className="block w-full rounded-lg border border-line bg-ink-800 px-4 py-2 text-center text-sm font-semibold text-accent hover:bg-ink-700"
+              >
+                Jatka muokkausta
+              </Link>
               <SendDraftButton id={offer.id} email={offer.email} />
             </div>
           </Card>
