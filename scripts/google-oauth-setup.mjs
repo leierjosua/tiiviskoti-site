@@ -36,6 +36,11 @@ const SCOPES = [
      `REQUIRED_SCOPES`-listaan (src/lib/google.ts), eli kuntotarkistus ei
      kaadu vaikka tämä joskus puuttuisi. */
   'https://www.googleapis.com/auth/gmail.readonly',
+  /* Allekirjoituksen asettaminen (users.settings.sendAs.patch). Gmailin
+     käyttöliittymä ei hyväksy ohjelmallista muokkausta ja käsin säätäminen
+     osui kerran väärään kenttään — rajapinnan kautta se menee kerralla
+     oikein ja on toistettavissa. */
+  'https://www.googleapis.com/auth/gmail.settings.basic',
   'https://www.googleapis.com/auth/calendar',
 ];
 
