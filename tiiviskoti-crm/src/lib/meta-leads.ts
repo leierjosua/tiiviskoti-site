@@ -112,7 +112,13 @@ export async function importMetaLeads(): Promise<MetaLeadsResult> {
         const rows = await sql<{ id: string }[]>`
           insert into tk.leads (full_name, email, phone, postal_code, message, campaign, external_id)
           values (${nimi}, ${email}, ${puhelin ?? ''}, ${pn}, ${viesti}, ${'meta-liidilomake'}, ${lead.id})
-          on conflict (external_id) do nothing
+          /* Ehto on TOISTETTAVA: leads_external_id_uniq on osittainen
+             indeksi (where external_id is not null), eikä Postgres tunnista
+             sitä ilman samaa ehtoa. Ilman tätä jokainen lisäys kaatui
+             virheeseen "no unique or exclusion constraint matching", tuonti
+             palautti virheen ja sivu nieli sen — yhtään liidiä ei tullut
+             perille ennen 28.8.2026. */
+          on conflict (external_id) where external_id is not null do nothing
           returning id
         `;
         if (rows.length) {

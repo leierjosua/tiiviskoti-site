@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
-import { Card, CardHeader, Empty } from '@/components/ui';
+import { Card, CardHeader, Empty, ErrorNote } from '@/components/ui';
 import { LeadStatus } from './ui';
 import { DeleteButton } from '@/components/delete-button';
 import { deleteLead } from '../alueet/actions';
@@ -24,11 +24,19 @@ export default async function LeadsPage() {
      liidejä oikeasti katsotaan, joten haku kannattaa tehdä tässä.
      Virhe ei saa estää sivun näyttämistä — kannassa olevat liidit ovat
      tärkeämpiä kuin Metan uusimmat. */
+  /* Tuonnin tulos otetaan talteen ja NÄYTETÄÄN. Aiemmin virhe vain
+     niellään: importMetaLeads palauttaa vian virhekenttänä eikä heitä
+     poikkeusta, joten catch ei laukea, ja sivu näytti normaalilta samalla
+     kun yhtään liidiä ei tullut perille. Se jäi huomaamatta kolmeksi
+     päiväksi. Nyt vika lukee sivun yläreunassa. */
+  let tuontiVirhe: string | null = null;
   try {
-    await importMetaLeads();
+    const tulos = await importMetaLeads();
+    if (tulos.error) tuontiVirhe = tulos.error;
   } catch (e) {
-    console.error('liidit: Metan liidien haku epäonnistui', e);
+    tuontiVirhe = e instanceof Error ? e.message : String(e);
   }
+  if (tuontiVirhe) console.error('liidit: Metan liidien haku epäonnistui', tuontiVirhe);
 
   const leads = await sql<Lead[]>`
     select id, full_name, email, phone, postal_code, city, message, status, created_at
@@ -54,6 +62,15 @@ export default async function LeadsPage() {
           Yhteydenottopyynnöt palvelualueiden ulkopuolelta — kysyntä alueille joilla ei vielä toimita.
         </p>
       </header>
+
+      {/* Metan haku on hiljainen taustatoiminto: jos se ei toimi, sivu
+          näyttää muuten täysin normaalilta ja liidit jäävät Metaan. */}
+      {tuontiVirhe && (
+        <ErrorNote>
+          Metan liidien haku ei onnistunut: {tuontiVirhe}. Alla olevat liidit ovat kannasta —
+          Metassa voi olla uudempia, jotka eivät ole tulleet perille.
+        </ErrorNote>
+      )}
 
       {demand.length > 0 && (
         <Card className="overflow-x-auto">
