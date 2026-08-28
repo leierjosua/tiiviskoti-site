@@ -108,6 +108,21 @@ export async function setCalendarAreas(formData: FormData) {
 
 const LEAD_STATUSES = ['new', 'contacted', 'converted', 'rejected'] as const;
 
+/**
+ * Poista liidi pysyvästi.
+ *
+ * Tarkoitettu testirivien siivoamiseen. Liidi on yhteydenottopyyntö, ei
+ * kirjanpitoaineistoa — jos liidistä on jo tehty työ, työ jää omaan
+ * tauluunsa koskematta. Käyttöliittymä vaatii vahvistuksen.
+ */
+export async function deleteLead(formData: FormData) {
+  await requireManager();
+  const id = String(formData.get('id') ?? '');
+  if (!id) return;
+  await sql`delete from tk.leads where id = ${id}`;
+  revalidatePath('/liidit');
+}
+
 export async function setLeadStatus(formData: FormData) {
   await requireManager();
   const id = String(formData.get('id') ?? '');

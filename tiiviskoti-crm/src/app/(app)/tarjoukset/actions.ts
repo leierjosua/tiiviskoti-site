@@ -274,6 +274,26 @@ export async function setOfferStatus(_prev: ActionState, formData: FormData): Pr
 }
 
 /**
+ * Poista tarjous pysyvästi.
+ *
+ * MIKSI ILMAN TILARAJOITUSTA: käyttötarve on testirivien siivoaminen, ja
+ * testejä on lähetettykin (T-0014, T-0015 omaan osoitteeseen). Tilaan
+ * sidottu rajoitus estäisi juuri sen mitä varten tämä on. Suoja on sen
+ * sijaan käyttöliittymässä: poisto vaatii kaksi klikkausta ja vahvistus
+ * näyttää tarjouksen numeron.
+ *
+ * Tarjous ei ole kirjanpitoaineistoa — lasku ja työ ovat omissa tauluissaan
+ * eikä niihin kosketa tästä.
+ */
+export async function deleteOffer(formData: FormData) {
+  await requireManager();
+  const id = String(formData.get('id') ?? '');
+  if (!id) return;
+  await sql`delete from tk.offers where id = ${id}`;
+  revalidatePath('/tarjoukset');
+}
+
+/**
  * Lähetä JO TALLENNETTU tarjous asiakkaalle.
  *
  * Tätä tarvitaan luonnoksille: ilman sitä luonnos olisi umpikuja, ja tarjous

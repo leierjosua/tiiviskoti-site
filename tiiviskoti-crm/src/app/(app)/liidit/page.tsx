@@ -3,6 +3,8 @@ import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty } from '@/components/ui';
 import { LeadStatus } from './ui';
+import { DeleteButton } from '@/components/delete-button';
+import { deleteLead } from '../alueet/actions';
 import { importMetaLeads } from '@/lib/meta-leads';
 
 export const dynamic = 'force-dynamic';
@@ -83,6 +85,7 @@ export default async function LeadsPage() {
                 <th className="px-4 py-2 font-medium">Postinro</th>
                 <th className="px-4 py-2 font-medium">Tila</th>
                 <th className="px-4 py-2 font-medium" />
+                <th className="px-4 py-2 font-medium" />
               </tr>
             </thead>
             <tbody className="divide-y divide-line-soft">
@@ -123,6 +126,9 @@ export default async function LeadsPage() {
                     >
                       Luo työ
                     </Link>
+                  </td>
+                  <td className="px-4 py-2.5 text-right">
+                    <DeleteButton id={lead.id} action={deleteLead} nimi={lead.full_name} />
                   </td>
                 </tr>
               ))}

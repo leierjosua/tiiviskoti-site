@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { DeleteButton } from '@/components/delete-button';
+import { deleteOffer } from './actions';
 import { requireManager } from '@/lib/session';
 import { listOffers, type OfferRow } from '@/lib/data';
 import { Button, Card, CardHeader, Empty, PageHead } from '@/components/ui';
@@ -27,6 +29,7 @@ function OfferTable({ rows, talo }: { rows: OfferRow[]; talo: boolean }) {
           <th className="px-4 py-2 font-medium">{talo ? 'Yhteyshenkilö' : 'Sähköposti'}</th>
           <th className="px-4 py-2 font-medium text-right">Summa</th>
           <th className="px-4 py-2 font-medium">Tila</th>
+          <th className="px-4 py-2 font-medium" />
         </tr>
       </thead>
       <tbody className="divide-y divide-line-soft">
@@ -47,6 +50,11 @@ function OfferTable({ rows, talo }: { rows: OfferRow[]; talo: boolean }) {
             <td className="px-4 py-2.5 text-right tabular font-semibold">{eur(o.total_cents)}</td>
             <td className="px-4 py-2.5">
               <OfferStatusChip status={o.error ? 'error' : o.status} label={o.error ? 'Lähetys epäonnistui' : OFFER_STATUS[o.status]} />
+            </td>
+            <td className="px-4 py-2.5 text-right">
+              {/* Testitarjouksia kertyy väistämättä, ja ilman poistoa ne jäävät
+                  listaan sekoittamaan oikeat tarjoukset. */}
+              <DeleteButton id={o.id} action={deleteOffer} nimi={o.offer_number} />
             </td>
           </tr>
         ))}
