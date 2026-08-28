@@ -1,0 +1,46 @@
+# Metan liidien haku varttitunnein.
+#
+# MIKSI TÄÄLLÄ EIKÄ VERCELISSÄ: Vercelin Hobby-tili sallii vain päivittäisen
+# ajastuksen. Liidimainoksen liidi on vuorokaudessa käytännössä kylmä —
+# soitto samana tuntina ratkaisee kaupan. Tämä herättää CRM:n oman
+# cron-reitin useammin ilman että Verceliin tarvitsee maksullista tiliä.
+#
+# Reitti on itsekorjaava ja idempotentti: sama liidi ei tallennu kahdesti
+# (tk.leads.external_id on uniikki), joten päällekkäinen tai epäonnistunut
+# ajo ei riko mitään.
+#
+# GitHubin ajastus ei ole tarkka — ruuhkassa ajo voi myöhästyä kymmeniä
+# minuutteja. Se on silti eri suuruusluokka kuin vuorokausi.
+name: Hae Metan liidit
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:        # ajettavissa myös käsin GitHubin käyttöliittymästä
+
+# Jos edellinen ajo on vielä kesken, ei käynnistetä päällekkäistä.
+concurrency:
+  group: liidit
+  cancel-in-progress: false
+
+jobs:
+  hae:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Kutsu CRM:n liidihakua
+        env:
+          TOKEN: ${{ secrets.LEADS_PING_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "LEADS_PING_TOKEN puuttuu repon secreteistä"; exit 1
+          fi
+          vastaus=$(mktemp)
+          koodi=$(curl -sS -o "$vastaus" -w '%{http_code}' -m 60 \
+            -H "authorization: Bearer $TOKEN" \
+            https://admin.tiiviskoti.fi/api/cron/meta-leads)
+          echo "HTTP $koodi"
+          cat "$vastaus"; echo
+          # 500 tarkoittaa että haku epäonnistui — se pitää näkyä punaisena,
+          # muuten vika jää huomaamatta juuri kuten kävi 28.8.2026.
+          [ "$koodi" = "200" ]
