@@ -899,10 +899,16 @@ function paintStepChrome(){
   if(dots) [...dots.children].forEach((d,i)=>{
     d.className = i===curIdx ? 'on' : (i<curIdx ? 'done' : '');
   });
-  if(title && cur.dataset.title) title.textContent = cur.dataset.title;
+  /* Polkukohtainen otsikko voittaa, kuten tagissakin: kuluttajalle
+     luvataan hinta, taloyhtiölle veloitukseton kartoitus. Sama vaihe,
+     eri lupaus — ilman tätä toinen polku lupaisi väärää asiaa. */
+  const polkuAvain = (nimi) => nimi + stepPath.charAt(0).toUpperCase() + stepPath.slice(1);
+  const otsikko = cur.dataset[polkuAvain('title')] || cur.dataset.title;
+  if(title && otsikko) title.textContent = otsikko;
   if(kicker && cur.dataset.kicker) kicker.textContent = cur.dataset.kicker;
   if(sub){
-    if(cur.dataset.sub){ sub.textContent=cur.dataset.sub; sub.style.display=''; }
+    const alaotsikko = cur.dataset[polkuAvain('sub')] || cur.dataset.sub;
+    if(alaotsikko){ sub.textContent=alaotsikko; sub.style.display=''; }
     else sub.style.display='none';
   }
   /* Osion oma paluulinkki (ajanvaraus.html: "muuta postinumeroa") kuuluu vain

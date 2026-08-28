@@ -913,9 +913,9 @@ html[data-ab="b"] .ab-b{display:block}
 
     <!-- VAIHE 2: postinumero ja polku -->
     <div class="step" data-step="postal"
-         data-kicker="Varaus" data-title="Missä kohde on?" data-tag="Vaihe 1/4" data-tag-yhtio="Vaihe 1/3"
+         data-kicker="Varaus" data-title="Paljonko työ maksaa?" data-title-yhtio="Missä taloyhtiö on?" data-tag="Vaihe 1/4" data-tag-yhtio="Vaihe 1/3"
          data-focus="fPostal"
-         data-sub="Tarkistetaan ensin, että palvelemme alueellasi.">
+         data-sub="Kerro postinumero, niin näet hinnan ja vapaat ajat omalta alueeltasi." data-sub-yhtio="Kartoituskäynti on veloitukseton eikä sido mihinkään.">
       <div class="gate-tabs" role="tablist">
         <button type="button" class="gate-tab on" id="tabKoti" role="tab" aria-selected="true">
           <b>Yksi koti</b>
@@ -932,8 +932,8 @@ html[data-ab="b"] .ab-b{display:block}
             Kohteen postinumero
           </label>
           <span class="gate-hint">
-            Syötä <b>kohteen postinumero</b> — näytämme vain ne ajat, jotka ovat
-            vapaana sinun alueellasi.
+            Syötä <b>kohteen postinumero</b> — tarvitsemme sen vain siihen, että näytämme
+            oikean hinnan ja ne ajat jotka ovat vapaana sinun alueellasi.
           </span>
           <input class="bk-input gate-postal" id="fPostal" inputmode="numeric" maxlength="5" required
                  placeholder="00100" autocomplete="postal-code" aria-describedby="areaNote" />
@@ -941,7 +941,7 @@ html[data-ab="b"] .ab-b{display:block}
 
         <div class="area-note" id="areaNote" style="margin-top:14px"></div>
 
-        <button type="button" class="btn btn-p gate-cta" id="gShow">Näytä vapaat ajat</button>
+        <button type="button" class="btn btn-p gate-cta" id="gShow">Laske hinta</button>
 
         <div class="gate-ticks">
           <span>✓ Kiinteä hinta</span><span>✓ Maksu työn jälkeen</span>
