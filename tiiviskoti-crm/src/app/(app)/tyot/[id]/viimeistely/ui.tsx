@@ -239,8 +239,8 @@ export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initial
             const line = lineOf(item.id);
             const qty = line?.quantity ?? 0;
             /* Rivin oma yksikköhinta voittaa katalogin: varaushinnastossa
-               ulko-ovi on 119 €, mutta saman käynnin toisesta ovesta
-               veloitettiin 99 €. Katalogin hinta kortissa väittäisi että
+               väliovi on 89 €, mutta saman käynnin toisesta kohteesta
+               veloitettiin 59 €. Katalogin hinta kortissa väittäisi että
                rivi maksaa enemmän kuin se maksaa. */
             const unit = line?.unitPriceCents ?? item.priceCents;
             return (

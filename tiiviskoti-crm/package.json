@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/tarkista-hinnasto.mjs && next build",
     "start": "next start",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "tarkista-hinnasto": "node scripts/tarkista-hinnasto.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
