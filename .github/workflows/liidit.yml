@@ -9,8 +9,14 @@
 # (tk.leads.external_id on uniikki), joten päällekkäinen tai epäonnistunut
 # ajo ei riko mitään.
 #
-# GitHubin ajastus ei ole tarkka — ruuhkassa ajo voi myöhästyä kymmeniä
-# minuutteja. Se on silti eri suuruusluokka kuin vuorokausi.
+# HUOM: GitHub EI kunnioita tätä tiheyttä. Mitattuna 28.-29.8.2026 ajot
+# tulivat 7-9 tunnin välein, eivät 15 minuutin — GitHub kuristaa tiheät
+# ajastukset vähän käytetyissä repoissa eikä lupaa niille mitään.
+#
+# Tämä jää siksi VARAJÄRJESTELMÄKSI. Varsinainen ajastus on Supabasen
+# pg_cronissa 5 minuutin välein (ks. Desktop/tiiviskoti-liidiajastus.sql).
+# Molemmat kutsuvat samaa idempotenttia reittiä, joten päällekkäisyys ei
+# haittaa.
 name: Hae Metan liidit
 
 on:
