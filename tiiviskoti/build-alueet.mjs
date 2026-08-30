@@ -874,13 +874,29 @@ const KUMPPANIT = [
     kuva: 'hero-entrance.webp',
     alt: 'TiivisKodin asentajat vaalean puutalon pihassa työvälineineen',
   },
+  /* Yhteissivu kolmelle yhdistykselle: Mäntsälän jäsenedut ovat myös Askolan
+     ja Pornaisten jäsenten käytössä (Mäntsälän pj. 30.8.2026). Mäntsälän ja
+     Askolan omat sivut jäävät ennalleen — niihin on jo lähetetty linkkejä.
+     Pornaisilla ei ole omaa sivua, tämä on heidän ainoansa. `genP` on monikon
+     genetiivi, jota yksittäisillä yhdistyksillä ei tarvita. */
+  {
+    slug: 'mantsala-askola-pornainen',
+    yhdistys: 'Mäntsälän, Askolan ja Pornaisten Omakotiyhdistykset',
+    lyhyt: 'Mäntsälä, Askola ja Pornainen',
+    gen: 'Mäntsälän, Askolan tai Pornaisten Omakotiyhdistyksen',
+    genP: 'Mäntsälän, Askolan ja Pornaisten Omakotiyhdistysten',
+    koodi: 'MAPO',
+    prosentti: 10,
+    kuva: 'hero-entrance.webp',
+    alt: 'TiivisKodin asentajat vaalean puutalon pihassa työvälineineen',
+  },
 ];
 
 function kumppaniSivu(k) {
   const R = '';
   const url = `${SITE}/${k.slug}`;
   const title = `${k.lyhyt}: −${k.prosentti} % ovien ja ikkunoiden tiivistyksestä — TiivisKoti`;
-  const desc = `${k.yhdistys} jäsenetu: ${k.prosentti} % alennus ovien ja ikkunoiden tiivistyksestä. Koodi ${k.koodi} varauksen yhteydessä — hinta näkyy laskurissa jo alennettuna.`;
+  const desc = `${k.genP ?? k.yhdistys} jäsenetu: ${k.prosentti} % alennus ovien ja ikkunoiden tiivistyksestä. Koodi ${k.koodi} varauksen yhteydessä — hinta näkyy laskurissa jo alennettuna.`;
   /* Laskuri on samalla sivulla, joten painike vie sen kohdalle eikä
      etusivulle. Koodi tulee bodyn data-attribuutista. */
   const varausUrl = '#laskuri';
@@ -1003,7 +1019,7 @@ ${laskuriOsio(R, null)}
   <div class="kicker">Ehdot</div>
   <h2 class="title">Edun ehdot lyhyesti</h2>
   <ul class="sub" style="max-width:70ch;line-height:1.9;padding-left:22px;margin-top:18px">
-    <li>Etu koskee ${esc(k.yhdistys)}:n jäseniä.</li>
+    <li>Etu koskee ${esc(k.genP ?? `${k.yhdistys}:n`)} jäseniä.</li>
     <li>Alennus ${k.prosentti} % lasketaan työn kokonaishinnasta, myös mahdollisesta matkalisästä.</li>
     <li>Koodi <b>${k.koodi}</b> syötetään varauksen yhteydessä. Jälkikäteen sitä ei voi lisätä valmiiseen varaukseen.</li>
     <li>Etua ei voi yhdistää muihin alennuskoodeihin.</li>
