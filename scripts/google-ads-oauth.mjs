@@ -10,7 +10,12 @@
  * lakkaavat lähtemästä.
  *
  * KÄYTTÖ
- *   node scripts/google-ads-oauth.mjs <CLIENT_ID> <CLIENT_SECRET>
+ *   node scripts/google-ads-oauth.mjs <CLIENT_ID> <CLIENT_SECRET> [--save]
+ *
+ * `--save` kirjoittaa refresh tokenin suoraan
+ * `tiiviskoti-crm/.env.local`-tiedostoon (gitignorattu). Ilman sitä token
+ * tulostetaan ruudulle. Tallennus on oletusta parempi tapa: salaisuutta ei
+ * tarvitse kopioida leikepöydän kautta eikä se jää terminaalin historiaan.
  *
  * Kirjaudu sillä Google-tilillä jolla on pääsy Ads-tilille. Skripti avaa
  * selaimen, ottaa vastaan callbackin osoitteessa
@@ -28,6 +33,7 @@
  */
 
 import { createServer } from 'node:http';
+import { appendFileSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 
@@ -47,7 +53,23 @@ const SCOPES = [
   'https://www.googleapis.com/auth/datamanager',
 ];
 
-const [, , CLIENT_ID, CLIENT_SECRET] = process.argv;
+const args = process.argv.slice(2).filter((a) => a !== '--save');
+const SAVE = process.argv.includes('--save');
+const ENV_PATH = new URL('../tiiviskoti-crm/.env.local', import.meta.url).pathname;
+const [CLIENT_ID, CLIENT_SECRET] = args;
+
+/* Korvaa rivin jos muuttuja on jo tiedostossa, muuten lisää loppuun.
+   Kahdesti ajettuna tiedostoon jäisi muuten kaksi arvoa, joista
+   `grep | head -1` poimisi vanhan — hiljainen ja ikävästi harhaanjohtava
+   vika. */
+function saveEnv(key, value) {
+  const line = `${key}=${value}`;
+  let body = existsSync(ENV_PATH) ? readFileSync(ENV_PATH, 'utf8') : '';
+  const re = new RegExp(`^${key}=.*$`, 'm');
+  if (re.test(body)) body = body.replace(re, line);
+  else body = body.replace(/\s*$/, '\n') + line + '\n';
+  writeFileSync(ENV_PATH, body);
+}
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error('Käyttö: node scripts/google-ads-oauth.mjs <CLIENT_ID> <CLIENT_SECRET>');
@@ -150,6 +172,15 @@ const server = createServer(async (req, res) => {
       '<h2>Valmis</h2><p>Refresh token haettu. Voit sulkea tämän välilehden ja palata terminaaliin.</p>' +
       '</body></html>',
     );
+
+    if (SAVE) {
+      saveEnv('GOOGLE_ADS_OAUTH_REFRESH_TOKEN', tokens.refresh_token);
+      console.log('\n✓ Refresh token haettu ja tallennettu tiiviskoti-crm/.env.local:iin.');
+      console.log('  (Arvoa ei tulosteta tähän — se on tiedostossa.)\n');
+      console.log('Myönnetyt scopet:', tokens.scope);
+      server.close();
+      process.exit(0);
+    }
 
     console.log('\n✓ Refresh token haettu.\n');
     console.log('Vie arvot tiiviskoti-crm-projektin ympäristömuuttujiin:\n');
