@@ -14,6 +14,27 @@ const fmt = (d: Date) => new Intl.DateTimeFormat('fi-FI', {
   timeZone: 'Europe/Helsinki', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit',
 }).format(d);
 
+/* Rahaluku tarjouslistan päälle.
+
+   MIKSI OMA KOMPONENTTI EIKÄ ETUSIVUN `Metric`: se on etusivun paikallinen
+   funktio eikä jaettu, ja sen kopioiminen tänne on halvempi kuin kolmannen
+   sijainnin luominen jaettuun ui.tsx:ään yhtä sivua varten. */
+function Money({ label, value, sub, tone = 'plain' }: {
+  label: string; value: string; sub?: string; tone?: 'plain' | 'accent';
+}) {
+  return (
+    <Card className="p-5">
+      <p className="text-sm font-semibold text-muted">{label}</p>
+      <p className={`mt-2 text-[32px] leading-none font-extrabold tabular ${
+        tone === 'accent' ? 'text-accent' : 'text-text'
+      }`}>
+        {value}
+      </p>
+      {sub && <p className="mt-2 text-xs text-faint">{sub}</p>}
+    </Card>
+  );
+}
+
 /* Yksi taulukko, kaksi käyttöä. Kuluttaja- ja taloyhtiötarjoukset pidetään
    erillään koska ne luetaan eri silmin: kuluttajalla riittää nimi, mutta
    taloyhtiöllä oleellinen on kenelle tarjous meni — isännöitsijä vaihtuu,
@@ -71,6 +92,20 @@ export default async function OffersPage() {
 
   const sum = (rows: OfferRow[]) => rows.reduce((s, o) => s + o.total_cents, 0);
 
+  /* Kaksi lukua joita tarjouksista oikeasti katsotaan: paljonko on jo
+     myyty ja paljonko on vielä auki.
+
+     `draft` EI ole odottavaa rahaa — luonnosta ei ole lähetetty, joten
+     kukaan ei odota vastausta. Samasta syystä lähetysvirheen saanut rivi
+     ei ole auki vaan rikki: asiakas ei ole koskaan nähnyt sitä. Sama
+     tulkinta kuin taulukon tilamerkissä, jossa `error` ohittaa statuksen. */
+  const hyvaksytyt = offers.filter((o) => o.status === 'accepted' && !o.error);
+  const odottaa = offers.filter((o) => o.status === 'sent' && !o.error);
+  const jakauma = (rows: OfferRow[]) => {
+    const talo = rows.filter((o) => o.kind === 'taloyhtio').length;
+    return `${rows.length} kpl · ${rows.length - talo} kuluttaja, ${talo} taloyhtiö`;
+  };
+
   return (
     <div className="space-y-6">
       <PageHead
@@ -83,6 +118,20 @@ export default async function OffersPage() {
           </div>
         }
       />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Money
+          label="Hyväksytyt tarjoukset"
+          value={eur(sum(hyvaksytyt))}
+          sub={jakauma(hyvaksytyt)}
+          tone="accent"
+        />
+        <Money
+          label="Odottaa vastausta"
+          value={eur(sum(odottaa))}
+          sub={jakauma(odottaa)}
+        />
+      </div>
 
       <Card className="overflow-x-auto">
         <CardHeader
