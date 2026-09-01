@@ -1,4 +1,4 @@
-import { sendPendingConversions } from '@/lib/ads-sync';
+import { sendPendingConversions, sendPendingLeadConversions } from '@/lib/ads-sync';
 
 /* =========================================================
    Konversioiden yövienti Google Adsiin (Vercel Cron, ks. vercel.json).
@@ -26,7 +26,19 @@ export async function GET(request: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const result = await sendPendingConversions();
-  const ok = !result.error && result.failed === 0;
-  return Response.json(result, { status: ok ? 200 : 500 });
+  /* Työt ja liidit peräkkäin samassa ajossa, mutta erillisinä tuloksina.
+
+     MIKSI SAMA REITTI: molemmat vievät samaa dataa samaan tiliin samalla
+     tunnuksella, ja kahden cronin ylläpito eriyttäisi ne toisistaan ilman
+     hyötyä. MIKSI ERILLISET TULOKSET: liidien konfiguraatio voi puuttua
+     (oma konversiotapahtuma) ilman että töiden vienti on rikki — ja
+     päinvastoin. Yksi yhteinen luku peittäisi kumman tahansa vian. */
+  const jobs = await sendPendingConversions();
+  const leads = await sendPendingLeadConversions();
+
+  /* Puuttuva liidiasetus EI ole virhe vaan asennustila: se ei saa värjätä
+     cron-näkymää punaiseksi joka yö ennen kuin muuttuja on asetettu. */
+  const jobsOk = !jobs.error && jobs.failed === 0;
+  const leadsOk = leads.configured ? (!leads.error && leads.failed === 0) : true;
+  return Response.json({ jobs, leads }, { status: jobsOk && leadsOk ? 200 : 500 });
 }

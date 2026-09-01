@@ -839,30 +839,27 @@ function tkCampaign(){
    Talletuksen tekee `_shared.js` (`tk_gclid`, 30 vrk) — sitä ladataan tällä
    sivulla laskurin mukana. Tämä vain lukee saman avaimen.
 
-   MIKSI VAIN `gclid` JA EI `wbraid`/`gbraid`: Adsin rajapinnassa ne ovat
-   kolme eri kenttää, eikä arvosta voi päätellä kumpi on kumpi. `tk.leads`
-   ei toistaiseksi kanna tyyppiä (`tk.jobs` kantaa, kenttä ads_click_kind),
-   joten iOS:n vastineiden lähettäminen gclidinä tuottaisi rivin jonka Ads
-   hylkää. Mieluummin tyhjä kuin väärä. Kun leadsiin lisätään tyyppikenttä,
-   poista tämä rajaus. */
+   TYYPPI KULKEE MUKANA: Adsin rajapinnassa gclid, wbraid ja gbraid ovat
+   kolme eri kenttää, eikä arvosta voi päätellä kumpi on kumpi — wbraid
+   gclidinä lähetettynä hylätään. `tk.leads` kantaa tyypin sarakkeessa
+   `gclid_kind` (db/025), joten kaikki kolme voi ottaa talteen. */
 const TK_GCLID_KEY = 'tk_gclid';
 const TK_GCLID_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+const TK_GCLID_KINDS = ['gclid', 'wbraid', 'gbraid'];
 function tkGclid(){
   const ok = (g) => g && /^[A-Za-z0-9_-]{10,200}$/.test(g) ? g : undefined;
   /* Osoiterivi voittaa: jos kävijä tulee juuri nyt mainoksesta, se on
      tuorein tieto eikä riipu siitä ehtikö talletus tapahtua. */
   try{
     const q = new URLSearchParams(location.search);
-    const suora = ok(q.get('gclid'));
-    if(suora) return suora;
-    /* Osoiterivillä oli wbraid/gbraid → ei lähetetä mitään, ks. yllä. */
-    if(q.get('wbraid') || q.get('gbraid')) return undefined;
+    for(const kind of TK_GCLID_KINDS){
+      const suora = ok(q.get(kind));
+      if(suora) return suora;
+    }
   }catch(_){}
   try{
     const s = JSON.parse(localStorage.getItem(TK_GCLID_KEY) || 'null');
     if(!s || Date.now() - (s.t || 0) > TK_GCLID_MAX_AGE_MS) return undefined;
-    /* Vanhat tallennukset ovat ilman `k`-kenttää ja käytännössä gclideja. */
-    if(s.k && s.k !== 'gclid') return undefined;
     return ok(s.v);
   }catch(_){ return undefined; }
 }
@@ -873,21 +870,35 @@ function tkGclid(){
    taloyhtiösivulle mainoksesta menettää gclidin heti kun siirtyy toiselle
    sivulle ja palaa. Sama avain ja sama ikkuna kuin `_shared.js`:ssä, ja
    ensimmäinen voittaa — ei ylikirjoiteta aiempaa klikkiä. */
+/* Vanhat tallennukset ovat ilman `k`-kenttää ja käytännössä gclideja. */
+function tkGclidKind(){
+  try{
+    const s = JSON.parse(localStorage.getItem(TK_GCLID_KEY) || 'null');
+    const q = new URLSearchParams(location.search);
+    for(const kind of TK_GCLID_KINDS) if(q.get(kind)) return kind;
+    if(s && TK_GCLID_KINDS.includes(s.k)) return s.k;
+  }catch(_){}
+  return 'gclid';
+}
+
 (function captureGclid(){
-  let v;
-  try{ v = new URLSearchParams(location.search).get('gclid'); }catch(_){ return; }
+  let v, k;
+  try{
+    const q = new URLSearchParams(location.search);
+    for(const kind of TK_GCLID_KINDS){ const got = q.get(kind); if(got){ v = got; k = kind; break; } }
+  }catch(_){ return; }
   if(!v || !/^[A-Za-z0-9_-]{10,200}$/.test(v)) return;
   try{
     const s = JSON.parse(localStorage.getItem(TK_GCLID_KEY) || 'null');
     if(s && Date.now() - (s.t || 0) <= TK_GCLID_MAX_AGE_MS) return;
-    localStorage.setItem(TK_GCLID_KEY, JSON.stringify({ v, k: 'gclid', t: Date.now() }));
+    localStorage.setItem(TK_GCLID_KEY, JSON.stringify({ v, k, t: Date.now() }));
   }catch(_){}
 })();
 
 /* Julkaistaan moduulille: `_kartoitus.js` on ES-moduuli eikä näe tämän
    klassisen skriptin lohkotason funktioita. */
 window.tkFbc=tkFbc; window.tkFbp=tkFbp;
-window.tkCampaign=tkCampaign; window.tkGclid=tkGclid;
+window.tkCampaign=tkCampaign; window.tkGclid=tkGclid; window.tkGclidKind=tkGclidKind;
 (function(){let v;try{v=new URLSearchParams(location.search).get('fbclid');}catch(_){return;}if(!v||!/^[A-Za-z0-9._-]{5,400}$/.test(v))return;if(tkCookie('_fbc')||tkFbc())return;try{localStorage.setItem(TK_FBC_KEY,JSON.stringify({v:`fb.1.${Date.now()}.${v}`,t:Date.now()}));}catch(_){}})();
 
 /* tarjouspyyntölomake */
@@ -912,7 +923,7 @@ tForm.addEventListener('submit',async e=>{
        Facebook/Instagram-mainoksesta. */
     fbc: tkFbc(), fbp: tkFbp(),
     /* Mistä mainoksesta taloyhtiön edustaja tuli. */
-    campaign: tkCampaign(), gclid: tkGclid(),
+    campaign: tkCampaign(), gclid: tkGclid(), gclidKind: tkGclidKind(),
   };
 
   try{

@@ -30,6 +30,7 @@ const schema = z.object({
      juuri se kertoo mihin kaupunkiin kannattaa laajentua seuraavaksi. */
   campaign: z.preprocess(campaignPreprocess, z.string().optional()),
   gclid: z.preprocess(gclidPreprocess, z.string().optional()),
+  gclid_kind: z.enum(['gclid', 'wbraid', 'gbraid']).optional(),
 });
 
 export async function POST(request: Request) {
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
     message: d.message ?? null,
     campaign: d.campaign ?? null,
     gclid: d.gclid ?? null,
+    gclidKind: d.gclid_kind ?? null,
   });
 
   return json({ ok: true }, { origin });

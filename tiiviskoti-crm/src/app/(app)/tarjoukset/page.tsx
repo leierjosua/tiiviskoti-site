@@ -101,6 +101,14 @@ export default async function OffersPage() {
      tulkinta kuin taulukon tilamerkissä, jossa `error` ohittaa statuksen. */
   const hyvaksytyt = offers.filter((o) => o.status === 'accepted' && !o.error);
   const odottaa = offers.filter((o) => o.status === 'sent' && !o.error);
+  /* Luonnokset omana lukunaan.
+
+     MIKSI NÄKYVIIN: ne eivät ole odottavaa rahaa, mutta ne ovat tehtyä
+     työtä jota kukaan ei odota — ja juuri siksi ne unohtuvat. Ilman tätä
+     korttia iso taloyhtiötarjous voi maata viikkoja lähettämättä eikä
+     mikään näkymä kerro siitä. Näin kävi: 15 868 € luonnoksina 1.9.2026,
+     joukossa 11 678 €:n tarjous. */
+  const luonnokset = offers.filter((o) => o.status === 'draft');
   const jakauma = (rows: OfferRow[]) => {
     const talo = rows.filter((o) => o.kind === 'taloyhtio').length;
     return `${rows.length} kpl · ${rows.length - talo} kuluttaja, ${talo} taloyhtiö`;
@@ -119,7 +127,7 @@ export default async function OffersPage() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Money
           label="Hyväksytyt tarjoukset"
           value={eur(sum(hyvaksytyt))}
@@ -130,6 +138,11 @@ export default async function OffersPage() {
           label="Odottaa vastausta"
           value={eur(sum(odottaa))}
           sub={jakauma(odottaa)}
+        />
+        <Money
+          label="Lähettämättä"
+          value={eur(sum(luonnokset))}
+          sub={luonnokset.length ? `${jakauma(luonnokset)} — luonnoksena` : 'Ei luonnoksia'}
         />
       </div>
 

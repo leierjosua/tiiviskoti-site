@@ -31,15 +31,18 @@ export type LeadRow = {
   message: string | null;
   campaign: string | null;
   gclid: string | null;
+  /* gclid | wbraid | gbraid. Adsissa kolme eri kenttää; ks. db/025. */
+  gclidKind?: string | null;
 };
 
 export async function insertLead(d: LeadRow): Promise<void> {
   if (campaignColumnsExist) {
     try {
       await sql`
-        insert into tk.leads (full_name, email, phone, postal_code, city, message, campaign, gclid)
+        insert into tk.leads (full_name, email, phone, postal_code, city, message, campaign, gclid, gclid_kind)
         values (${d.full_name}, ${d.email}, ${d.phone}, ${d.postal_code},
-                ${d.city}, ${d.message}, ${d.campaign}, ${d.gclid})
+                ${d.city}, ${d.message}, ${d.campaign}, ${d.gclid},
+                ${d.gclidKind && ['gclid','wbraid','gbraid'].includes(d.gclidKind) ? d.gclidKind : 'gclid'})
       `;
       return;
     } catch (e) {

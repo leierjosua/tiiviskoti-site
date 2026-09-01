@@ -60,18 +60,25 @@ const CONVERSION_ACTION_ID = digits(process.env.GOOGLE_ADS_CONVERSION_ACTION_ID)
  *  arvo kelpaa toisen paikalle. Ks. db/017_ads_conversions.sql. */
 export type ClickKind = 'gclid' | 'wbraid' | 'gbraid';
 
+/* Yksi rivi lähetettävää konversiota.
+   `rowId` ja `transactionId` ovat tarkoituksella neutraalit: sama lähetin
+   vie sekä työt (tk.jobs, tunnus = työnumero) että liidit (tk.leads,
+   tunnus = rivin uuid). Ks. sendPendingConversions ja
+   sendPendingLeadConversions ads-sync.ts:ssä. */
 export type PendingConversion = {
-  jobId: string;
-  jobNumber: string;
+  rowId: string;
+  /** Adsin duplikaattiavain. Sama arvo ei kirjaudu kahdesti. */
+  transactionId: string;
   clickId: string;
   clickKind: ClickKind;
   createdAt: Date;
+  /** 0 = pelkkä tapahtuma ilman rahallista arvoa (liidi). */
   priceCents: number;
 };
 
 export type UploadOutcome =
-  | { ok: true; jobId: string }
-  | { ok: false; jobId: string; error: string };
+  | { ok: true; rowId: string }
+  | { ok: false; rowId: string; error: string };
 
 export type UploadResult = {
   configured: boolean;
@@ -84,12 +91,12 @@ export type UploadResult = {
 
 /** Mitkä asetukset puuttuvat. Palautetaan listana, jotta admin voi kertoa
  *  kaikki kerralla eikä yksi kerrallaan uuden yrityksen jälkeen. */
-export function adsMissingConfig(): string[] {
+export function adsMissingConfig(opts: { conversionActionId?: string } = {}): string[] {
   const missing: string[] = [];
   /* Developer token EI ole enää pakollinen: Data Manager tunnistaa
      oikeudet OAuth-tilin pääsystä mainostilille. */
   if (!CUSTOMER_ID) missing.push('GOOGLE_ADS_CUSTOMER_ID');
-  if (!CONVERSION_ACTION_ID) missing.push('GOOGLE_ADS_CONVERSION_ACTION_ID');
+  if (!(opts.conversionActionId || CONVERSION_ACTION_ID)) missing.push('GOOGLE_ADS_CONVERSION_ACTION_ID');
   if (!refreshToken()) missing.push('GOOGLE_ADS_OAUTH_REFRESH_TOKEN tai GOOGLE_OAUTH_REFRESH_TOKEN');
   return missing;
 }
@@ -180,9 +187,9 @@ function eventTime(d: Date): string {
  */
 export async function uploadConversions(
   rows: PendingConversion[],
-  opts: { validateOnly?: boolean } = {},
+  opts: { validateOnly?: boolean; conversionActionId?: string } = {},
 ): Promise<UploadResult> {
-  const missing = adsMissingConfig();
+  const missing = adsMissingConfig({ conversionActionId: opts.conversionActionId });
   if (missing.length > 0) {
     return { configured: false, error: `Puuttuu: ${missing.join(', ')}`, outcomes: [] };
   }
@@ -190,7 +197,7 @@ export async function uploadConversions(
 
   const destination: Record<string, unknown> = {
     operatingAccount: { accountType: 'GOOGLE_ADS', accountId: CUSTOMER_ID },
-    productDestinationId: CONVERSION_ACTION_ID,
+    productDestinationId: opts.conversionActionId || CONVERSION_ACTION_ID,
   };
   /* Vain jos mainostili on hallinnointitilin alla. Väärin asetettuna se
      tuottaa luvattoman, joten se jätetään pois ellei arvoa ole annettu. */
@@ -204,9 +211,12 @@ export async function uploadConversions(
       /* Vain yksi kolmesta tunnisteesta kerrallaan — ks. ClickKind. */
       adIdentifiers: { [r.clickKind]: r.clickId },
       eventTimestamp: eventTime(r.createdAt),
-      transactionId: r.jobNumber,
-      conversionValue: r.priceCents / 100,
-      currency: 'EUR',
+      transactionId: r.transactionId,
+      /* Nolla-arvo jätetään pois kokonaan: liidi ei ole kauppa, eikä sille
+         keksitä euromäärää. Arvopohjainen tarjoaminen käyttäisi keksittyä
+         lukua sellaisenaan, ja väärä arvo ohjaa tarjoamista pahemmin kuin
+         puuttuva. Määrä riittää signaaliksi. */
+      ...(r.priceCents > 0 ? { conversionValue: r.priceCents / 100, currency: 'EUR' } : {}),
       eventSource: 'WEB',
     })),
     validateOnly: opts.validateOnly === true,
@@ -245,6 +255,6 @@ export async function uploadConversions(
   return {
     configured: true,
     requestId,
-    outcomes: rows.map((r) => ({ ok: true as const, jobId: r.jobId })),
+    outcomes: rows.map((r) => ({ ok: true as const, rowId: r.rowId })),
   };
 }

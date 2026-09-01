@@ -110,6 +110,7 @@ async function mirrorToCrmLeads(f, client) {
         message: ['Taloyhtiö-tarjouspyyntö', f.message, extra].filter(Boolean).join('\n'),
         campaign: f.campaign || undefined,
         gclid: f.gclid || undefined,
+        gclid_kind: f.gclidKind || undefined,
       }),
     });
     /* Vastauksesta tarvitaan vain `fbc` Metan CAPIa varten. Peilaus on silti
@@ -164,6 +165,11 @@ export default async function handler(req, res) {
       ? clean(body.gclid, 200)
       : '';
     const campaign = campaignRaw || (gclid ? 'google-ads' : '');
+    /* Klikin tyyppi. Adsissa gclid, wbraid ja gbraid ovat eri kenttiä eikä
+       arvosta voi päätellä kumpi on kumpi — ks. db/025_leads_ads.sql. */
+    const gclidKind = ['gclid', 'wbraid', 'gbraid'].includes(clean(body.gclidKind, 10))
+      ? clean(body.gclidKind, 10)
+      : 'gclid';
 
     const fields = [];
     if (!yhtio) fields.push('yhtio');
@@ -196,6 +202,7 @@ export default async function handler(req, res) {
           // Kampanja mahtuu payloadiin sellaisenaan — jsonb, ei migraatiota.
           kampanja: campaign || null,
           gclid: gclid || null,
+          gclid_kind: gclid ? gclidKind : null,
         },
         status: 'new',
       }),
@@ -211,7 +218,7 @@ export default async function handler(req, res) {
     // Peilaa CRM:n Liidit-sivulle (tk.leads) — sinne minne admin oikeasti katsoo.
     const mirrored = await mirrorToCrmLeads({
       contact, email, phone, role, yhtio, addr, doors, when, message,
-      postalCode: postalFrom(addr), campaign, gclid,
+      postalCode: postalFrom(addr), campaign, gclid, gclidKind,
     }, {
       ip: (req.headers['x-forwarded-for'] || '').split(',')[0].trim(),
       ua: req.headers['user-agent'] || '',

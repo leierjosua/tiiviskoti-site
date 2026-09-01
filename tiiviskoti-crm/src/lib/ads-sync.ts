@@ -75,8 +75,8 @@ export async function sendPendingConversions(): Promise<SyncResult> {
   `;
 
   const pending: PendingConversion[] = rows.map((r) => ({
-    jobId: r.id,
-    jobNumber: r.job_number,
+    rowId: r.id,
+    transactionId: r.job_number,
     clickId: r.gclid,
     clickKind: r.ads_click_kind,
     createdAt: r.created_at,
@@ -118,16 +118,16 @@ export async function sendPendingConversions(): Promise<SyncResult> {
       await sql`
         update tk.jobs
            set ads_uploaded_at = now(), ads_upload_error = null
-         where id = ${outcome.jobId}::uuid
+         where id = ${outcome.rowId}::uuid
       `;
       sent++;
     } else {
       await sql`
         update tk.jobs
            set ads_upload_error = ${outcome.error}
-         where id = ${outcome.jobId}::uuid
+         where id = ${outcome.rowId}::uuid
       `;
-      errors.push({ jobNumber: byId.get(outcome.jobId) ?? '—', error: outcome.error });
+      errors.push({ jobNumber: byId.get(outcome.rowId) ?? '—', error: outcome.error });
     }
   }
 
@@ -138,4 +138,110 @@ export async function sendPendingConversions(): Promise<SyncResult> {
     expired: expired.length,
     errors,
   };
+}
+
+
+/* =========================================================
+   Liidien vienti. Sama kaava kuin töillä, kolme eroa.
+
+   1. OMA KONVERSIOTAPAHTUMA. Liidi ja maksettu keikka eivät ole sama asia,
+      eikä niitä saa laskea yhteen samaan lukuun. Tapahtuma on Adsissa
+      toissijainen (`primaryForGoal: false`), eli se näkyy raportissa mutta
+      ei ohjaa tarjoamista ennen kuin se erikseen nostetaan ensisijaiseksi.
+
+   2. EI EUROMÄÄRÄÄ. Lomakkeen täyttö ei ole liikevaihtoa. Keksitty arvo
+      ohjaisi tarjoamista väärään suuntaan pahemmin kuin puuttuva arvo.
+
+   3. HYLÄTTYJÄ EI RAPORTOIDA. Kun liidi on merkitty adminissa hylätyksi,
+      se ei ole kauppa jota halutaan lisää — sen raportoiminen opettaisi
+      Googlea etsimään samanlaisia. Sama periaate kuin peruutetulla työllä.
+   ========================================================= */
+
+const LEAD_CONVERSION_ACTION_ID = (process.env.GOOGLE_ADS_LEAD_CONVERSION_ACTION_ID || '').replace(/\D/g, '');
+
+export type LeadSyncResult = Omit<SyncResult, 'errors'> & {
+  errors: { leadId: string; error: string }[];
+};
+
+type PendingLeadRow = {
+  id: string;
+  gclid: string;
+  gclid_kind: ClickKind;
+  created_at: Date;
+};
+
+export async function sendPendingLeadConversions(): Promise<LeadSyncResult> {
+  if (!LEAD_CONVERSION_ACTION_ID) {
+    return {
+      configured: false,
+      error: 'Puuttuu: GOOGLE_ADS_LEAD_CONVERSION_ACTION_ID',
+      sent: 0, failed: 0, expired: 0, errors: [],
+    };
+  }
+
+  const expired = await sql<{ id: string }[]>`
+    update tk.leads
+       set ads_upload_error = ${`Klikistä yli ${MAX_CLICK_AGE_DAYS} vrk — Ads ei ota enää vastaan`}
+     where gclid is not null
+       and ads_uploaded_at is null
+       and ads_upload_error is null
+       and status <> 'rejected'
+       and created_at < now() - ${`${MAX_CLICK_AGE_DAYS} days`}::interval
+    returning id
+  `;
+
+  const rows = await sql<PendingLeadRow[]>`
+    select id, gclid, gclid_kind, created_at
+      from tk.leads
+     where gclid is not null
+       and ads_uploaded_at is null
+       and status <> 'rejected'
+       and created_at < now() - ${`${GRACE_MINUTES} minutes`}::interval
+       and created_at >= now() - ${`${MAX_CLICK_AGE_DAYS} days`}::interval
+     order by created_at
+     limit ${BATCH_SIZE}
+  `;
+
+  const pending: PendingConversion[] = rows.map((r) => ({
+    rowId: r.id,
+    /* `L-`-etuliite erottaa liidin työnumerosta. Adsin duplikaattiavain on
+       tilikohtainen, joten ilman etuliitettä liidin uuid ja työnumero
+       voisivat periaatteessa törmätä. */
+    transactionId: `L-${r.id}`,
+    clickId: r.gclid,
+    clickKind: r.gclid_kind,
+    createdAt: r.created_at,
+    priceCents: 0,
+  }));
+
+  const result = await uploadConversions(pending, { conversionActionId: LEAD_CONVERSION_ACTION_ID });
+  if (result.error) {
+    if (result.configured) {
+      for (const r of rows) {
+        await sql`update tk.leads set ads_upload_error = ${result.error} where id = ${r.id}::uuid`;
+      }
+    }
+    return {
+      configured: result.configured,
+      error: result.error,
+      sent: 0, failed: rows.length, expired: expired.length, errors: [],
+    };
+  }
+
+  const errors: LeadSyncResult['errors'] = [];
+  let sent = 0;
+  for (const outcome of result.outcomes) {
+    if (outcome.ok) {
+      await sql`
+        update tk.leads set ads_uploaded_at = now(), ads_upload_error = null
+         where id = ${outcome.rowId}::uuid
+      `;
+      sent++;
+    } else {
+      await sql`update tk.leads set ads_upload_error = ${outcome.error} where id = ${outcome.rowId}::uuid`;
+      errors.push({ leadId: outcome.rowId, error: outcome.error });
+    }
+  }
+
+  return { configured: result.configured, sent, failed: errors.length, expired: expired.length, errors };
 }
