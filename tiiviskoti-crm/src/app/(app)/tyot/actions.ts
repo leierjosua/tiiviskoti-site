@@ -1,5 +1,6 @@
 'use server';
 
+import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -37,6 +38,10 @@ function parseLocalInput(value: string): Date {
 
 const createSchema = z.object({
   calendarId: z.string().uuid('Valitse kalenteri'),
+  /* Toinen asentaja samalle keikalle. Tyhjä = yhden miehen keikka. */
+  calendarId2: z.string().uuid('Valitse toinen asentaja').or(z.literal('')),
+  /* Tarjous josta aika laitetaan. Tyhjä = työ ei tule tarjouksesta. */
+  offerId: z.string().uuid().or(z.literal('')),
   startsAt: z.string().min(1, 'Valitse aika'),
   durationMinutes: z.coerce.number().int().min(15).max(600),
   title: z.string().min(1, 'Anna työlle nimi'),
@@ -54,6 +59,8 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
 
   const parsed = createSchema.safeParse({
     calendarId: String(formData.get('calendarId') ?? ''),
+    calendarId2: String(formData.get('calendarId2') ?? ''),
+    offerId: String(formData.get('offerId') ?? ''),
     startsAt: String(formData.get('startsAt') ?? ''),
     durationMinutes: formData.get('durationMinutes'),
     title: String(formData.get('title') ?? '').trim(),
@@ -68,6 +75,9 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot' };
 
   const d = parsed.data;
+  if (d.calendarId2 && d.calendarId2 === d.calendarId) {
+    return { error: 'Sama asentaja on valittu kahdesti.' };
+  }
   /* Liidin tunniste tulee esitäytetystä lomakkeesta. Ei skeemassa: jos se
      on roskaa, työ syntyy silti — liidin tilan päivitys on kirjanpitoa,
      ei ehto työn luomiselle. */
@@ -97,16 +107,75 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
           `
         : [];
 
-      const [job] = await tx<{ id: string }[]>`
+      /* Tarjouksen rivit ja summa siirtyvät työlle, jotta kuitti ja
+         liikevaihto vastaavat sitä mitä asiakkaalle luvattiin — muuten
+         hinta pitäisi näpytellä uudelleen työn sivulla. */
+      const [offer] = d.offerId
+        ? await tx<{ lines: { name: string; quantity: number; unit_price_cents: number }[];
+                     total_cents: number; offer_number: string }[]>`
+            select lines, total_cents, offer_number
+              from tk.offers where id = ${d.offerId}::uuid
+          `
+        : [];
+
+      const source = d.offerId ? 'tarjous' : leadId ? 'liidi' : 'admin';
+
+      const [job] = await tx<{ id: string; job_number: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status,
                              title, address, postal_code, city, notes, source,
-                             campaign, gclid)
+                             campaign, gclid, price_cents)
         values (${customer.id}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
                 ${d.title}, ${d.address ?? null}, ${d.postalCode ?? null},
-                ${d.city ?? null}, ${d.notes ?? null}, ${leadId ? 'liidi' : 'admin'},
-                ${lead?.campaign ?? null}, ${lead?.gclid ?? null})
-        returning id
+                ${d.city ?? null}, ${d.notes ?? null}, ${source},
+                ${lead?.campaign ?? null}, ${lead?.gclid ?? null},
+                ${offer?.total_cents ?? 0})
+        returning id, job_number
       `;
+
+      if (offer?.lines?.length) {
+        for (const [i, l] of offer.lines.entries()) {
+          await tx`
+            insert into tk.job_lines (job_id, name, quantity, unit_price_cents, sort_order)
+            values (${job.id}, ${l.name}, ${Math.max(1, l.quantity)},
+                    ${l.unit_price_cents}, ${i})
+          `;
+        }
+      }
+
+      /* Työpari: oma rivi toisen asentajan kalenteriin, jotta hänenkin
+         aikansa on varattu. Hinta on nolla ja rivit ovat päätyöllä — sama
+         keikka ei saa näkyä liikevaihdossa kahteen kertaan. */
+      if (d.calendarId2) {
+        const [mate] = await tx<{ id: string }[]>`
+          insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status,
+                               title, address, postal_code, city, notes, source,
+                               campaign, gclid, price_cents)
+          values (${customer.id}, ${d.calendarId2}, ${starts}, ${ends}, 'confirmed',
+                  ${`${d.title} (työpari)`}, ${d.address ?? null}, ${d.postalCode ?? null},
+                  ${d.city ?? null},
+                  ${[`Työpari keikalla ${job.job_number} — laskutus ja rivit siellä.`,
+                     d.notes].filter(Boolean).join('\n\n')},
+                  ${source}, ${lead?.campaign ?? null}, ${lead?.gclid ?? null}, 0)
+          returning id
+        `;
+        const crew = randomUUID();
+        await tx`update tk.jobs set crew_group_id = ${crew}::uuid where id = ${job.id}`;
+        await tx`update tk.jobs set crew_group_id = ${crew}::uuid where id = ${mate.id}`;
+        if (d.offerId) {
+          await tx`update tk.jobs set offer_id = ${d.offerId}::uuid where id = ${mate.id}`;
+        }
+      }
+
+      if (d.offerId) {
+        await tx`update tk.jobs set offer_id = ${d.offerId}::uuid where id = ${job.id}`;
+        /* Aika kalenterissa tarkoittaa että kauppa syntyi. Hylättyä tarjousta
+           ei herätetä henkiin: jos joku on merkinnyt sen hylätyksi, tila on
+           tuoreempi tieto kuin tämä nappi. */
+        await tx`
+          update tk.offers set status = 'accepted'
+           where id = ${d.offerId}::uuid and status in ('draft', 'sent', 'expired')
+        `;
+      }
       /* Liidi merkitään asiakkaaksi samassa transaktiossa: muuten se jäisi
          Liidit-sivulle avoimeksi ja joku soittaisi perään turhaan. */
       if (leadId) {
@@ -119,13 +188,42 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
     }) as unknown as string;
   } catch (err) {
     if (isSlotTaken(err)) return { error: SLOT_TAKEN };
+    /* Sarake puuttuu = db/026 on ajamatta. Kerrotaan se suoraan: muuten
+       tästä tulee 500 eikä kukaan tiedä mitä tehdä. */
+    if ((err as { code?: string })?.code === '42703') {
+      return { error: 'Tietokannasta puuttuu sarake — aja db/026_offer_booking.sql Supabasen SQL-editorissa.' };
+    }
     throw err;
   }
 
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
   if (leadId) revalidatePath('/liidit');
+  if (d.offerId) { revalidatePath('/tarjoukset'); revalidatePath(`/tarjoukset/${d.offerId}`); }
   redirect(`/tyot/${jobId}`);
+}
+
+/**
+ * Työn ja sen työparin tunnisteet — yksin tehdyllä keikalla pelkkä työ itse.
+ *
+ * Pari on kaksi riviä kahdessa kalenterissa (ks. db/026). Siirto, peruminen ja
+ * poisto osuvat siksi molempiin: jos vain toista siirrettäisiin, asentajat
+ * ajaisivat samaan keikkaan eri aikoina.
+ */
+async function crewIds(id: string): Promise<string[]> {
+  try {
+    const rows = await sql<{ id: string }[]>`
+      select mate.id
+        from tk.jobs j
+        join tk.jobs mate on mate.crew_group_id = j.crew_group_id
+       where j.id = ${id} and j.crew_group_id is not null
+    `;
+    return rows.length > 0 ? rows.map((r) => r.id) : [id];
+  } catch (e) {
+    // db/026 ajamatta: paria ei ole olemassakaan, joten työ on yksin.
+    if ((e as { code?: string })?.code === '42703') return [id];
+    throw e;
+  }
 }
 
 export async function rescheduleJob(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -140,16 +238,24 @@ export async function rescheduleJob(_prev: ActionState, formData: FormData): Pro
   if (!Number.isFinite(durationMinutes) || durationMinutes < 15) return { error: 'Tarkista kesto.' };
   const ends = new Date(starts.getTime() + durationMinutes * 60_000);
 
+  const ids = await crewIds(id);
   try {
-    await sql`update tk.jobs set starts_at = ${starts}, ends_at = ${ends} where id = ${id}`;
+    /* Molemmat rivit samassa transaktiossa: jos toisen asentajan kalenteri on
+       jo varattu uuteen aikaan, kumpikaan ei siirry eikä pari hajoa. */
+    await sql.begin(async (tx) => {
+      for (const jobId of ids) {
+        await tx`update tk.jobs set starts_at = ${starts}, ends_at = ${ends} where id = ${jobId}`;
+      }
+    });
   } catch (err) {
-    if (isSlotTaken(err)) return { error: SLOT_TAKEN };
+    if (isSlotTaken(err)) return { error: ids.length > 1 ? `${SLOT_TAKEN} Aika on vapaa vain jos se sopii molemmille asentajille.` : SLOT_TAKEN };
     throw err;
   }
 
-  revalidatePath(`/tyot/${id}`);
+  for (const jobId of ids) revalidatePath(`/tyot/${jobId}`);
+  revalidatePath('/tyot');
   revalidatePath('/kalenteri');
-  return { ok: 'Aika siirretty.' };
+  return { ok: ids.length > 1 ? 'Aika siirretty molemmilta asentajilta.' : 'Aika siirretty.' };
 }
 
 const editSchema = z.object({
@@ -227,10 +333,15 @@ export async function deleteJob(formData: FormData) {
   if (staff.role === 'installer') return;
 
   const id = String(formData.get('id') ?? '');
-  await removeCalendarEventForJob(id);
-  const rows = await sql<{ id: string }[]>`
-    delete from tk.jobs where id = ${id} and status = 'cancelled' returning id
-  `;
+  const ids = await crewIds(id);
+  let rows: { id: string }[] = [];
+  for (const jobId of ids) {
+    await removeCalendarEventForJob(jobId);
+    const deleted = await sql<{ id: string }[]>`
+      delete from tk.jobs where id = ${jobId} and status = 'cancelled' returning id
+    `;
+    if (jobId === id) rows = deleted;
+  }
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
   if (rows.length > 0) redirect('/tyot');
@@ -247,18 +358,25 @@ export async function setJobStatus(formData: FormData) {
 
   // Perutun työn palauttaminen voi törmätä aikaan, joka on sillä välin
   // varattu toiselle — silloin muutos vain ei mene läpi.
+  const ids = await crewIds(id);
   try {
-    await sql`update tk.jobs set status = ${status} where id = ${id}`;
+    await sql.begin(async (tx) => {
+      for (const jobId of ids) {
+        await tx`update tk.jobs set status = ${status} where id = ${jobId}`;
+      }
+    });
   } catch (err) {
     if (!isSlotTaken(err)) throw err;
     return;
   }
 
   // Peruttu työ pois myös Google-kalenterista, jottei asentaja aja paikalle
-  // työhön jota ei ole.
-  if (status === 'cancelled') await removeCalendarEventForJob(id);
+  // työhön jota ei ole. Työparilla molemmat.
+  if (status === 'cancelled') {
+    for (const jobId of ids) await removeCalendarEventForJob(jobId);
+  }
 
-  revalidatePath(`/tyot/${id}`);
+  for (const jobId of ids) revalidatePath(`/tyot/${jobId}`);
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
 }

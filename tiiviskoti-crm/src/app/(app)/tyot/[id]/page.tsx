@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getJob } from '@/lib/data';
+import { getJob, jobLinks } from '@/lib/data';
 import { requireStaff, viewMode } from '@/lib/session';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib/time';
@@ -35,8 +35,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     (job.ends_at.getTime() - job.starts_at.getTime()) / 60_000,
   );
 
-  // Rivit ja viestiloki ovat toisistaan riippumattomia — haetaan rinnakkain.
-  const [lines, mails] = await Promise.all([
+  // Rivit, viestiloki ja liitokset ovat toisistaan riippumattomia — rinnakkain.
+  const [lines, mails, links] = await Promise.all([
     sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
       select name, quantity, unit_price_cents from tk.job_lines
        where job_id = ${id} order by sort_order
@@ -45,6 +45,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
       select kind::text as kind, to_email, sent_at, error from tk.mail_log
        where job_id = ${id} order by created_at
     `,
+    jobLinks(id),
   ]);
   const lineSumCents = lines.reduce((s, l) => s + l.quantity * l.unit_price_cents, 0);
 
@@ -74,7 +75,41 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               label="Hinta"
               value={<span className="tabular">{(job.price_cents / 100).toFixed(2)} €</span>}
             />
-            <Row label="Lähde" value={job.source === 'web' ? 'Verkkosivu' : 'Hallinta'} />
+            <Row
+              label="Lähde"
+              value={job.source === 'web' ? 'Verkkosivu'
+                : job.source === 'tarjous' ? 'Tarjous'
+                : job.source === 'liidi' ? 'Liidi'
+                : 'Hallinta'}
+            />
+            {/* Työpari: kummallakin asentajalla on oma rivi omassa
+                kalenterissaan, joten ilman tätä työn sivulta ei näkisi että
+                keikalla on toinenkin tekijä. Siirto ja peruminen osuvat
+                molempiin riveihin. */}
+            {links.mates.length > 0 && (
+              <Row
+                label="Työpari"
+                value={
+                  <span className="flex flex-wrap gap-x-2 gap-y-1">
+                    {links.mates.map((m) => (
+                      <Link key={m.id} href={`/tyot/${m.id}`} className="text-accent hover:underline">
+                        {m.staff_name} ({m.job_number})
+                      </Link>
+                    ))}
+                  </span>
+                }
+              />
+            )}
+            {links.offer && (
+              <Row
+                label="Tarjous"
+                value={
+                  <Link href={`/tarjoukset/${links.offer.id}`} className="text-accent hover:underline">
+                    {links.offer.offer_number}
+                  </Link>
+                }
+              />
+            )}
             {/* Mainoskampanja on eri asia kuin lähde: lähde kertoo syntyikö työ
                 verkossa vai hallinnassa, kampanja mikä mainos toi asiakkaan.
                 Näytetään vain kun tiedossa, jottei rivi toistu tyhjänä. */}

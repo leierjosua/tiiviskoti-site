@@ -320,15 +320,45 @@ export type OfferRow = {
   error: string | null;
   sent_at: Date | null;
   created_at: Date;
+  /* Kalenteriin laitettu työ, jos tarjous on jo aikataulutettu (db/026).
+     undefined = migraatio ajamatta, null = ei vielä buukattu. */
+  job_id?: string | null;
+  job_number?: string | null;
+  job_starts_at?: Date | null;
 };
 
 export async function listOffers(): Promise<OfferRow[]> {
-  return sql<OfferRow[]>`
-    select id, offer_number, kind, contact_name, customer_name, email, phone, address,
-           postal_code, city, lines, total_cents, travel_fee_cents, notes, status,
-           valid_until, provider_id, error, sent_at, created_at
-      from tk.offers order by created_at desc
+  /* Peruttu työ ei ole varaus, joten se ei tee tarjouksesta buukattua —
+     muuten peruttu keikka piilottaisi "Laita aika" -napin lopullisesti.
+     Aikaisin voimassa oleva riittää: pari on samaan aikaan, ja uudelleen
+     buukatun tarjouksen kohdalla ensimmäinen tuleva on se joka on voimassa. */
+  const run = (withJob: boolean) => sql<OfferRow[]>`
+    select o.id, o.offer_number, o.kind, o.contact_name, o.customer_name, o.email,
+           o.phone, o.address, o.postal_code, o.city, o.lines, o.total_cents,
+           o.travel_fee_cents, o.notes, o.status, o.valid_until, o.provider_id,
+           o.error, o.sent_at, o.created_at
+           ${withJob ? sql`, j.id as job_id, j.job_number, j.starts_at as job_starts_at` : sql``}
+      from tk.offers o
+      ${withJob
+        ? sql`left join lateral (
+                select jj.id, jj.job_number, jj.starts_at
+                  from tk.jobs jj
+                 where jj.offer_id = o.id and jj.status <> 'cancelled'
+                 order by jj.starts_at
+                 limit 1
+              ) j on true`
+        : sql``}
+     order by o.created_at desc
   `;
+  try {
+    return await run(jobOfferLinkExists);
+  } catch (e) {
+    if (jobOfferLinkExists && undefinedColumn(e)?.includes('offer_id')) {
+      jobOfferLinkExists = false;
+      return run(false);
+    }
+    throw e;
+  }
 }
 
 /** Puuttuvan sarakkeen (42703) virheteksti, muuten null. */
@@ -343,15 +373,30 @@ function undefinedColumn(e: unknown): string | null {
    deployssa. */
 let offerCustomerNoteExists = true;
 let offerInclusionsExists = true;
+/* Onko db/026 ajettu (tk.jobs.offer_id / crew_group_id). Sama tarkoitus kuin
+   yllä: tarjouslista on tärkeämpi kuin tieto siitä onko aika jo laitettu. */
+let jobOfferLinkExists = true;
 
 export async function getOffer(id: string): Promise<OfferRow | null> {
-  const run = (withNote: boolean, withInclusions: boolean) => sql<OfferRow[]>`
-    select id, offer_number, kind, contact_name, customer_name, email, phone, address,
-           postal_code, city, lines, total_cents, travel_fee_cents, notes, status,
-           valid_until, provider_id, error, sent_at, created_at
-           ${withNote ? sql`, customer_note` : sql``}
-           ${withInclusions ? sql`, inclusions` : sql``}
-      from tk.offers where id = ${id}
+  const run = (withNote: boolean, withInclusions: boolean, withJob: boolean) => sql<OfferRow[]>`
+    select o.id, o.offer_number, o.kind, o.contact_name, o.customer_name, o.email,
+           o.phone, o.address, o.postal_code, o.city, o.lines, o.total_cents,
+           o.travel_fee_cents, o.notes, o.status, o.valid_until, o.provider_id,
+           o.error, o.sent_at, o.created_at
+           ${withNote ? sql`, o.customer_note` : sql``}
+           ${withInclusions ? sql`, o.inclusions` : sql``}
+           ${withJob ? sql`, j.id as job_id, j.job_number, j.starts_at as job_starts_at` : sql``}
+      from tk.offers o
+      ${withJob
+        ? sql`left join lateral (
+                select jj.id, jj.job_number, jj.starts_at
+                  from tk.jobs jj
+                 where jj.offer_id = o.id and jj.status <> 'cancelled'
+                 order by jj.starts_at
+                 limit 1
+              ) j on true`
+        : sql``}
+     where o.id = ${id}
   `;
   /* Sarake puuttuu (migraatio ajamatta): tarjous on tärkeämpi kuin sen
      saateteksti tai sisältyy-lista, joten näytetään tarjous ilman niitä.
@@ -359,13 +404,57 @@ export async function getOffer(id: string): Promise<OfferRow | null> {
      voivat puuttua, joten yritetään uudelleen kunnes kysely menee läpi. */
   for (let attempt = 0; ; attempt++) {
     try {
-      const [row] = await run(offerCustomerNoteExists, offerInclusionsExists);
+      const [row] = await run(offerCustomerNoteExists, offerInclusionsExists, jobOfferLinkExists);
       return row ?? null;
     } catch (e) {
-      const missing = attempt < 2 ? undefinedColumn(e) : null;
+      const missing = attempt < 3 ? undefinedColumn(e) : null;
       if (missing?.includes('inclusions')) offerInclusionsExists = false;
       else if (missing?.includes('customer_note')) offerCustomerNoteExists = false;
+      else if (missing?.includes('offer_id')) jobOfferLinkExists = false;
       else throw e;
     }
+  }
+}
+
+/* Työn liitokset: mistä tarjouksesta se tuli ja kuka on työparina.
+   Erillinen kysely eikä osa `getJob`ia, koska db/026 voi olla ajamatta —
+   silloin työn sivu näyttää työn ilman näitä eikä kaadu. */
+export type JobCrewMate = { id: string; job_number: string; staff_name: string };
+
+export async function jobLinks(jobId: string): Promise<{
+  offer: { id: string; offer_number: string } | null;
+  mates: JobCrewMate[];
+}> {
+  const none = { offer: null, mates: [] as JobCrewMate[] };
+  if (!jobOfferLinkExists) return none;
+  try {
+    const [row] = await sql<{
+      offer_id: string | null; offer_number: string | null; crew_group_id: string | null;
+    }[]>`
+      select j.offer_id, o.offer_number, j.crew_group_id
+        from tk.jobs j
+        left join tk.offers o on o.id = j.offer_id
+       where j.id = ${jobId}
+    `;
+    if (!row) return none;
+    const mates = row.crew_group_id
+      ? await sql<JobCrewMate[]>`
+          select j.id, j.job_number, s.full_name as staff_name
+            from tk.jobs j
+            join tk.calendars c on c.id = j.calendar_id
+            join tk.staff s on s.id = c.staff_id
+           where j.crew_group_id = ${row.crew_group_id} and j.id <> ${jobId}
+           order by s.full_name
+        `
+      : [];
+    return {
+      offer: row.offer_id && row.offer_number
+        ? { id: row.offer_id, offer_number: row.offer_number }
+        : null,
+      mates,
+    };
+  } catch (e) {
+    if (undefinedColumn(e)) { jobOfferLinkExists = false; return none; }
+    throw e;
   }
 }

@@ -8,18 +8,24 @@ import { dateKeyOf, formatDateKey, isoWeekday, timeOf, weekdayShort } from '@/li
 
 type Prefill = {
   customerName: string; email: string; phone: string;
-  postalCode: string; address: string; notes: string;
+  postalCode: string; address: string; city: string; notes: string; title: string;
 };
 
+/* Tarjous josta aika laitetaan. Vain näyttöä varten — työn tiedot tulevat
+   esitäyttönä, ja rivit sekä summa haetaan kannasta tallennuksen yhteydessä. */
+type OfferHead = { id: string; number: string; total: string; customer: string };
+
 export function NewJobForm({
-  calendars, calendarId, duration, durations, slots, leadId, prefill,
+  calendars, calendarId, calendarId2, duration, durations, slots, leadId, offer, prefill,
 }: {
   calendars: { id: string; label: string }[];
   calendarId: string;
+  calendarId2: string;
   duration: number;
   durations: number[];
   slots: string[];
   leadId?: string;
+  offer?: OfferHead;
   prefill?: Prefill;
 }) {
   const router = useRouter();
@@ -28,13 +34,18 @@ export function NewJobForm({
 
   // Kalenterin ja keston vaihto hakee vapaat ajat uudelleen palvelimelta,
   // koska laskenta on siellä.
-  const reload = (next: { kalenteri?: string; kesto?: number }) => {
+  const reload = (next: { kalenteri?: string; kalenteri2?: string; kesto?: number }) => {
     /* Esitäyttö kulkee mukana kun kalenteri tai kesto vaihtuu — muuten
        liidistä tulleet tiedot katoaisivat ensimmäisestä valinnasta. */
     const params = new URLSearchParams({
       kalenteri: next.kalenteri ?? calendarId,
       kesto: String(next.kesto ?? duration),
     });
+    const toinen = next.kalenteri2 ?? calendarId2;
+    if (toinen) params.set('kalenteri2', toinen);
+    /* Tarjouksesta tullut varaus säilyttää tarjouksen: ilman tätä toisen
+       asentajan valinta pudottaisi linkin ja työ jäisi irralleen. */
+    if (offer) params.set('tarjous', offer.id);
     if (leadId) params.set('liidi', leadId);
     if (prefill?.customerName) params.set('nimi', prefill.customerName);
     if (prefill?.email) params.set('email', prefill.email);
@@ -57,9 +68,11 @@ export function NewJobForm({
   return (
     <form action={action} className="grid gap-6 p-4 lg:grid-cols-2">
       <input type="hidden" name="calendarId" value={calendarId} />
+      <input type="hidden" name="calendarId2" value={calendarId2} />
       <input type="hidden" name="durationMinutes" value={duration} />
       <input type="hidden" name="startsAt" value={selected ?? ''} />
       {leadId ? <input type="hidden" name="leadId" value={leadId} /> : null}
+      {offer ? <input type="hidden" name="offerId" value={offer.id} /> : null}
 
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
@@ -77,11 +90,27 @@ export function NewJobForm({
           </Field>
         </div>
 
+        {/* Toinen asentaja on oma valintansa eikä monivalinta: keikalla on
+            päävastuullinen, jonka työlle hinta ja rivit kirjataan. Pari saa
+            oman rivin omaan kalenteriinsa, jotta hänenkin aikansa varautuu. */}
+        <Field label="Toinen asentaja">
+          <Select value={calendarId2} onChange={(e) => reload({ kalenteri2: e.target.value })}>
+            <option value="">— ei toista —</option>
+            {calendars.filter((c) => c.id !== calendarId).map((c) => (
+              <option key={c.id} value={c.id}>{c.label}</option>
+            ))}
+          </Select>
+        </Field>
+
         <div>
-          <span className="mb-1.5 block text-xs font-medium text-muted">Vapaat ajat</span>
+          <span className="mb-1.5 block text-xs font-medium text-muted">
+            {calendarId2 ? 'Vapaat ajat — molemmille yhteiset' : 'Vapaat ajat'}
+          </span>
           {byDay.size === 0 ? (
             <p className="rounded-md border border-line px-3 py-6 text-center text-sm text-faint">
-              Ei vapaita aikoja. Tarkista kalenterin työajat.
+              {calendarId2
+                ? 'Ei aikaa joka sopii molemmille. Kokeile lyhyempää kestoa tai tee keikka yksin.'
+                : 'Ei vapaita aikoja. Tarkista kalenterin työajat.'}
             </p>
           ) : (
             <div className="max-h-96 space-y-3 overflow-y-auto rounded-md border border-line p-3">
@@ -117,8 +146,18 @@ export function NewJobForm({
       <div className="space-y-4">
         <ErrorNote>{state.error}</ErrorNote>
 
+        {offer && (
+          <div className="rounded-lg border border-accent/35 bg-accent-dim px-4 py-3 text-sm">
+            <p className="font-semibold text-accent">Tarjous {offer.number} — {offer.total}</p>
+            <p className="mt-1 text-muted">
+              {offer.customer}. Tarjouksen rivit ja summa siirtyvät työlle, ja tarjous
+              merkitään hyväksytyksi kun aika on tallennettu.
+            </p>
+          </div>
+        )}
+
         <Field label="Työn nimi">
-          <Input name="title" defaultValue="Tiivistetyö" required />
+          <Input name="title" defaultValue={prefill?.title || 'Tiivistetyö'} required />
         </Field>
         <Field label="Asiakas">
           <Input name="customerName" defaultValue={prefill?.customerName} required />
@@ -139,7 +178,7 @@ export function NewJobForm({
             <Input name="postalCode" defaultValue={prefill?.postalCode} inputMode="numeric" />
           </Field>
           <Field label="Kaupunki">
-            <Input name="city" />
+            <Input name="city" defaultValue={prefill?.city} />
           </Field>
         </div>
         <Field label="Muistiinpanot">
@@ -147,7 +186,11 @@ export function NewJobForm({
         </Field>
 
         <Button type="submit" disabled={pending || !selected} className="w-full">
-          {!selected ? 'Valitse ensin aika' : pending ? 'Tallennetaan…' : 'Luo työ'}
+          {!selected
+            ? 'Valitse ensin aika'
+            : pending
+              ? 'Tallennetaan…'
+              : calendarId2 ? 'Luo työ kahdelle asentajalle' : 'Luo työ'}
         </Button>
       </div>
     </form>

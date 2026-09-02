@@ -14,6 +14,28 @@ const fmt = (d: Date) => new Intl.DateTimeFormat('fi-FI', {
   timeZone: 'Europe/Helsinki', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit',
 }).format(d);
 
+/* Aikasarake: joko linkki kalenteriin laitettuun työhön tai nappi joka vie
+   varaamaan. Hylätty tarjous ei saa nappia — kauppaa ei tullut, eikä sen
+   aikatauluttaminen vahingossa ole mikään palvelus. */
+function BookingCell({ offer }: { offer: OfferRow }) {
+  if (offer.job_id) {
+    return (
+      <Link href={`/tyot/${offer.job_id}`} className="whitespace-nowrap font-semibold text-accent hover:underline">
+        {offer.job_starts_at ? fmt(new Date(offer.job_starts_at)) : offer.job_number}
+      </Link>
+    );
+  }
+  if (offer.status === 'declined') return <span className="text-faint">—</span>;
+  return (
+    <Link
+      href={`/tyot/uusi?tarjous=${offer.id}`}
+      className="inline-flex whitespace-nowrap rounded-md border border-line bg-ink-800 px-2.5 py-1 text-xs font-semibold text-text hover:border-accent/50 hover:text-accent"
+    >
+      Laita aika
+    </Link>
+  );
+}
+
 /* Rahaluku tarjouslistan päälle.
 
    MIKSI OMA KOMPONENTTI EIKÄ ETUSIVUN `Metric`: se on etusivun paikallinen
@@ -50,6 +72,7 @@ function OfferTable({ rows, talo }: { rows: OfferRow[]; talo: boolean }) {
           <th className="px-4 py-2 font-medium">{talo ? 'Yhteyshenkilö' : 'Sähköposti'}</th>
           <th className="px-4 py-2 font-medium text-right">Summa</th>
           <th className="px-4 py-2 font-medium">Tila</th>
+          <th className="px-4 py-2 font-medium">Aika</th>
           <th className="px-4 py-2 font-medium" />
         </tr>
       </thead>
@@ -72,6 +95,7 @@ function OfferTable({ rows, talo }: { rows: OfferRow[]; talo: boolean }) {
             <td className="px-4 py-2.5">
               <OfferStatusChip status={o.error ? 'error' : o.status} label={o.error ? 'Lähetys epäonnistui' : OFFER_STATUS[o.status]} />
             </td>
+            <td className="px-4 py-2.5"><BookingCell offer={o} /></td>
             <td className="px-4 py-2.5 text-right">
               {/* Testitarjouksia kertyy väistämättä, ja ilman poistoa ne jäävät
                   listaan sekoittamaan oikeat tarjoukset. */}

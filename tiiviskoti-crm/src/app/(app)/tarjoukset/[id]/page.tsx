@@ -11,6 +11,11 @@ const eur = (cents: number) =>
   (cents / 100).toLocaleString('fi-FI', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €';
 const fmtDate = (d: Date | string | null) =>
   d ? new Intl.DateTimeFormat('fi-FI', { timeZone: 'Europe/Helsinki', day: 'numeric', month: 'numeric', year: 'numeric' }).format(new Date(d)) : '—';
+const fmtTime = (d: Date | string) =>
+  new Intl.DateTimeFormat('fi-FI', {
+    timeZone: 'Europe/Helsinki', weekday: 'short', day: 'numeric', month: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  }).format(new Date(d));
 
 export default async function OfferDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireManager();
@@ -102,6 +107,43 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
       </div>
 
       <div className="h-fit space-y-6">
+        {/* Aika ennen PDF:ää: hyväksytyn tarjouksen jälkeen seuraava teko on
+            keikan laittaminen kalenteriin, ei tiedoston lataaminen. */}
+        <Card>
+          <CardHeader title="Aika kalenterissa" />
+          <div className="space-y-2 p-4">
+            {offer.job_id ? (
+              <>
+                <p className="text-sm text-text">
+                  {offer.job_starts_at ? fmtTime(offer.job_starts_at) : 'Aika sovittu'}
+                </p>
+                <Link
+                  href={`/tyot/${offer.job_id}`}
+                  className="block w-full rounded-lg border border-line bg-ink-800 px-4 py-2 text-center text-sm font-semibold text-accent hover:bg-ink-700"
+                >
+                  Avaa työ {offer.job_number}
+                </Link>
+                <p className="text-xs text-faint">
+                  Ajan siirto ja peruminen tehdään työn sivulla.
+                </p>
+              </>
+            ) : (
+              <>
+                <Link
+                  href={`/tyot/uusi?tarjous=${offer.id}`}
+                  className="block w-full rounded-lg border border-accent/40 bg-accent-dim px-4 py-2 text-center text-sm font-semibold text-accent hover:border-accent"
+                >
+                  Laita aika
+                </Link>
+                <p className="text-xs text-faint">
+                  Valitse vapaa aika ja asentaja — tarvittaessa kaksi. Rivit ja summa
+                  siirtyvät työlle, ja tarjous merkitään hyväksytyksi.
+                </p>
+              </>
+            )}
+          </div>
+        </Card>
+
         <Card>
           <CardHeader title="PDF" />
           <div className="space-y-2 p-4">
