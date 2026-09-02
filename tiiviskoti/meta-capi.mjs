@@ -72,6 +72,33 @@ function clientIp(req) {
    käynnillä eri ihmiseltä eikä Meta osaisi liittää aietta myöhempään
    kauppaan. Tunniste on satunnaisluku selaimen muistissa — ei johdettu
    mistään henkilötiedosta. */
+/* ---------- Omat testivaraukset pois mittauksesta ----------
+
+   Sivustoa testataan tuotannossa — se on ainoa paikka jossa koko ketju
+   (kalenteri, sähköposti, CRM) toimii oikeasti. Testivaraus poistetaan
+   CRM:stä jälkikäteen, mutta CAPI-tapahtuma on jo lähtenyt Metalle eikä
+   sitä saa peruttua.
+
+   MIKSI SILLÄ ON VÄLIÄ: tapahtumia on kymmeniä, ei tuhansia. Elokuussa
+   2026 Metan datajoukon MOLEMMAT Schedule-tapahtumat olivat omia testejä
+   (22.8. ja 24.8.), eli sadan prosentin kohina siinä signaalissa.
+   Optimointi oppii omistajan käyttäytymisestä eikä asiakkaiden.
+
+   Google Ads ei tarvitse tätä: siellä vienti odottaa tunnin ennen
+   lähetystä (ads-sync GRACE_MINUTES), joten poistettu testivaraus ei ehdi
+   mukaan. Metalle lähtee heti, joten suoja tarvitaan tänne.
+
+   Osoitteet ympäristömuuttujasta pilkulla eroteltuna, jotta uuden tekijän
+   lisääminen ei vaadi julkaisua. */
+const TEST_EMAILS = new Set(
+  (process.env.META_TEST_EMAILS || 'leier.josua@gmail.com,info@tiiviskoti.fi')
+    .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean),
+);
+
+export function isInternalTest(email) {
+  return typeof email === 'string' && TEST_EMAILS.has(email.trim().toLowerCase());
+}
+
 export function buildUserData({ email, phone, name, postal, city, fbc, fbp, externalId, req } = {}) {
   const { fn, ln } = splitName(name);
   const ud = {
@@ -93,6 +120,10 @@ export function buildUserData({ email, phone, name, postal, city, fbc, fbp, exte
     if (ua) ud.client_user_agent = ua;
   }
   for (const k of Object.keys(ud)) if (ud[k] == null) delete ud[k];
+  /* Lippu kulkee user_datan mukana, jotta tarkistus on YHDESSÄ paikassa
+     eikä neljässä kutsupaikassa joista yksi unohtuu. sendMetaEvent poistaa
+     sen ennen lähetystä. */
+  if (isInternalTest(email)) Object.defineProperty(ud, '__test', { value: true, enumerable: false });
   return ud;
 }
 
@@ -108,6 +139,12 @@ export async function sendMetaEvent({
   customData = {},
 } = {}) {
   if (!metaConfigured()) return false;
+  /* Oma testivaraus: ei lähetetä. Ks. TEST_EMAILS yllä. Lokitetaan, jotta
+     hiljainen ohitus ei näytä siltä että CAPI on rikki. */
+  if (userData && userData.__test) {
+    console.log('meta-capi:', eventName, '— ohitettu, oma testiosoite');
+    return false;
+  }
   try {
     const event = {
       event_name: eventName,
