@@ -1,4 +1,5 @@
 import { sendPendingConversions, sendPendingLeadConversions } from '@/lib/ads-sync';
+import { sendLeadStages } from '@/lib/meta-lead-stages';
 
 /* =========================================================
    Konversioiden yövienti Google Adsiin (Vercel Cron, ks. vercel.json).
@@ -36,9 +37,19 @@ export async function GET(request: Request) {
   const jobs = await sendPendingConversions();
   const leads = await sendPendingLeadConversions();
 
+  /* Metan liidien laatupalaute samassa ajossa.
+
+     MIKSI TÄSSÄ EIKÄ liidien haun cronissa: se ajetaan varttitunnein
+     (GitHub Actions), ja liidin lopputulos muuttuu päivissä eikä
+     minuuteissa. Kerran vuorokaudessa riittää, eikä sata tapahtumaa
+     lähde 96 kertaa päivässä turhaan. Tämä reitti on jo se paikka jossa
+     tulokset raportoidaan mainosalustoille — sinne se kuuluu. */
+  const metaStages = await sendLeadStages();
+
   /* Puuttuva liidiasetus EI ole virhe vaan asennustila: se ei saa värjätä
      cron-näkymää punaiseksi joka yö ennen kuin muuttuja on asetettu. */
   const jobsOk = !jobs.error && jobs.failed === 0;
   const leadsOk = leads.configured ? (!leads.error && leads.failed === 0) : true;
-  return Response.json({ jobs, leads }, { status: jobsOk && leadsOk ? 200 : 500 });
+  const metaOk = metaStages.configured ? !metaStages.error : true;
+  return Response.json({ jobs, leads, metaStages }, { status: jobsOk && leadsOk && metaOk ? 200 : 500 });
 }
