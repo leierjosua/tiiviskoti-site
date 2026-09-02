@@ -103,17 +103,21 @@ export default async function NewJobPage({
   const until = new Date(Date.now() + 45 * 86_400_000);
   const [first, second] = await Promise.all([
     calendarId ? availability({ durationMinutes: duration, until, calendarId }) : [],
-    calendarId2 ? availability({ durationMinutes: duration, until, calendarId: calendarId2 }) : null,
+    /* Työparin ajat tiheällä ruudukolla: kysymys on vain siitä onko hän
+       vapaa päävastuullisen ehdottamalla hetkellä. Kaikki tarjottavat ajat
+       osuvat vartin tarkkuudelle (työajat tasatunneista, kestot 15 min
+       moninkertoja), joten tämä ei ohita yhtään todellista vaihtoehtoa. */
+    calendarId2
+      ? availability({ durationMinutes: duration, until, calendarId: calendarId2, slotMinutes: 15 })
+      : null,
   ]);
 
   // Palvelinkomponentti ei voi siirtää Date-olioita asiakkaalle sellaisenaan.
   let slots = (first[0]?.slots ?? []).map((s) => s.start.toISOString());
   if (second) {
-    /* Työparin ajat = molemmilta vapaat alkuajat. Vertailu tehdään tarkoilla
-       alkuhetkillä: kalentereilla on sama 30 min ruudukko, joten yhteiset ajat
-       osuvat kohdakkain. Jos jommankumman ruudukkoa joskus muutetaan, tästä
-       tulee turhan tiukka — se näkyy heti tyhjänä listana eikä vääränä
-       varauksena, mikä on oikea suunta erehtyä. */
+    /* Tarjotaan päävastuullisen ruudukon ajat, joista karsitaan ne joissa
+       pari ei ole vapaa. Pari lasketaan vartin ruudukolla (yllä), joten
+       kalenterien eri pituiset aikaruudut eivät enää pudota päiviä pois. */
     const mine = new Set((second[0]?.slots ?? []).map((s) => s.start.toISOString()));
     slots = slots.filter((iso) => mine.has(iso));
   }

@@ -193,6 +193,11 @@ export async function availability(opts: {
   /** Rajaa kalenterit tähän alueeseen. Ilman tätä palautetaan kaikki
    *  kalenterit — käytössä vain hallinnan sisäisissä näkymissä. */
   areaId?: string;
+  /** Ohittaa kalenterin oman aikaruudukon. Työparia haettaessa toisen
+   *  asentajan ajat lasketaan tiheällä ruudukolla, jotta kysymykseksi jää
+   *  "onko hän vapaa juuri tuolloin" eikä "osuuko hänen ruudukkonsa
+   *  samaan hetkeen" — eri ruudukot pudottivat kokonaisia päiviä pois. */
+  slotMinutes?: number;
 }): Promise<CalendarAvailability[]> {
   const now = opts.now ?? new Date();
 
@@ -274,7 +279,7 @@ export async function availability(opts: {
         now,
         until: opts.until,
         settings: {
-          slotMinutes: calendar.slot_minutes,
+          slotMinutes: opts.slotMinutes ?? calendar.slot_minutes,
           leadTimeHours: calendar.lead_time_hours,
           horizonDays: calendar.horizon_days,
         },

@@ -72,6 +72,28 @@ export function helsinkiDateTime(dateKey: string, time: string): Date {
 }
 
 /** Hetki → 'YYYY-MM-DD' Suomen aikaa. */
+/**
+ * Lomakkeelta tullut varauksen alkuhetki.
+ *
+ * Kaksi eri muotoa tulee samaan kenttään:
+ *   - vapaiden aikojen lista lähettää ISO-hetken, esim. `2026-09-08T05:00:00.000Z`
+ *   - "Siirrä aikaa" lähettää `datetime-local`-arvon ilman vyöhykettä, `2026-09-08T08:00`
+ *
+ * VYÖHYKKEELLINEN ARVO ON JO HETKI eikä seinäkelloaika. Aiemmin tästä
+ * luettiin vain kellonaika ja se tulkittiin Suomen aikana, jolloin
+ * klikattu 08:00 (= 05:00Z) tallentui varaukseksi klo 05:00 — kolme tuntia
+ * liian aikaisin, ja jokainen tarjouksesta tehty varaus piti siirtää
+ * käsin. Vyöhykkeetön arvo on edelleen Suomen aikaa, koska lomake näyttää
+ * Suomen aikaa; sitä EI saa antaa `new Date()`:lle, joka tulkitsisi sen
+ * ajoympäristön vyöhykkeellä (Vercelissä UTC).
+ */
+export function parseBookingStart(value: string): Date {
+  if (/(?:Z|[+-]\d{2}:?\d{2})$/.test(value)) return new Date(value);
+  const [dateKey, time] = value.split('T');
+  if (!dateKey || !time) return new Date(NaN);
+  return helsinkiDateTime(dateKey, time.slice(0, 5));
+}
+
 export function dateKeyOf(date: Date): string {
   const p = partsIn(date);
   return `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
