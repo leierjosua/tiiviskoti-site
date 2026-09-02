@@ -43,9 +43,24 @@ const STAGE_EVENT: Record<string, string> = {
   rejected: 'LeadDisqualified',
 };
 
-/* Metan attribuutioikkuna. Vanhempaa ei kannata lähettää: se ei enää
-   vaikuta optimointiin, ja ilman rajausta jono kasvaisi loputtomiin. */
-const MAX_AGE_DAYS = 90;
+/* VAIN VIIMEKSI MUUTTUNEET.
+
+   Ensimmäinen versio lähetti kaikki 90 vuorokauden liidit joka ajossa ja
+   nojasi siihen että Meta poistaa kaksoiskappaleet `event_id`:n perusteella.
+   Se on väärin: **Metan deduplikointi kattaa noin 48 tuntia**, joten sen
+   jälkeen sama tapahtuma laskettaisiin uudestaan. Päivittäinen ajo olisi
+   kirjannut samat neljä liidiä yhä uudelleen ja paisuttanut laatulukuja.
+
+   Näkyi datassa 2.9.2026: neljä liidiä oli tuottanut yhdeksän tapahtumaa
+   (LeadContacted 6 + LeadDisqualified 3), koska ajo käynnistettiin käsin
+   kolmesti.
+
+   Kahden vuorokauden ikkuna tarkoittaa että tilan muutos ehtii mukaan
+   seuraavaan päivittäiseen ajoon ja lähtee korkeintaan kahdesti — molemmat
+   deduplikointi-ikkunan sisällä. Hinta: jos ajo on rikki kaksi vuorokautta
+   putkeen, yksi tilamuutos jää lähettämättä. Se on halvempi virhe kuin
+   ylilaskenta, ja vaihtoehto olisi oma sarake kannassa. */
+const MAX_AGE_DAYS = 2;
 const BATCH_SIZE = 100;
 
 export type StageSyncResult = {
