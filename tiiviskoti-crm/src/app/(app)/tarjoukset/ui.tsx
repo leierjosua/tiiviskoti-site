@@ -5,13 +5,10 @@ import { Button, ErrorNote, OkNote, cx } from '@/components/ui';
 import { SubmitButton } from '@/components/submit';
 import { sendSavedOffer, setOfferStatus, type ActionState } from './actions';
 
-export const OFFER_STATUS: Record<string, string> = {
-  draft: 'Luonnos',
-  sent: 'Lähetetty',
-  accepted: 'Hyväksytty',
-  declined: 'Hylätty',
-  expired: 'Vanhentunut',
-};
+/* Nimet ovat `@/lib/offer-status`issa, koska palvelinsivut tarvitsevat ne
+   eivätkä saa niitä tästä client-moduulista. Vienti säilyy, jotta tuonti
+   `./ui`:sta toimii yhä client-puolella. */
+export { OFFER_STATUS } from '@/lib/offer-status';
 
 const CHIP: Record<string, string> = {
   draft: 'border-line bg-ink-700 text-muted',

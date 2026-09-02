@@ -4,7 +4,8 @@ import { deleteOffer } from './actions';
 import { requireManager } from '@/lib/session';
 import { listOffers, type OfferRow } from '@/lib/data';
 import { Button, Card, CardHeader, Empty, PageHead } from '@/components/ui';
-import { OFFER_STATUS, OfferStatusChip } from './ui';
+import { OFFER_STATUS } from '@/lib/offer-status';
+import { OfferStatusChip } from './ui';
 
 export const dynamic = 'force-dynamic';
 

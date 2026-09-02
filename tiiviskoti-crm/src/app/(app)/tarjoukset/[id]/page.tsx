@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { requireManager } from '@/lib/session';
 import { getOffer } from '@/lib/data';
 import { Card, CardHeader, PageHead } from '@/components/ui';
-import { OFFER_STATUS, OfferStatusButtons, OfferStatusChip, SendDraftButton } from '../ui';
+import { OFFER_STATUS } from '@/lib/offer-status';
+import { OfferStatusButtons, OfferStatusChip, SendDraftButton } from '../ui';
 
 export const dynamic = 'force-dynamic';
 
