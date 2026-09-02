@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { availability, getOffer, listCalendars, type OfferLine, type OfferRow } from '@/lib/data';
+import { availability, getOffer, kartoitusCalendarId, listCalendars, type OfferLine, type OfferRow } from '@/lib/data';
 import { EXTRAS, TYPES } from '@/lib/pricing';
 import { requireStaff } from '@/lib/session';
 import { Card, CardHeader, Empty } from '@/components/ui';
@@ -87,7 +87,14 @@ export default async function NewJobPage({
   const suggested = offer ? estimateDuration(offer.lines) : null;
   const duration = DURATIONS.includes(Number(kesto)) ? Number(kesto) : (suggested ?? 120);
 
-  const calendarId = calendars.some((c) => c.id === kalenteri) ? kalenteri : calendars[0]?.id;
+  /* Oletukseksi asennuskalenteri, ei taloyhtiöiden kartoituskalenteria.
+     Se sattui olemaan listan ensimmäinen, joten "Laita aika" olisi
+     tarjonnut ilmaisen kartoituskäynnin aikoja asennukselle — ja varaus
+     olisi mennyt väärään kalenteriin ilman että kukaan huomaa. Valittavissa
+     se on yhä, jos joku tarvitsee sitä tietoisesti. */
+  const kartoitus = kartoitusCalendarId();
+  const oletusKalenteri = (calendars.find((c) => c.id !== kartoitus) ?? calendars[0])?.id;
+  const calendarId = calendars.some((c) => c.id === kalenteri) ? kalenteri : oletusKalenteri;
   /* Toinen asentaja kelpaa vain jos hän on eri henkilö kuin ensimmäinen —
      muuten sama kalenteri varattaisiin kahdesti eikä työ syntyisi lainkaan. */
   const calendarId2 = kalenteri2 && kalenteri2 !== calendarId
