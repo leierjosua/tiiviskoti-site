@@ -590,6 +590,25 @@ function bookingMinutes(){
   return 120;
 }
 
+/* Postinumeron kohtalo mittaukseen.
+
+   MIKSI: suppilossa oli aukko, jota ei voinut päätellä mistään. Kävijä joka
+   ei koskaan syöttänyt postinumeroa ja kävijä jolle vastattiin "emme palvele"
+   näyttivät raportissa täsmälleen samalta — kummaltakin puuttui seuraava
+   vaihe. Siksi ei tiedetty kumpaa korjata: houkuttelevuutta vai aluetta.
+
+   Sama postinumero ja sama lopputulos kirjataan vain kerran sivulatausta
+   kohti, koska tämä ajetaan joka kerta kun kentässä on viisi numeroa —
+   muuten yksi epäröivä näppäily tuottaisi kymmenen tapahtumaa. */
+let _trackedArea = '';
+function trackArea(tulos){
+  if(!window.tkTrack) return;
+  const avain = avail.postal + ':' + tulos;
+  if(_trackedArea === avain) return;
+  _trackedArea = avain;
+  window.tkTrack({ type:'cta', cta:tulos });
+}
+
 async function loadAvailability(){
   /* Ehtona on aluehuomio TAI kalenteri — ei pelkkä kalenteri. Aloituskortin
      sivulla (varaa.html) ei ole kalenteria mutta alue on silti tarkistettava,
@@ -613,6 +632,7 @@ async function loadAvailability(){
     const data = await r.json();
 
     if(data.served === false){
+      trackArea('Postinumero: ei palvella');
       avail.state='unserved'; avail.slotsByDay=new Map(); avail.area=null; avail.travelFeeCents=0;
       selDay=null; selSlot=null; renderCal(); renderSlots(); renderAreaNote(); syncBookingSummary();
       return;
@@ -629,6 +649,9 @@ async function loadAvailability(){
     });
     avail.slotsByDay = map;
     avail.state = map.size ? 'ready' : 'none';
+    /* Erotellaan "alue kelpaa mutta kalenteri on tyhjä" siitä että aikoja on:
+       edellinen on menetetty varaus jota ei näy mistään muualta. */
+    trackArea(map.size ? 'Postinumero: palvellaan' : 'Postinumero: ei vapaita aikoja');
 
     /* Hyppy ensimmäiseen vapaaseen päivään.
 
@@ -650,6 +673,7 @@ async function loadAvailability(){
       selDay = firstFree; selSlot = null;
     }
   }catch(_){
+    trackArea('Postinumero: tarkistus epäonnistui');
     avail.state = 'error';
   }
   renderAreaNote();
