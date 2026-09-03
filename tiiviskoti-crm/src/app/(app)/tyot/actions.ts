@@ -12,6 +12,7 @@ import { generateReceiptPdf } from '@/lib/receipt-pdf';
 import { generateOfferPdf } from '@/lib/offer-pdf';
 import { sendMail } from '@/lib/google';
 import { parseBookingStart } from '@/lib/time';
+import { reportSaleToMeta } from '@/lib/meta-sale';
 import { receiptEmailSubject, receiptEmailHtml, receiptEmailText, offerEmailSubject, offerEmailHtml, offerEmailText } from '@/lib/mail-templates';
 
 const OFFER_VALID_DAYS = 14;
@@ -37,6 +38,14 @@ const createSchema = z.object({
   city: z.string().optional(),
   notes: z.string().optional(),
 });
+
+/** Liidiltä perittävät mainostunnisteet: Google-klikki ja Metan liiditunnus. */
+type LeadAds = {
+  campaign: string | null;
+  gclid: string | null;
+  gclid_kind: string | null;
+  external_id: string | null;
+};
 
 export async function createJob(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requireStaff();
@@ -71,6 +80,10 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
   const ends = new Date(starts.getTime() + d.durationMinutes * 60_000);
 
   let jobId: string;
+  /* Metan liiditunniste ja kaupan arvo talteen transaktiosta, jotta ilmoitus
+     lähtee vasta kun työ on oikeasti syntynyt. */
+  let metaLeadId: string | null = null;
+  let saleCents = 0;
   try {
     // Asiakas ja työ syntyvät joko molemmat tai ei kumpikaan: ilman
     // transaktiota päällekkäinen aika jättäisi orvon asiakasrivin.
@@ -86,8 +99,8 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
          kauppa sovittaisiin puhelimessa tai sähköpostitse. Ilman tätä
          Google näkisi klikin muttei koskaan kauppaa. */
       const [lead] = leadId
-        ? await tx<{ campaign: string | null; gclid: string | null; gclid_kind: string | null }[]>`
-            select campaign, gclid, gclid_kind from tk.leads where id = ${leadId}::uuid
+        ? await tx<LeadAds[]>`
+            select campaign, gclid, gclid_kind, external_id from tk.leads where id = ${leadId}::uuid
           `
         /* Tarjouksesta tai puhelimessa sovittu kauppa ei tule liidiriviltä,
            joten klikkitunniste jäi kokonaan kirjaamatta eikä kauppa
@@ -97,10 +110,10 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
            voittaa; liian vanhan klikin Ads hylkää itse (90 vrk) eikä
            `ads-sync` yritä sitä uudelleen. */
         : d.email
-          ? await tx<{ campaign: string | null; gclid: string | null; gclid_kind: string | null }[]>`
-              select campaign, gclid, gclid_kind from tk.leads
+          ? await tx<LeadAds[]>`
+              select campaign, gclid, gclid_kind, external_id from tk.leads
                where lower(email) = lower(${d.email})
-                 and gclid is not null
+                 and (gclid is not null or external_id is not null)
                order by created_at desc
                limit 1
             `
@@ -118,6 +131,8 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
         : [];
 
       const source = d.offerId ? 'tarjous' : leadId ? 'liidi' : 'admin';
+      metaLeadId = lead?.external_id ?? null;
+      saleCents = offer?.total_cents ?? 0;
 
       const [job] = await tx<{ id: string; job_number: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status,
@@ -197,6 +212,17 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
       return { error: 'Tietokannasta puuttuu sarake — aja db/026_offer_booking.sql Supabasen SQL-editorissa.' };
     }
     throw err;
+  }
+
+  /* Kauppa Metalle vasta kun työ on kannassa. Vain liiditunnisteelliset:
+     ilman rajausta Metalle raportoitaisiin myös orgaaniset ja Googlesta
+     tulleet kaupat, ja se lukisi ne omikseen. */
+  if (metaLeadId && saleCents > 0) {
+    await reportSaleToMeta({
+      jobId, leadId: metaLeadId, valueCents: saleCents,
+      email: d.email || null, phone: d.phone ?? null, name: d.customerName,
+      postal: d.postalCode ?? null, city: d.city ?? null,
+    });
   }
 
   revalidatePath('/tyot');

@@ -138,6 +138,21 @@ export function mountKartoitus(o) {
   const today = new Date(Number(todayKey.slice(0,4)), Number(todayKey.slice(5,7))-1, Number(todayKey.slice(8,10)));
   const maxDay = new Date(today); maxDay.setDate(maxDay.getDate() + 70);
 
+  /* Postinumeron kohtalo mittaukseen — sama kuvio kuin varauspolussa
+     (_shared.js `trackArea`). Ilman tätä taloyhtiöpolussa ei erotu se joka
+     ei koskaan syöttänyt postinumeroa siitä jolle vastattiin "emme palvele":
+     kummaltakin puuttuu vain seuraava vaihe. Sama postinumero ja tulos
+     kirjataan kerran, koska haku ajetaan joka kerta kun kentässä on viisi
+     numeroa. */
+  let trackedArea = '';
+  function trackArea(tulos) {
+    if (!window.tkTrack) return;
+    const avain = st.postal + ':' + tulos;
+    if (trackedArea === avain) return;
+    trackedArea = avain;
+    window.tkTrack({ type: 'cta', cta: tulos });
+  }
+
   /* state: 'postal' | 'loading' | 'ready' | 'none' | 'unserved' | 'error' */
   const st = { state:'postal', slotsByDay:new Map(), postal:'', area:null, leadRef:'', booked:false };
   let viewY = today.getFullYear(), viewM = today.getMonth(), selDay = null, selSlot = null;
@@ -165,6 +180,7 @@ export function mountKartoitus(o) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const data = await r.json();
       if (data.served === false) {
+        trackArea('Kartoitus: ei palvella');
         st.state = 'unserved'; st.slotsByDay = new Map(); st.area = null;
         selDay = null; selSlot = null; renderAll(); return;
       }
@@ -177,6 +193,7 @@ export function mountKartoitus(o) {
       });
       st.slotsByDay = map;
       st.state = map.size ? 'ready' : 'none';
+      trackArea(map.size ? 'Kartoitus: palvellaan' : 'Kartoitus: ei vapaita aikoja');
 
       /* Sama hyppy ensimmäiseen vapaaseen päivään kuin varauskalenterissa
          (_shared.js) — perustelu siellä. Kartoituskäynnillä tämä on jos
@@ -189,7 +206,7 @@ export function mountKartoitus(o) {
         viewY = firstFree.getFullYear(); viewM = firstFree.getMonth();
         selDay = firstFree; selSlot = null;
       }
-    } catch (_) { st.state = 'error'; }
+    } catch (_) { trackArea('Kartoitus: tarkistus epäonnistui'); st.state = 'error'; }
     // Valittu aika voi kadota päivityksessä (joku ehti varata sen).
     if (selDay && selSlot && !freeSlots(selDay).some((s) => s.time === selSlot)) selSlot = null;
     renderAll();

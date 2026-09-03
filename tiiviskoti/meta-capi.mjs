@@ -99,7 +99,7 @@ export function isInternalTest(email) {
   return typeof email === 'string' && TEST_EMAILS.has(email.trim().toLowerCase());
 }
 
-export function buildUserData({ email, phone, name, postal, city, fbc, fbp, externalId, req } = {}) {
+export function buildUserData({ email, phone, name, postal, city, fbc, fbp, externalId, leadId, req } = {}) {
   const { fn, ln } = splitName(name);
   const ud = {
     em: sha(email),
@@ -113,6 +113,11 @@ export function buildUserData({ email, phone, name, postal, city, fbc, fbp, exte
   };
   if (fbc) ud.fbc = fbc;
   if (fbp) ud.fbp = fbp;
+  /* Liidimainoksen tunniste EI ole hashattava — Meta odottaa sen raakana ja
+     yhdistää sillä kaupan siihen mainokseen josta lomake täytettiin. Tämä on
+     ainoa tapa kertoa Metalle että liidistä tuli oikeasti kauppa: ilman sitä
+     se optimoi lomakkeiden määrää eikä myyntiä. */
+  if (leadId) ud.lead_id = String(leadId);
   if (req) {
     const ip = clientIp(req);
     const ua = req.headers?.['user-agent'];
