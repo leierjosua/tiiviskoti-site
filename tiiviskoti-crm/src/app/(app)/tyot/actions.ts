@@ -86,10 +86,25 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
          kauppa sovittaisiin puhelimessa tai sähköpostitse. Ilman tätä
          Google näkisi klikin muttei koskaan kauppaa. */
       const [lead] = leadId
-        ? await tx<{ campaign: string | null; gclid: string | null }[]>`
-            select campaign, gclid from tk.leads where id = ${leadId}::uuid
+        ? await tx<{ campaign: string | null; gclid: string | null; gclid_kind: string | null }[]>`
+            select campaign, gclid, gclid_kind from tk.leads where id = ${leadId}::uuid
           `
-        : [];
+        /* Tarjouksesta tai puhelimessa sovittu kauppa ei tule liidiriviltä,
+           joten klikkitunniste jäi kokonaan kirjaamatta eikä kauppa
+           raportoitunut Adsille — mainos näytti tuloksettomalta vaikka se oli
+           tuonut asiakkaan. Sähköposti on ainoa yhteinen tunniste, joten
+           haetaan sillä. Vain klikkitunnisteen kantava liidi kelpaa ja tuorein
+           voittaa; liian vanhan klikin Ads hylkää itse (90 vrk) eikä
+           `ads-sync` yritä sitä uudelleen. */
+        : d.email
+          ? await tx<{ campaign: string | null; gclid: string | null; gclid_kind: string | null }[]>`
+              select campaign, gclid, gclid_kind from tk.leads
+               where lower(email) = lower(${d.email})
+                 and gclid is not null
+               order by created_at desc
+               limit 1
+            `
+          : [];
 
       /* Tarjouksen rivit ja summa siirtyvät työlle, jotta kuitti ja
          liikevaihto vastaavat sitä mitä asiakkaalle luvattiin — muuten
@@ -107,12 +122,12 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
       const [job] = await tx<{ id: string; job_number: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status,
                              title, address, postal_code, city, notes, source,
-                             campaign, gclid, price_cents)
+                             campaign, gclid, ads_click_kind, price_cents)
         values (${customer.id}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
                 ${d.title}, ${d.address ?? null}, ${d.postalCode ?? null},
                 ${d.city ?? null}, ${d.notes ?? null}, ${source},
                 ${lead?.campaign ?? null}, ${lead?.gclid ?? null},
-                ${offer?.total_cents ?? 0})
+                ${lead?.gclid_kind ?? null}, ${offer?.total_cents ?? 0})
         returning id, job_number
       `;
 
@@ -128,7 +143,11 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
 
       /* Työpari: oma rivi toisen asentajan kalenteriin, jotta hänenkin
          aikansa on varattu. Hinta on nolla ja rivit ovat päätyöllä — sama
-         keikka ei saa näkyä liikevaihdossa kahteen kertaan. */
+         keikka ei saa näkyä liikevaihdossa kahteen kertaan.
+
+         Kampanja kulkee paririville raportointia varten, mutta KLIKKITUNNISTE
+         EI: ads-sync lähettää jokaisen gclidin kantavan työn, joten pari
+         raportoisi saman kaupan Google Adsille toiseen kertaan. */
       if (d.calendarId2) {
         const [mate] = await tx<{ id: string }[]>`
           insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status,
@@ -139,7 +158,7 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
                   ${d.city ?? null},
                   ${[`Työpari keikalla ${job.job_number} — laskutus ja rivit siellä.`,
                      d.notes].filter(Boolean).join('\n\n')},
-                  ${source}, ${lead?.campaign ?? null}, ${lead?.gclid ?? null}, 0)
+                  ${source}, ${lead?.campaign ?? null}, null, 0)
           returning id
         `;
         const crew = randomUUID();
