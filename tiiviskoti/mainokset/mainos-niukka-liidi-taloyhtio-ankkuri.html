@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fi"><head>
+<meta charset="utf-8">
+<title>TiivisKoti — niukka mainos: mainos-niukka-liidi-taloyhtio-ankkuri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="_niukka.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Sama ankkurikulma kuin kuluttajapuolella (TK31/TK33), taloyhtiön
+       mittakaavassa. Vertailuluku on tarkoituksella sanallinen: ikkuna-
+       remontin hinta riippuu talon koosta niin paljon, ettei yhtä lukua voi
+       luvata — "satoja tuhansia" on tosi jokaisessa kerrostalossa, keksitty
+       täsmäluku ei olisi.
+
+       Halpa puoli ei ole tässä tiivistyksen hinta vaan KARTOITUS 0 €, koska
+       taloyhtiölle ei myydä hinnastosta vaan käynnistä: hallitus ei päätä
+       mitään ennen kuin joku on katsonut ikkunat. -->
+  <div class="photo"><img src="kuvat/ad-kerrostalo.jpg" alt=""></div>
+  <div class="wash"></div>
+
+  <div class="mark">
+    <svg viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#F6F7F3"/>
+      <rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#217A4E" stroke-width="5"/>
+      <rect x="35" y="20" width="4" height="60" fill="#217A4E"/>
+    </svg>
+    <span>TiivisKoti</span>
+  </div>
+
+  <div class="block">
+    <h1>Ikkunaremontti<br>satoja tuhansia.<br><span class="hl">Kartoitus 0 €.</span></h1>
+    <p class="sub">Vetävät ikkunat eivät aina tarkoita remonttia — tiivistys korjaa vedon murto-osalla hinnasta</p>
+    <!-- Napin teksti seuraa mainoksen oikeaa CTA:ta: Meta ei hyväksy
+       BOOK_NOW:ta liidilomakemainokseen, joten nappi on GET_QUOTE eli
+       "Pyydä tarjous". Kuvan ja mainoksen napin pitää sanoa sama asia. -->
+    <span class="btn">Pyydä tarjous
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h12M12 6l6 6-6 6"/></svg>
+    </span>
+  </div>
+</body></html>
