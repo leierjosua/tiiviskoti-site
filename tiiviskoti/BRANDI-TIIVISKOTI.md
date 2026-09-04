@@ -36,7 +36,7 @@ Lämmin, rehellinen, käytännönläheinen. Korostetaan konkreettista hyötyä: 
 - Veto loppuu, lämpö jää kotiin
 - Kiinteä hinta heti — alk. 89 €/ulko-ovi, ei piilokuluja
 - Jopa −15 % lämmityskuluihin, kotitalousvähennys −40 %
-- Laadukkaat EPDM-/silikonitiivisteet + oven käynnin säätö
+- Laadukkaat silikonitiivisteet + oven käynnin säätö
 - Automaattinen ajanvaraus verkosta, koko Uusimaa
 
 ## Hinnoittelu (kiinteät hinnat, sis. tiivisteet + työ + oven säätö)

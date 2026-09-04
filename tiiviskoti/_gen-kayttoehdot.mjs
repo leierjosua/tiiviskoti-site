@@ -79,7 +79,7 @@ const body = `
     </div>
 
     <h2>2. Palvelun sisältö</h2>
-    <p>Tiivistevaihtoon kuuluu vanhojen tiivisteiden poisto, pintojen puhdistus, uudet EPDM- tai
+    <p>Tiivistevaihtoon kuuluu vanhojen tiivisteiden poisto, pintojen puhdistus, uudet
       silikonitiivisteet sekä oven käynnin säätö niin, että ovi painuu tasaisesti tiivisteitä vasten.
       Ulko-oviin kuuluu lisäksi kynnyskumi. Työ tehdään asiakkaan osoitteessa sovittuna aikana.</p>
     <p>Toiminta-alue on Uusimaa. Vahvistamme varauksen yhteydessä, että palvelemme antamassasi

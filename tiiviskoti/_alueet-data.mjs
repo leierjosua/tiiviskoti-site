@@ -299,7 +299,7 @@ export const ALUEET = [
     osat: ['Keskusta', 'Valko', 'Pernaja', 'Liljendal', 'Ruotsinpyhtää', 'Isnäs', 'Tesjoki'],
     faq: [
       ['Betjänar ni på svenska i Lovisa?', 'Kyllä. Palvelemme Loviisassa sekä suomeksi että ruotsiksi — myös varauksen, laskun ja työn erittelyn saa ruotsiksi.'],
-      ['Miksi meillä tiivisteet kuluvat nopeammin kuin sisämaassa?', 'Merituuli kohdistaa julkisivuun selvästi kovemman paineen kuin suojaisa sisämaan tontti. Tiiviste puristuu kokoon ja menettää palautumiskykynsä nopeammin. Käytämme rannikkokohteissa EPDM-tiivisteitä, jotka kestävät pakkasta ja UV:ta vuosia.'],
+      ['Miksi meillä tiivisteet kuluvat nopeammin kuin sisämaassa?', 'Merituuli kohdistaa julkisivuun selvästi kovemman paineen kuin suojaisa sisämaan tontti. Tiiviste puristuu kokoon ja menettää palautumiskykynsä nopeammin. Käytämme silikonitiivisteitä, jotka kestävät pakkasta ja UV:ta vuosia — myös rannikon olosuhteissa.'],
     ],
   },
   {

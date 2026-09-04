@@ -384,7 +384,7 @@ const PALVELUT = [
     faq: [
       ['Paljonko ikkunoiden tiivistys maksaa?', `Ikkuna maksaa ${WINDOW_TIERS[0].price} € kappaleelta, ja hinta laskee määrän mukaan: 5 ikkunasta ${WINDOW_TIERS[1].price} €, 10 ikkunasta ${WINDOW_TIERS[2].price} € ja 20 ikkunasta ${WINDOW_TIERS[3].price} €. Pienin veloitus käynniltä on ${MIN_PRICE} €. Hinnat sisältävät tiivisteet, työn ja ALV 25,5 %.`],
       ['Kuinka kauan yhden ikkunan tiivistys kestää?', 'Noin 20 minuuttia ikkunaa kohti. Tavallinen omakotitalon kierros on 2–4 tuntia, ja työ tehdään yhdellä käynnillä.'],
-      ['Mitä tiivisteitä käytätte?', 'Aukon mukaan valittu EPDM- tai silikonitiiviste. Paksuus valitaan mitatun välyksen mukaan — liian ohut ei tiivistä ja liian paksu estää ikkunaa sulkeutumasta.'],
+      ['Mitä tiivisteitä käytätte?', 'Aukon mukaan valittu silikonitiiviste. Paksuus valitaan mitatun välyksen mukaan — liian ohut ei tiivistä ja liian paksu estää ikkunaa sulkeutumasta.'],
       ['Voiko tiivisteet vaihtaa talvella?', 'Kyllä. Työ tehdään sisäkautta eikä se vaadi lämpimiä olosuhteita. Syksy on silti helpoin aika, koska vedon huomaa heti ensimmäisillä pakkasilla.'],
       ['Kannattaako vanhat ikkunat tiivistää vai vaihtaa?', 'Jos puitteet ja karmit ovat kunnossa, tiivistys maksaa murto-osan ikkunaremontista ja poistaa vedon. Lahonneita rakenteita se ei korjaa — kerromme rehellisesti jos vaihto on järkevämpi.'],
     ],
