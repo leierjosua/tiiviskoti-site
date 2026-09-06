@@ -371,7 +371,7 @@ export const ALUEET = [
     osat: ['Keskusta', 'Haukkamäki', 'Tuorila', 'Ahmoo', 'Vattola', 'Nyhkälä'],
     faq: [
       ['Kannattaako 60-luvun ikkuna tiivistää vai vaihtaa?', 'Lähes aina tiivistää. Sen ajan puuikkuna on tehty kestävästä puusta ja on rakenteeltaan usein parempi kuin moni oletta — vika on tiivisteessä, ei ikkunassa. Vaihto tulee kyseeseen vasta jos puite on lahonnut.'],
-      ['Paljonko koko talon tiivistys maksaa?', 'Riippuu ikkunamäärästä: 10–19 ikkunan talossa yksikköhinta on 75 €, eli esimerkiksi 12 ikkunaa on 900 €. Ovet lasketaan päälle. Näet tarkan summan laskurista.'],
+      ['Paljonko koko talon tiivistys maksaa?', 'Riippuu ikkunamäärästä: 10–13 ikkunan talossa yksikköhinta on 80 €, eli esimerkiksi 12 ikkunaa on 960 €, ja neljästätoista ylöspäin 75 €. Ovet lasketaan päälle. Näet tarkan summan laskurista.'],
     ],
   },
   {
