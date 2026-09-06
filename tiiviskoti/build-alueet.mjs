@@ -22,6 +22,17 @@ import { ALUEET, SITE } from './_alueet-data.mjs';
 import { ARTIKKELIT } from './_artikkelit-data.mjs';
 import { TYPES, MIN_PRICE, WINDOW_TIERS } from './pricing.mjs';
 
+/* Ikkunaportaiden rajat ja haarukka johdetaan hinnastosta, ei kirjoiteta
+   käsin. Aiemmin sivuilla luki "20+" myös sen jälkeen kun viimeinen porras
+   oli siirtynyt — teksti ja laskuri erosivat toisistaan. */
+const TIER_FROM = WINDOW_TIERS.map((_, i) => (i === 0 ? 1 : WINDOW_TIERS[i - 1].upTo + 1));
+const tierRange = (i) => (i === WINDOW_TIERS.length - 1
+  ? `${TIER_FROM[i]}+`
+  : `${TIER_FROM[i]}\u2013${WINDOW_TIERS[i].upTo}`);
+const WINDOW_HIGH = WINDOW_TIERS[0].price;
+const WINDOW_LOW = WINDOW_TIERS[WINDOW_TIERS.length - 1].price;
+const WINDOW_RANGE = `${WINDOW_LOW}\u2013${WINDOW_HIGH}`;
+
 const TEL = '045 875 5996';
 const TELH = '+358458755996';
 
@@ -157,7 +168,7 @@ function hintaTaulukko() {
       ? `${t.tiers[0].price} €`
       : `${t.price} €`;
     const lisa = t.tiers
-      ? `<span class="mut">${t.tiers[1].price} € (5–9 kpl) · ${t.tiers[2].price} € (10–19) · ${t.tiers[3].price} € (20+)</span>`
+      ? `<span class="mut">${t.tiers.slice(1).map((_, i) => `${t.tiers[i + 1].price} € (${tierRange(i + 1)} kpl)`).join(' · ')}</span>`
       : (t.combo ? `<span class="mut">${t.combo} € samalla käynnillä muun työn kanssa</span>` : '');
     return `<tr><td><b>${esc(t.name)}</b><span class="mut">${esc(t.desc)}</span></td><td>${hinta}${lisa}</td></tr>`;
   }).join('\n      ');
@@ -178,7 +189,7 @@ function kuntaSivu(a, i) {
   const [kuva, alt] = KUVAT[i % KUVAT.length];
   const title = `Ovien ja ikkunoiden tiivistys ${a.ine} — TiivisKoti`;
   /* Alle 155 merkkiä: pidempi katkeaa hakutuloksessa kesken lauseen. */
-  const desc = `Ovien ja ikkunoiden tiivistys ${a.ine} kiinteään hintaan: ikkuna ${WINDOW_TIERS[0].price} €, ovi ${TYPES[1].price} €. Näet hinnan laskurista ja varaat ajan heti.`;
+  const desc = `Ovien ja ikkunoiden tiivistys ${a.ine} kiinteään hintaan: ikkuna ${WINDOW_RANGE} €, ovi ${TYPES[1].price} €. Näet hinnan laskurista ja varaat ajan heti.`;
 
   const faqLd = a.faq.map(([q, v]) => ({
     '@type': 'Question',
@@ -295,7 +306,7 @@ ${nav(R)}
 
 <section class="wrap" style="padding-bottom:clamp(16px,3vw,32px)">
   <div class="metrics rv">
-    <div class="metric"><b><span class="a">${WINDOW_TIERS[0].price} €</span></b><span>per ikkuna ${a.ine}</span></div>
+    <div class="metric"><b><span class="a">${WINDOW_RANGE} €</span></b><span>per ikkuna ${a.ine}, määrän mukaan</span></div>
     <div class="metric"><b><span class="a">${TYPES[1].price} €</span></b><span>ulko- ja parvekeovi</span></div>
     <div class="metric"><b><span class="a">${MIN_PRICE} €</span></b><span>pienin veloitus / käynti</span></div>
   </div>
@@ -370,15 +381,15 @@ const PALVELUT = [
     slug: 'ikkunoiden-tiivistys',
     kuva: 'ikkunat.webp',
     alt: 'Puutalon ikkuna ulkoa, valkoiset puitteet ja karmit',
-    title: `Ikkunoiden tiivistys ${WINDOW_TIERS[WINDOW_TIERS.length-1].price}\u2013${WINDOW_TIERS[0].price} € / ikkuna — TiivisKoti`,
+    title: `Ikkunoiden tiivistys ${WINDOW_RANGE} € / ikkuna — TiivisKoti`,
     h1a: 'Ikkunoiden tiivistys',
     h1b: 'kiinteään hintaan.',
     kicker: 'Ikkunat',
-    hinta: `${WINDOW_TIERS[WINDOW_TIERS.length-1].price}\u2013${WINDOW_TIERS[0].price}`,
-    hintaMin: WINDOW_TIERS[WINDOW_TIERS.length-1].price,
-    hintaMax: WINDOW_TIERS[0].price,
+    hinta: WINDOW_RANGE,
+    hintaMin: WINDOW_LOW,
+    hintaMax: WINDOW_HIGH,
     hintaSelite: 'per ikkuna, määrän mukaan',
-    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_TIERS[WINDOW_TIERS.length-1].price}\u2013${WINDOW_TIERS[0].price} € / ikkuna. Karmi- ja puitetiivisteet, helojen säätö ja toimivuuden tarkistus. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
+    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_RANGE} € / ikkuna. Karmi- ja puitetiivisteet, helojen säätö ja toimivuuden tarkistus. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
     lead: 'Vaihdamme karmi- ja puitetiivisteet, säädämme helat ja tarkistamme että ikkuna sulkeutuu tiiviisti. Näet hinnan laskurista ilman tarjouspyyntöä.',
     oireetOtsikko: 'Milloin ikkunat kannattaa tiivistää',
     oireet: [
@@ -388,7 +399,7 @@ const PALVELUT = [
       ['Ikkuna vinkuu tai on jäykkä', 'Helojen välykset ovat muuttuneet. Pelkkä uusi tiiviste ei riitä, jos puite ei purista sitä tasaisesti.'],
     ],
     faq: [
-      ['Paljonko ikkunoiden tiivistys maksaa?', `Ikkuna maksaa ${WINDOW_TIERS[0].price} € kappaleelta, ja hinta laskee määrän mukaan: 5 ikkunasta ${WINDOW_TIERS[1].price} €, 10 ikkunasta ${WINDOW_TIERS[2].price} € ja 20 ikkunasta ${WINDOW_TIERS[3].price} €. Pienin veloitus käynniltä on ${MIN_PRICE} €. Hinnat sisältävät tiivisteet, työn ja ALV 25,5 %.`],
+      ['Paljonko ikkunoiden tiivistys maksaa?', `Ikkuna maksaa ${WINDOW_HIGH} € kappaleelta, ja hinta laskee määrän mukaan: ${WINDOW_TIERS.slice(1).map((t, i) => `${TIER_FROM[i + 1]} ikkunasta ${t.price} €`).join(', ')}. Pienin veloitus käynniltä on ${MIN_PRICE} €. Hinnat sisältävät tiivisteet, työn ja ALV 25,5 %.`],
       ['Kuinka kauan yhden ikkunan tiivistys kestää?', 'Noin 20 minuuttia ikkunaa kohti. Tavallinen omakotitalon kierros on 2–4 tuntia, ja työ tehdään yhdellä käynnillä.'],
       ['Mitä tiivisteitä käytätte?', 'Aukon mukaan valittu silikonitiiviste. Paksuus valitaan mitatun välyksen mukaan — liian ohut ei tiivistä ja liian paksu estää ikkunaa sulkeutumasta.'],
       ['Voiko tiivisteet vaihtaa talvella?', 'Kyllä. Työ tehdään sisäkautta eikä se vaadi lämpimiä olosuhteita. Syksy on silti helpoin aika, koska vedon huomaa heti ensimmäisillä pakkasilla.'],
@@ -1143,7 +1154,7 @@ ${nav(R)}
 <header class="sec" style="padding-bottom:0"><div class="wrap">
   <div class="kicker">Toiminta-alueet</div>
   <h1 style="font-size:clamp(34px,4.8vw,54px);max-width:20ch">Tiivistämme ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla ja Riihimäellä</h1>
-  <p class="sub" style="max-width:64ch">Sama kiinteä hinta jokaisessa kunnassa: ikkuna ${WINDOW_TIERS[0].price} €, ulko- ja parvekeovi ${TYPES[1].price} €, pienin veloitus ${MIN_PRICE} € per käynti. Valitse kuntasi, niin näet mitä juuri siellä tyypillisesti tiivistetään.</p>
+  <p class="sub" style="max-width:64ch">Sama kiinteä hinta jokaisessa kunnassa: ikkuna ${WINDOW_RANGE} € määrän mukaan, ulko- ja parvekeovi ${TYPES[1].price} €, pienin veloitus ${MIN_PRICE} € per käynti. Valitse kuntasi, niin näet mitä juuri siellä tyypillisesti tiivistetään.</p>
   <div class="aluegrid">
     ${ALUEET.map((a) => `<a class="aluecard rv" href="toiminta-alueet/${a.slug}.html">
       <b>${a.name}</b>
@@ -1374,6 +1385,9 @@ function hinnatTekstiin(teksti) {
   const ovi = TYPES[1];
   const arvot = {
     IKKUNA: w[0], IKKUNA5: w[1], IKKUNA10: w[2], IKKUNA20: w[3],
+    /* Rajat mukaan, jotta artikkeliteksti ei väitä väärää kappalemäärää. */
+    RAJA2: TIER_FROM[1], RAJA3: TIER_FROM[2], RAJA4: TIER_FROM[3],
+    IKKUNA_HAARUKKA: WINDOW_RANGE,
     OVI: ovi.price, OVICOMBO: ovi.combo ?? ovi.price,
     TERASSI: TYPES[3].price, VALIOVI: TYPES[4].price,
     MIN: MIN_PRICE,

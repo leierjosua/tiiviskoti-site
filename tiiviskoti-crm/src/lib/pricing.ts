@@ -15,10 +15,10 @@ export const MIN_PRICE = 149;
 export const MIN_PRICE_NAME = `Pienen käynnin lisä (min. ${MIN_PRICE} €)`;
 
 export const WINDOW_TIERS = [
-  { upTo: 4, price: 95 },
+  { upTo: 4, price: 90 },
   { upTo: 9, price: 85 },
-  { upTo: 19, price: 75 },
-  { upTo: Infinity, price: 65 },
+  { upTo: 13, price: 80 },
+  { upTo: Infinity, price: 75 },
 ];
 
 export type OfferType = {
@@ -32,7 +32,7 @@ export type OfferType = {
 };
 
 export const TYPES: OfferType[] = [
-  { id: 'ikkuna',  name: 'Ikkuna',                  desc: 'Karmi- ja puitetiivisteet, per ikkuna',      tiers: WINDOW_TIERS, price: 95, min: 20 },
+  { id: 'ikkuna',  name: 'Ikkuna',                  desc: 'Karmi- ja puitetiivisteet, per ikkuna',      tiers: WINDOW_TIERS, price: 90, min: 20 },
   { id: 'ulko',    name: 'Ulko-ovi',                desc: 'Sivutiivisteet + kynnyskumi, käynnin säätö', price: 99,  min: 30 },
   { id: 'parveke', name: 'Parvekeovi',              desc: 'Puu-/alumiiniparvekeovi, koko kehä',         price: 99,  min: 30 },
   { id: 'terassi', name: 'Terassin liuku-/pariovi', desc: 'Iso lasiovi tai liukuovi, kiskon huolto',    price: 149, min: 30 },

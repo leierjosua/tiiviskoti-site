@@ -20,7 +20,9 @@ const ico = {
 };
 /* Ikkunan porrastuksen selite: näytetään kortissa, jotta asiakas näkee
    miksi yksikköhinta muuttuu määrää kasvattaessa. */
-const TIER_HINT = 'Mitä useampi ikkuna, sitä halvempi: 5+ 85 € · 10+ 75 € · 20+ 65 €';
+/* Vihje rakennetaan portaista, jottei se voi jäädä jälkeen hinnastosta. */
+const TIER_HINT = 'Mitä useampi ikkuna, sitä halvempi: '
+  + WINDOW_TIERS.slice(1).map((t, i) => `${WINDOW_TIERS[i].upTo + 1}+ ${t.price} €`).join(' · ');
 
 /* ---------- mainoskampanjan tunnistus ----------
    Osoitteen ?src=-parametri kertoo mistä mainoksesta kävijä tuli, esim.
@@ -294,7 +296,7 @@ function campaignFromUrl(){
 })();
 
 const FAQ = [
-  ['Paljonko tiivistys maksaa?','Pienin veloitus on 149 €, joka kattaa käynnin, matkat, kartoituksen ja lämpökamerakuvauksen. Sen jälkeen hinta muodostuu valitsemistasi kohteista kiinteillä hinnoilla. Ikkuna maksaa 95 € kappaleelta, ja hinta laskee määrän mukaan: 5–9 ikkunaa 85 €, 10–19 ikkunaa 75 € ja 20 ikkunasta ylöspäin 65 € kappaleelta. Ulko- ja parvekeovi on 99 €, terassin liuku- tai pariovi 149 €. Esimerkiksi yksi ikkuna on 149 € (minimiveloitus) ja kuusi ikkunaa 6 × 85 € = 510 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
+  ['Paljonko tiivistys maksaa?','Pienin veloitus on 149 €, joka kattaa käynnin, matkat, kartoituksen ja lämpökamerakuvauksen. Sen jälkeen hinta muodostuu valitsemistasi kohteista kiinteillä hinnoilla. Ikkuna maksaa 90 € kappaleelta, ja hinta laskee määrän mukaan: 5–9 ikkunaa 85 €, 10–13 ikkunaa 80 € ja 14 ikkunasta ylöspäin 75 € kappaleelta. Ulko- ja parvekeovi on 99 €, terassin liuku- tai pariovi 149 €. Esimerkiksi yksi ikkuna on 149 € (minimiveloitus) ja kuusi ikkunaa 6 × 85 € = 510 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.'],
   ['Miksi väliovi on halvempi kun tilaan samalla muutakin?','Suurin yksittäinen kustannus pienessä työssä on matka ja työpisteen pystytys. Kun asentaja on jo paikalla, seuraava kohde maksaa vähemmän: väli- tai huoneovi 89 € → 59 €, kun samaan käyntiin kuuluu vähintään yksi muu ovi tai ikkuna. Ulko- ja parvekeovi on 99 € aina, myös yksin tilattuna. Laskuri huomioi tämän automaattisesti.'],
   ['Mitä tiivisteiden vaihtoon sisältyy?','Vanhojen tiivisteiden poisto, pintojen puhdistus, uudet silikonitiivisteet sekä oven käynnin säätö niin, että ovi painuu tasaisesti tiivisteitä vasten. Ulko-oviin kuuluu myös kynnyskumi.'],
   ['Kannattaako vetävä ovi tiivistää vai vaihtaa?','Jos ovilehti ja karmi ovat suorassa ja ovi toimii, tiivisteiden uusiminen riittää lähes aina. Se maksaa murto-osan uuden oven hinnasta (2 200–4 900 €) ja poistaa vedon. Katsomme oven kunnon paikan päällä ja sanomme, jos tiivistys ei sinun kohdallasi riitä.'],

@@ -26,14 +26,23 @@ export const MIN_PRICE_NAME = `Pienen käynnin lisä (min. ${MIN_PRICE} €)`;
 
 /* Ikkunoiden määräporrastus. Koko ikkunamäärä hinnoitellaan sen portaan
    yksikköhinnalla, johon kokonaismäärä osuu — ei liukuvasti portaittain.
-   Huom: porras vaihtuu jyrkästi, joten 10 ikkunaa (750 €) on halvempi kuin
-   9 ikkunaa (765 €). Se on tietoinen valinta: raja kannustaa ottamaan koko
-   asunnon kerralla, ja virhe on aina asiakkaan eduksi. */
+
+   Portaiden rajat EIVÄT ole vapaasti valittavissa. Koska halvempi hinta
+   koskee taannehtivasti kaikkia ikkunoita, liian myöhäinen raja tekisi
+   isommasta tilauksesta halvemman: ehto on `N * vanha < (N+1) * uusi`,
+   missä N on portaan viimeinen kappalemäärä. Viiden euron askeleella se
+   rajoittaa rajat aikaisiksi: askel 85 → 80 vaatii N < 16 ja askel
+   80 → 75 vaatii N < 15. Siksi viimeinen porras ei voi alkaa 15:tä
+   myöhemmin. Jos hintoja muutetaan, laske rajat uudelleen — aiemmassa
+   hinnastossa 10 ikkunaa (750 €) oli halvempi kuin 9 (765 €).
+
+   Tarkistettu 6.9.2026: 4*90=360 < 5*85=425 < ... 9*85=765 < 10*80=800,
+   13*80=1040 < 14*75=1050. Kokonaishinta kasvaa monotonisesti. */
 export const WINDOW_TIERS = [
-  { upTo: 4, price: 95 },
+  { upTo: 4, price: 90 },
   { upTo: 9, price: 85 },
-  { upTo: 19, price: 75 },
-  { upTo: Infinity, price: 65 },
+  { upTo: 13, price: 80 },
+  { upTo: Infinity, price: 75 },
 ];
 
 /* `price`   = hinta kun kohde teetetään yksinään
@@ -42,7 +51,7 @@ export const WINDOW_TIERS = [
    `tiers`   = määräporrastus, korvaa `price`n kokonaan
    `min`     = arvioitu työaika minuutteina per kappale (= kalenterivaraus) */
 export const TYPES = [
-  { id: 'ikkuna',  name: 'Ikkuna',                   desc: 'Karmi- ja puitetiivisteet, per ikkuna',      tiers: WINDOW_TIERS, price: 95, min: 20 },
+  { id: 'ikkuna',  name: 'Ikkuna',                   desc: 'Karmi- ja puitetiivisteet, per ikkuna',      tiers: WINDOW_TIERS, price: 90, min: 20 },
   { id: 'ulko',    name: 'Ulko-ovi',                 desc: 'Sivutiivisteet + kynnyskumi, käynnin säätö', price: 99,  min: 30 },
   { id: 'parveke', name: 'Parvekeovi',               desc: 'Puu-/alumiiniparvekeovi, koko kehä',         price: 99,  min: 30 },
   { id: 'terassi', name: 'Terassin liuku-/pariovi',  desc: 'Iso lasiovi tai liukuovi, kiskon huolto',    price: 149, min: 30 },

@@ -73,7 +73,7 @@ export const ARTIKKELIT = [
     kicker: 'Hinta ja kesto',
     osiot: [
       ['Mitä tiivisteiden vaihto maksaa', [
-        'Meillä yksi ikkuna maksaa {{IKKUNA}} €, ja hinta laskee määrän mukaan: viidestä ikkunasta ylöspäin {{IKKUNA5}} €, kymmenestä {{IKKUNA10}} € ja kahdestakymmenestä {{IKKUNA20}} € ikkunalta. Ulko- ja parvekeovi on {{OVI}} €, terassin liuku- tai pariovi {{TERASSI}} € ja väliovi {{VALIOVI}} €.',
+        'Meillä yksi ikkuna maksaa {{IKKUNA}} €, ja hinta laskee määrän mukaan: {{RAJA2}} ikkunasta ylöspäin {{IKKUNA5}} €, {{RAJA3}} ikkunasta {{IKKUNA10}} € ja {{RAJA4}} ikkunasta {{IKKUNA20}} € ikkunalta. Ulko- ja parvekeovi on {{OVI}} €, terassin liuku- tai pariovi {{TERASSI}} € ja väliovi {{VALIOVI}} €.',
         'Pienin veloitus käynniltä on {{MIN}} €. Se kattaa käynnin, matkat, kartoituksen ja lämpökamerakuvauksen. Käytännössä yhden ikkunan tilaaminen erikseen ei siis kannata — jos ikkunoita on useampi, hinta ikkunaa kohden putoaa nopeasti.',
         'Kaikki hinnat sisältävät arvonlisäveron 25,5 %, tiivisteet ja työn. Hinta ei ole arvio vaan se, mitä laskuun tulee.',
       ]],

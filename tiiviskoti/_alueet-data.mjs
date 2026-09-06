@@ -134,7 +134,7 @@ export const ALUEET = [
     gen: 'Järvenpään',
     lead: 'Omakotitalovaltainen kaupunki, jossa koko talo kannattaa tiivistää kerralla.',
     intro: 'Järvenpää on selvästi omakotitalovaltainen, ja se muuttaa hinnoittelun logiikkaa asiakkaan eduksi. Kun saman katon alla on paljon ikkunoita, ikkunahinta laskee portaittain — koko talon ikkunat kerralla maksaa vähemmän per ikkuna kuin muutama kerrallaan. Rakennuskanta painottuu 1970-luvulta 2000-luvulle, ja siinä haarukassa ikkunatiivisteet ovat tyypillisesti alkuperäisiä.',
-    kulma: 'Tyypillinen järvenpääläinen omakotitalo on 10–20 ikkunan kokoluokkaa. Siinä haarukassa ikkunan yksikköhinta on 75 € eikä 95 €, eli koko talon tiivistäminen maksaa vähemmän kuin moni olettaa hinnaston ensimmäisen rivin perusteella.',
+    kulma: 'Tyypillinen järvenpääläinen omakotitalo on 10–20 ikkunan kokoluokkaa. Siinä haarukassa ikkunan yksikköhinta on 75–80 € eikä 90 €, eli koko talon tiivistäminen maksaa vähemmän kuin moni olettaa hinnaston ensimmäisen rivin perusteella.',
     osat: ['Keskusta', 'Loutti', 'Kinnari', 'Jamppa', 'Saunakallio', 'Haarajoki', 'Kyrölä', 'Pöytäalho', 'Peltola'],
     faq: [
       ['Kannattaako tiivistää koko talo vai vain vetävät huoneet?', 'Koko talo. Kun yksi vuotokohta tukitaan, paine siirtyy seuraavaan ja veto tuntuu sitten siellä. Lisäksi ikkunahinta laskee määrän mukaan, joten koko talo kerralla on myös edullisempi per ikkuna.'],
@@ -176,10 +176,10 @@ export const ALUEET = [
     gen: 'Hyvinkään',
     lead: 'Toiminta-alueemme pohjoisin kaupunki — omalla keskustallaan ja omalla rakennuskannallaan.',
     intro: 'Hyvinkää poikkeaa kehyskunnista siinä, että sillä on oma selkeä kaupunkikeskustansa eikä se ole pelkkä pääkaupunkiseudun nukkumalähiö. Rakennuskannassa on sekä 1960–1980-luvun kerros- ja rivitaloja että laajoja pientaloalueita. Vanhemmissa kerrostaloissa parvekeovet ovat usein yhä alkuperäisiä, ja niissä tiivistys tuo suurimman yksittäisen hyödyn.',
-    kulma: 'Hyvinkää on toiminta-alueemme pohjoisin kunta, joten ajomatka on pisimpiä. Se ei muuta kohteiden hintoja — ikkuna on 65–95 € täälläkin — mutta tekee koko talon kerralla tiivistämisestä selvästi järkevämpää kuin yhden ikkunan käynnistä.',
+    kulma: 'Hyvinkää on toiminta-alueemme pohjoisin kunta, joten ajomatka on pisimpiä. Se ei muuta kohteiden hintoja — ikkuna on 75–90 € täälläkin — mutta tekee koko talon kerralla tiivistämisestä selvästi järkevämpää kuin yhden ikkunan käynnistä.',
     osat: ['Keskusta', 'Paavola', 'Hakala', 'Martti', 'Kaukas', 'Hyvinkäänkylä', 'Vehkoja', 'Palopuro', 'Kytäjä', 'Nummenkylä'],
     faq: [
-      ['Onko Hyvinkäällä eri hinta kuin pääkaupunkiseudulla?', 'Kohteiden hinnat ovat samat: ikkuna 65–95 € määrän mukaan, ulko- ja parvekeovi 99 €. Etäisyys voi tuoda postinumerokohtaisen matkalisän, joka näkyy laskurissa ennen varauksen vahvistamista.'],
+      ['Onko Hyvinkäällä eri hinta kuin pääkaupunkiseudulla?', 'Kohteiden hinnat ovat samat: ikkuna 75–90 € määrän mukaan, ulko- ja parvekeovi 99 €. Etäisyys voi tuoda postinumerokohtaisen matkalisän, joka näkyy laskurissa ennen varauksen vahvistamista.'],
       ['Kuinka pitkä toimitusaika Hyvinkäälle on?', 'Vapaat ajat näet suoraan kalenterista postinumerolla. Pidemmän ajomatkan takia Hyvinkään käynnit sijoitetaan yleensä samaan päivään muiden pohjoisen alueen kohteiden kanssa, joten valikoima on hieman suppeampi kuin Keravalla.'],
     ],
   },
@@ -196,7 +196,7 @@ export const ALUEET = [
     kulma: 'Riihimäki on sisämaata, ja se erottaa sen rannikkokunnista. Helsingissä ja Sipoossa tiivisteitä kuluttaa ennen kaikkea mereltä tuleva tuulikuorma; täällä ratkaisee lämpötilaero. Pakkanen painuu talvella selvästi alemmas kuin rannikolla, jolloin kova tiivistynyt tiiviste ei enää jousta takaisin karmia vasten ja veto tuntuu heti lattianrajassa. Siksi riihimäkeläisessä talossa vetoisuus paljastuu tyypillisesti vasta ensimmäisillä oikeilla pakkasilla, ei syyskuun tuulilla.',
     osat: ['Keskusta', 'Peltosaari', 'Patastenmäki', 'Herajoki', 'Uramo', 'Hirsimäki', 'Juppala', 'Petsamo', 'Vahteristo', 'Kalmu', 'Arolampi'],
     faq: [
-      ['Palveletteko Riihimäellä, vaikka se ei kuulu Uudellemaalle?', 'Kyllä. Riihimäki on Kanta-Hämettä, mutta se kuuluu toiminta-alueeseemme siinä missä Uudenmaan kunnatkin. Kohteiden hinnat ovat samat — ikkuna 95 €, ulko- ja parvekeovi 99 € — eikä Riihimäelle tule matkalisää. Voit varmistaa asian itse syöttämällä postinumerosi laskuriin ennen varausta.'],
+      ['Palveletteko Riihimäellä, vaikka se ei kuulu Uudellemaalle?', 'Kyllä. Riihimäki on Kanta-Hämettä, mutta se kuuluu toiminta-alueeseemme siinä missä Uudenmaan kunnatkin. Kohteiden hinnat ovat samat — ikkuna 75–90 € määrän mukaan, ulko- ja parvekeovi 99 € — eikä Riihimäelle tule matkalisää. Voit varmistaa asian itse syöttämällä postinumerosi laskuriin ennen varausta.'],
       ['Kannattaako 1970-luvun kerrostaloasunnossa tiivistää vain parvekeovi?', 'Usein kannattaa aloittaa siitä, koska parvekeovi on tuon ikäisessä asunnossa lähes poikkeuksetta vetoisin kohta: siinä on sekä pitkät karmitiivisteet että kynnyskumi, ja ovea käytetään päivittäin. Jos asunnossa on kuitenkin samalla julkisivulla useampi alkuperäinen ikkuna, ne kannattaa tiivistää samalla kertaa — käynti on jo maksettu, ja yksikköhinta putoaa selvästi.'],
     ],
   },
@@ -284,7 +284,7 @@ export const ALUEET = [
     kulma: 'Askola on lähellä Porvoota, joten käynnit sijoitetaan usein samaan päivään porvoolaisten kohteiden kanssa. Se lyhentää toimitusaikaa verrattuna siihen mitä kunnan koosta voisi päätellä.',
     osat: ['Kirkonkylä', 'Monninkylä', 'Vahijärvi', 'Särkijärvi', 'Juornaankylä', 'Onkimaa'],
     faq: [
-      ['Onko vanhassa maalaistalossa liikaa ikkunoita järkeväksi?', 'Päinvastoin — mitä enemmän ikkunoita, sitä halvemmaksi yksikköhinta tulee. Kymmenen ikkunan talossa hinta on 75 € per ikkuna eikä 95 €, ja kahdestakymmenestä ylöspäin 65 €.'],
+      ['Onko vanhassa maalaistalossa liikaa ikkunoita järkeväksi?', 'Päinvastoin — mitä enemmän ikkunoita, sitä halvemmaksi yksikköhinta tulee. Kymmenen ikkunan talossa hinta on 80 € per ikkuna eikä 90 €, ja neljästätoista ylöspäin 75 €.'],
       ['Tuleeko Askolaan matkalisä?', 'Mahdollinen matkalisä määräytyy postinumeron mukaan ja näkyy laskurissa ennen kuin vahvistat varauksen. Sitä ei koskaan lisätä jälkikäteen laskuun.'],
     ],
   },
@@ -309,7 +309,7 @@ export const ALUEET = [
     gen: 'Lapinjärven',
     lead: 'Toiminta-alueemme itäisin kunta — kaksikielinen ja maaseutumainen.',
     intro: 'Lapinjärvi on toiminta-alueemme itäisin kunta, kaksikielinen ja maatalousvaltainen. Asutus keskittyy kirkonkylään ja Porlammille, ja niiden ympärillä on maatiloja ja laajaa haja-asutusta. Rakennuskannalle on tyypillistä, että talot ovat suuria: maatilan päärakennuksessa on usein 15–25 ikkunaa, mikä on moninkertaisesti enemmän kuin taajaman rivitaloasunnossa.',
-    kulma: 'Juuri ikkunoiden määrä tekee Lapinjärvestä hinnoittelun kannalta poikkeuksellisen. Yksikköhinta laskee portaittain, joten kahdenkymmenen ikkunan päärakennuksessa ikkuna maksaa 65 € eikä 95 € — eli kolmanneksen vähemmän kuin muutaman ikkunan kohteessa. Iso vanha talo on siis suhteellisesti halvin mahdollinen tiivistyskohde, vaikka kokonaissumma onkin isompi.',
+    kulma: 'Juuri ikkunoiden määrä tekee Lapinjärvestä hinnoittelun kannalta poikkeuksellisen. Yksikköhinta laskee portaittain, joten kahdenkymmenen ikkunan päärakennuksessa ikkuna maksaa 75 € eikä 90 € — eli kuudenneksen vähemmän kuin muutaman ikkunan kohteessa. Iso vanha talo on siis suhteellisesti halvin mahdollinen tiivistyskohde, vaikka kokonaissumma onkin isompi.',
     osat: ['Kirkonkylä', 'Porlammi', 'Ingermanninkylä', 'Pukaro', 'Rutumi'],
     faq: [
       ['Ehditäänkö näin kauas?', 'Kyllä, Lapinjärvi kuuluu toiminta-alueeseemme. Käynnit sijoitetaan samaan päivään muiden itäisen Uudenmaan kohteiden kanssa, joten vapaita aikoja on harvemmin kuin lähempänä — näet ne kalenterista postinumerolla.'],
@@ -327,7 +327,7 @@ export const ALUEET = [
     osat: ['Kirkonkylä', 'Kankkila', 'Sulkava', 'Hallila'],
     faq: [
       ['Kunta on pieni — käyttekö täällä oikeasti?', 'Käymme. Myrskylä kuuluu toiminta-alueeseemme, ja käynnit yhdistetään lähialueen muihin kohteisiin. Tarkista vapaat ajat syöttämällä postinumerosi laskuriin.'],
-      ['Kannattaako maatilan päärakennus tiivistää kerralla?', 'Kannattaa. Vanhassa päärakennuksessa on tyypillisesti 10–20 ikkunaa, jolloin yksikköhinta on 75 € eikä 95 €. Koko talo kerralla on siis sekä halvempi per ikkuna että ainoa tapa saada veto oikeasti loppumaan.'],
+      ['Kannattaako maatilan päärakennus tiivistää kerralla?', 'Kannattaa. Vanhassa päärakennuksessa on tyypillisesti 10–20 ikkunaa, jolloin yksikköhinta on 75–80 € eikä 90 €. Koko talo kerralla on siis sekä halvempi per ikkuna että ainoa tapa saada veto oikeasti loppumaan.'],
     ],
   },
   {
@@ -337,7 +337,7 @@ export const ALUEET = [
     gen: 'Pukkilan',
     lead: 'Maatalousvaltainen pikkukunta Porvoonjoen varrella.',
     intro: 'Pukkila on pieni maatalousvaltainen kunta Porvoonjoen yläjuoksulla, ja jokilaakso on määrittänyt sen asutuksen: talot ovat rivissä jokivarren kylissä, ei tiiviinä taajamana. Rakennuskanta on iäkästä ja pientalovaltaista — vanhoja puu- ja hirsitaloja, maatilojen päärakennuksia ja jonkin verran uudempaa omakotiasutusta kirkonkylän tuntumassa. Hirsitalossa karmit ovat eläneet vuosikymmenten aikana, joten tiiviste sovitetaan kohta kohdalta eikä vakiomitalla.',
-    kulma: 'Maatilan päärakennuksessa ikkunoita on usein enemmän kuin omistaja tulee ajatelleeksi, ja juuri se tekee tiivistyksestä edullista. Kahdenkymmenen ikkunan kohteessa yksikköhinta on 65 € — alle kaksi kolmasosaa yhden ikkunan hinnasta.',
+    kulma: 'Maatilan päärakennuksessa ikkunoita on usein enemmän kuin omistaja tulee ajatelleeksi, ja juuri se tekee tiivistyksestä edullista. Kahdenkymmenen ikkunan kohteessa yksikköhinta on 75 € — kuudenneksen vähemmän kuin muutaman ikkunan kohteessa.',
     osat: ['Kirkonkylä', 'Kanteleenkylä', 'Savijoki', 'Torppi', 'Naarkoski'],
     faq: [
       ['Onko vanha hirsitalo hankala tiivistää?', 'Ei ole, mutta se on hitaampaa: urat ovat epätasaisia ja karmit eläneet, joten tiiviste sovitetaan kohta kohdalta. Se näkyy varatussa ajassa, ei hinnassa.'],

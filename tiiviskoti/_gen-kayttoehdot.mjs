@@ -7,6 +7,21 @@
 //     verkkosivu ja sopimuspaperi eivät sano eri asiaa
 //   - hinnat: pricing.mjs MIN_PRICE + WINDOW_TIERS + TYPES + EXTRAS
 import { readFileSync, writeFileSync } from 'node:fs';
+import { WINDOW_TIERS } from './pricing.mjs';
+
+/* Sopimusehtojen hinnasto tulee samasta lähteestä kuin laskuri. Ehdot ovat
+   sitova dokumentti: jos ne lupaavat eri hinnan kuin laskuri veloittaa,
+   asiakas on oikeassa ja me väärässä. Rajat johdetaan portaista. */
+function ikkunaRivit() {
+  return WINDOW_TIERS.map((t, i) => {
+    const alku = i === 0 ? 1 : WINDOW_TIERS[i - 1].upTo + 1;
+    const nimi = i === WINDOW_TIERS.length - 1
+      ? `Ikkuna, ${alku} kpl tai enemmän`
+      : `Ikkuna, ${alku}\u2013${t.upTo} kpl`;
+    return `      <div><dt>${nimi}</dt><dd>${t.price} € / kpl</dd></div>`;
+  }).join('\n');
+}
+
 
 const DIR = import.meta.dirname;
 const src = readFileSync(`${DIR}/varaa.html`, 'utf8');
@@ -88,10 +103,7 @@ const body = `
     <h2>3. Hinnat</h2>
     <p>Hinta muodostuu valitsemistasi kohteista kiinteillä hinnoilla:</p>
     <dl class="kv">
-      <div><dt>Ikkuna, 1–4 kpl</dt><dd>95 € / kpl</dd></div>
-      <div><dt>Ikkuna, 5–9 kpl</dt><dd>85 € / kpl</dd></div>
-      <div><dt>Ikkuna, 10–19 kpl</dt><dd>75 € / kpl</dd></div>
-      <div><dt>Ikkuna, 20 kpl tai enemmän</dt><dd>65 € / kpl</dd></div>
+${ikkunaRivit()}
       <div><dt>Ulko-ovi tai parvekeovi</dt><dd>99 € / kpl</dd></div>
       <div><dt>Terassin liuku- tai pariovi</dt><dd>149 € / kpl</dd></div>
       <div><dt>Väli- / huoneovi</dt><dd>89 € / kpl</dd></div>
