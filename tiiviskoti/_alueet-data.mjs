@@ -176,10 +176,10 @@ export const ALUEET = [
     gen: 'Hyvinkään',
     lead: 'Toiminta-alueemme pohjoisin kaupunki — omalla keskustallaan ja omalla rakennuskannallaan.',
     intro: 'Hyvinkää poikkeaa kehyskunnista siinä, että sillä on oma selkeä kaupunkikeskustansa eikä se ole pelkkä pääkaupunkiseudun nukkumalähiö. Rakennuskannassa on sekä 1960–1980-luvun kerros- ja rivitaloja että laajoja pientaloalueita. Vanhemmissa kerrostaloissa parvekeovet ovat usein yhä alkuperäisiä, ja niissä tiivistys tuo suurimman yksittäisen hyödyn.',
-    kulma: 'Hyvinkää on toiminta-alueemme pohjoisin kunta, joten ajomatka on pisimpiä. Se ei muuta kohteiden hintoja — ikkuna on 95 € täälläkin — mutta tekee koko talon kerralla tiivistämisestä selvästi järkevämpää kuin yhden ikkunan käynnistä.',
+    kulma: 'Hyvinkää on toiminta-alueemme pohjoisin kunta, joten ajomatka on pisimpiä. Se ei muuta kohteiden hintoja — ikkuna on 65–95 € täälläkin — mutta tekee koko talon kerralla tiivistämisestä selvästi järkevämpää kuin yhden ikkunan käynnistä.',
     osat: ['Keskusta', 'Paavola', 'Hakala', 'Martti', 'Kaukas', 'Hyvinkäänkylä', 'Vehkoja', 'Palopuro', 'Kytäjä', 'Nummenkylä'],
     faq: [
-      ['Onko Hyvinkäällä eri hinta kuin pääkaupunkiseudulla?', 'Kohteiden hinnat ovat samat: ikkuna 95 €, ulko- ja parvekeovi 99 €. Etäisyys voi tuoda postinumerokohtaisen matkalisän, joka näkyy laskurissa ennen varauksen vahvistamista.'],
+      ['Onko Hyvinkäällä eri hinta kuin pääkaupunkiseudulla?', 'Kohteiden hinnat ovat samat: ikkuna 65–95 € määrän mukaan, ulko- ja parvekeovi 99 €. Etäisyys voi tuoda postinumerokohtaisen matkalisän, joka näkyy laskurissa ennen varauksen vahvistamista.'],
       ['Kuinka pitkä toimitusaika Hyvinkäälle on?', 'Vapaat ajat näet suoraan kalenterista postinumerolla. Pidemmän ajomatkan takia Hyvinkään käynnit sijoitetaan yleensä samaan päivään muiden pohjoisen alueen kohteiden kanssa, joten valikoima on hieman suppeampi kuin Keravalla.'],
     ],
   },

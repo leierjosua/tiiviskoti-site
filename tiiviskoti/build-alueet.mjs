@@ -201,10 +201,14 @@ function kuntaSivu(a, i) {
         /* Maakunta kunnasta, ei vakiona: Riihimäki on Kanta-Hämettä, ja väärä
            maakunta rakenteisessa datassa on Googlelle suora virhe. */
         areaServed: { '@type': 'City', name: a.name, address: { '@type': 'PostalAddress', addressRegion: a.maakunta || 'Uusimaa', addressCountry: 'FI' } },
+        /* Sama haarukka kuin palvelusivulla: yksikköhinta laskee määrän
+           mukaan, joten yksi luku antaisi väärän kuvan. */
         offers: {
-          '@type': 'Offer',
+          '@type': 'AggregateOffer',
           priceCurrency: 'EUR',
-          price: String(WINDOW_TIERS[0].price),
+          lowPrice: String(WINDOW_TIERS[WINDOW_TIERS.length - 1].price),
+          highPrice: String(WINDOW_TIERS[0].price),
+          offerCount: 1,
           description: `Ikkunan tiivistys ${a.ine}, sis. ALV 25,5 %. Pienin veloitus ${MIN_PRICE} € / käynti.`,
         },
       },
@@ -366,13 +370,15 @@ const PALVELUT = [
     slug: 'ikkunoiden-tiivistys',
     kuva: 'ikkunat.webp',
     alt: 'Puutalon ikkuna ulkoa, valkoiset puitteet ja karmit',
-    title: `Ikkunoiden tiivistys ${WINDOW_TIERS[0].price} € / ikkuna — TiivisKoti`,
+    title: `Ikkunoiden tiivistys ${WINDOW_TIERS[WINDOW_TIERS.length-1].price}\u2013${WINDOW_TIERS[0].price} € / ikkuna — TiivisKoti`,
     h1a: 'Ikkunoiden tiivistys',
     h1b: 'kiinteään hintaan.',
     kicker: 'Ikkunat',
-    hinta: WINDOW_TIERS[0].price,
-    hintaSelite: 'per ikkuna',
-    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_TIERS[0].price} € / ikkuna. Karmi- ja puitetiivisteet, helojen säätö ja toimivuuden tarkistus. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
+    hinta: `${WINDOW_TIERS[WINDOW_TIERS.length-1].price}\u2013${WINDOW_TIERS[0].price}`,
+    hintaMin: WINDOW_TIERS[WINDOW_TIERS.length-1].price,
+    hintaMax: WINDOW_TIERS[0].price,
+    hintaSelite: 'per ikkuna, määrän mukaan',
+    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_TIERS[WINDOW_TIERS.length-1].price}\u2013${WINDOW_TIERS[0].price} € / ikkuna. Karmi- ja puitetiivisteet, helojen säätö ja toimivuuden tarkistus. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
     lead: 'Vaihdamme karmi- ja puitetiivisteet, säädämme helat ja tarkistamme että ikkuna sulkeutuu tiiviisti. Näet hinnan laskurista ilman tarjouspyyntöä.',
     oireetOtsikko: 'Milloin ikkunat kannattaa tiivistää',
     oireet: [
@@ -450,7 +456,14 @@ function palveluSivu(c) {
         image: `${SITE}/img/${c.kuva}`,
         provider: { '@id': `${SITE}/#business` },
         areaServed: { '@type': 'State', name: 'Uusimaa', address: { '@type': 'PostalAddress', addressRegion: 'Uusimaa', addressCountry: 'FI' } },
-        offers: { '@type': 'Offer', priceCurrency: 'EUR', price: String(c.hinta), description: `${c.h1a}, sis. ALV 25,5 %. Pienin veloitus ${MIN_PRICE} € / käynti.` },
+        /* Hinta on porrastettu, joten rakennedataan menee AggregateOffer eikä
+           Offer: schema.org vaatii `price`-kenttään yhden luvun, ja "65–95"
+           olisi kelvoton arvo. lowPrice/highPrice kertoo saman haarukan
+           muodossa jonka hakukone ymmärtää. */
+        offers: c.hintaMin
+          ? { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: String(c.hintaMin), highPrice: String(c.hintaMax),
+              offerCount: 1, description: `${c.h1a}, sis. ALV 25,5 %. Pienin veloitus ${MIN_PRICE} € / käynti.` }
+          : { '@type': 'Offer', priceCurrency: 'EUR', price: String(c.hinta), description: `${c.h1a}, sis. ALV 25,5 %. Pienin veloitus ${MIN_PRICE} € / käynti.` },
       },
       { '@type': 'FAQPage', '@id': `${url}#ukk`, mainEntity: c.faq.map(([q, v]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: v } })) },
       {
