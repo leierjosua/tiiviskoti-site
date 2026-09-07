@@ -134,6 +134,14 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
       metaLeadId = lead?.external_id ?? null;
       saleCents = offer?.total_cents ?? 0;
 
+      /* Klikin tyyppi ei saa olla null. Sarake on migraatiossa 017 not null
+         default 'gclid', mutta nimetty sarake ohittaa oletuksen — ja ilman
+         liidiä tähän meni null, jolloin KOKO työn luonti kaatui. Tarjouksesta
+         ja puhelimessa sovittu keikka ei tule liidiriviltä, joten se osui
+         jokaiseen sellaiseen. Oletus on merkityksetön ilman klikkitunnistetta:
+         ads-sync lukee vain rivit joilla gclid on. */
+      const clickKind = lead?.gclid_kind ?? 'gclid';
+
       const [job] = await tx<{ id: string; job_number: string }[]>`
         insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status,
                              title, address, postal_code, city, notes, source,
@@ -142,7 +150,7 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
                 ${d.title}, ${d.address ?? null}, ${d.postalCode ?? null},
                 ${d.city ?? null}, ${d.notes ?? null}, ${source},
                 ${lead?.campaign ?? null}, ${lead?.gclid ?? null},
-                ${lead?.gclid_kind ?? null}, ${offer?.total_cents ?? 0})
+                ${clickKind}, ${offer?.total_cents ?? 0})
         returning id, job_number
       `;
 
