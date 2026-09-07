@@ -41,6 +41,13 @@ h1 { margin: 0; font-weight: 800; font-size: 92px; line-height: 1.03;
   letter-spacing: -.035em; color: #fff; }
 h1 .hl { color: #A8E3C4; }
 
+/* Ankkuririvi (kalliin vaihtoehdon hinta) on tarjousta pienempi.
+
+   Ankkuri on perustelu, ei lupaus: jos se on samankokoinen kuin tarjous,
+   ohi selaava lukee ensin sen ja luulee että myymme oven vaihtoa. Pienempi
+   koko pitää myös pidemmän rivin ("...maksaisi 2 200 €") yhdellä rivillä. */
+h1 .anchor { font-size: 58px; letter-spacing: -.02em; color: rgba(255,255,255,.92); }
+
 .sub { margin: 22px 0 0; font-size: 33px; font-weight: 700; line-height: 1.32;
   color: rgba(255,255,255,.88); max-width: 830px; }
 
