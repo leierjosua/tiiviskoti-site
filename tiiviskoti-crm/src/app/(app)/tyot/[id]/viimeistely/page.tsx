@@ -1,18 +1,20 @@
 import { notFound, redirect } from 'next/navigation';
 import { sql } from '@/lib/db';
 import { getJob } from '@/lib/data';
-import { requireStaff } from '@/lib/session';
+import { ownsJob, requireStaff } from '@/lib/session';
 import { linesFromDb, linesTotal } from '@/lib/completion';
 import { ViimeistelyWizard } from './ui';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ViimeistelyPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireStaff();
+  const staff = await requireStaff();
   const { id } = await params;
 
   const job = await getJob(id);
   if (!job) notFound();
+  // Asentaja viimeistelee vain omansa — sama rajaus kuin työn sivulla.
+  if (!(await ownsJob(staff, id))) notFound();
 
   /* Peruttua keikkaa ei viimeistellä. Se ei ole virhe vaan väärä ovi:
      ohjataan takaisin varaukseen, jossa tilan voi palauttaa. */

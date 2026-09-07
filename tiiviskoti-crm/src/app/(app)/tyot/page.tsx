@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { listJobs } from '@/lib/data';
+import { requireStaff, viewMode } from '@/lib/session';
 import { addDays, dateKeyOf, formatDateKey, helsinkiDateTime, timeOf } from '@/lib/time';
 import { Card, CardHeader, Empty, StatusBadge } from '@/components/ui';
 
@@ -15,6 +16,13 @@ type RangeKey = keyof typeof RANGES;
 export default async function JobsPage({
   searchParams,
 }: { searchParams: Promise<{ jakso?: string }> }) {
+  /* Asennusnäkymässä tämä on yhden ihmisen työlista, ei yrityksen: lista
+     rajataan katsojan omiin kalentereihin samoin kuin etusivulla ja
+     kalenterissa. Asentajalla näkymä on aina asennus, joten hän ei näe
+     muiden keikkoja täältä lainkaan — eikä `ownsJob` päästä häntä niihin
+     osoitteellakaan. */
+  const staff = await requireStaff();
+  const asennus = await viewMode(staff) === 'asennus';
   const { jakso } = await searchParams;
   const key: RangeKey = jakso === 'menneet' ? 'menneet' : 'tulevat';
   const range = RANGES[key];
@@ -23,7 +31,7 @@ export default async function JobsPage({
   const from = helsinkiDateTime(addDays(today, range.from), '00:00');
   const to = helsinkiDateTime(addDays(today, range.to), '00:00');
 
-  const jobs = await listJobs(from.toISOString(), to.toISOString());
+  const jobs = await listJobs(from.toISOString(), to.toISOString(), asennus ? staff.id : null);
   const ordered = key === 'menneet' ? [...jobs].reverse() : jobs;
 
   return (
@@ -33,12 +41,16 @@ export default async function JobsPage({
           <h1 className="text-[22px] font-extrabold tracking-tight text-text">Työt</h1>
           <p className="text-sm text-muted">{ordered.length} työtä</p>
         </div>
-        <Link
-          href="/tyot/uusi"
-          className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-ink hover:bg-accent/90"
-        >
-          Uusi työ
-        </Link>
+        {/* Varauksen tekeminen on toimiston työtä: asennusnäkymässä nappi
+            johtaisi sivulle jota `requireManager` ei päästä auki. */}
+        {!asennus && (
+          <Link
+            href="/tyot/uusi"
+            className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-ink hover:bg-accent/90"
+          >
+            Uusi työ
+          </Link>
+        )}
       </header>
 
       <Card className="overflow-x-auto">

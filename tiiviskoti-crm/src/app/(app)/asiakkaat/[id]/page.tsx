@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { sql } from '@/lib/db';
-import { requireStaff } from '@/lib/session';
+import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf } from '@/lib/time';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireStaff();
+  await requireManager();
   const { id } = await params;
 
   const [customer] = await sql<{

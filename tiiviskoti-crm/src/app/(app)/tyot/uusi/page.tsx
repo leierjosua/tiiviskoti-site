@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { availability, getOffer, kartoitusCalendarId, listCalendars, type OfferLine, type OfferRow } from '@/lib/data';
 import { EXTRAS, TYPES } from '@/lib/pricing';
-import { requireStaff } from '@/lib/session';
+import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty } from '@/components/ui';
 import { NewJobForm } from './ui';
 
@@ -72,7 +72,8 @@ export default async function NewJobPage({
     tarjous?: string;
   }>;
 }) {
-  await requireStaff();
+  // Varauksen tekeminen on toimiston työtä, ei asentajan.
+  await requireManager();
   const {
     kalenteri, kalenteri2, kesto, liidi, nimi, email, puhelin, postinumero, osoite,
     muistiinpano, tarjous,

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getJob, jobLinks } from '@/lib/data';
-import { requireStaff, viewMode } from '@/lib/session';
+import { ownsJob, requireStaff, viewMode } from '@/lib/session';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib/time';
 import { sql } from '@/lib/db';
@@ -25,6 +25,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
   const job = await getJob(id);
   if (!job) notFound();
+  /* Asentajalle toisen keikka on olematon, ei kielletty: sama 404 kuin
+     tuntemattomalle tunnisteelle, jottei osoitteesta voi päätellä keiden
+     keikkoja on olemassa. */
+  if (!(await ownsJob(staff, id))) notFound();
 
   /* Asennusnäkymässä sama työ näytetään toisin: ei muokkauslomakkeita
      vaan tiedot ja Viimeistele-nappi. */

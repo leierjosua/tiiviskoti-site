@@ -113,7 +113,14 @@ export async function getCalendar(id: string) {
 
 /* ---------- työt ---------- */
 
-export function listJobs(fromIso: string, toIso: string) {
+/**
+ * Aikavälin työt, valinnaisesti yhden työntekijän kalentereihin rajattuna.
+ *
+ * Rajaus on olemassa asennusnäkymää varten: siellä lista on yhden ihmisen
+ * työlista, ei yrityksen. Asentajalla rajaus on pakko — hän ei näe muiden
+ * keikkoja lainkaan (ks. `ownsJob`).
+ */
+export function listJobs(fromIso: string, toIso: string, staffId?: string | null) {
   return sql<JobRow[]>`
     select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
            j.address, j.postal_code, j.city, j.price_cents, j.notes, j.source, j.campaign,
@@ -125,6 +132,7 @@ export function listJobs(fromIso: string, toIso: string) {
       join tk.staff s on s.id = c.staff_id
       left join tk.customers cu on cu.id = j.customer_id
      where j.starts_at >= ${fromIso} and j.starts_at < ${toIso}
+       ${staffId ? sql`and c.staff_id = ${staffId}` : sql``}
      order by j.starts_at
   `;
 }

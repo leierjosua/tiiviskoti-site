@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { sql } from '@/lib/db';
-import { requireStaff } from '@/lib/session';
+import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty, Input } from '@/components/ui';
 import { dateKeyOf, formatDateKey } from '@/lib/time';
 
@@ -15,7 +15,7 @@ type CustomerRow = {
 export default async function CustomersPage({
   searchParams,
 }: { searchParams: Promise<{ haku?: string }> }) {
-  await requireStaff();
+  await requireManager();
   const { haku } = await searchParams;
   const q = (haku ?? '').trim();
 

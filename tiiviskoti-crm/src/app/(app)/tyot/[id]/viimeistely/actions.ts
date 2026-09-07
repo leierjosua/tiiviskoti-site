@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { sql } from '@/lib/db';
-import { requireStaff } from '@/lib/session';
+import { ownsJob, requireStaff } from '@/lib/session';
 import { finalTotal, type Line } from '@/lib/completion';
 import { deliverReceipt } from '../../actions';
 
@@ -43,13 +43,17 @@ export type CompleteInput = z.input<typeof schema>;
  * lomakkeen kanssa uudestaan.
  */
 export async function completeJob(input: CompleteInput): Promise<CompleteState> {
-  await requireStaff();
+  const staff = await requireStaff();
 
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot' };
   }
   const d = parsed.data;
+
+  /* Sivun rajaus ei riitä: action on oma päätepisteensä, ja sen voi
+     kutsua ohi käyttöliittymän millä tahansa työn tunnisteella. */
+  if (!(await ownsJob(staff, d.id))) return { error: 'Työtä ei löytynyt.' };
 
   const lines = d.lines as Line[];
   if (lines.length === 0) return { error: 'Lisää vähintään yksi rivi.' };

@@ -87,6 +87,34 @@ export async function viewMode(staff: Staff): Promise<ViewMode> {
   return resolveView(staff.role, (await cookies()).get(VIEW_COOKIE)?.value);
 }
 
+/**
+ * Onko keikka kirjautuneen henkilön omissa kalentereissa?
+ *
+ * Asentajan pääsy on rajattu hänen omiin kalentereihinsa. Rajaus on
+ * ROOLISSA eikä näkymässä: toimistolainen saa avata kenen tahansa keikan
+ * myös asennusnäkymässä, koska hänellä on siihen oikeus muutenkin. Vain
+ * asentajalta toisen keikka on kokonaan poissa.
+ *
+ * Kutsujan kuuluu vastata kieltoon `notFound()`:lla eikä virheilmoituksella:
+ * asentajalle toisen keikka ei ole kielletty vaan olematon, eikä
+ * osoitteesta saa päätellä keiden keikkoja on olemassa.
+ *
+ * Kelvoton tunniste on `false` eikä poikkeus. Ilman tarkistusta rikkinäinen
+ * osoiterivi kaatuisi `22P02`:een ja näyttäisi palvelinvirheeltä.
+ */
+export async function ownsJob(staff: Staff, jobId: string): Promise<boolean> {
+  if (staff.role !== 'installer') return true;
+  if (!/^[0-9a-f-]{36}$/i.test(jobId)) return false;
+  const rows = await sql<{ ok: number }[]>`
+    select 1 as ok
+      from tk.jobs j
+      join tk.calendars c on c.id = j.calendar_id
+     where j.id = ${jobId}::uuid and c.staff_id = ${staff.id}
+     limit 1
+  `;
+  return rows.length > 0;
+}
+
 /** Kalentereita, työntekijöitä ja asetuksia saa muokata vain omistaja tai admin. */
 export async function requireManager(): Promise<Staff> {
   const staff = await requireStaff();

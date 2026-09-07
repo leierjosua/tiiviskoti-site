@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
-import { requireStaff } from '@/lib/session';
+import { requireManager, requireStaff } from '@/lib/session';
 import { removeCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
@@ -48,7 +48,7 @@ type LeadAds = {
 };
 
 export async function createJob(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireStaff();
+  await requireManager();
 
   const parsed = createSchema.safeParse({
     calendarId: String(formData.get('calendarId') ?? ''),
@@ -264,7 +264,7 @@ async function crewIds(id: string): Promise<string[]> {
 }
 
 export async function rescheduleJob(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireStaff();
+  await requireManager();
 
   const id = String(formData.get('id') ?? '');
   const startsAt = String(formData.get('startsAt') ?? '');
@@ -317,7 +317,7 @@ const editSchema = z.object({
  * päällä. Panel kertoo erosta työn sivulla.
  */
 export async function updateJob(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireStaff();
+  await requireManager();
 
   const parsed = editSchema.safeParse({
     id: String(formData.get('id') ?? ''),
@@ -366,8 +366,7 @@ export async function updateJob(_prev: ActionState, formData: FormData): Promise
 /** Työn poisto. Vain peruttu työ voi kadota, jottei laskutettavaa työtä
  *  hävitetä vahingossa — muu poistetaan perumalla ensin. */
 export async function deleteJob(formData: FormData) {
-  const staff = await requireStaff();
-  if (staff.role === 'installer') return;
+  await requireManager();
 
   const id = String(formData.get('id') ?? '');
   const ids = await crewIds(id);
@@ -387,7 +386,7 @@ export async function deleteJob(formData: FormData) {
 const STATUSES = ['tentative', 'confirmed', 'done', 'cancelled'] as const;
 
 export async function setJobStatus(formData: FormData) {
-  await requireStaff();
+  await requireManager();
 
   const id = String(formData.get('id') ?? '');
   const status = String(formData.get('status') ?? '');
@@ -422,7 +421,7 @@ export async function setJobStatus(formData: FormData) {
    Kuitti = keikan tiedoista koostettu PDF (työn osuus 90 %, uusi logo), joka
    lähetetään Gmaililla ja kirjataan tk.mail_log:iin (kind='receipt'). */
 export async function sendReceipt(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireStaff();
+  await requireManager();
   const id = String(formData.get('id') ?? '');
   if (!id) return { error: 'Työtä ei löytynyt.' };
   return deliverReceipt(id);
@@ -432,6 +431,13 @@ export async function sendReceipt(_prev: ActionState, formData: FormData): Promi
    viimeistelyvelho lähettää kuitin osana isompaa tallennusta eikä sillä
    ole FormDataa — eikä kuittilogiikkaa saa olla kahta versiota. */
 export async function deliverReceipt(id: string): Promise<ActionState> {
+  /* Tämä ei ole pelkkä apufunktio vaan `'use server'`-moduulin vienti, eli
+     oma päätepisteensä jonka voi kutsua ilman käyttöliittymää. Ilman tätä
+     riviä kuka tahansa saisi lähetettyä asiakkaalle kuitin liitteineen
+     millä tahansa työn tunnisteella. Kutsujat (`sendReceipt`,
+     viimeistelyvelho) tarkistavat oikeutensa jo itse — tarkistus tässä on
+     halpa eikä riipu siitä muistaako seuraava kutsuja sen. */
+  await requireStaff();
   const job = await getJob(id);
   if (!job) return { error: 'Työtä ei löytynyt.' };
   if (!job.customer_email) return { error: 'Asiakkaalla ei ole sähköpostiosoitetta — lisää se ensin.' };
@@ -510,7 +516,7 @@ export async function deliverReceipt(id: string): Promise<ActionState> {
 /* Lähetä tarjous asiakkaalle ennen työtä. Kuin kuitti, mutta ei muuta työn
    tilaa: PDF (VOIMASSA 14 pv) + sähköposti + tk.mail_log (kind='offer'). */
 export async function sendOffer(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireStaff();
+  await requireManager();
   const id = String(formData.get('id') ?? '');
   if (!id) return { error: 'Työtä ei löytynyt.' };
 
@@ -599,7 +605,7 @@ export async function sendOffer(_prev: ActionState, formData: FormData): Promise
 
    Vanha teksti säilyy sellaisenaan — merkintä on kirjaus, ei korvaus. */
 export async function appendJobNote(formData: FormData) {
-  await requireStaff();
+  await requireManager();
 
   const id = String(formData.get('id') ?? '');
   const text = String(formData.get('note') ?? '').trim().slice(0, 500);
