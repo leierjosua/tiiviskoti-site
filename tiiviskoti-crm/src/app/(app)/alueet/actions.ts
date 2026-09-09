@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
+import { helsinkiDateTime } from '@/lib/time';
 
 export type ActionState = { error?: string; ok?: string };
 
@@ -106,7 +107,11 @@ export async function setCalendarAreas(formData: FormData) {
   revalidatePath('/alueet');
 }
 
-const LEAD_STATUSES = ['new', 'contacted', 'converted', 'rejected'] as const;
+/* `no_answer` = soitettu, ei vastattu. Se ei ole `contacted` (mitään ei ole
+   vielä opittu) eikä `new` (yrityksiä on jo tehty) — ja juuri se ero katosi
+   ennen: väärä tila sai liidin joko näyttämään hoidetulta tai koskemattomalta.
+   Vaatii db/027:n; ilman sitä kanta hylkää arvon 22P02:lla. */
+const LEAD_STATUSES = ['new', 'contacted', 'no_answer', 'converted', 'rejected'] as const;
 
 /**
  * Poista liidi pysyvästi.
@@ -127,7 +132,40 @@ export async function setLeadStatus(formData: FormData) {
   await requireManager();
   const id = String(formData.get('id') ?? '');
   const status = String(formData.get('status') ?? '');
-  if (!LEAD_STATUSES.includes(status as (typeof LEAD_STATUSES)[number])) return;
-  await sql`update tk.leads set status = ${status} where id = ${id}`;
+  if (!id || !LEAD_STATUSES.includes(status as (typeof LEAD_STATUSES)[number])) return;
+
+  try {
+    await sql`update tk.leads set status = ${status}, updated_at = now() where id = ${id}::uuid`;
+  } catch (e) {
+    /* 22P02 = enumissa ei ole tätä arvoa, eli db/027 on ajamatta. Muut tilat
+       toimivat silti, joten vain tämä valinta jää tekemättä — ei 500. */
+    if ((e as { code?: string })?.code !== '22P02') throw e;
+    console.error('setLeadStatus: db/027 ajamatta, tila', status);
+  }
+  revalidatePath('/liidit');
+}
+
+/**
+ * Milloin liidille soitetaan uudelleen.
+ *
+ * Vyöhykkeetön `datetime-local` on Suomen aikaa — sama sääntö kuin
+ * varauksissa, ks. `parseBookingStart`. Tyhjä arvo poistaa ajan.
+ */
+export async function setLeadCallBack(formData: FormData) {
+  await requireManager();
+  const id = String(formData.get('id') ?? '');
+  const raw = String(formData.get('soittoaika') ?? '').trim();
+  if (!id) return;
+
+  const at = raw ? helsinkiDateTime(raw.slice(0, 10), raw.slice(11, 16)) : null;
+  if (raw && Number.isNaN(at!.getTime())) return;
+
+  try {
+    await sql`update tk.leads set call_back_at = ${at}, updated_at = now() where id = ${id}::uuid`;
+  } catch (e) {
+    // 42703 = saraketta ei ole (db/027 ajamatta).
+    if ((e as { code?: string })?.code !== '42703') throw e;
+    console.error('setLeadCallBack: db/027 ajamatta');
+  }
   revalidatePath('/liidit');
 }

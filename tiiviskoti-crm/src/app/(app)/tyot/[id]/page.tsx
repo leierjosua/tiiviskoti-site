@@ -7,6 +7,8 @@ import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib
 import { sql } from '@/lib/db';
 import { DeleteJob, EditJobForm, RescheduleForm, SendOffer, SendReceipt, StatusButtons } from './ui';
 import AsennusTyo from './asennus-tyo';
+import { JobPhotos } from './photos';
+import { listJobPhotos } from '@/lib/photos';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +42,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   );
 
   // Rivit, viestiloki ja liitokset ovat toisistaan riippumattomia — rinnakkain.
-  const [lines, mails, links] = await Promise.all([
+  const [lines, mails, links, photos] = await Promise.all([
     sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
       select name, quantity, unit_price_cents from tk.job_lines
        where job_id = ${id} order by sort_order
@@ -50,6 +52,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
        where job_id = ${id} order by created_at
     `,
     jobLinks(id),
+    listJobPhotos(id),
   ]);
   const lineSumCents = lines.reduce((s, l) => s + l.quantity * l.unit_price_cents, 0);
 
@@ -241,6 +244,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           )}
         </Card>
       </div>
+
+      <JobPhotos
+        jobId={id}
+        canEdit
+        photos={photos.map((p) => ({
+          id: p.id, caption: p.caption, url: p.url, createdAt: p.createdAt.toISOString(),
+        }))}
+      />
     </div>
   );
 }

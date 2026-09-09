@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createJob, type ActionState } from '../actions';
 import { Button, ErrorNote, Field, Input, Select, Textarea, cx } from '@/components/ui';
 import { dateKeyOf, formatDateKey, isoWeekday, timeOf, weekdayShort } from '@/lib/time';
+import { TilatutTuotteet } from './laskuri';
 
 type Prefill = {
   customerName: string; email: string; phone: string;
@@ -159,6 +160,18 @@ export function NewJobForm({
         <Field label="Työn nimi">
           <Input name="title" defaultValue={prefill?.title || 'Tiivistetyö'} required />
         </Field>
+        {/* Tarjouksesta tehdyllä työllä rivit tulevat tarjoukselta, joten
+            laskuri näytetään vain kun niitä ei ole. Kaksi hintalähdettä
+            samalle työlle olisi tapa saada ne eroamaan toisistaan. */}
+        {!offer && (
+          <TilatutTuotteet
+            suositeltuKesto={(min) => {
+              const sopiva = durations.find((d) => d >= min) ?? durations[durations.length - 1];
+              if (sopiva !== duration) reload({ kesto: sopiva });
+            }}
+          />
+        )}
+
         <Field label="Asiakas">
           <Input name="customerName" defaultValue={prefill?.customerName} required />
         </Field>
@@ -184,6 +197,27 @@ export function NewJobForm({
         <Field label="Muistiinpanot">
           <Textarea name="notes" rows={3} defaultValue={prefill?.notes} />
         </Field>
+
+        {/* Vahvistus on VALINTA eikä automatiikka. Toimisto varaa joskus ajan
+            josta asiakas jo tietää, ja joskus sähköposti on isännöitsijän eikä
+            asiakkaan. Oletus on päällä, koska tavallisin tapaus on se että
+            asiakas haluaa saada ajan kirjallisena. */}
+        <label className="flex items-start gap-3 rounded-md border border-line bg-ink-800 p-3">
+          <input
+            type="checkbox"
+            name="lahetaVahvistus"
+            defaultChecked
+            className="mt-0.5 size-4 accent-accent"
+          />
+          <span className="text-sm">
+            <span className="font-medium text-text">Lähetä vahvistus asiakkaalle</span>
+            <span className="mt-0.5 block text-xs text-muted">
+              Asiakkaalle varausvahvistus, sinulle työmääräin, ja käynti Google-kalenteriin.
+              Vaatii sähköpostiosoitteen. Viestin summa tulee yltä
+              {offer ? ' tarjoukselta' : ' Tilatut tuotteet -laskurista'}.
+            </span>
+          </span>
+        </label>
 
         <Button type="submit" disabled={pending || !selected} className="w-full">
           {!selected

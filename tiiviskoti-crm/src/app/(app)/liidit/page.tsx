@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty, ErrorNote } from '@/components/ui';
-import { LeadStatus } from './ui';
+import { LeadCallBack, LeadStatus } from './ui';
 import { DeleteButton } from '@/components/delete-button';
 import { deleteLead } from '../alueet/actions';
 import { importMetaLeads } from '@/lib/meta-leads';
@@ -12,7 +12,8 @@ export const dynamic = 'force-dynamic';
 type Lead = {
   id: string; full_name: string; email: string | null; phone: string | null;
   postal_code: string | null; city: string | null; message: string | null;
-  status: 'new' | 'contacted' | 'converted' | 'rejected'; created_at: Date;
+  status: 'new' | 'contacted' | 'no_answer' | 'converted' | 'rejected'; created_at: Date;
+  call_back_at: Date | null;
 };
 
 export default async function LeadsPage() {
@@ -38,10 +39,33 @@ export default async function LeadsPage() {
   }
   if (tuontiVirhe) console.error('liidit: Metan liidien haku epäonnistui', tuontiVirhe);
 
-  const leads = await sql<Lead[]>`
-    select id, full_name, email, phone, postal_code, city, message, status, created_at
-      from tk.leads order by created_at desc limit 300
+  /* Erääntynyt soittoaika ylimmäksi, vanhin ensin — muu järjestys on yhä
+     uusin ensin. Tulevaa soittoaikaa EI nosteta: ensi viikolle sovittu
+     paluu ei ole kiireellisempi kuin tänään saapunut uusi liidi. */
+  const JARJESTYS = sql`
+    order by (call_back_at is not null and call_back_at <= now()) desc,
+             case when call_back_at is not null and call_back_at <= now()
+                  then call_back_at end asc,
+             created_at desc
   `;
+  /* db/027 voi olla ajamatta. Liidilista on tärkeämpi kuin soittoaika, joten
+     puuttuva sarake pudottaa vain sen — ei koko sivua. */
+  let leads: Lead[];
+  try {
+    leads = await sql<Lead[]>`
+      select id, full_name, email, phone, postal_code, city, message, status,
+             created_at, call_back_at
+        from tk.leads ${JARJESTYS} limit 300
+    `;
+  } catch (e) {
+    if ((e as { code?: string })?.code !== '42703') throw e;
+    const rivit = await sql<Omit<Lead, 'call_back_at'>[]>`
+      select id, full_name, email, phone, postal_code, city, message, status, created_at
+        from tk.leads order by created_at desc limit 300
+    `;
+    leads = rivit.map((r) => ({ ...r, call_back_at: null }));
+  }
+  const nyt = Date.now();
 
   // Kysyntä alueittain: mihin kannattaisi laajentua.
   const demand = await sql<{ prefix: string; n: number }[]>`
@@ -101,6 +125,7 @@ export default async function LeadsPage() {
                 <th className="px-4 py-2 font-medium">Sähköposti</th>
                 <th className="px-4 py-2 font-medium">Postinro</th>
                 <th className="px-4 py-2 font-medium">Tila</th>
+                <th className="px-4 py-2 font-medium">Soita uudelleen</th>
                 <th className="px-4 py-2 font-medium" />
                 <th className="px-4 py-2 font-medium" />
               </tr>
@@ -122,6 +147,13 @@ export default async function LeadsPage() {
                   </td>
                   <td className="px-4 py-2.5 tabular">{lead.postal_code ?? '—'}</td>
                   <td className="px-4 py-2.5"><LeadStatus id={lead.id} status={lead.status} /></td>
+                  <td className="px-4 py-2.5">
+                    <LeadCallBack
+                      id={lead.id}
+                      at={lead.call_back_at}
+                      overdue={!!lead.call_back_at && new Date(lead.call_back_at).getTime() <= nyt}
+                    />
+                  </td>
                   <td className="px-4 py-2.5 whitespace-nowrap">
                     {/* Ilman tätä linkkiä sovittu käynti jäi kirjaamatta: tiedot
                         olisi pitänyt näpytellä uudestaan Uusi työ -lomakkeelle.

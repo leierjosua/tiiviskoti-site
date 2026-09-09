@@ -3,6 +3,8 @@ import { sql } from '@/lib/db';
 import type { JobRow } from '@/lib/data';
 import { satisfactionLabel } from '@/lib/completion';
 import { dateKeyOf, formatDateKey, isoWeekday, timeOf, weekdayName } from '@/lib/time';
+import { JobPhotos } from './photos';
+import { listJobPhotos } from '@/lib/photos';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { NoteForm } from './ui';
 
@@ -59,7 +61,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
   const minutes = Math.round((job.ends_at.getTime() - job.starts_at.getTime()) / 60_000);
   const address = [job.address, job.postal_code, job.city].filter(Boolean).join(', ');
 
-  const [lines, mails, completion] = await Promise.all([
+  const [lines, mails, completion, kuvat] = await Promise.all([
     sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
       select name, quantity, unit_price_cents from tk.job_lines
        where job_id = ${job.id} order by sort_order
@@ -68,6 +70,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
       select kind::text as kind, sent_at from tk.mail_log where job_id = ${job.id}
     `,
     readCompletion(job.id),
+    listJobPhotos(job.id),
   ]);
 
   const receiptSent = mails.some((m) => m.kind === 'receipt' && m.sent_at);
@@ -208,6 +211,16 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
           </div>
         </Card>
       </div>
+
+      {/* Kuvat myös asentajalle: hän on se joka seisoo paikan päällä ja
+          näkee mitä kannattaa muistaa. */}
+      <JobPhotos
+        jobId={job.id}
+        canEdit
+        photos={kuvat.map((p) => ({
+          id: p.id, caption: p.caption, url: p.url, createdAt: p.createdAt.toISOString(),
+        }))}
+      />
 
       {job.campaign && (
         <Card>

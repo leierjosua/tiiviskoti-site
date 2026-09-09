@@ -6,8 +6,9 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { requireManager, requireStaff } from '@/lib/session';
-import { removeCalendarEventForJob } from '@/lib/deliver';
+import { deliverBooking, removeCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
+import { computePricing } from '@/lib/pricing';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
 import { generateOfferPdf } from '@/lib/offer-pdf';
 import { sendMail } from '@/lib/google';
@@ -37,6 +38,12 @@ const createSchema = z.object({
   postalCode: z.string().optional(),
   city: z.string().optional(),
   notes: z.string().optional(),
+  /* Vahvistuksen lähetys on lomakkeen valinta. Checkbox lähettää arvon vain
+     valittuna, joten puuttuva kenttä tarkoittaa "ei lähetetä". */
+  lahetaVahvistus: z.coerce.boolean().optional(),
+  /* Laskurin valinnat JSONina. EI summaa: hinta lasketaan tässä uudestaan,
+     koska selaimen lähettämä luku olisi asiakkaan muokattavissa. */
+  tuotteet: z.string().optional(),
 });
 
 /** Liidiltä perittävät mainostunnisteet: Google-klikki ja Metan liiditunnus. */
@@ -64,6 +71,8 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
     postalCode: String(formData.get('postalCode') ?? '').trim() || undefined,
     city: String(formData.get('city') ?? '').trim() || undefined,
     notes: String(formData.get('notes') ?? '').trim() || undefined,
+    lahetaVahvistus: formData.get('lahetaVahvistus') != null,
+    tuotteet: String(formData.get('tuotteet') ?? '') || undefined,
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot' };
 
@@ -75,6 +84,26 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
      on roskaa, työ syntyy silti — liidin tilan päivitys on kirjanpitoa,
      ei ehto työn luomiselle. */
   const leadId = String(formData.get('leadId') ?? '').trim() || null;
+  /* Puhelimessa sovitun keikan rivit. Hinnasto on sama kuin tarjouslaskurissa
+     ja sivuston varauksessa, joten ikkunan määräporras ja 149 €:n minimi
+     pätevät ilman erillistä logiikkaa. Roskadata ei kaada työn luontia:
+     ilman rivejä työ syntyy kuten ennenkin. */
+  const omat = (() => {
+    if (!d.tuotteet) return null;
+    try {
+      const v = JSON.parse(d.tuotteet) as {
+        counts?: Record<string, number>;
+        extras?: Record<string, boolean>;
+        custom?: { name: string; qty: number; unit: number }[];
+      };
+      const p = computePricing(v.counts ?? {}, v.extras ?? {}, { custom: v.custom ?? [] });
+      return p.lines.length > 0 ? p : null;
+    } catch {
+      return null;
+    }
+  })();
+  const omatCents = omat ? Math.round(omat.total * 100) : 0;
+
   const starts = parseBookingStart(d.startsAt);
   if (Number.isNaN(starts.getTime())) return { error: 'Aika ei kelpaa.' };
   const ends = new Date(starts.getTime() + d.durationMinutes * 60_000);
@@ -84,6 +113,12 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
      lähtee vasta kun työ on oikeasti syntynyt. */
   let metaLeadId: string | null = null;
   let saleCents = 0;
+  /* Vahvistusta varten talteen transaktiosta: numero, rivit ja kalenterin
+     Google-tunniste. Posti lähtee vasta kun työ on oikeasti kannassa —
+     muuten asiakas saisi vahvistuksen ajasta jota ei ole. */
+  let jobNumber = '';
+  let mailLines: { name: string; qty: number; unit: number; sum: number }[] = [];
+  let googleCalendarId: string | null = null;
   try {
     // Asiakas ja työ syntyvät joko molemmat tai ei kumpikaan: ilman
     // transaktiota päällekkäinen aika jättäisi orvon asiakasrivin.
@@ -130,9 +165,14 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
           `
         : [];
 
+      const [kal] = await tx<{ google_calendar_id: string | null }[]>`
+        select google_calendar_id from tk.calendars where id = ${d.calendarId}
+      `;
+      googleCalendarId = kal?.google_calendar_id ?? null;
+
       const source = d.offerId ? 'tarjous' : leadId ? 'liidi' : 'admin';
       metaLeadId = lead?.external_id ?? null;
-      saleCents = offer?.total_cents ?? 0;
+      saleCents = offer?.total_cents ?? omatCents;
 
       /* Klikin tyyppi ei saa olla null. Sarake on migraatiossa 017 not null
          default 'gclid', mutta nimetty sarake ohittaa oletuksen — ja ilman
@@ -150,18 +190,41 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
                 ${d.title}, ${d.address ?? null}, ${d.postalCode ?? null},
                 ${d.city ?? null}, ${d.notes ?? null}, ${source},
                 ${lead?.campaign ?? null}, ${lead?.gclid ?? null},
-                ${clickKind}, ${offer?.total_cents ?? 0})
+                ${clickKind}, ${offer?.total_cents ?? omatCents})
         returning id, job_number
       `;
 
-      if (offer?.lines?.length) {
-        for (const [i, l] of offer.lines.entries()) {
-          await tx`
-            insert into tk.job_lines (job_id, name, quantity, unit_price_cents, sort_order)
-            values (${job.id}, ${l.name}, ${Math.max(1, l.quantity)},
-                    ${l.unit_price_cents}, ${i})
-          `;
-        }
+      jobNumber = job.job_number;
+      /* Postin rivit: tarjouksen rivit sellaisenaan, muuten yksi rivi työn
+         nimellä. Kartoituskäynnillä summa on nolla, ja se on oikein — käynti
+         on veloitukseton. */
+      /* Rivien lähde on joko tarjous tai laskuri, ei koskaan molemmat:
+         kaksi hintalähdettä samalle työlle olisi tapa saada ne eroamaan. */
+      const rivit = offer?.lines?.length
+        ? offer.lines.map((l) => ({
+            name: l.name,
+            qty: Math.max(1, l.quantity),
+            unitCents: l.unit_price_cents,
+          }))
+        : (omat?.lines ?? []).map((l) => ({
+            name: l.name,
+            qty: Math.max(1, l.qty),
+            unitCents: Math.round(l.unit * 100),
+          }));
+
+      mailLines = rivit.length > 0
+        ? rivit.map((l) => ({
+            name: l.name, qty: l.qty,
+            unit: l.unitCents / 100,
+            sum: (l.qty * l.unitCents) / 100,
+          }))
+        : [{ name: d.title, qty: 1, unit: 0, sum: 0 }];
+
+      for (const [i, l] of rivit.entries()) {
+        await tx`
+          insert into tk.job_lines (job_id, name, quantity, unit_price_cents, sort_order)
+          values (${job.id}, ${l.name}, ${l.qty}, ${l.unitCents}, ${i})
+        `;
       }
 
       /* Työpari: oma rivi toisen asentajan kalenteriin, jotta hänenkin
@@ -220,6 +283,38 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
       return { error: 'Tietokannasta puuttuu sarake — aja db/026_offer_booking.sql Supabasen SQL-editorissa.' };
     }
     throw err;
+  }
+
+  /* Vahvistus asiakkaalle, työmääräin meille ja käynti Google-kalenteriin.
+     Sama polku jota verkkovaraus käyttää — administa luodusta työstä ei
+     aiemmin lähtenyt näistä yhtäkään, joten puhelimessa sovittu käynti jäi
+     ilman kirjallista vahvistusta eikä näkynyt kenenkään puhelimessa.
+
+     Ei kaada työn luontia: aika on jo varattu, ja epäonnistunut posti on
+     pienempi vahinko kuin kadonnut varaus. `deliverBooking` kirjaa oman
+     tuloksensa `tk.mail_log`iin, joten vika näkyy työn sivulla. */
+  if (d.lahetaVahvistus && d.email) {
+    try {
+      await deliverBooking({
+        jobId, jobNumber,
+        customerName: d.customerName,
+        email: d.email,
+        phone: d.phone ?? '',
+        address: d.address ?? '',
+        postalCode: d.postalCode ?? '',
+        city: d.city ?? null,
+        startsAt: starts,
+        endsAt: ends,
+        lines: mailLines,
+        totalCents: saleCents,
+        // Kotitalousvähennys: 40 % työn osuudesta, työ n. 70 % hinnasta.
+        netCents: Math.round(saleCents * (1 - 0.4 * 0.7)),
+        notes: d.notes ?? null,
+        googleCalendarId,
+      });
+    } catch (e) {
+      console.error('createJob: vahvistuksen lähetys epäonnistui', jobNumber, e);
+    }
   }
 
   /* Kauppa Metalle vasta kun työ on kannassa. Vain liiditunnisteelliset:
