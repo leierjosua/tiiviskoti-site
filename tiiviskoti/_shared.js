@@ -33,17 +33,7 @@ const TIER_STEPS = WINDOW_TIERS.slice(1).map((t, i) => ({
    seinä, jonka loppu jäi hintapalkin alle ruudun ulkopuolelle.
    HUOM: tämä on vain esitys. Hinnoittelun järjestys on pricing.mjs:n
    TYPES-taulukko eikä siihen kosketa täältä. */
-/* Mitkä kohteet ovat laskurissa suoraan esillä; loput menevät "Muut kohteet"
-   -painikkeen taakse. `?layout=v3` kaventaa listan kahteen yleisimpään —
-   ks. koeasettelut tiedoston lopussa. VÄLIAIKAINEN, poistetaan kun B-version
-   ulkoasu on valittu. */
-const KOE = (function(){
-  try { var v = new URLSearchParams(location.search).get('layout');
-        return /^v[1-5]$/.test(v||'') ? v : null; } catch(e){ return null; }
-})();
-const PRIMARY_TYPES = KOE === 'v3'
-  ? ['ikkuna', 'ulko']
-  : ['ikkuna', 'ulko', 'terassi', 'vali'];
+const PRIMARY_TYPES = ['ikkuna', 'ulko', 'terassi', 'vali'];
 
 /* Askeltimen pohjassa pitäminen juoksuttaa lukua. Kymmenen ikkunan talossa
    yksi napautus per ikkuna on kymmenen napautusta samaan nappiin, ja juuri
@@ -1094,16 +1084,12 @@ if(stepCard){
        taloyhtiöt eikä sitä että B näytti hinnan heti. Napit painavat samoja
        välilehtiä kuin ihminenkin, joten polkulogiikka on yksi ja sama. */
     const valinta=document.createElement('div');
-    valinta.className='gate-tabs ab-gate';
-    valinta.style.cssText='grid-column:1/-1;margin:0 0 4px';
+    valinta.className='ab-seg';
     valinta.innerHTML=
-      '<button type="button" class="gate-tab on" data-ab-go="koti">'
-      + '<b>Yksi koti</b><span>hinta heti alla</span></button>'
-      + '<button type="button" class="gate-tab ab-yhtio" data-ab-go="yhtio">'
-      + '<b>Taloyhtiöt</b><span>ilmainen kartoitus</span></button>';
+      '<button type="button" class="ab-seg-on"><b>Yksi koti</b><span>hinta heti alla</span></button>'
+      + '<button type="button" class="ab-yhtio"><b>Taloyhtiö</b><span>ilmainen kartoitus</span></button>';
     valinta.addEventListener('click', (e)=>{
-      const nappi=e.target.closest('[data-ab-go]');
-      if(!nappi || nappi.dataset.abGo!=='yhtio') return;
+      if(!e.target.closest('.ab-yhtio')) return;
       const t=document.getElementById('tabYhtio'); if(t) t.click();
     });
     _calc.insertBefore(valinta, _calc.firstChild);
@@ -1869,112 +1855,6 @@ setTimeout(()=>rvEls.forEach(el=>{ if(el.getBoundingClientRect().top<innerHeight
 const yrEl=document.getElementById('yr'); if(yrEl) yrEl.textContent=new Date().getFullYear();
 render(); renderCal(); renderSlots(); syncBookingSummary();
 
-/* ---------- B-VERSION ULKOASUVAIHTOEHDOT (VÄLIAIKAINEN) ----------
-   `?layout=v1..v5` yhdessä `?ab=b`:n kanssa. Ilman parametria mikään tästä ei
-   aja, joten tuotantonäkymä on koskematon. Tarkoitus on että vaihtoehdot voi
-   kokeilla oikealla sivulla puhelimessa eikä vain kuvina — ja kun yksi
-   valitaan, tämä lohko ja variaatiot.html poistetaan ja valittu jää pysyväksi.
-
-   TALOYHTIÖVALINNAN PAIKKA. Mitattu 60 pv: taloyhtiöpolun kalenteriin
-   edettiin 17 kertaa ETUSIVULTA ja 0 kertaa taloyhtio.html:ltä, ja molemmat
-   kartoitusvaraukset tulivat etusivulta — vaikka taloyhtiösivulla kävi 489
-   ihmistä. Etusivun valinta on siis koko taloyhtiöpolun oikea sisäänkäynti,
-   ei koriste, ja sen on oltava näkyvissä ENNEN kuin ihminen alkaa napsutella
-   ikkunoita: sen jälkeen hän on jo yhden kodin polulla.
-
-   Siksi valinta on yksirivinen segmentoitu valitsin kortin yläreunassa: yksi
-   rivi (~46 px) kahden pinotun laatikon (~96 px) sijaan, mutta yhä oikea
-   valinta eikä ohitettava tekstilinkki. `?yhtio=linkki` näyttää vertailuksi
-   sen kevyimmän muodon.                                                    */
-if(KOE && document.querySelector('.ab-gate')){
-  const gate = document.querySelector('.ab-gate');
-  const kevyt = (function(){
-    try { return new URLSearchParams(location.search).get('yhtio') === 'linkki'; }
-    catch(e){ return false; }
-  })();
-
-  if(kevyt){
-    gate.classList.add('ab-gate-slim');
-    gate.style.cssText = 'grid-column:1/-1;margin:0 0 10px;text-align:right;font-size:14px';
-    gate.innerHTML = '<button type="button" class="ab-yhtio" style="background:none;border:0;'
-      + 'cursor:pointer;font:inherit;color:var(--green);font-weight:700">'
-      + 'Taloyhtiö? Varaa veloitukseton kartoitus →</button>';
-  } else {
-    gate.className = 'ab-seg';
-    gate.style.cssText = 'grid-column:1/-1;margin:0 0 12px;display:grid;'
-      + 'grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--card);'
-      + 'border:1.5px solid var(--line);border-radius:12px';
-    /* Kaksi riviä napissa eikä yhtä: "Taloyhtiö · kartoitus 0 €" katkesi
-       puhelimessa kolmeen pisteeseen, ja juuri se veloituksettomuus on se
-       syy jonka takia taloyhtiöpäättäjä klikkaa. Kaksirivisenäkin valitsin
-       on noin puolet matalampi kuin kaksi pinottua laatikkoa. */
-    const nappi = (otsikko, ala, aktiivinen, luokka) =>
-      '<button type="button" class="' + luokka + '" style="border:0;border-radius:8px;'
-      + 'padding:9px 6px;cursor:pointer;font:inherit;line-height:1.25;text-align:center;'
-      + (aktiivinen ? 'background:var(--green-soft)' : 'background:none') + '">'
-      + '<b style="display:block;font-size:14.5px;font-weight:700;color:'
-      + (aktiivinen ? 'var(--green)' : 'var(--ink)') + '">' + otsikko + '</b>'
-      + '<span style="display:block;font-size:12px;margin-top:1px;color:'
-      + (aktiivinen ? 'var(--green)' : 'var(--mute)') + '">' + ala + '</span>'
-      + '</button>';
-    gate.innerHTML = nappi('Yksi koti', 'hinta heti alla', true, 'ab-koti')
-      + nappi('Taloyhtiö', 'ilmainen kartoitus', false, 'ab-yhtio');
-  }
-
-  gate.addEventListener('click', (e)=>{
-    if(!e.target.closest('.ab-yhtio')) return;
-    const t=document.getElementById('tabYhtio'); if(t) t.click();
-  });
-
-  /* Osio avattavan otsikon taakse. Sisältö säilyy DOM:issa ja toimii
-     tavalliseen tapaan — vain näkyvyys muuttuu. */
-  const piiloonOtsikonTaakse = (otsikkoEl, sisaltoEl, teksti) => {
-    if(!otsikkoEl || !sisaltoEl) return;
-    const d=document.createElement('details');
-    d.style.cssText='border-top:1px solid var(--line)';
-    const sum=document.createElement('summary');
-    sum.textContent=teksti;
-    sum.style.cssText='cursor:pointer;padding:14px 22px;font-weight:700;color:var(--green);'
-      + 'font-size:14.5px;list-style:none';
-    d.appendChild(sum);
-    otsikkoEl.replaceWith(d);
-    d.appendChild(sisaltoEl);
-  };
-
-  const extrasHd=document.querySelector('.extras-hd'), extras=document.getElementById('calcExtras');
-  if(KOE==='v2' || KOE==='v3'){
-    piiloonOtsikonTaakse(extrasHd, extras, 'Lisää tarvittaessa — saumaus, helat, kahva');
-  }
-
-  if(KOE==='v4'){
-    const w=document.querySelector('.calc-wrap');
-    if(w){ w.style.gridTemplateColumns='1fr'; w.style.maxWidth='620px'; w.style.marginInline='auto'; }
-    const q=document.querySelector('.quote');
-    if(q){ q.style.position='static'; q.style.padding='18px 20px'; }
-    ['.q-meta','.rc-lines','.q-t'].forEach(sel=>{
-      const el=document.querySelector(sel); if(el) el.style.display='none';
-    });
-    const pv=document.querySelector('.q-total .pv'); if(pv) pv.style.fontSize='34px';
-  }
-
-  if(KOE==='v5'){
-    const q=document.querySelector('.quote');
-    if(q){ q.style.background='var(--card)'; q.style.color='var(--text)';
-           q.style.border='1px solid var(--line)'; q.style.padding='20px'; }
-    document.querySelectorAll('.q-total .pt,.q-note,.q-net,.q-meta span')
-      .forEach(e=>e.style.color='var(--mute)');
-    document.querySelectorAll('.q-total .pv,.q-t,.q-meta b')
-      .forEach(e=>e.style.color='var(--ink)');
-    const pv=document.querySelector('.q-total .pv'); if(pv) pv.style.fontSize='38px';
-    /* Vaalealla pohjalla vihreä nappi tarvitsee täyden värin: kuvassa se
-       hukkui taustaan, ja juuri se nappi on koko kortin tarkoitus. */
-    const btn=document.getElementById('cpBtn');
-    if(btn){ btn.style.background='var(--green)'; btn.style.color='#fff'; }
-    const st=document.createElement('style');
-    st.textContent='#calcTypes > .type{padding-top:10px!important;padding-bottom:10px!important}';
-    document.head.appendChild(st);
-  }
-}
 if(document.getElementById('stepCard')){
   paintStepChrome();
   /* 'card' = varauskortti näkyi. Tämä on A/B-testien yhteinen nimittäjä:

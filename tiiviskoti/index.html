@@ -321,6 +321,49 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .gate-tab span{display:block;font-size:12.5px;color:var(--green);font-weight:700;margin-top:2px}
 .gate-tab:hover{border-color:var(--line2)}
 .gate-tab.on{border-color:var(--green);background:var(--green-soft)}
+
+/* ---------- A/B-TESTI: VARAUSKORTIN JÄRJESTYS (versio B) ----------
+   B näyttää laskurin ensin ja kysyy postinumeron vasta ennen kalenteria.
+   Toteutus on _shared.js:n `abLaskuriEnsin`; täällä on vain se mitä B:ssä
+   näyttää erilaiselta.
+
+   MIKSI KEVEÄMPI ULKOASU: laskuri on B:ssä sivun ENSIMMÄINEN näkymä eikä
+   toinen. Täytenä ja tummana se luki "täytä lomake" siinä kohtaa jossa piti
+   lukea "katso hinta" — sama sisältö kevyempänä on koko ero.
+
+   Valintapari (Yksi koti / Taloyhtiö) on yksi rivi kahden laatikon sijaan.
+   Se on kortissa mukana, koska mitattuna KOKO taloyhtiöpolku alkaa etusivun
+   valinnasta: 60 päivässä 17 etenemistä etusivulta ja 0 taloyhtiösivulta. */
+.ab-seg{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;
+  margin:0 0 12px;background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+.ab-seg button{border:0;background:none;border-radius:8px;padding:9px 6px;cursor:pointer;
+  font:inherit;line-height:1.25;text-align:center;transition:background .18s var(--ease)}
+.ab-seg b{display:block;font-size:14.5px;font-weight:700;color:var(--ink)}
+.ab-seg span{display:block;font-size:12px;margin-top:1px;color:var(--mute)}
+.ab-seg .ab-seg-on{background:var(--green-soft)}
+.ab-seg .ab-seg-on b,.ab-seg .ab-seg-on span{color:var(--green)}
+.ab-seg button:hover{background:var(--green-soft)}
+
+/* Yhteenveto vaaleaksi: sama tieto, kevyempi paino. */
+html[data-ab="b"] .quote{background:var(--card);color:var(--text);
+  border:1px solid var(--line);padding:20px;box-shadow:var(--sh)}
+html[data-ab="b"] .q-t,
+html[data-ab="b"] .q-total .pv,
+html[data-ab="b"] .q-meta b{color:var(--ink)}
+html[data-ab="b"] .q-total .pt,
+html[data-ab="b"] .q-note,
+html[data-ab="b"] .q-net,
+html[data-ab="b"] .q-meta span{color:var(--mute)}
+html[data-ab="b"] .q-total{border-top-color:var(--line)}
+html[data-ab="b"] .q-total .pv{font-size:38px}
+html[data-ab="b"] .q-total .pv small,
+html[data-ab="b"] .q-net b{color:var(--green)}
+html[data-ab="b"] .rc-lines,html[data-ab="b"] .rc-empty{color:var(--mute)}
+/* Vaalealla pohjalla nappi tarvitsee täyden värin — se on koko kortin
+   tarkoitus, eikä se saa hukkua taustaan. */
+html[data-ab="b"] .q-btn{background:var(--green);color:#fff}
+/* Rivit hieman tiiviimmiksi: lista on ensimmäinen näkymä. */
+html[data-ab="b"] .wtype{padding-top:12px;padding-bottom:12px}
 .gate-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
 .gate-price{font-size:40px;font-weight:800;color:var(--ink);letter-spacing:-1px;line-height:1;
   font-variant-numeric:tabular-nums}
@@ -530,6 +573,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .quote{order:-1;position:sticky;top:62px;z-index:30;padding:13px 15px;border-radius:14px;
     display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;
     box-shadow:0 14px 28px -16px rgba(0,0,0,.6)}
+  html[data-ab="b"] .quote{box-shadow:0 12px 26px -18px rgba(16,24,32,.45)}
   .q-t,.rc-lines,.q-meta,.q-note{display:none}
   .q-total{grid-column:1;grid-row:1;margin:0;padding:0;border-top:none}
   .q-total .pt{font-size:10.5px}
