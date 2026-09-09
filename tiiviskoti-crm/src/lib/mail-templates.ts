@@ -55,6 +55,13 @@ export function confirmationSubject(data: ConfirmationData): string {
   return `Varausvahvistus ${data.jobNumber} — ${d}.${m}. klo ${timeOf(data.startsAt)}`;
 }
 
+/* Muistiinpano EI mene asiakkaalle. `notes` on sisäinen kenttä johon
+   kirjataan ovikoodeja ja muuta työn tekemiseen kuuluvaa — se kuuluu
+   työmääräimeen, ei vahvistukseen. Aiemmin se kaikuutettiin asiakkaalle
+   "Lisätietosi"-otsikolla, jolloin ovikoodi päätyi sähköpostiin.
+
+   Myöskään laajuuden tarkistuksesta ei luvata mitään: vahvistus on
+   kuitti varatusta ajasta, ei työn ehdoista. */
 export function confirmationHtml(data: ConfirmationData): string {
   const when = whenText(data.startsAt, data.endsAt);
   const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')]
@@ -88,8 +95,7 @@ export function confirmationHtml(data: ConfirmationData): string {
     <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Varaus vahvistettu</div>
     <h1 style="margin:8px 0 0;color:${INK};font-size:23px;font-weight:700;line-height:1.3">Kiitos varauksesta, ${esc(firstName(data.customerName))}!</h1>
     <p style="margin:12px 0 0;color:${MUTED};font-size:15px;line-height:1.6">
-      Aika on varattu kalenteriimme. Tarkistamme työn laajuuden paikan päällä ennen aloitusta —
-      jos jotain poikkeaa, sovimme siitä kanssasi etukäteen.
+      Aika on varattu kalenteriimme.
     </p>
   </td></tr>
 
@@ -128,11 +134,6 @@ export function confirmationHtml(data: ConfirmationData): string {
       </td></tr>
     </table>
   </td></tr>
-
-  ${data.notes ? `<tr><td style="padding:18px 28px 0">
-    <div style="color:${MUTED};font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase">Lisätietosi</div>
-    <div style="color:${INK};font-size:14px;line-height:1.6;margin-top:4px">${esc(data.notes)}</div>
-  </td></tr>` : ''}
 
   <tr><td style="padding:24px 28px 28px">
     <div style="border-top:1px solid #E6E2DA;padding-top:18px;color:${MUTED};font-size:14px;line-height:1.7">
@@ -174,8 +175,6 @@ export function confirmationText(data: ConfirmationData): string {
     `Yhteensä: ${eur(data.totalCents)} (sis. ALV 25,5 %)`,
     `Kotitalousvähennyksen jälkeen arviolta ${eur(data.netCents)}.`,
     '',
-    data.notes ? `Lisätietosi: ${data.notes}\n` : '',
-    'Tarkistamme työn laajuuden paikan päällä ennen aloitusta.',
     `Muutokset ja peruutukset: ${PHONE} tai info@tiiviskoti.fi`,
     '',
     'TiivisKoti · Uusimaa',
