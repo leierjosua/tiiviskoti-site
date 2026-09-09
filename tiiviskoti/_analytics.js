@@ -110,22 +110,34 @@
 
      `?ab=`-parametrilla version voi pakottaa testausta varten. */
   var VARIANTS = ['a', 'b'];
-  var variant = window.tkVariant;
-  if (VARIANTS.indexOf(variant) < 0) {
-    /* Sivuilla joilla on tekstiversioita arvonta on tehty jo <head>issä, jotta
-       teksti ei ehdi välähtää. Tänne päädytään vain muilla sivuilla. */
+  var variant = VARIANTS.indexOf(window.tkVariant) >= 0 ? window.tkVariant : null;
+  /* VERSIO LÄHTEE VAIN SILLOIN KUN SIVULLA ON TESTI.
+
+     Arvonta tehdään testisivun <head>issä (jotta versio ei ehdi välähtää), ja
+     tänne jää vain kysymys siitä onko se tehty. Aiemmin tämä arpoi version
+     myös silloin kun sitä ei ollut kysytty, jolloin JOKAINEN sivu leimasi
+     tapahtumansa satunnaisella a/b:llä. Sama varauskortti on 34 sivulla mutta
+     testi vain etusivulla, joten arvonta jakoi noin 40 % suppilosta kahteen
+     haaraan jotka näkivät saman sivun — pelkkää kohinaa testin ympärille.
+     Ilman versiota rivi jää testien ulkopuolelle, mikä on oikea vastaus
+     sivulle jolla ei testata mitään.
+
+     `?ab=` toimii yhä pakotuksena: se on ainoa tapa katsoa haluttua versiota
+     itse, ja testisivulla se ohittaa arvonnan jo <head>issä. */
+  if (!variant) {
     try {
       var forced = new URLSearchParams(location.search).get('ab');
-      variant = VARIANTS.indexOf(forced) >= 0 ? forced
-        : VARIANTS[Math.floor(Math.random() * VARIANTS.length)];
-    } catch (e) { variant = VARIANTS[0]; }
-    window.tkVariant = variant;
-    document.documentElement.setAttribute('data-ab', variant);
+      if (VARIANTS.indexOf(forced) >= 0) {
+        variant = forced;
+        window.tkVariant = variant;
+        document.documentElement.setAttribute('data-ab', variant);
+      }
+    } catch (e) { /* ei versiota */ }
   }
 
   function send(o) {
     if (!o.path) o.path = location.pathname;
-    if (!o.variant) o.variant = variant;
+    if (!o.variant && variant) o.variant = variant;
     /* Klikkitunniste jokaiseen tapahtumaan: soittoklikki on `cta`, eikä
        lähettäjä tiedä etukäteen mikä tapahtuma päätyy konversioksi. */
     var g = gclid ? { v: gclid, k: gclidKind } : (window.tkGclid || null);

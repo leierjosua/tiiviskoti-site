@@ -1074,22 +1074,29 @@ if(stepCard){
     _postal.hidden=true;
 
     /* Taloyhtiövälilehti asuu postinumerovaiheessa, joka B:ssä ei ole enää
-       ensimmäisenä. Ilman tätä linkkiä ilmainen kartoitus katoaisi kortin
+       ensimmäisenä. Ilman korviketta ilmainen kartoitus katoaisi kortin
        ensimmäiseltä ruudulta kokonaan — se olisi testin sivuvahinko eikä
-       testattava muutos. Linkki painaa samaa välilehteä kuin ihminenkin. */
-    const yhtioLink=document.createElement('button');
-    yhtioLink.type='button';
-    yhtioLink.className='lnk ab-yhtio';
-    /* Laskurivaihe on kaksipalstainen grid (.order + .quote). Ilman koko
-       leveyden varausta linkki menisi omaksi sarakkeekseen ja työntäisi
-       yhteenvedon toiselle riville. */
-    yhtioLink.style.cssText='grid-column:1/-1;justify-self:start;margin:0 0 4px;'
-      + 'background:none;border:0;cursor:pointer;font:inherit';
-    yhtioLink.textContent='Taloyhtiö? Varaa veloitukseton kartoitus →';
-    yhtioLink.addEventListener('click', ()=>{
+       testattava muutos.
+
+       Valinta on tehty samannäköiseksi kuin A:n välilehdet (.gate-tabs /
+       .gate-tab): taloyhtiöpäättäjän pitää tunnistaa oma polkunsa yhtä
+       nopeasti kummassakin versiossa, tai testi mittaisi sitä että B piilotti
+       taloyhtiöt eikä sitä että B näytti hinnan heti. Napit painavat samoja
+       välilehtiä kuin ihminenkin, joten polkulogiikka on yksi ja sama. */
+    const valinta=document.createElement('div');
+    valinta.className='gate-tabs ab-gate';
+    valinta.style.cssText='grid-column:1/-1;margin:0 0 4px';
+    valinta.innerHTML=
+      '<button type="button" class="gate-tab on" data-ab-go="koti">'
+      + '<b>Yksi koti</b><span>hinta heti alla</span></button>'
+      + '<button type="button" class="gate-tab ab-yhtio" data-ab-go="yhtio">'
+      + '<b>Taloyhtiöt</b><span>ilmainen kartoitus</span></button>';
+    valinta.addEventListener('click', (e)=>{
+      const nappi=e.target.closest('[data-ab-go]');
+      if(!nappi || nappi.dataset.abGo!=='yhtio') return;
       const t=document.getElementById('tabYhtio'); if(t) t.click();
     });
-    _calc.insertBefore(yhtioLink, _calc.firstChild);
+    _calc.insertBefore(valinta, _calc.firstChild);
   }
 }
 /* Vaiheet luetaan DOM:ista, jolloin sama moottori ajaa etusivun täyden polun
