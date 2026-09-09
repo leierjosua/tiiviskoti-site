@@ -388,7 +388,9 @@ function tierChips(){
   box.setAttribute('aria-label','Ikkunoiden määräalennus');
   box.innerHTML = '<span class="tl">Mitä useampi, sitä halvempi:</span>' +
     TIER_STEPS.map(st =>
-      `<button type="button" class="tchip" data-tier="${st.qty}" aria-label="Aseta ${st.qty} ikkunaa — ${st.price} euroa kappaleelta"><b>${st.qty} kpl</b> ${st.price} €/kpl</button>`
+      // Sirun teksti ilman "/kpl": kolme sirua mahtuu puhelimessa yhdelle
+      // riville vain lyhyenä, ja yksikkö sanotaan jo rivin selitteessä.
+      `<button type="button" class="tchip" data-tier="${st.qty}" aria-label="Aseta ${st.qty} ikkunaa — ${st.price} euroa kappaleelta"><b>${st.qty} kpl</b> ${st.price} €</button>`
     ).join('');
   return box;
 }
@@ -404,7 +406,9 @@ if(typesEl && extrasEl){
     const more = document.createElement('button');
     more.type='button'; more.className='morecats'; more.id='calcMore';
     more.setAttribute('aria-expanded','false'); more.setAttribute('aria-controls','calcMoreBox');
-    more.innerHTML = `<span>Muut kohteet — ${secondary.map(t=>t.name.toLowerCase()).join(', ')}</span>`+
+    // "Pelkkä kynnyskumi" → "kynnyskumi": napin teksti mahtuu puhelimessa
+    // yhdelle riville, ja täysi nimi on rivillä itsellään.
+    more.innerHTML = `<span>Muut kohteet — ${secondary.map(t=>t.name.toLowerCase().replace('pelkkä ','')).join(', ')}</span>`+
       `<svg class="cv" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     const box = document.createElement('div');
     box.id='calcMoreBox'; box.className='calc-more'; box.hidden=true;
