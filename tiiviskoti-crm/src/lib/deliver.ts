@@ -1,6 +1,6 @@
 import 'server-only';
 import { sql } from './db';
-import { createCalendarEvent, deleteCalendarEvent, googleConfigured } from './google';
+import { createCalendarEvent, deleteCalendarEvent, googleConfigured, updateCalendarEvent } from './google';
 import { sendMail } from './google';
 import {
   calendarDescription, confirmationHtml, confirmationSubject, confirmationText,
@@ -186,10 +186,15 @@ async function recordOutcome(
                 ${result.workOrder.ok ? new Date() : null})
       `;
     }
+    /* Uudelleenlähetys ei saa pyyhkiä aiempaa onnistumista: jos vahvistus on
+       kerran mennyt perille ja toinen yritys kaatuu, vanha aikaleima jää
+       voimaan ja virhe kirjataan sen rinnalle. Ilman coalescea työ näyttäisi
+       siltä ettei asiakas ole koskaan saanut vahvistusta. */
     await sql`
       update tk.jobs
-         set google_event_id     = coalesce(${result.calendar.id ?? null}, google_event_id),
-             confirmation_sent_at = ${result.mail.ok ? new Date() : null},
+         set google_event_id      = coalesce(${result.calendar.id ?? null}, google_event_id),
+             confirmation_sent_at = coalesce(${result.mail.ok ? new Date() : null}::timestamptz,
+                                             confirmation_sent_at),
              confirmation_error   = ${result.mail.error ?? null}
        where id = ${input.jobId}
     `;
@@ -317,6 +322,50 @@ async function recordKartoitusOutcome(
 
 /** Peruttaessa tai siirrettäessä vanha kalenteritapahtuma poistetaan, ettei
  *  asentajan kalenteriin jää työtä jota ei enää ole. */
+/* Kalenteritapahtuman päivitys työn nykyisiin tietoihin.
+
+   Ajan siirto panelissa muutti vain kannan rivin: asentajan puhelimessa ja
+   yrityksen kalenterissa keikka jäi vanhaan aikaan, eikä kukaan huomannut
+   koska panel näytti oikean. Siksi siirto kutsuu tätä.
+
+   Ei kaada kutsujaansa eikä luo tapahtumaa jos sitä ei ole: työ jolle ei
+   koskaan lähetetty vahvistusta ei ole kalenterissa, ja sinne se viedään
+   vahvistuksen lähetyksellä, ei ajan siirrolla. */
+export async function syncCalendarEventForJob(jobId: string): Promise<void> {
+  if (!googleConfigured()) return;
+  const rows = await sql<{
+    job_number: string; starts_at: Date; ends_at: Date;
+    address: string | null; postal_code: string | null; city: string | null;
+    google_event_id: string | null; google_calendar_id: string | null;
+    customer_name: string | null;
+  }[]>`
+    select j.job_number, j.starts_at, j.ends_at, j.address, j.postal_code, j.city,
+           j.google_event_id, c.google_calendar_id, cu.full_name as customer_name
+      from tk.jobs j
+      join tk.calendars c on c.id = j.calendar_id
+      left join tk.customers cu on cu.id = j.customer_id
+     where j.id = ${jobId}
+  `;
+  const row = rows[0];
+  if (!row?.google_event_id) return;
+
+  try {
+    const { missing } = await updateCalendarEvent(row.google_event_id, {
+      summary: `${row.customer_name ?? 'Asiakas'} — ${row.address ?? ''} (${row.job_number})`,
+      location: [row.address, row.postal_code, row.city].filter(Boolean).join(', '),
+      startsAt: row.starts_at,
+      endsAt: row.ends_at,
+      calendarId: row.google_calendar_id ?? undefined,
+    });
+    /* Käsin poistettu tapahtuma: tunniste kannassa osoittaa olemattomaan.
+       Tyhjennetään, jotta vahvistuksen uudelleenlähetys luo uuden eikä
+       kaadu vanhaan tunnisteeseen. */
+    if (missing) await sql`update tk.jobs set google_event_id = null where id = ${jobId}`;
+  } catch (e) {
+    console.error('syncCalendarEventForJob:', jobId, msg(e));
+  }
+}
+
 export async function removeCalendarEventForJob(jobId: string): Promise<void> {
   const rows = await sql<{ google_event_id: string | null; google_calendar_id: string | null }[]>`
     select j.google_event_id, c.google_calendar_id

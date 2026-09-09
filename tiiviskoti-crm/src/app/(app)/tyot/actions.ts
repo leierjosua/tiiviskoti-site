@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { requireManager, requireStaff } from '@/lib/session';
-import { deliverBooking, removeCalendarEventForJob } from '@/lib/deliver';
+import { deliverBooking, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
 import { computePricing } from '@/lib/pricing';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
@@ -384,6 +384,11 @@ export async function rescheduleJob(_prev: ActionState, formData: FormData): Pro
     throw err;
   }
 
+  /* Google-kalenteri perässä. Ilman tätä siirto näkyi vain panelissa ja
+     asentajan puhelin herätti hänet yhä vanhaan aikaan. Ei kaada siirtoa:
+     aika on jo vaihtunut kannassa, joka on totuus. */
+  for (const jobId of ids) await syncCalendarEventForJob(jobId);
+
   for (const jobId of ids) revalidatePath(`/tyot/${jobId}`);
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
@@ -510,6 +515,83 @@ export async function setJobStatus(formData: FormData) {
   for (const jobId of ids) revalidatePath(`/tyot/${jobId}`);
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
+}
+
+/* Vahvistus asiakkaalle, työmääräin asentajalle ja käynti Google-kalenteriin
+   JÄLKIKÄTEEN, olemassa olevalle työlle.
+
+   Työn luonnissa on valinta "Lähetä vahvistus asiakkaalle", mutta sitä ennen
+   luoduilta töiltä — tarjouksesta ja liidistä syntyneiltä — nämä puuttuvat
+   kokonaan, eikä niitä saanut mistään jälkikäteen. Asiakkaalla ei ollut
+   kirjallista vahvistusta eikä keikka näkynyt kenenkään kalenterissa.
+
+   Sama `deliverBooking` kuin verkkovarauksella: viestien sisältö ei saa olla
+   kahta versiota. */
+export async function sendConfirmation(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireManager();
+  const id = String(formData.get('id') ?? '');
+  if (!id) return { error: 'Työtä ei löytynyt.' };
+
+  const job = await getJob(id);
+  if (!job) return { error: 'Työtä ei löytynyt.' };
+  if (!job.customer_email) return { error: 'Asiakkaalla ei ole sähköpostiosoitetta — lisää se ensin.' };
+  if (job.status === 'cancelled') return { error: 'Peruttua työtä ei vahvisteta.' };
+
+  const [lines, [kal]] = await Promise.all([
+    sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
+      select name, quantity, unit_price_cents from tk.job_lines
+       where job_id = ${id} order by sort_order
+    `,
+    sql<{ google_calendar_id: string | null }[]>`
+      select c.google_calendar_id from tk.jobs j
+        join tk.calendars c on c.id = j.calendar_id
+       where j.id = ${id}
+    `,
+  ]);
+
+  /* Rivitön työ (hallinnasta ennen laskuria luotu) saa yhden rivin työn
+     nimellä — muuten vahvistuksessa olisi tyhjä taulukko. */
+  const mailLines = lines.length
+    ? lines.map((l) => ({
+        name: l.name, qty: l.quantity,
+        unit: l.unit_price_cents / 100,
+        sum: (l.quantity * l.unit_price_cents) / 100,
+      }))
+    : [{ name: job.title, qty: 1, unit: job.price_cents / 100, sum: job.price_cents / 100 }];
+
+  /* Vanha tapahtuma pois ennen uutta. `deliverBooking` luo aina uuden, joten
+     ilman tätä uudelleenlähetys jättäisi kalenteriin kaksi samaa keikkaa. */
+  await removeCalendarEventForJob(id);
+
+  const result = await deliverBooking({
+    jobId: id,
+    jobNumber: job.job_number,
+    customerName: job.customer_name ?? 'Asiakas',
+    email: job.customer_email,
+    phone: job.customer_phone ?? '',
+    address: job.address ?? '',
+    postalCode: job.postal_code ?? '',
+    city: job.city,
+    startsAt: job.starts_at,
+    endsAt: job.ends_at,
+    lines: mailLines,
+    totalCents: job.price_cents,
+    // Kotitalousvähennys: 40 % työn osuudesta, työ n. 70 % hinnasta.
+    netCents: Math.round(job.price_cents * (1 - 0.4 * 0.7)),
+    notes: job.notes,
+    googleCalendarId: kal?.google_calendar_id ?? null,
+  });
+
+  revalidatePath(`/tyot/${id}`);
+  revalidatePath('/tyot');
+
+  if (!result.mail.ok) return { error: `Vahvistus ei lähtenyt: ${result.mail.error ?? 'tuntematon virhe'}` };
+  /* Posti meni mutta kalenteri ei: asiakas tietää ajan, me emme näe sitä
+     puhelimessa. Se on kerrottava, ei piilotettava onnistumisen taakse. */
+  if (!result.calendar.ok) {
+    return { ok: `Vahvistus lähetetty osoitteeseen ${job.customer_email}, mutta kalenteriin vienti epäonnistui: ${result.calendar.error ?? ''}` };
+  }
+  return { ok: `Vahvistus lähetetty osoitteeseen ${job.customer_email} ja käynti viety kalenteriin.` };
 }
 
 /* Merkitse maksetuksi & lähetä kuitti asiakkaalle.

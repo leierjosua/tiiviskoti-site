@@ -284,6 +284,43 @@ export async function createCalendarEvent(ev: CalendarEvent): Promise<{ id: stri
   return { id: (JSON.parse(text) as { id: string }).id };
 }
 
+/* Olemassa olevan tapahtuman päivitys.
+
+   PATCH eikä PUT: annetut kentät korvataan ja loput (osallistujat,
+   muistutukset) jäävät ennalleen. Käytetään kun työn aikaa siirretään
+   panelissa — ilman tätä asentajan puhelimessa näkyisi yhä vanha kellonaika.
+
+   `missing: true` tarkoittaa että tapahtuma on poistettu kalenterista käsin.
+   Se ei ole virhe vaan tieto kutsujalle: tunniste kannassa on vanhentunut. */
+export async function updateCalendarEvent(
+  eventId: string,
+  ev: Partial<Omit<CalendarEvent, 'calendarId'>> & { calendarId?: string },
+): Promise<{ missing: boolean }> {
+  const token = await accessToken();
+  const calendarId = ev.calendarId || DEFAULT_CALENDAR_ID;
+
+  const body: Record<string, unknown> = {};
+  if (ev.summary !== undefined) body.summary = ev.summary;
+  if (ev.description !== undefined) body.description = ev.description;
+  if (ev.location !== undefined) body.location = ev.location;
+  if (ev.startsAt) body.start = { dateTime: ev.startsAt.toISOString(), timeZone: 'Europe/Helsinki' };
+  if (ev.endsAt) body.end = { dateTime: ev.endsAt.toISOString(), timeZone: 'Europe/Helsinki' };
+
+  const res = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=none`,
+    {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+  );
+  if (res.status === 404 || res.status === 410) return { missing: true };
+  if (!res.ok) {
+    throw new Error(`Kalenteritapahtuman päivitys epäonnistui: ${res.status} ${(await res.text()).slice(0, 300)}`);
+  }
+  return { missing: false };
+}
+
 export async function deleteCalendarEvent(eventId: string, calendarId?: string): Promise<void> {
   const token = await accessToken();
   const id = calendarId || DEFAULT_CALENDAR_ID;
