@@ -4,7 +4,6 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
-import { helsinkiDateTime } from '@/lib/time';
 
 export type ActionState = { error?: string; ok?: string };
 
@@ -145,27 +144,3 @@ export async function setLeadStatus(formData: FormData) {
   revalidatePath('/liidit');
 }
 
-/**
- * Milloin liidille soitetaan uudelleen.
- *
- * Vyöhykkeetön `datetime-local` on Suomen aikaa — sama sääntö kuin
- * varauksissa, ks. `parseBookingStart`. Tyhjä arvo poistaa ajan.
- */
-export async function setLeadCallBack(formData: FormData) {
-  await requireManager();
-  const id = String(formData.get('id') ?? '');
-  const raw = String(formData.get('soittoaika') ?? '').trim();
-  if (!id) return;
-
-  const at = raw ? helsinkiDateTime(raw.slice(0, 10), raw.slice(11, 16)) : null;
-  if (raw && Number.isNaN(at!.getTime())) return;
-
-  try {
-    await sql`update tk.leads set call_back_at = ${at}, updated_at = now() where id = ${id}::uuid`;
-  } catch (e) {
-    // 42703 = saraketta ei ole (db/027 ajamatta).
-    if ((e as { code?: string })?.code !== '42703') throw e;
-    console.error('setLeadCallBack: db/027 ajamatta');
-  }
-  revalidatePath('/liidit');
-}
