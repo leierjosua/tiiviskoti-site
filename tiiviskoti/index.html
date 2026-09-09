@@ -153,13 +153,20 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .stp.plus{background:var(--green);color:#fff;border-color:var(--green)}
 .qty{font-weight:800;font-size:20px;color:var(--ink);min-width:28px;text-align:center;font-variant-numeric:tabular-nums}
 .extras-hd{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);padding:14px 22px 2px}
-.extras{display:grid;grid-template-columns:1fr 1fr}
-.extra{display:flex;align-items:center;gap:10px;padding:11px 22px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;text-align:left;font-family:inherit}
+/* minmax(0,1fr) eikä 1fr: fr-radan automaattinen alaraja on sen sisällön
+   min-content, ja määrällisen lisätyön rivi (nimi + hinta + askellin +
+   sisennys) on leveämpi kuin kortti 320 px:n näytöllä — silloin koko
+   lisätyölaatikko työntyi kortin reunan yli. */
+.extras{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.extra{display:flex;align-items:center;gap:10px;min-width:0;padding:11px 22px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;text-align:left;font-family:inherit}
 .extra:nth-child(2n){border-left:1px solid var(--line)}
 .extra.on{background:var(--green-soft)}
 .extra-chk{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:11px;color:transparent;flex:0 0 auto}
 .extra.on .extra-chk{background:var(--green);border-color:var(--green);color:#fff}
-.extra-nm{font-size:14px;color:var(--text);flex:1}
+/* min-width:0 — ilman sitä flex-kohde ei kutistu tekstinsä alle, ja
+   pitkä lisätyön nimi levitti rivin kortin yli 320 px:n näytöillä
+   (mitattu iPhone SE: kortti 266 px, rivi 304 px). */
+.extra-nm{font-size:14px;color:var(--text);flex:1;min-width:0}
 .extra-pr{font-weight:700;font-size:13px;color:var(--green);white-space:nowrap}
 .extra-note{font-weight:600;font-size:11.5px;color:var(--mute)}
 /* Määrällinen lisätyö: div eikä button (askellin ei mahdu napin sisään),
@@ -504,7 +511,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .metric b{font-size:19px}
   .metric>span{font-size:10.5px;margin-top:6px;line-height:1.35}
 
-  .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
+  .extras{grid-template-columns:minmax(0,1fr)}.extra:nth-child(2n){border-left:none}
+  /* Sisennys pois kapealla: se oli varattu valintaruudun leveydelle,
+     mutta yhden palstan taitossa se vain vie tilaa askeltimelta. */
+  .extra.extra-q{padding-left:14px}
 
   /* HINTALASKURI puhelimessa.
      Ongelma: yhden palstan taitossa yhteenveto valui listan alle, joten

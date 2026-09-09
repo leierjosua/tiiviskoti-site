@@ -141,13 +141,20 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .stp.plus{background:var(--green);color:#fff;border-color:var(--green)}
 .qty{font-weight:800;font-size:20px;color:var(--ink);min-width:28px;text-align:center;font-variant-numeric:tabular-nums}
 .extras-hd{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);padding:14px 22px 2px}
-.extras{display:grid;grid-template-columns:1fr 1fr}
-.extra{display:flex;align-items:center;gap:10px;padding:11px 22px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;text-align:left;font-family:inherit}
+/* minmax(0,1fr) eikä 1fr: fr-radan automaattinen alaraja on sen sisällön
+   min-content, ja määrällisen lisätyön rivi (nimi + hinta + askellin +
+   sisennys) on leveämpi kuin kortti 320 px:n näytöllä — silloin koko
+   lisätyölaatikko työntyi kortin reunan yli. */
+.extras{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.extra{display:flex;align-items:center;gap:10px;min-width:0;padding:11px 22px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;text-align:left;font-family:inherit}
 .extra:nth-child(2n){border-left:1px solid var(--line)}
 .extra.on{background:var(--green-soft)}
 .extra-chk{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:11px;color:transparent;flex:0 0 auto}
 .extra.on .extra-chk{background:var(--green);border-color:var(--green);color:#fff}
-.extra-nm{font-size:14px;color:var(--text);flex:1}
+/* min-width:0 — ilman sitä flex-kohde ei kutistu tekstinsä alle, ja
+   pitkä lisätyön nimi levitti rivin kortin yli 320 px:n näytöillä
+   (mitattu iPhone SE: kortti 266 px, rivi 304 px). */
+.extra-nm{font-size:14px;color:var(--text);flex:1;min-width:0}
 .extra-pr{font-weight:700;font-size:13px;color:var(--green)}
 .quote{position:sticky;top:88px;background:var(--deep);color:var(--dtext);border-radius:var(--r-lg);padding:26px}
 .q-t{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dmute)}
@@ -364,7 +371,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   nav.top .btn-p{margin-left:auto;padding:9px 15px;font-size:14.5px}
   .burger{display:flex;margin-left:0}
   .nlinks.op{display:flex;position:absolute;top:74px;left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border-bottom:1px solid var(--line)}
-  .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
+  .extras{grid-template-columns:minmax(0,1fr)}.extra:nth-child(2n){border-left:none}
+  /* Sisennys pois kapealla: se oli varattu valintaruudun leveydelle,
+     mutta yhden palstan taitossa se vain vie tilaa askeltimelta. */
+  .extra.extra-q{padding-left:14px}
   .why-stats{grid-template-columns:1fr}
   .slots{grid-template-columns:repeat(3,1fr)}
 
@@ -454,7 +464,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .q-btn{grid-column:2;grid-row:1/span 2;width:auto;margin-top:0;padding:13px 18px;font-size:15px;white-space:nowrap}
   .q-btn-long{display:none}
   .order-note{display:block}
-  .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
+  .extras{grid-template-columns:minmax(0,1fr)}.extra:nth-child(2n){border-left:none}
+  /* Sisennys pois kapealla: se oli varattu valintaruudun leveydelle,
+     mutta yhden palstan taitossa se vain vie tilaa askeltimelta. */
+  .extra.extra-q{padding-left:14px}
 }
 </style>
 </head>
