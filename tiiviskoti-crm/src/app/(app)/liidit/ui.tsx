@@ -20,9 +20,17 @@ const LABELS: Record<string, string> = {
  * liidit, joten tallennuksen jälkeinen uudelleenlataus kestää pari
  * sekuntia. Ilman näkyvää merkkiä valinta näytti siltä ettei se mennyt
  * läpi, ja sitä klikattiin uudestaan — viisi liidiä vaihtoi tilaa
- * vahingossa ennen kuin vika huomattiin. Nyt valinta näkyy heti ja
- * kenttä lukittuu tallennuksen ajaksi.
- */
+ * vahingossa ennen kuin vika huomattiin.
+ *
+ * VALIKKOA EI LUKITA TALLENNUKSEN AJAKSI. Ensimmäinen yritys teki niin
+ * `disabled`illa — ja koska selain EI lähetä disabloitua kenttää, `status`
+ * jäi tyhjäksi ja tallennus lopetti heti alkuunsa. Kenttä näytti reagoivan
+ * tallentamatta mitään.
+ *
+ * Arvo luetaan valikosta itsestään eikä tilamuuttujasta: selain on jo
+ * asettanut valitun arvon DOMiin kun `onChange` laukeaa, joten lähetys saa
+ * oikean arvon riippumatta siitä ehtiikö React piirtää välissä. Tila on
+ * pelkkää näyttöä varten. */
 export function LeadStatus({ id, status }: { id: string; status: string }) {
   const [value, setValue] = useState(status);
   const [pending, startTransition] = useTransition();
@@ -37,7 +45,7 @@ export function LeadStatus({ id, status }: { id: string; status: string }) {
       <Select
         name="status"
         value={value}
-        disabled={pending}
+        aria-busy={pending}
         onChange={(e) => {
           const valittu = e.currentTarget.value;
           const form = e.currentTarget.form;
