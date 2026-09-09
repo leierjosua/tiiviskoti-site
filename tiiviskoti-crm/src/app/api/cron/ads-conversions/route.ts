@@ -1,4 +1,4 @@
-import { sendPendingConversions, sendPendingLeadConversions } from '@/lib/ads-sync';
+import { sendPendingCallConversions, sendPendingConversions, sendPendingLeadConversions } from '@/lib/ads-sync';
 import { sendLeadStages } from '@/lib/meta-lead-stages';
 
 /* =========================================================
@@ -36,6 +36,9 @@ export async function GET(request: Request) {
      päinvastoin. Yksi yhteinen luku peittäisi kumman tahansa vian. */
   const jobs = await sendPendingConversions();
   const leads = await sendPendingLeadConversions();
+  /* Soittoklikit omana lukunaan samasta syystä kuin liidit: ikkunapolun
+     signaali saa olla rikki ilman että töiden vienti näyttää rikkinäiseltä. */
+  const calls = await sendPendingCallConversions();
 
   /* Metan liidien laatupalaute samassa ajossa.
 
@@ -51,5 +54,7 @@ export async function GET(request: Request) {
   const jobsOk = !jobs.error && jobs.failed === 0;
   const leadsOk = leads.configured ? (!leads.error && leads.failed === 0) : true;
   const metaOk = metaStages.configured ? !metaStages.error : true;
-  return Response.json({ jobs, leads, metaStages }, { status: jobsOk && leadsOk && metaOk ? 200 : 500 });
+  const callsOk = calls.configured ? (!calls.error && calls.failed === 0) : true;
+  return Response.json({ jobs, leads, calls, metaStages },
+    { status: jobsOk && leadsOk && callsOk && metaOk ? 200 : 500 });
 }

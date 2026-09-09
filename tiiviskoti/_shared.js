@@ -128,6 +128,19 @@ function readGclidKind(){
   try{ localStorage.setItem(GCLID_KEY, JSON.stringify({ v, k, t: Date.now() })); }catch(_){}
 })();
 
+/* Klikkitunniste analytiikan käyttöön.
+
+   MIKSI GLOBAALIN KAUTTA: `_analytics.js` ei lue selaimen tallennustilaa
+   lainkaan — se on sen tiedoston nimenomainen lupaus. Se osaa lukea
+   tunnisteen osoiteriviltä, mutta osoiterivi on tyhjä heti kun kävijä
+   siirtyy toiselle sivulle. Tässä tiedostossa tunniste on jo muistissa,
+   joten se tarjotaan eteenpäin ilman että kumpikaan tiedosto rikkoo
+   omaa sääntöään. */
+try{
+  const _g = readGclid();
+  if(_g) window.tkGclid = { v: _g, k: readGclidKind() || 'gclid' };
+}catch(_){}
+
 /* ---------- Meta-klikin tunnisteet (fbclid → _fbc, _fbp) ----------
    Sama periaate kuin gclidissä: talletetaan Facebook/Instagram-mainosklikin
    tunniste ja lähetetään vasta toteutuneen varauksen/liidin mukana Metan

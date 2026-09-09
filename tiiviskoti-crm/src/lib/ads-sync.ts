@@ -245,3 +245,120 @@ export async function sendPendingLeadConversions(): Promise<LeadSyncResult> {
 
   return { configured: result.configured, sent, failed: errors.length, expired: expired.length, errors };
 }
+
+/* =========================================================
+   Soittoklikki konversiona.
+
+   MIKSI TÄMÄ ON OLEMASSA: Googlen ainoa ensisijainen konversio oli
+   verkkovaraus. Ikkuna-asiakas ei varaa verkosta — hän soittaa. Ikkunatyöt
+   ovat 83 % toteutuneesta liikevaihdosta, mutta Google ei nähnyt niistä
+   yhtäkään signaalia ja optimoi siksi ovikauppaa.
+
+   YKSI KONVERSIO PER KLIKKI, EI PER KLIKKAUS. Sama kävijä painaa
+   soittonappia helposti kahdesti — numero ei auennut, palasi takaisin.
+   Tapahtumarivejä syntyy monta, mutta myyntitapahtumia yksi. Siksi
+   `transactionId` johdetaan klikkitunnisteesta eikä rivin id:stä: Ads
+   karsii kaksoiskappaleet sen perusteella, ja sama tunniste tuottaa
+   korkeintaan yhden konversion riippumatta siitä montako riviä lähetetään.
+
+   Arvo on nolla. Soitto ei ole kauppa vaan aikomus, eikä sille voi antaa
+   rahamäärää jota ei ole ansaittu.
+   ========================================================= */
+
+const CALL_CONVERSION_ACTION_ID = (process.env.GOOGLE_ADS_CALL_CONVERSION_ACTION_ID || '').replace(/\D/g, '');
+
+export type CallSyncResult = Omit<SyncResult, 'errors'> & {
+  errors: { gclid: string; error: string }[];
+};
+
+type PendingCallRow = { id: string; gclid: string; gclid_kind: ClickKind; ts: Date };
+
+export async function sendPendingCallConversions(): Promise<CallSyncResult> {
+  if (!CALL_CONVERSION_ACTION_ID) {
+    return {
+      configured: false,
+      error: 'Puuttuu: GOOGLE_ADS_CALL_CONVERSION_ACTION_ID',
+      sent: 0, failed: 0, expired: 0, errors: [],
+    };
+  }
+
+  let expired: { gclid: string }[] = [];
+  let rows: PendingCallRow[] = [];
+  try {
+    expired = await sql<{ gclid: string }[]>`
+      update tk.web_events
+         set ads_upload_error = ${`Klikistä yli ${MAX_CLICK_AGE_DAYS} vrk — Ads ei ota enää vastaan`}
+       where cta = 'Soita' and gclid is not null
+         and ads_uploaded_at is null and ads_upload_error is null
+         and ts < now() - ${`${MAX_CLICK_AGE_DAYS} days`}::interval
+      returning gclid
+    `;
+
+    /* Yksi rivi per klikkitunniste, vanhin ensin: loput saman tunnisteen
+       rivit kuitataan lähetetyiksi samalla, jotta ne eivät jää jonoon
+       ikuisesti odottamaan omaa vuoroaan jota ei koskaan tule. */
+    rows = await sql<PendingCallRow[]>`
+      select distinct on (gclid) id, gclid, gclid_kind, ts
+        from tk.web_events
+       where cta = 'Soita' and gclid is not null
+         and ads_uploaded_at is null
+         and ts >= now() - ${`${MAX_CLICK_AGE_DAYS} days`}::interval
+       order by gclid, ts
+       limit ${BATCH_SIZE}
+    `;
+  } catch (e) {
+    // 42703 = db/029 ajamatta. Muut konversiot lähtevät silti.
+    if ((e as { code?: string })?.code !== '42703') throw e;
+    return {
+      configured: false,
+      error: 'Tietokannasta puuttuu sarake — aja db/029_call_click_conversions.sql.',
+      sent: 0, failed: 0, expired: 0, errors: [],
+    };
+  }
+
+  const pending: PendingConversion[] = rows.map((r) => ({
+    rowId: r.id,
+    // `C-` erottaa soiton työnumerosta ja liidin `L-`-tunnisteesta.
+    transactionId: `C-${r.gclid}`,
+    clickId: r.gclid,
+    clickKind: r.gclid_kind ?? 'gclid',
+    createdAt: r.ts,
+    priceCents: 0,
+  }));
+
+  const result = await uploadConversions(pending, { conversionActionId: CALL_CONVERSION_ACTION_ID });
+  if (result.error) {
+    if (result.configured) {
+      for (const r of rows) {
+        await sql`update tk.web_events set ads_upload_error = ${result.error} where id = ${r.id}::uuid`;
+      }
+    }
+    return {
+      configured: result.configured,
+      error: result.error,
+      sent: 0, failed: rows.length, expired: expired.length, errors: [],
+    };
+  }
+
+  const byRow = new Map(rows.map((r) => [r.id, r.gclid]));
+  const errors: CallSyncResult['errors'] = [];
+  let sent = 0;
+  for (const outcome of result.outcomes) {
+    const gclid = byRow.get(outcome.rowId);
+    if (!gclid) continue;
+    if (outcome.ok) {
+      /* Kaikki saman tunnisteen rivit kerralla: yksi konversio on jo
+         raportoitu, eikä samasta klikistä lähetetä toista. */
+      await sql`
+        update tk.web_events set ads_uploaded_at = now(), ads_upload_error = null
+         where cta = 'Soita' and gclid = ${gclid} and ads_uploaded_at is null
+      `;
+      sent++;
+    } else {
+      await sql`update tk.web_events set ads_upload_error = ${outcome.error} where id = ${outcome.rowId}::uuid`;
+      errors.push({ gclid, error: outcome.error });
+    }
+  }
+
+  return { configured: result.configured, sent, failed: errors.length, expired: expired.length, errors };
+}

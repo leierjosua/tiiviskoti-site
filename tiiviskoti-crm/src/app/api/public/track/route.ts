@@ -62,6 +62,8 @@ const TYPES = new Set(['pageview', 'scroll', 'cta', 'funnel']);
    tapahtumalla. Liput nollautuvat deployssa. */
 let variantColumnExists = true;
 let fbcColumnExists = true;
+/* db/029: soittoklikin klikkitunniste. Sama lippukaava kuin yllä. */
+let gclidColumnExists = true;
 const isUndefinedColumn = (e: unknown) =>
   typeof e === 'object' && e !== null && (e as { code?: string }).code === '42703';
 
@@ -105,6 +107,16 @@ export async function POST(request: Request) {
   const rawFbc = clip(body.fbc, 300);
   const fbc = rawFbc && /^fb\.[0-9]\.[0-9]{10,16}\.[A-Za-z0-9_-]{1,255}$/.test(rawFbc) ? rawFbc : null;
 
+  /* Google-klikin tunniste. Sama muotorajaus kuin kannan
+     web_events_gclid_format-rajoitteessa: arvo tulee julkisesta
+     osoiterivistä, joten kelvoton pudotetaan tyhjäksi eikä pyyntöä hylätä.
+     Tyyppi on tallennettava erikseen — rajapinnassa gclid, wbraid ja
+     gbraid ovat kolme eri kenttää. */
+  const rawGclid = clip(body.gclid, 200);
+  const gclid = rawGclid && /^[A-Za-z0-9_-]{10,200}$/.test(rawGclid) ? rawGclid : null;
+  const rawKind = clip(body.gclid_kind, 10);
+  const gclidKind = gclid ? (['gclid', 'wbraid', 'gbraid'].includes(rawKind ?? '') ? rawKind : 'gclid') : null;
+
   /* Rivi kootaan sarakkeista jotka tiedetään olemassa oleviksi. Käsin
      kirjoitetut vaihtoehdot olisivat kahdella valinnaisella sarakkeella jo
      neljä lähes identtistä INSERTiä. */
@@ -116,6 +128,7 @@ export async function POST(request: Request) {
     };
     if (variantColumnExists) row.variant = variant;
     if (fbcColumnExists) row.fbc = fbc;
+    if (gclidColumnExists) { row.gclid = gclid; row.gclid_kind = gclidKind; }
     return row;
   };
 
@@ -129,6 +142,7 @@ export async function POST(request: Request) {
       const msg = String((e as { message?: string }).message ?? '');
       if (msg.includes('"fbc"')) fbcColumnExists = false;
       if (msg.includes('"variant"')) variantColumnExists = false;
+      if (msg.includes('"gclid"')) gclidColumnExists = false;
       await sql`insert into tk.web_events ${sql(buildRow())}`;
     }
   } catch {

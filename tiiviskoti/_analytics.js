@@ -71,6 +71,28 @@
     if (fbclid && /^[A-Za-z0-9_-]{1,255}$/.test(fbclid)) fbc = 'fb.1.' + Date.now() + '.' + fbclid;
   } catch (e) { /* ei väliä */ }
 
+  /* ---------- Google-klikin tunniste (gclid / wbraid / gbraid) ----------
+     MIKSI: soittolinkin klikkaus on ikkuna-asiakkaan tavallisin seuraava
+     askel, mutta Google ei nähnyt sitä lainkaan — konversioksi kelpaa vain
+     tapahtuma jolla on klikkitunniste. Ilman tätä Ads optimoi pelkkien
+     verkkovarausten mukaan, eli ovikauppaa, vaikka ikkunat ovat 83 %
+     liikevaihdosta.
+
+     LUETAAN OSOITERIVILTÄ, EI TALLENNUSTILASTA. Tämä tiedosto ei koske
+     selaimen muistiin — sama lupaus kuin kampanjalla ja fbc:llä. Jos kävijä
+     on jo siirtynyt sivulta toiselle, tunniste on `_shared.js`:n
+     localStoragessa, ja se tarjoaa sen globaalina `window.tkGclid`.
+     Kumpikaan ei siis riipu toisesta: kumpi tahansa löytyy, se kelpaa. */
+  var gclid = null, gclidKind = null;
+  try {
+    var q = new URLSearchParams(location.search);
+    var kinds = ['gclid', 'wbraid', 'gbraid'];
+    for (var i = 0; i < kinds.length; i++) {
+      var got = q.get(kinds[i]);
+      if (got && /^[A-Za-z0-9_-]{10,200}$/.test(got)) { gclid = got; gclidKind = kinds[i]; break; }
+    }
+  } catch (e) { /* ei väliä */ }
+
   /* ---------- A/B-testi ----------
      Versio arvotaan KERRAN SIVULATAUSTA KOHTI ja pidetään muistissa. Ei
      evästettä eikä localStoragea — tämä sivusto ei koske käyttäjän laitteen
@@ -104,6 +126,10 @@
   function send(o) {
     if (!o.path) o.path = location.pathname;
     if (!o.variant) o.variant = variant;
+    /* Klikkitunniste jokaiseen tapahtumaan: soittoklikki on `cta`, eikä
+       lähettäjä tiedä etukäteen mikä tapahtuma päätyy konversioksi. */
+    var g = gclid ? { v: gclid, k: gclidKind } : (window.tkGclid || null);
+    if (g && g.v && !o.gclid) { o.gclid = g.v; o.gclid_kind = g.k || 'gclid'; }
     var data = JSON.stringify(o);
     try {
       var blob = new Blob([data], { type: 'text/plain' });
