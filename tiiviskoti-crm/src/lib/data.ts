@@ -364,10 +364,10 @@ export async function listOffers(): Promise<OfferRow[]> {
      order by o.created_at desc
   `;
   try {
-    return await run(jobOfferLinkExists);
+    return await run(jobOfferLinkExists());
   } catch (e) {
-    if (jobOfferLinkExists && undefinedColumn(e)?.includes('offer_id')) {
-      jobOfferLinkExists = false;
+    if (jobOfferLinkExists() && undefinedColumn(e)?.includes('offer_id')) {
+      markJobOfferLinkMissing();
       return run(false);
     }
     throw e;
@@ -388,7 +388,19 @@ let offerCustomerNoteExists = true;
 let offerInclusionsExists = true;
 /* Onko db/026 ajettu (tk.jobs.offer_id / crew_group_id). Sama tarkoitus kuin
    yllä: tarjouslista on tärkeämpi kuin tieto siitä onko aika jo laitettu. */
-let jobOfferLinkExists = true;
+/* MIKSI TÄMÄ EI OLE PELKKÄ BOOLEAN: aiemmin lippu kääntyi kerran epäonnistuneesta
+   kyselystä eikä palannut koskaan takaisin. Tarjouslistan varausajat katosivat
+   siis prosessin loppuun asti — myös silloin kun kanta oli jo kunnossa — ja
+   ainoa korjaus oli uudelleenjulkaisu. Mikään ei kertonut miksi napit vaihtuivat
+   takaisin "Laita aika" -muotoon.
+
+   Nyt muisti vanhenee. Puuttuva rakenne on yhä halpa havaita, mutta ohimenevä
+   vika korjaa itsensä viidessä minuutissa ilman deployta. */
+const RAKENNE_MUISTI_MS = 5 * 60_000;
+let jobOfferLinkMissingAt: number | null = null;
+const jobOfferLinkExists = () =>
+  jobOfferLinkMissingAt === null || Date.now() - jobOfferLinkMissingAt > RAKENNE_MUISTI_MS;
+const markJobOfferLinkMissing = () => { jobOfferLinkMissingAt = Date.now(); };
 
 export async function getOffer(id: string): Promise<OfferRow | null> {
   const run = (withNote: boolean, withInclusions: boolean, withJob: boolean) => sql<OfferRow[]>`
@@ -417,13 +429,13 @@ export async function getOffer(id: string): Promise<OfferRow | null> {
      voivat puuttua, joten yritetään uudelleen kunnes kysely menee läpi. */
   for (let attempt = 0; ; attempt++) {
     try {
-      const [row] = await run(offerCustomerNoteExists, offerInclusionsExists, jobOfferLinkExists);
+      const [row] = await run(offerCustomerNoteExists, offerInclusionsExists, jobOfferLinkExists());
       return row ?? null;
     } catch (e) {
       const missing = attempt < 3 ? undefinedColumn(e) : null;
       if (missing?.includes('inclusions')) offerInclusionsExists = false;
       else if (missing?.includes('customer_note')) offerCustomerNoteExists = false;
-      else if (missing?.includes('offer_id')) jobOfferLinkExists = false;
+      else if (missing?.includes('offer_id')) markJobOfferLinkMissing();
       else throw e;
     }
   }
@@ -439,7 +451,7 @@ export async function jobLinks(jobId: string): Promise<{
   mates: JobCrewMate[];
 }> {
   const none = { offer: null, mates: [] as JobCrewMate[] };
-  if (!jobOfferLinkExists) return none;
+  if (!jobOfferLinkExists()) return none;
   try {
     const [row] = await sql<{
       offer_id: string | null; offer_number: string | null; crew_group_id: string | null;
@@ -467,7 +479,7 @@ export async function jobLinks(jobId: string): Promise<{
       mates,
     };
   } catch (e) {
-    if (undefinedColumn(e)) { jobOfferLinkExists = false; return none; }
+    if (undefinedColumn(e)) { markJobOfferLinkMissing(); return none; }
     throw e;
   }
 }
