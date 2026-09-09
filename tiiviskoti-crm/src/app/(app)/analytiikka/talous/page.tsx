@@ -102,13 +102,20 @@ export default async function TalousPage({
       )}
 
       <Section title="Myynti" tone="accent">
+        {/* Myyty ja tekemätön on eri asia kuin myyty ja tehty, vaikka
+            molemmat ovat myyntiä. Kassavirran kannalta ero on koko juttu,
+            joten se lukee suoraan kortissa. */}
         <Metric label="Kokonaismyynti (sis. alv)" value={eur(now.myyntiCents)}
-                nowValue={now.myyntiCents} prevValue={p('myyntiCents')} big />
-        <Metric label={`Liikevaihto (alv 0 %)`} value={eur(now.liikevaihtoCents)}
+                nowValue={now.myyntiCents} prevValue={p('myyntiCents')} big
+                sub={now.avoinN > 0
+                  ? `${eur(now.avoinCents)} vielä tekemättä (${now.avoinN} keikkaa)`
+                  : 'kaikki jakson keikat tehty'} />
+        <Metric label="Liikevaihto (alv 0 %)" value={eur(now.liikevaihtoCents)}
                 nowValue={now.liikevaihtoCents} prevValue={p('liikevaihtoCents')}
                 sub={`alv ${(settings.vatBp / 100).toFixed(1).replace('.', ',')} %`} big />
         <Metric label="Varaukset" value={String(now.varaukset)}
-                nowValue={now.varaukset} prevValue={p('varaukset')} big />
+                nowValue={now.varaukset} prevValue={p('varaukset')} big
+                sub={`${now.varaukset - now.avoinN} tehty · ${now.avoinN} tekemättä`} />
         <Metric label="Keskim. varausarvo" value={eur(now.keskiarvoCents)}
                 nowValue={now.keskiarvoCents} prevValue={p('keskiarvoCents')} big />
       </Section>
@@ -158,8 +165,10 @@ export default async function TalousPage({
       </div>
 
       <p className="text-xs leading-relaxed text-faint">
-        Myynti on vahvistettujen ja tehtyjen töiden summa työn päivän mukaan; peruutetut ja
-        vielä vahvistamattomat eivät ole mukana, eikä ilmainen kartoituskäynti.
+        Myynti on <b>kaikki kalenteriin tulleet keikat</b> työn päivän mukaan — alustavat,
+        vahvistetut ja tehdyt, myös vielä tekemättömät tulevat keikat. Pois jäävät vain
+        peruutetut, keskeneräiset varaukset ja ilmainen kartoituskäynti. Jakso on koko
+        kalenterijakso, ja muutosprosentti vertaa edelliseen samanmittaiseen jaksoon.
         Kuluprosentit lasketaan liikevaihdosta ja kiinteät kulut jaetaan jaksolle päivien
         suhteessa. Käsin kirjatut kulut lisätään päälle samaan kategoriaan.
       </p>

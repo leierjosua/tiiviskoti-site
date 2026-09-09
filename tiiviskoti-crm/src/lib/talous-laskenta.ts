@@ -73,9 +73,9 @@ export type ResolvedRange = {
   label: string;
   /** Jakson alku (mukaan lukien). */
   fromKey: string;
-  /** Jakson loppu, poissulkeva — leikattuna huomiseen, jotta kesken oleva
-   *  jakso ei laskisi tulevaisuutta mukaan eikä jaa kiinteitä kuluja
-   *  päiville joita ei ole vielä eletty. */
+  /** Jakson loppu, poissulkeva. EI leikattu tähän päivään: kalenterissa jo
+   *  oleva tuleva keikka on myyty, ja juuri se on se luku jonka pitää näkyä
+   *  kuluvan kuukauden kohdalla. */
   toKey: string;
   /** Vertailujakso, tai null kun edeltävää dataa ei ole mielekästä hakea. */
   prevFromKey: string | null;
@@ -91,6 +91,8 @@ export type TalousMetrics = {
   liikevaihtoCents: number;   // alv 0 %
   varaukset: number;
   keskiarvoCents: number;     // keskimääräinen varausarvo (sis. alv)
+  avoinCents: number;         // myyty mutta tekemättä (sis. alv)
+  avoinN: number;
 
   tekijaCents: number;
   markkinointiCents: number;
@@ -144,15 +146,23 @@ export function fixedCostFor(fromKey: string, toKey: string, perMonthCents: numb
   return Math.round(total);
 }
 
-export type DaySales = { cents: number; n: number };
+/* Päivän myynti. `avoin*` on se osa joka on myyty mutta jota ei ole vielä
+   tehty — kalenterissa oleva keikka on myynti siitä hetkestä kun se on
+   kalenterissa, mutta johdon on silti nähtävä paljonko siitä on vielä
+   tekemättä. */
+export type DaySales = { cents: number; n: number; avoinCents: number; avoinN: number };
 
 export function sumSales(days: Map<string, DaySales>, fromKey: string, toKey: string): DaySales {
-  let cents = 0;
-  let n = 0;
+  const out: DaySales = { cents: 0, n: 0, avoinCents: 0, avoinN: 0 };
   for (const [key, v] of days) {
-    if (key >= fromKey && key < toKey) { cents += v.cents; n += v.n; }
+    if (key >= fromKey && key < toKey) {
+      out.cents += v.cents;
+      out.n += v.n;
+      out.avoinCents += v.avoinCents;
+      out.avoinN += v.avoinN;
+    }
   }
-  return { cents, n };
+  return out;
 }
 
 export function sumExpenses(
@@ -210,6 +220,8 @@ export function computeMetrics(input: {
     liikevaihtoCents,
     varaukset: sales.n,
     keskiarvoCents: sales.n > 0 ? Math.round(myyntiCents / sales.n) : 0,
+    avoinCents: sales.avoinCents,
+    avoinN: sales.avoinN,
     tekijaCents, markkinointiCents, laiteCents, komissioCents, kiinteatCents, provisioCents,
     kulutCents,
     kateCents,
@@ -232,62 +244,71 @@ export function rangeWindow(
   key: RangeKey, now: Date, firstJobKey: string | null,
 ): ResolvedRange {
   const today = dateKeyOf(now);
-  const tomorrow = addDays(today, 1);
   const [y, m] = ymd(today);
   const thisMonth = firstOfMonth(y, m);
   const nextM = addMonths(y, m, 1);
   const nextMonth = firstOfMonth(nextM.y, nextM.m);
   const label = RANGES.find((r) => r.key === key)!.label;
 
+  /* Kuukausisiirto eikä päivien vähennys: elokuussa on 31 päivää ja
+     syyskuussa 30, joten "edellinen kuukausi" ei ole sama asia kuin
+     "30 päivää taaksepäin". Viikko on ainoa jakso jolla siirto on
+     päivissä, koska viikko on aina 7 päivää. */
+  const kuukausiaTaakse = (avain: string, kk: number) => {
+    const [ay, am] = ymd(avain);
+    const p = addMonths(ay, am, -kk);
+    return firstOfMonth(p.y, p.m);
+  };
+
   let fromKey: string;
   let toKey: string;
+  let prevFromKey: string | null;
 
   switch (key) {
     case 'viikko':
       fromKey = addDays(today, -(isoWeekday(today) - 1));
       toKey = addDays(fromKey, 7);
+      prevFromKey = addDays(fromKey, -7);
       break;
     case 'edelliskk': {
-      const p = addMonths(y, m, -1);
-      fromKey = firstOfMonth(p.y, p.m);
+      fromKey = kuukausiaTaakse(thisMonth, 1);
       toKey = thisMonth;
+      prevFromKey = kuukausiaTaakse(fromKey, 1);
       break;
     }
     case '6kk': {
-      const p = addMonths(y, m, -5);
-      fromKey = firstOfMonth(p.y, p.m);
+      fromKey = kuukausiaTaakse(nextMonth, 6);
       toKey = nextMonth;
+      prevFromKey = kuukausiaTaakse(fromKey, 6);
       break;
     }
     case '12kk': {
-      const p = addMonths(y, m, -11);
-      fromKey = firstOfMonth(p.y, p.m);
+      fromKey = kuukausiaTaakse(nextMonth, 12);
       toKey = nextMonth;
+      prevFromKey = kuukausiaTaakse(fromKey, 12);
       break;
     }
     case 'kaikki': {
       const [fy, fm] = ymd(firstJobKey ?? today);
       fromKey = firstOfMonth(fy, fm);
       toKey = nextMonth;
+      // Koko historialla ei ole edeltävää jaksoa johon verrata.
+      prevFromKey = null;
       break;
     }
     default:
       fromKey = thisMonth;
       toKey = nextMonth;
+      prevFromKey = kuukausiaTaakse(fromKey, 1);
   }
-
-  const cappedTo = minKey(toKey, tomorrow);
-  const elapsed = Math.max(dayDiff(fromKey, cappedTo), 0);
-  // Koko historialla ei ole edeltävää jaksoa johon verrata.
-  const vertailu = key !== 'kaikki' && elapsed > 0;
 
   return {
     key,
     label,
     fromKey,
-    toKey: cappedTo,
-    prevFromKey: vertailu ? addDays(fromKey, -elapsed) : null,
-    prevToKey: vertailu ? fromKey : null,
+    toKey,
+    prevFromKey,
+    prevToKey: prevFromKey ? fromKey : null,
   };
 }
 

@@ -25,7 +25,7 @@ const tyhjatKulut = {
 describe('kulujen ja katteen laskenta', () => {
   it('erottaa alvin kuluttajahinnasta', () => {
     const m = computeMetrics({
-      sales: { cents: 125_500, n: 1 },
+      sales: { cents: 125_500, n: 1, avoinCents: 0, avoinN: 0 },
       expenses: { ...tyhjatKulut },
       metaCents: 0,
       fromKey: '2026-09-01', toKey: '2026-09-02',
@@ -39,7 +39,7 @@ describe('kulujen ja katteen laskenta', () => {
 
   it('laskee prosenttikulut liikevaihdosta, ei kuluttajahinnasta', () => {
     const m = computeMetrics({
-      sales: { cents: 125_500, n: 1 },
+      sales: { cents: 125_500, n: 1, avoinCents: 0, avoinN: 0 },
       expenses: { ...tyhjatKulut },
       metaCents: 0,
       fromKey: '2026-09-01', toKey: '2026-09-02',
@@ -54,7 +54,7 @@ describe('kulujen ja katteen laskenta', () => {
 
   it('lisää käsinkirjatun kulun säännön päälle samaan kategoriaan', () => {
     const m = computeMetrics({
-      sales: { cents: 125_500, n: 1 },
+      sales: { cents: 125_500, n: 1, avoinCents: 0, avoinN: 0 },
       expenses: { ...tyhjatKulut, tekija: 50_000, markkinointi: 20_000 },
       metaCents: 30_000,
       fromKey: '2026-09-01', toKey: '2026-09-02',
@@ -66,7 +66,7 @@ describe('kulujen ja katteen laskenta', () => {
 
   it('jättää Meta-kulun pois kun automatiikka on suljettu', () => {
     const m = computeMetrics({
-      sales: { cents: 0, n: 0 },
+      sales: { cents: 0, n: 0, avoinCents: 0, avoinN: 0 },
       expenses: { ...tyhjatKulut, markkinointi: 20_000 },
       metaCents: 30_000,
       fromKey: '2026-09-01', toKey: '2026-09-02',
@@ -77,7 +77,7 @@ describe('kulujen ja katteen laskenta', () => {
 
   it('vähentää markkinoinnin ja kiinteät vasta tuloksessa', () => {
     const m = computeMetrics({
-      sales: { cents: 125_500, n: 1 },
+      sales: { cents: 125_500, n: 1, avoinCents: 0, avoinN: 0 },
       expenses: { ...tyhjatKulut, markkinointi: 10_000 },
       metaCents: 0,
       fromKey: '2026-09-01', toKey: '2026-10-01',
@@ -90,7 +90,7 @@ describe('kulujen ja katteen laskenta', () => {
 
   it('ei tuota NaN:ia nollamyynnistä', () => {
     const m = computeMetrics({
-      sales: { cents: 0, n: 0 },
+      sales: { cents: 0, n: 0, avoinCents: 0, avoinN: 0 },
       expenses: { ...tyhjatKulut },
       metaCents: 0,
       fromKey: '2026-09-01', toKey: '2026-09-02',
@@ -126,17 +126,19 @@ describe('jaksojen rajat', () => {
   // Keskiviikko 9.9.2026, Suomen aikaa.
   const nyt = new Date('2026-09-09T12:00:00Z');
 
-  it('rajaa kuluvan kuukauden tähän päivään ja vertaa yhtä pitkään jaksoon', () => {
+  it('ottaa kuluvan kuukauden kokonaan, myös loppukuun myydyt keikat', () => {
     const r = rangeWindow('kk', nyt, null);
-    expect([r.fromKey, r.toKey]).toEqual(['2026-09-01', '2026-09-10']);
-    // 9 elettyä päivää → vertailu on 9 edellistä päivää, ei koko elokuu.
-    expect([r.prevFromKey, r.prevToKey]).toEqual(['2026-08-23', '2026-09-01']);
+    // EI leikkausta tähän päivään: 20.9. kalenterissa oleva keikka on jo
+    // myyty, ja juuri se puuttui kun jakso päättyi tähän päivään.
+    expect([r.fromKey, r.toKey]).toEqual(['2026-09-01', '2026-10-01']);
+    // Vertailu on edellinen kalenterikuukausi kokonaisuudessaan.
+    expect([r.prevFromKey, r.prevToKey]).toEqual(['2026-08-01', '2026-09-01']);
   });
 
   it('aloittaa viikon maanantaista', () => {
     const r = rangeWindow('viikko', nyt, null);
-    expect([r.fromKey, r.toKey]).toEqual(['2026-09-07', '2026-09-10']);
-    expect([r.prevFromKey, r.prevToKey]).toEqual(['2026-09-04', '2026-09-07']);
+    expect([r.fromKey, r.toKey]).toEqual(['2026-09-07', '2026-09-14']);
+    expect([r.prevFromKey, r.prevToKey]).toEqual(['2026-08-31', '2026-09-07']);
   });
 
   it('ottaa edellisen kuukauden kokonaisuudessaan', () => {
@@ -147,12 +149,13 @@ describe('jaksojen rajat', () => {
 
   it('laskee 12 kuukauden jakson kuukauden alusta', () => {
     const r = rangeWindow('12kk', nyt, null);
-    expect([r.fromKey, r.toKey]).toEqual(['2025-10-01', '2026-09-10']);
+    expect([r.fromKey, r.toKey]).toEqual(['2025-10-01', '2026-10-01']);
+    expect([r.prevFromKey, r.prevToKey]).toEqual(['2024-10-01', '2025-10-01']);
   });
 
   it('aloittaa koko historian ensimmäisen työn kuukaudesta eikä vertaa mihinkään', () => {
     const r = rangeWindow('kaikki', nyt, '2026-06-17');
-    expect([r.fromKey, r.toKey]).toEqual(['2026-06-01', '2026-09-10']);
+    expect([r.fromKey, r.toKey]).toEqual(['2026-06-01', '2026-10-01']);
     expect(r.prevFromKey).toBeNull();
   });
 });
@@ -160,11 +163,25 @@ describe('jaksojen rajat', () => {
 describe('päivien summaaminen jaksolle', () => {
   it('ottaa alkupäivän mukaan ja jättää loppupäivän pois', () => {
     const days = new Map<string, DaySales>([
-      ['2026-08-31', { cents: 100, n: 1 }],
-      ['2026-09-01', { cents: 200, n: 1 }],
-      ['2026-09-09', { cents: 400, n: 2 }],
-      ['2026-09-10', { cents: 800, n: 1 }],
+      ['2026-08-31', { cents: 100, n: 1, avoinCents: 0, avoinN: 0 }],
+      ['2026-09-01', { cents: 200, n: 1, avoinCents: 0, avoinN: 0 }],
+      ['2026-09-09', { cents: 400, n: 2, avoinCents: 400, avoinN: 2 }],
+      ['2026-09-10', { cents: 800, n: 1, avoinCents: 800, avoinN: 1 }],
     ]);
-    expect(sumSales(days, '2026-09-01', '2026-09-10')).toEqual({ cents: 600, n: 3 });
+    expect(sumSales(days, '2026-09-01', '2026-09-10'))
+      .toEqual({ cents: 600, n: 3, avoinCents: 400, avoinN: 2 });
+  });
+
+  it('erittelee tekemättömän osuuden myynnistä', () => {
+    const m = computeMetrics({
+      // Kuukauden 8 keikkaa, joista 5 vielä tekemättä.
+      sales: { cents: 800_000, n: 8, avoinCents: 500_000, avoinN: 5 },
+      expenses: { ...tyhjatKulut },
+      metaCents: 0,
+      fromKey: '2026-09-01', toKey: '2026-10-01',
+      s: settings(),
+    });
+    expect(m.myyntiCents).toBe(800_000);
+    expect([m.avoinCents, m.avoinN]).toEqual([500_000, 5]);
   });
 });

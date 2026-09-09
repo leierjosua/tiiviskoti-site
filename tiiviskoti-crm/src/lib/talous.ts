@@ -15,8 +15,14 @@ import {
    mainoskulut Metan rajapinnasta. Laskenta on lib/talous-laskenta.ts:ssä.
 
    MISTÄ LUVUT TULEVAT
-     Myynti      tk.jobs.price_cents, status confirmed|done, työn päivän
-                 (starts_at) mukaan. Kuluttajahinta eli sisältää alvin.
+     Myynti      tk.jobs.price_cents, työn päivän (starts_at) mukaan.
+                 KAIKKI kalenteriin päätyneet keikat: alustava, vahvistettu
+                 ja tehty. Keikka on myyty siinä hetkessä kun se on
+                 kalenterissa, joten tekemätön tuleva keikka on myyntiä
+                 siinä missä eilen tehty. Pois jäävät vain peruutetut ja
+                 `hold` (checkoutin aikainen varaus, joka vanhenee itsestään
+                 eikä ole vielä kenenkään sopima). Kuluttajahinta eli
+                 sisältää alvin.
      Kulut       tk.cost_settings (osuus liikevaihdosta + kiinteä €/kk)
                  + tk.expenses (yksittäiset kirjaukset)
                  + Meta-mainoskulut, jos automatiikka on päällä.
@@ -102,10 +108,11 @@ export async function getTalous(rangeKey: RangeKey, now: Date = new Date()): Pro
   const nextM = addMonths(ty, tm, 1);
   // Kuukausisarja on aina viimeiset 12 kuukautta — se ei kavennu vaikka
   // ylhäältä katsoisi yhtä viikkoa, koska juuri trendi on se mitä
-  // yksittäisestä viikosta ei näe.
+  // yksittäisestä viikosta ei näe. Kuluva kuukausi on mukana kokonaisena:
+  // loppukuun keikat on jo myyty, vaikka niitä ei ole vielä tehty.
   const firstOfSeries = addMonths(ty, tm, -11);
   const seriesFrom = firstOfMonth(firstOfSeries.y, firstOfSeries.m);
-  const seriesTo = minKey(firstOfMonth(nextM.y, nextM.m), addDays(today, 1));
+  const seriesTo = firstOfMonth(nextM.y, nextM.m);
 
   const unionFrom = minKey(range.prevFromKey ?? range.fromKey, seriesFrom);
   const unionTo = maxKey(range.toKey, seriesTo);
@@ -114,12 +121,16 @@ export async function getTalous(rangeKey: RangeKey, now: Date = new Date()): Pro
   const toIso = helsinkiDateTime(unionTo, '00:00').toISOString();
   const kartoitus = kartoitusCalendarId();
 
-  const salesRowsP = sql<{ d: string; cents: string; n: number }[]>`
+  const salesRowsP = sql<{
+    d: string; cents: string; n: number; avoin_cents: string; avoin_n: number;
+  }[]>`
     select to_char(j.starts_at at time zone 'Europe/Helsinki', 'YYYY-MM-DD') as d,
            coalesce(sum(j.price_cents), 0)::bigint as cents,
-           count(*)::int as n
+           count(*)::int as n,
+           coalesce(sum(j.price_cents) filter (where j.status <> 'done'), 0)::bigint as avoin_cents,
+           count(*) filter (where j.status <> 'done')::int as avoin_n
       from tk.jobs j
-     where j.status in ('confirmed', 'done')
+     where j.status in ('tentative', 'confirmed', 'done')
        and j.starts_at >= ${fromIso}
        and j.starts_at <  ${toIso}
        -- Ilmainen kartoituskäynti ei ole myynti eikä varaus: se on nollan
@@ -155,7 +166,12 @@ export async function getTalous(rangeKey: RangeKey, now: Date = new Date()): Pro
   const [salesRows, expenseRows, meta] = await Promise.all([salesRowsP, expenseRowsP, metaP]);
 
   const salesByDay = new Map<string, DaySales>();
-  for (const r of salesRows) salesByDay.set(r.d, { cents: Number(r.cents), n: r.n });
+  for (const r of salesRows) {
+    salesByDay.set(r.d, {
+      cents: Number(r.cents), n: r.n,
+      avoinCents: Number(r.avoin_cents), avoinN: r.avoin_n,
+    });
+  }
 
   const expensesByDay = new Map<string, Record<Category, number>>();
   for (const r of expenseRows) {
@@ -176,8 +192,7 @@ export async function getTalous(rangeKey: RangeKey, now: Date = new Date()): Pro
     const p = addMonths(firstOfSeries.y, firstOfSeries.m, i);
     const start = firstOfMonth(p.y, p.m);
     const nx = addMonths(p.y, p.m, 1);
-    const end = minKey(firstOfMonth(nx.y, nx.m), addDays(today, 1));
-    if (end <= start) break;
+    const end = firstOfMonth(nx.y, nx.m);
     const mm = forWindow(start, end);
     months.push({
       key: monthOf(start),
