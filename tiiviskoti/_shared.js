@@ -431,6 +431,7 @@ if(typesEl && extrasEl){
       d.innerHTML = `<span class="extra-nm">${e.name}</span><span class="extra-pr">${pr}</span>`+
         `<span class="extra-stp"><button type="button" class="stp minus" aria-label="Vähennä ${e.name}" data-a="-1" disabled>−</button><span class="qty" data-q="extra_${e.id}">0</span><button type="button" class="stp plus" aria-label="Lisää ${e.name}" data-a="1">+</button></span>`;
       const bumpExtra = (delta)=>{
+        kavijaKoskiLaskuria = true;
         const k = 'extra_'+e.id;
         state[k] = Math.max(0, Math.min(99, state[k] + delta));
         d.querySelector('.qty').textContent = state[k];
@@ -452,7 +453,7 @@ if(typesEl && extrasEl){
       const b = document.createElement('button');
       b.type='button'; b.className='extra'; b.dataset.id=e.id;
       b.innerHTML = `<span class="extra-chk">✓</span><span class="extra-nm">${e.name}</span><span class="extra-pr">${pr}</span>`;
-      b.addEventListener('click',()=>{ extraState[e.id]=!extraState[e.id]; b.classList.toggle('on',extraState[e.id]); render(); });
+      b.addEventListener('click',()=>{ kavijaKoskiLaskuria = true; extraState[e.id]=!extraState[e.id]; b.classList.toggle('on',extraState[e.id]); render(); });
       extrasEl.appendChild(b);
     }
   });
@@ -460,6 +461,7 @@ if(typesEl && extrasEl){
      päätyvät kaikki tänne, jottei rivin ulkoasu voi jäädä eri tilaan kuin
      `state`. */
   function applyQty(card, id, value){
+    kavijaKoskiLaskuria = true;
     state[id] = Math.max(0, Math.min(99, Number.isFinite(value) ? value : 0));
     const q = card.querySelector(`[data-q="${id}"]`);
     if(q && q.tagName!=='INPUT'){
@@ -610,6 +612,9 @@ function render(){
   });
 
   const q = computePricing(state, extraState);
+  /* Yksi paikka, josta kaikki valintatavat kulkevat: askellin, määräsirut,
+     kirjoitettu luku ja lisätyöt. */
+  trackValinta(q.total);
   booking.total = q.total; booking.count = q.count;
   /* Yhteenvetoteksti listaa vain ovet ja ikkunat — lisätyöt vain lukumääränä,
      muuten teksti kasvaa varaussivulla ja kalenteritapahtuman otsikossa
@@ -773,6 +778,26 @@ function bookingMinutes(){
    kohti, koska tämä ajetaan joka kerta kun kentässä on viisi numeroa —
    muuten yksi epäröivä näppäily tuottaisi kymmenen tapahtumaa. */
 let _trackedArea = '';
+/* Ensimmäinen valittu kohde laskurissa.
+
+   MIKSI: `calc` kertoo vain että laskuri aukesi ja `cal` että kalenteri
+   avattiin. Niiden väliin mahtuu kaksi täysin eri ongelmaa saman luvun
+   sisään: kävijä joka ei valinnut mitään (laskuri on liian työläs tai
+   väärä kohteille) ja kävijä joka valitsi, näki hinnan ja lähti (hinta ei
+   kelvannut). Korjaus on eri kummassakin, joten ne on erotettava.
+   Mitattu 9.9.2026: hinnan nähneistä 75 % ei avannut kalenteria.
+
+   Kirjataan kerran sivulatausta kohti ja VAIN kävijän omasta toimesta:
+   varaussivulle palautettu aiempi valinta ei ole uusi valinta, ja ilman
+   tätä ehtoa jokainen paluu varaussivulle näyttäisi valinnalta. */
+let valintaKirjattu = false, kavijaKoskiLaskuria = false;
+function trackValinta(total){
+  if(valintaKirjattu || !kavijaKoskiLaskuria || !window.tkTrack) return;
+  if(!(total > 0)) return;
+  valintaKirjattu = true;
+  window.tkTrack({ type:'funnel', step:'pick' });
+}
+
 function trackArea(tulos){
   if(!window.tkTrack) return;
   const avain = avail.postal + ':' + tulos;

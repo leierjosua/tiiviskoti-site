@@ -11,12 +11,19 @@ const RANGES: Record<string, { days: number; label: string }> = {
   '90': { days: 90, label: '90 pv' },
 };
 
+/* Vaiheiden nimet kertovat mitä kävijä TEKI, ei mikä ruutu oli auki.
+   'postal' laukeaa jo varauskortin latauksessa, joten "Postinumero" luki
+   sen väärin: se ei tarkoita että postinumero olisi syötetty.
+   'pick' = ensimmäinen valittu kohde. Se erottaa toisistaan kävijän joka ei
+   valinnut mitään ja kävijän joka valitsi, näki hinnan ja lähti — ilman sitä
+   molemmat katosivat samaan 'calc' → 'cal' -pudotukseen. */
 const FUNNEL: { key: string; label: string }[] = [
-  { key: 'postal', label: 'Postinumero' },
-  { key: 'calc', label: 'Palvelut' },
+  { key: 'postal', label: 'Näki varauskortin' },
+  { key: 'calc', label: 'Avasi laskurin' },
+  { key: 'pick', label: 'Valitsi kohteen' },
   { key: 'cal', label: 'Kalenteri' },
   { key: 'form', label: 'Yhteystiedot' },
-  { key: 'done', label: 'Vahvistus' },
+  { key: 'done', label: 'Varasi' },
 ];
 
 function fmtDur(sec: number): string {
@@ -149,13 +156,26 @@ export default async function SivustoAnalytics({
               <p className="mt-3 text-xs text-faint">Ei varausvaihedataa vielä.</p>
             ) : (
               <ul className="mt-3 space-y-2">
-                {FUNNEL.map((step) => {
+                {FUNNEL.map((step, i) => {
                   const n = a.funnel.find((f) => f.key === step.key)?.n ?? 0;
+                  /* Läpäisy edellisestä vaiheesta: pullonkaula näkyy vasta
+                     suhteessa, ei absoluuttisessa luvussa. */
+                  const edellinen = i === 0
+                    ? 0
+                    : a.funnel.find((f) => f.key === FUNNEL[i - 1].key)?.n ?? 0;
+                  const osuus = edellinen > 0 ? Math.round((n / edellinen) * 100) : null;
                   return (
                     <li key={step.key} className="text-sm">
                       <div className="flex items-baseline justify-between gap-3">
                         <span className="text-text">{step.label}</span>
-                        <span className="shrink-0 tabular text-muted">{n} kävijää</span>
+                        <span className="shrink-0 tabular text-muted">
+                          {n} kävijää
+                          {osuus !== null && (
+                            <span className={osuus < 40 ? 'ml-2 text-warn' : 'ml-2 text-faint'}>
+                              {osuus} %
+                            </span>
+                          )}
+                        </span>
                       </div>
                       <div className="mt-1 h-2 rounded-full bg-line-soft">
                         <div className="h-2 rounded-full bg-accent"
