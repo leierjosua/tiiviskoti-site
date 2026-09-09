@@ -32,6 +32,16 @@ export function NewJobForm({
   const router = useRouter();
   const [state, action, pending] = useActionState<ActionState, FormData>(createJob, {});
   const [selected, setSelected] = useState<string | null>(null);
+  /* Vapaa aika kalenterin ulkopuolelta. Vapaat ajat kattavat työaikojen
+     sisällä olevat ruudut, mutta keikka sovitaan joskus niiden ulkopuolelle:
+     ilta, lauantai, tai asiakkaan ainoa mahdollinen hetki. Aiemmin sellaista
+     ei voinut kirjata lainkaan, joten se jäi kalenterin ulkopuolelle.
+
+     Arvo on vyöhykkeetön `datetime-local`, jonka palvelin tulkitsee Suomen
+     ajaksi (`parseBookingStart`). Päällekkäisyyden estää kannan rajoite,
+     joten oikeasti varattua aikaa ei voi tälläkään ohittaa. */
+  const [vapaaAika, setVapaaAika] = useState('');
+  const [vapaaKesto, setVapaaKesto] = useState('');
 
   // Kalenterin ja keston vaihto hakee vapaat ajat uudelleen palvelimelta,
   // koska laskenta on siellä.
@@ -70,8 +80,8 @@ export function NewJobForm({
     <form action={action} className="grid gap-6 p-4 lg:grid-cols-2">
       <input type="hidden" name="calendarId" value={calendarId} />
       <input type="hidden" name="calendarId2" value={calendarId2} />
-      <input type="hidden" name="durationMinutes" value={duration} />
-      <input type="hidden" name="startsAt" value={selected ?? ''} />
+      <input type="hidden" name="durationMinutes" value={vapaaAika && vapaaKesto ? vapaaKesto : duration} />
+      <input type="hidden" name="startsAt" value={vapaaAika || selected || ''} />
       {leadId ? <input type="hidden" name="leadId" value={leadId} /> : null}
       {offer ? <input type="hidden" name="offerId" value={offer.id} /> : null}
 
@@ -125,7 +135,7 @@ export function NewJobForm({
                       <button
                         key={iso}
                         type="button"
-                        onClick={() => setSelected(iso)}
+                        onClick={() => { setSelected(iso); setVapaaAika(''); }}
                         className={cx(
                           'rounded border px-2 py-1 text-xs tabular transition-colors',
                           selected === iso
@@ -142,6 +152,47 @@ export function NewJobForm({
             </div>
           )}
         </div>
+
+        {/* Vapaa aika. Erillään vapaista ajoista, koska se ohittaa työajat:
+            valinta on tietoinen eikä vahinko. Päällekkäisyyttä se ei ohita —
+            kannan rajoite hylkää oikeasti varatun ajan ja lomake kertoo sen. */}
+        <details className="rounded-md border border-line" open={!!vapaaAika}>
+          <summary className="cursor-pointer px-3 py-2 text-xs font-medium text-muted">
+            Muu aika — työaikojen ulkopuolelta
+          </summary>
+          <div className="space-y-2 border-t border-line px-3 py-3">
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block">
+                <span className="mb-1 block text-xs text-faint">Alkaa</span>
+                <input
+                  type="datetime-local"
+                  value={vapaaAika}
+                  onChange={(e) => { setVapaaAika(e.target.value); if (e.target.value) setSelected(null); }}
+                  className="w-full rounded-md border border-line bg-ink-800 px-2 py-1.5 text-sm text-text"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-faint">Kesto (min)</span>
+                <input
+                  type="number" min={15} max={600} step={15}
+                  placeholder={String(duration)}
+                  value={vapaaKesto}
+                  onChange={(e) => setVapaaKesto(e.target.value)}
+                  className="w-full rounded-md border border-line bg-ink-800 px-2 py-1.5 text-sm text-text tabular"
+                />
+              </label>
+            </div>
+            {vapaaAika && (
+              <p className="text-xs text-accent">
+                Käytetään tätä aikaa, ei listalta valittua.
+                {!vapaaKesto && ` Kesto ${duration} min.`}
+              </p>
+            )}
+            <p className="text-xs text-faint">
+              Ohittaa työajat ja vapaat ajat. Jo varattua aikaa ei voi varata päälle.
+            </p>
+          </div>
+        </details>
       </div>
 
       <div className="space-y-4">
@@ -219,8 +270,8 @@ export function NewJobForm({
           </span>
         </label>
 
-        <Button type="submit" disabled={pending || !selected} className="w-full">
-          {!selected
+        <Button type="submit" disabled={pending || !(selected || vapaaAika)} className="w-full">
+          {!(selected || vapaaAika)
             ? 'Valitse ensin aika'
             : pending
               ? 'Tallennetaan…'
