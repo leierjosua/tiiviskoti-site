@@ -421,6 +421,18 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .mf-brand{grid-column:1/-1}
 }
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
+
+/* Yhteenveto vaaleana: sama laskuri, sama ilme joka sivulla. Tumma paneeli
+   luki "täytä lomake" siinä kohtaa jossa piti lukea "katso hinta". */
+.quote{background:var(--card);color:var(--text);border:1px solid var(--line);padding:20px;box-shadow:var(--sh)}
+.q-t,.q-total .pv,.q-meta b{color:var(--ink)}
+.q-total .pt,.q-note,.q-net,.q-meta span{color:var(--mute)}
+.q-total{border-top-color:var(--line)}
+.q-total .pv{font-size:38px}
+.q-total .pv small,.q-net b{color:var(--green)}
+.rc-lines,.rc-empty{color:var(--mute)}
+.q-btn{background:var(--green);color:#fff}
+.wtype{padding-top:12px;padding-bottom:12px}
 </style>
 </head>
 <body>

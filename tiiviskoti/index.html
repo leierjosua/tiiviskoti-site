@@ -344,26 +344,25 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .ab-seg .ab-seg-on b,.ab-seg .ab-seg-on span{color:var(--green)}
 .ab-seg button:hover{background:var(--green-soft)}
 
-/* Yhteenveto vaaleaksi: sama tieto, kevyempi paino. */
-html[data-ab="b"] .quote{background:var(--card);color:var(--text);
+/* Yhteenveto vaaleaksi: sama tieto, kevyempi paino.
+
+   TÄMÄ KOSKEE MOLEMPIA VERSIOITA, ei vain B:tä. Testi kysyy yhtä asiaa:
+   kannattaako hinta näyttää ennen postinumeroa. Jos B olisi samalla myös
+   erinäköinen, voittajasta ei tietäisi kumpi sen teki — järjestys vai
+   ulkoasu. Kahden muuttujan testi vastaa kysymykseen jota ei kysytty. */
+.quote{background:var(--card);color:var(--text);
   border:1px solid var(--line);padding:20px;box-shadow:var(--sh)}
-html[data-ab="b"] .q-t,
-html[data-ab="b"] .q-total .pv,
-html[data-ab="b"] .q-meta b{color:var(--ink)}
-html[data-ab="b"] .q-total .pt,
-html[data-ab="b"] .q-note,
-html[data-ab="b"] .q-net,
-html[data-ab="b"] .q-meta span{color:var(--mute)}
-html[data-ab="b"] .q-total{border-top-color:var(--line)}
-html[data-ab="b"] .q-total .pv{font-size:38px}
-html[data-ab="b"] .q-total .pv small,
-html[data-ab="b"] .q-net b{color:var(--green)}
-html[data-ab="b"] .rc-lines,html[data-ab="b"] .rc-empty{color:var(--mute)}
+.q-t,.q-total .pv,.q-meta b{color:var(--ink)}
+.q-total .pt,.q-note,.q-net,.q-meta span{color:var(--mute)}
+.q-total{border-top-color:var(--line)}
+.q-total .pv{font-size:38px}
+.q-total .pv small,.q-net b{color:var(--green)}
+.rc-lines,.rc-empty{color:var(--mute)}
 /* Vaalealla pohjalla nappi tarvitsee täyden värin — se on koko kortin
    tarkoitus, eikä se saa hukkua taustaan. */
-html[data-ab="b"] .q-btn{background:var(--green);color:#fff}
-/* Rivit hieman tiiviimmiksi: lista on ensimmäinen näkymä. */
-html[data-ab="b"] .wtype{padding-top:12px;padding-bottom:12px}
+.q-btn{background:var(--green);color:#fff}
+/* Rivit hieman tiiviimmiksi: lista on B:ssä ensimmäinen näkymä. */
+.wtype{padding-top:12px;padding-bottom:12px}
 /* Postinumerovaiheen välilehtipari pois yhden kodin polulla: valinta on jo
    tehty kortin yläreunassa. Taloyhtiöpolulla pari jää, koska se on ainoa
    tie takaisin. */
@@ -577,7 +576,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
   .quote{order:-1;position:sticky;top:62px;z-index:30;padding:13px 15px;border-radius:14px;
     display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;
     box-shadow:0 14px 28px -16px rgba(0,0,0,.6)}
-  html[data-ab="b"] .quote{box-shadow:0 12px 26px -18px rgba(16,24,32,.45)}
+  .quote{box-shadow:0 12px 26px -18px rgba(16,24,32,.45)}
   .q-t,.rc-lines,.q-meta,.q-note{display:none}
   .q-total{grid-column:1;grid-row:1;margin:0;padding:0;border-top:none}
   .q-total .pt{font-size:10.5px}
