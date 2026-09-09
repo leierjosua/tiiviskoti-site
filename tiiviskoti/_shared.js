@@ -18,11 +18,32 @@ const ico = {
   ikkuna:'<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v18M4 12h16" stroke="currentColor" stroke-width="1.6"/></svg>',
   kynnys:'<svg viewBox="0 0 24 24" fill="none"><path d="M3 18h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><rect x="6" y="6" width="12" height="8" rx="1.2" stroke="currentColor" stroke-width="1.7"/></svg>'
 };
-/* Ikkunan porrastuksen selite: näytetään kortissa, jotta asiakas näkee
-   miksi yksikköhinta muuttuu määrää kasvattaessa. */
-/* Vihje rakennetaan portaista, jottei se voi jäädä jälkeen hinnastosta. */
-const TIER_HINT = 'Mitä useampi ikkuna, sitä halvempi: '
-  + WINDOW_TIERS.slice(1).map((t, i) => `${WINDOW_TIERS[i].upTo + 1}+ ${t.price} €`).join(' · ');
+/* Ikkunan määräporrastus SIRUINA: portaan alkumäärä ja sen yksikköhinta
+   yhtenä nappina, joka asettaa määrän suoraan. Aiemmin sama tieto oli
+   pelkkänä selitetekstinä kortin kuvauksessa — ja `.wtype-desc` on
+   puhelimessa `display:none`, eli koko määräalennus oli näkymätön juuri
+   siellä missä mainosliikenne on. Portaat luetaan WINDOW_TIERSistä, joten
+   sirut eivät voi jäädä jälkeen hinnastosta. */
+const TIER_STEPS = WINDOW_TIERS.slice(1).map((t, i) => ({
+  qty: WINDOW_TIERS[i].upTo + 1, price: t.price, upTo: t.upTo,
+}));
+
+/* Laskurin ESITYSJÄRJESTYS: neljä yleisintä kohdetta näkyvissä, loput
+   "Muut kohteet" -napin takana. Kuusi tasa-arvoista riviä oli puhelimessa
+   seinä, jonka loppu jäi hintapalkin alle ruudun ulkopuolelle.
+   HUOM: tämä on vain esitys. Hinnoittelun järjestys on pricing.mjs:n
+   TYPES-taulukko eikä siihen kosketa täältä. */
+const PRIMARY_TYPES = ['ikkuna', 'ulko', 'terassi', 'vali'];
+
+/* Askeltimen pohjassa pitäminen juoksuttaa lukua. Kymmenen ikkunan talossa
+   yksi napautus per ikkuna on kymmenen napautusta samaan nappiin, ja juuri
+   ne tilaukset ovat isoimpia. Ajastimet ovat moduulitasolla ja pysähtyvät
+   ikkunan pointerup-tapahtumaan: jos sormi liukuu napin ulkopuolelle, napin
+   omaan kuuntelijaan jätetty intervalli jäisi juoksemaan. */
+let holdWait = null, holdRun = null;
+function stopHold(){ clearTimeout(holdWait); clearInterval(holdRun); holdWait = holdRun = null; }
+function startHold(fn){ stopHold(); holdWait = setTimeout(() => { holdRun = setInterval(fn, 110); }, 420); }
+['pointerup','pointercancel','blur'].forEach(ev => window.addEventListener(ev, stopHold));
 
 /* ---------- mainoskampanjan tunnistus ----------
    Osoitteen ?src=-parametri kertoo mistä mainoksesta kävijä tuli, esim.
@@ -344,16 +365,57 @@ function unitInfo(t){
 
 const typesEl = document.getElementById('calcTypes');
 const extrasEl = document.getElementById('calcExtras');
+/* Yhden kohdetyypin rivi. Erillinen funktio, koska rivejä syntyy kahteen
+   paikkaan: näkyviin ja "Muut kohteet" -laatikkoon. */
+function typeCard(t){
+  const c = document.createElement('div');
+  c.className='wtype'; c.dataset.id=t.id;
+  /* Seuraavan portaan vihje on `.wtype-top`issa eikä `.wtype-desc`issä:
+     kuvaus piilotetaan puhelimessa, ja vihje on juuri se rivi joka kasvattaa
+     tilausta — se ei saa kadota siellä missä liikenne on. */
+  c.innerHTML =
+    `<div class="wtype-ic">${ico[t.id]}</div>
+     <div class="wtype-top"><div class="wtype-name">${t.name}</div><div class="wtype-desc">${t.desc}</div><span class="wtype-price" data-p="${t.id}">${t.price} €/kpl</span>${t.tiers?`<span class="wtype-next" data-next="${t.id}" hidden></span>`:''}</div>
+     <div class="stepper"><div class="stepper-btns"><button class="stp minus" aria-label="Vähennä: ${t.name}" data-a="-1" disabled>−</button><span class="qty tap" data-q="${t.id}" role="button" tabindex="0" aria-label="${t.name}, määrä — napauta kirjoittaaksesi luvun">0</span><button class="stp plus" aria-label="Lisää: ${t.name}" data-a="1">+</button></div></div>`;
+  return c;
+}
+
+/* Määräalennus toimintana: sirun napautus asettaa määrän portaan alkuun. */
+function tierChips(){
+  const box = document.createElement('div');
+  box.className = 'wtype-tiers';
+  box.setAttribute('role','group');
+  box.setAttribute('aria-label','Ikkunoiden määräalennus');
+  box.innerHTML = '<span class="tl">Mitä useampi, sitä halvempi:</span>' +
+    TIER_STEPS.map(st =>
+      `<button type="button" class="tchip" data-tier="${st.qty}" aria-label="Aseta ${st.qty} ikkunaa — ${st.price} euroa kappaleelta"><b>${st.qty} kpl</b> ${st.price} €/kpl</button>`
+    ).join('');
+  return box;
+}
+
 if(typesEl && extrasEl){
-  TYPES.forEach(t=>{
-    const c = document.createElement('div');
-    c.className='wtype'; c.dataset.id=t.id;
-    c.innerHTML =
-      `<div class="wtype-ic">${ico[t.id]}</div>
-       <div class="wtype-top"><div class="wtype-name">${t.name}</div><div class="wtype-desc">${t.desc}${t.tiers?`<span class="wtype-tier">${TIER_HINT}</span><span class="wtype-next" data-next="${t.id}" hidden></span>`:''}</div><span class="wtype-price" data-p="${t.id}">${t.price} €/kpl</span></div>
-       <div class="stepper"><div class="stepper-btns"><button class="stp minus" aria-label="Vähennä" data-a="-1" disabled>−</button><span class="qty" data-q="${t.id}">0</span><button class="stp plus" aria-label="Lisää" data-a="1">+</button></div></div>`;
-    typesEl.appendChild(c);
+  const primary = PRIMARY_TYPES.map(id => TYPES.find(t => t.id===id)).filter(Boolean);
+  const secondary = TYPES.filter(t => !PRIMARY_TYPES.includes(t.id));
+  primary.forEach(t=>{
+    typesEl.appendChild(typeCard(t));
+    if(t.tiers) typesEl.appendChild(tierChips());
   });
+  if(secondary.length){
+    const more = document.createElement('button');
+    more.type='button'; more.className='morecats'; more.id='calcMore';
+    more.setAttribute('aria-expanded','false'); more.setAttribute('aria-controls','calcMoreBox');
+    more.innerHTML = `<span>Muut kohteet — ${secondary.map(t=>t.name.toLowerCase()).join(', ')}</span>`+
+      `<svg class="cv" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const box = document.createElement('div');
+    box.id='calcMoreBox'; box.className='calc-more'; box.hidden=true;
+    secondary.forEach(t => box.appendChild(typeCard(t)));
+    more.addEventListener('click', ()=>{
+      const open = box.hidden;
+      box.hidden = !open;
+      more.setAttribute('aria-expanded', String(open));
+    });
+    typesEl.append(more, box);
+  }
   EXTRAS.forEach(e=>{
     const unit = e.unit ? `/${e.unit}` : '';
     const pr = `+${e.price} €${unit}${e.note?` <span class="extra-note">${e.note}</span>`:''}`;
@@ -364,14 +426,22 @@ if(typesEl && extrasEl){
       d.className='extra extra-q'; d.dataset.id=e.id;
       d.innerHTML = `<span class="extra-nm">${e.name}</span><span class="extra-pr">${pr}</span>`+
         `<span class="extra-stp"><button type="button" class="stp minus" aria-label="Vähennä ${e.name}" data-a="-1" disabled>−</button><span class="qty" data-q="extra_${e.id}">0</span><button type="button" class="stp plus" aria-label="Lisää ${e.name}" data-a="1">+</button></span>`;
-      d.addEventListener('click',ev=>{
-        const btn = ev.target.closest('.stp'); if(!btn) return;
+      const bumpExtra = (delta)=>{
         const k = 'extra_'+e.id;
-        state[k] = Math.max(0, Math.min(99, state[k] + +btn.dataset.a));
+        state[k] = Math.max(0, Math.min(99, state[k] + delta));
         d.querySelector('.qty').textContent = state[k];
         d.querySelector('.minus').disabled = state[k]===0;
         d.classList.toggle('on', state[k]>0);
         render();
+      };
+      d.addEventListener('click',ev=>{
+        const btn = ev.target.closest('.stp'); if(!btn) return;
+        bumpExtra(+btn.dataset.a);
+      });
+      // Sama pohjassa pito kuin kohderiveillä, ettei kahvoja napauteta yksitellen.
+      d.addEventListener('pointerdown',ev=>{
+        const btn = ev.target.closest('.stp'); if(!btn) return;
+        startHold(()=>bumpExtra(+btn.dataset.a));
       });
       extrasEl.appendChild(d);
     } else {
@@ -382,15 +452,79 @@ if(typesEl && extrasEl){
       extrasEl.appendChild(b);
     }
   });
-  typesEl.addEventListener('click', e=>{
-    const btn = e.target.closest('.stp'); if(!btn) return;
-    const card = btn.closest('.wtype'); const id = card.dataset.id;
-    state[id] = Math.max(0, Math.min(99, state[id]+ +btn.dataset.a));
-    const q = card.querySelector('.qty'); q.textContent = state[id];
-    q.classList.remove('pop'); void q.offsetWidth; q.classList.add('pop');
+  /* Määrän asetus yhdestä paikasta: askellin, sirut ja kirjoitettu luku
+     päätyvät kaikki tänne, jottei rivin ulkoasu voi jäädä eri tilaan kuin
+     `state`. */
+  function applyQty(card, id, value){
+    state[id] = Math.max(0, Math.min(99, Number.isFinite(value) ? value : 0));
+    const q = card.querySelector(`[data-q="${id}"]`);
+    if(q && q.tagName!=='INPUT'){
+      q.textContent = state[id];
+      q.classList.remove('pop'); void q.offsetWidth; q.classList.add('pop');
+    }
     card.querySelector('.minus').disabled = state[id]===0;
     card.classList.toggle('has', state[id]>0);
     render();
+  }
+
+  /* Luvun kirjoittaminen: askellin on hyvä yhdelle tai kahdelle, mutta
+     kymmentä ikkunaa ei napauteta kymmentä kertaa. Luku vaihtuu hetkeksi
+     kentäksi ja palaa tekstiksi heti kun se on annettu. */
+  function editQty(span, id, card){
+    if(!span || !card) return;
+    const inp = document.createElement('input');
+    inp.type='text'; inp.inputMode='numeric'; inp.className='qty qty-edit';
+    inp.setAttribute('data-q', id); inp.setAttribute('aria-label','Määrä');
+    inp.value = state[id]>0 ? String(state[id]) : '';
+    span.replaceWith(inp);
+    inp.focus(); inp.select();
+    const close = (commit)=>{
+      // Peruutus sulkee kentän, ja sen jälkeen tuleva blur ei saa tehdä mitään.
+      if(!inp.parentNode) return;
+      const val = commit ? parseInt(inp.value, 10) : state[id];
+      inp.replaceWith(span);
+      applyQty(card, id, Number.isFinite(val) ? val : 0);
+      span.focus();
+    };
+    inp.addEventListener('blur', ()=>close(true));
+    inp.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); close(true); }
+      else if(e.key==='Escape'){ e.preventDefault(); close(false); }
+    });
+  }
+
+  typesEl.addEventListener('click', e=>{
+    const chip = e.target.closest('.tchip');
+    if(chip){
+      const card = typesEl.querySelector('.wtype[data-id="ikkuna"]');
+      if(card) applyQty(card, 'ikkuna', +chip.dataset.tier);
+      return;
+    }
+    const qEl = e.target.closest('.qty');
+    if(qEl && qEl.tagName!=='INPUT'){
+      editQty(qEl, qEl.dataset.q, qEl.closest('.wtype'));
+      return;
+    }
+    const btn = e.target.closest('.stp'); if(!btn) return;
+    const card = btn.closest('.wtype'); const id = card.dataset.id;
+    applyQty(card, id, (state[id]||0) + +btn.dataset.a);
+  });
+
+  // Näppäimistöllä sama: luku on rooliltaan nappi, joka avaa kentän.
+  typesEl.addEventListener('keydown', e=>{
+    const qEl = e.target.closest('.qty');
+    if(!qEl || qEl.tagName==='INPUT') return;
+    if(e.key==='Enter' || e.key===' '){
+      e.preventDefault();
+      editQty(qEl, qEl.dataset.q, qEl.closest('.wtype'));
+    }
+  });
+
+  typesEl.addEventListener('pointerdown', e=>{
+    const btn = e.target.closest('.stp'); if(!btn) return;
+    const card = btn.closest('.wtype'); if(!card) return;
+    const id = card.dataset.id, d = +btn.dataset.a;
+    startHold(()=> applyQty(card, id, (state[id]||0) + d));
   });
 }
 let shownPrice = 0, rafId=null;
@@ -446,6 +580,25 @@ function render(){
       vihje.hidden = !teksti;
     }
   });
+  /* Sirun korostus kertoo missä portaassa ollaan nyt — se on sama tieto
+     kuin yksikköhinnassa, mutta luettavissa yhdellä silmäyksellä. */
+  if(typesEl) typesEl.querySelectorAll('.tchip').forEach(ch=>{
+    const st = TIER_STEPS.find(x => x.qty === +ch.dataset.tier);
+    ch.classList.toggle('on', !!st && windows >= st.qty &&
+      (!Number.isFinite(st.upTo) || windows <= st.upTo));
+  });
+
+  /* "Muut kohteet" auki, jos sieltä on jotain valittuna. Paluu varaussivulta
+     palauttaa määrät `stateen`, ja piilossa oleva valinta näkyisi muuten
+     vain hinnassa — se luetaan virheeksi. */
+  const moreBox = document.getElementById('calcMoreBox');
+  if(moreBox && moreBox.hidden &&
+     TYPES.some(t => !PRIMARY_TYPES.includes(t.id) && (state[t.id]||0) > 0)){
+    moreBox.hidden = false;
+    const mb = document.getElementById('calcMore');
+    if(mb) mb.setAttribute('aria-expanded','true');
+  }
+
   if(extrasEl) EXTRAS.forEach(e=>{
     const el = extrasEl.querySelector(`.extra[data-id="${e.id}"]`); if(!el) return;
     if(e.per==='ikkuna'){ el.disabled = windows===0; el.classList.toggle('off', windows===0); }

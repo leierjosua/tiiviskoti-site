@@ -176,6 +176,23 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
    muuttuu valinnan mukana ja on kehotus, ei staattinen tieto. */
 .wtype-next{display:block;margin-top:4px;padding:3px 8px;border-radius:6px;background:rgba(46,158,99,.12);color:var(--green);font-weight:700;font-size:13px;width:fit-content}
 .wtype-next[hidden]{display:none}
+/* Määräalennuksen sirut: portaikko toimintana eikä alaviitteenä. Napautus
+   asettaa määrän portaan alkuun, ja aktiivinen siru kertoo missä ollaan.
+   Sirut ovat oma rivinsä ikkunakortin alla, koska ne koskevat vain sitä. */
+.wtype-tiers{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 22px 11px;background:var(--card);border-bottom:1px solid var(--line)}
+.wtype-tiers .tl{font-size:12.5px;font-weight:700;color:var(--mute)}
+.tchip{font-family:inherit;font-size:13px;font-weight:700;color:var(--green);background:var(--green-soft);border:1.5px solid transparent;border-radius:999px;padding:5px 12px;cursor:pointer;white-space:nowrap;transition:.16s var(--ease)}
+.tchip b{font-weight:800}
+.tchip:hover{border-color:var(--green)}
+.tchip.on{background:var(--green);color:#fff}
+/* Harvinaisemmat kohteet avautuvat napista: neljä riviä näkyvissä, ei kuutta. */
+.morecats{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;font-family:inherit;font-size:14.5px;font-weight:700;color:var(--green);background:var(--card);border:none;border-bottom:1px solid var(--line);padding:14px 22px;cursor:pointer;text-align:left}
+.morecats .cv{flex:0 0 auto;transition:transform .2s var(--ease)}
+.morecats[aria-expanded="true"] .cv{transform:rotate(180deg)}
+/* Kirjoitettava määrä: luku on napautettava ja muuttuu kentäksi. */
+.qty.tap{cursor:text;border-bottom:1.5px dashed var(--line2)}
+.qty-edit{width:46px;border:1.5px solid var(--green);border-bottom:1.5px solid var(--green);border-radius:8px;text-align:center;padding:2px 0;font-family:inherit;background:var(--card);color:var(--ink)}
+
 .wtype-price s{opacity:.55;font-weight:600}
 .cp-unit{font-size:12px;color:var(--dmute);font-weight:600}
 .quote{position:sticky;top:88px;background:var(--deep);color:var(--dtext);border-radius:var(--r-lg);padding:26px}
@@ -522,6 +539,13 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .wtype-top{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
   .wtype-name{font-size:15.5px}
   .wtype-desc{display:none}
+  .wtype-tiers{padding:9px 14px 10px;gap:6px}
+  .wtype-tiers .tl{width:100%;font-size:11.5px}
+  .tchip{font-size:12.5px;padding:5px 10px}
+  .morecats{padding:13px 14px;font-size:14px}
+  /* Seuraavan portaan vihje omalle rivilleen: `.wtype-top` on puhelimessa
+     rivitaittuva, ja vihje on koko rivin levyinen kehotus. */
+  .wtype-next{width:100%}
   .wtype-price{font-size:12px;margin-top:0}
   .stp{width:31px;height:31px;font-size:17px}
   .qty{font-size:18px;min-width:24px}
