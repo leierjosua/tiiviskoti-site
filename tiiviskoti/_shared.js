@@ -33,7 +33,17 @@ const TIER_STEPS = WINDOW_TIERS.slice(1).map((t, i) => ({
    seinä, jonka loppu jäi hintapalkin alle ruudun ulkopuolelle.
    HUOM: tämä on vain esitys. Hinnoittelun järjestys on pricing.mjs:n
    TYPES-taulukko eikä siihen kosketa täältä. */
-const PRIMARY_TYPES = ['ikkuna', 'ulko', 'terassi', 'vali'];
+/* Mitkä kohteet ovat laskurissa suoraan esillä; loput menevät "Muut kohteet"
+   -painikkeen taakse. `?layout=v3` kaventaa listan kahteen yleisimpään —
+   ks. koeasettelut tiedoston lopussa. VÄLIAIKAINEN, poistetaan kun B-version
+   ulkoasu on valittu. */
+const KOE = (function(){
+  try { var v = new URLSearchParams(location.search).get('layout');
+        return /^v[1-5]$/.test(v||'') ? v : null; } catch(e){ return null; }
+})();
+const PRIMARY_TYPES = KOE === 'v3'
+  ? ['ikkuna', 'ulko']
+  : ['ikkuna', 'ulko', 'terassi', 'vali'];
 
 /* Askeltimen pohjassa pitäminen juoksuttaa lukua. Kymmenen ikkunan talossa
    yksi napautus per ikkuna on kymmenen napautusta samaan nappiin, ja juuri
@@ -1858,6 +1868,76 @@ if('IntersectionObserver' in window){
 setTimeout(()=>rvEls.forEach(el=>{ if(el.getBoundingClientRect().top<innerHeight) el.classList.add('in'); }),1000);
 const yrEl=document.getElementById('yr'); if(yrEl) yrEl.textContent=new Date().getFullYear();
 render(); renderCal(); renderSlots(); syncBookingSummary();
+
+/* ---------- B-VERSION ULKOASUVAIHTOEHDOT (VÄLIAIKAINEN) ----------
+   `?layout=v1..v5` yhdessä `?ab=b`:n kanssa. Ilman parametria mikään tästä ei
+   aja, joten tuotantonäkymä on koskematon. Tarkoitus on että vaihtoehdot voi
+   kokeilla oikealla sivulla puhelimessa eikä vain kuvina — ja kun yksi
+   valitaan, tämä lohko ja variaatiot.html poistetaan ja valittu jää pysyväksi.
+
+   Yhteinen kaikille: taloyhtiövalinta kutistuu yhdeksi riviksi, koska juuri
+   kahden ison napin pari teki B:stä ahtaan.                                */
+if(KOE && document.querySelector('.ab-gate')){
+  const gate = document.querySelector('.ab-gate');
+  gate.classList.add('ab-gate-slim');
+  gate.style.cssText = 'grid-column:1/-1;margin:0 0 10px;text-align:right;font-size:14px';
+  gate.innerHTML = '<button type="button" class="ab-yhtio" style="background:none;border:0;'
+    + 'cursor:pointer;font:inherit;color:var(--green);font-weight:700">'
+    + 'Taloyhtiö? Varaa veloitukseton kartoitus →</button>';
+  gate.addEventListener('click', (e)=>{
+    if(!e.target.closest('.ab-yhtio')) return;
+    const t=document.getElementById('tabYhtio'); if(t) t.click();
+  });
+
+  /* Osio avattavan otsikon taakse. Sisältö säilyy DOM:issa ja toimii
+     tavalliseen tapaan — vain näkyvyys muuttuu. */
+  const piiloonOtsikonTaakse = (otsikkoEl, sisaltoEl, teksti) => {
+    if(!otsikkoEl || !sisaltoEl) return;
+    const d=document.createElement('details');
+    d.style.cssText='border-top:1px solid var(--line)';
+    const sum=document.createElement('summary');
+    sum.textContent=teksti;
+    sum.style.cssText='cursor:pointer;padding:14px 22px;font-weight:700;color:var(--green);'
+      + 'font-size:14.5px;list-style:none';
+    d.appendChild(sum);
+    otsikkoEl.replaceWith(d);
+    d.appendChild(sisaltoEl);
+  };
+
+  const extrasHd=document.querySelector('.extras-hd'), extras=document.getElementById('calcExtras');
+  if(KOE==='v2' || KOE==='v3'){
+    piiloonOtsikonTaakse(extrasHd, extras, 'Lisää tarvittaessa — saumaus, helat, kahva');
+  }
+
+  if(KOE==='v4'){
+    const w=document.querySelector('.calc-wrap');
+    if(w){ w.style.gridTemplateColumns='1fr'; w.style.maxWidth='620px'; w.style.marginInline='auto'; }
+    const q=document.querySelector('.quote');
+    if(q){ q.style.position='static'; q.style.padding='18px 20px'; }
+    ['.q-meta','.rc-lines','.q-t'].forEach(sel=>{
+      const el=document.querySelector(sel); if(el) el.style.display='none';
+    });
+    const pv=document.querySelector('.q-total .pv'); if(pv) pv.style.fontSize='34px';
+  }
+
+  if(KOE==='v5'){
+    const q=document.querySelector('.quote');
+    if(q){ q.style.background='var(--card)'; q.style.color='var(--text)';
+           q.style.border='1px solid var(--line)'; q.style.padding='20px'; }
+    document.querySelectorAll('.q-total .pt,.q-note,.q-net,.q-meta span')
+      .forEach(e=>e.style.color='var(--mute)');
+    document.querySelectorAll('.q-total .pv,.q-t,.q-meta b')
+      .forEach(e=>e.style.color='var(--ink)');
+    const pv=document.querySelector('.q-total .pv'); if(pv) pv.style.fontSize='38px';
+    /* Vaalealla pohjalla vihreä nappi tarvitsee täyden värin: kuvassa se
+       hukkui taustaan, ja juuri se nappi on koko kortin tarkoitus. */
+    const btn=document.getElementById('cpBtn');
+    if(btn){ btn.style.background='var(--green)'; btn.style.color='#fff'; }
+    const st=document.createElement('style');
+    st.textContent='#calcTypes > .type{padding-top:10px!important;padding-bottom:10px!important}';
+    document.head.appendChild(st);
+  }
+}
 if(document.getElementById('stepCard')){
   paintStepChrome();
   /* 'card' = varauskortti näkyi. Tämä on A/B-testien yhteinen nimittäjä:
