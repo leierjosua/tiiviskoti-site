@@ -19,7 +19,8 @@ const RANGES: Record<string, { days: number; label: string }> = {
    valinnut mitään ja kävijän joka valitsi, näki hinnan ja lähti — ilman sitä
    molemmat katosivat samaan 'calc' → 'cal' -pudotukseen. */
 const FUNNEL: { key: string; label: string }[] = [
-  { key: 'postal', label: 'Näki varauskortin' },
+  { key: 'card',   label: 'Näki varauskortin' },
+  { key: 'postal', label: 'Postinumerovaihe' },
   { key: 'calc', label: 'Avasi laskurin' },
   { key: 'pick', label: 'Valitsi kohteen' },
   { key: 'cal', label: 'Kalenteri' },

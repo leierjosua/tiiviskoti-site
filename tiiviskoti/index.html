@@ -782,6 +782,24 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 }
 </script>
 <!-- ukk-schema:loppu -->
+<script>
+/* A/B-testin versio arvotaan TÄSSÄ eikä _analytics.js:ssä, koska se on defer
+   eikä ehtisi ennen ensimmäistä piirtoa — kortin ensimmäinen vaihe välähtäisi
+   väärin päin. Ei evästettä eikä localStoragea: arvonta on sivulatauskohtainen.
+   `?ab=a` / `?ab=b` pakottaa version testausta varten.
+
+   KÄYNNISSÄ: varauskortin järjestys. A = postinumero ensin (nykyinen),
+   B = laskuri ensin ja postinumero vasta ennen kalenteria. Toteutus on
+   _shared.js:ssä (`abLaskuriEnsin`). */
+(function(){
+  var V=['a','b'], v;
+  try{ var f=new URLSearchParams(location.search).get('ab');
+       v = V.indexOf(f)>=0 ? f : V[Math.floor(Math.random()*V.length)]; }
+  catch(e){ v=V[0]; }
+  window.tkVariant=v;
+  document.documentElement.setAttribute('data-ab',v);
+})();
+</script>
 </head>
 <body>
 <nav class="top" id="nav"><div class="wrap">

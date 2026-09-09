@@ -1038,15 +1038,59 @@ if(mNextBtn) mNextBtn.addEventListener('click',()=>{ if(viewM===11){viewM=0;view
    kortin korkeus animoidaan uuteen mittaan, jottei alla oleva sisältö nytkähdä.
    Näkymän vaihtaminen ei nollaa mitään tilaa — takaisin pääsee aina. */
 const stepCard = document.getElementById('stepCard');
-/* Etusivun polku halutaan järjestyksessä postinumero → laskuri → kalenteri:
+/* Etusivun polku on ollut järjestyksessä postinumero → laskuri → kalenteri:
    asiakas näkee palvelemmeko alueella ENNEN palveluvalintaa. HTML:ssä laskuri on
-   ensin (se on myös #laskuri-ankkuri ja "Laske hinta" -osio), joten siirretään
-   postinumerovaihe sen eteen ennen kuin vaiheet luetaan DOM:ista. Sivuilla joilla
-   ei ole molempia (ajanvaraus.html) tämä ei tee mitään. */
+   ensin (se on myös #laskuri-ankkuri ja "Laske hinta" -osio), joten postinumero
+   siirretään sen eteen ennen kuin vaiheet luetaan DOM:ista.
+
+   A/B-TESTI (versio 'b'): siirtoa EI tehdä, jolloin laskuri jää ensimmäiseksi ja
+   postinumero kysytään vasta ennen kalenteria. Koko testi on tämä yksi ehto —
+   vaihemoottori, hinnoittelu ja kalenteri ovat molemmissa samat, joten mikään ei
+   voi erota versioiden välillä muusta kuin järjestyksestä.
+
+   MIKSI TÄMÄ ON TESTATTAVISSA ILMAN RISKIÄ HINNALLE: hinta ei riipu
+   postinumerosta. Aktiivisia palvelualueita on yksi (Uusimaa, matkalisä 0 €),
+   joten portin siirto ei muuta yhtäkään näytettävää euroa. Postinumeroa
+   tarvitaan vain kahteen asiaan — palvelemmeko aluetta ja minkä kalenterin ajat
+   näytetään — ja molemmat tarvitaan vasta kalenterivaiheessa.
+
+   Sivuilla joilla ei ole molempia vaiheita (ajanvaraus.html) tämä ei tee mitään. */
+const abLaskuriEnsin = window.tkVariant === 'b';
 if(stepCard){
   const _calc=stepCard.querySelector('[data-step="calc"]');
   const _postal=stepCard.querySelector('[data-step="postal"]');
-  if(_calc && _postal) stepCard.insertBefore(_postal, _calc);
+  if(_calc && _postal && !abLaskuriEnsin) stepCard.insertBefore(_postal, _calc);
+  else if(_calc && _postal){
+    /* B: vaihenumerot, paluulinkki ja lupaus vaihtavat paikkaa järjestyksen
+       mukana. Postinumerovaihe ei enää voi luvata "Paljonko työ maksaa?" —
+       hinta on siinä kohtaa jo nähty. */
+    _calc.dataset.tag='Vaihe 1/4';
+    delete _calc.dataset.back;
+    _calc.hidden=false;
+    _postal.dataset.tag='Vaihe 2/4';
+    _postal.dataset.back='Takaisin hintaan';
+    _postal.dataset.title='Minne työ tehdään?';
+    _postal.dataset.sub='Kerro postinumero, niin näet vapaat ajat omalta alueeltasi.';
+    _postal.hidden=true;
+
+    /* Taloyhtiövälilehti asuu postinumerovaiheessa, joka B:ssä ei ole enää
+       ensimmäisenä. Ilman tätä linkkiä ilmainen kartoitus katoaisi kortin
+       ensimmäiseltä ruudulta kokonaan — se olisi testin sivuvahinko eikä
+       testattava muutos. Linkki painaa samaa välilehteä kuin ihminenkin. */
+    const yhtioLink=document.createElement('button');
+    yhtioLink.type='button';
+    yhtioLink.className='lnk ab-yhtio';
+    /* Laskurivaihe on kaksipalstainen grid (.order + .quote). Ilman koko
+       leveyden varausta linkki menisi omaksi sarakkeekseen ja työntäisi
+       yhteenvedon toiselle riville. */
+    yhtioLink.style.cssText='grid-column:1/-1;justify-self:start;margin:0 0 4px;'
+      + 'background:none;border:0;cursor:pointer;font:inherit';
+    yhtioLink.textContent='Taloyhtiö? Varaa veloitukseton kartoitus →';
+    yhtioLink.addEventListener('click', ()=>{
+      const t=document.getElementById('tabYhtio'); if(t) t.click();
+    });
+    _calc.insertBefore(yhtioLink, _calc.firstChild);
+  }
 }
 /* Vaiheet luetaan DOM:ista, jolloin sama moottori ajaa etusivun täyden polun
    (laskuri → postinumero → aika → tiedot → valmis) ja ajanvaraus.html:n
@@ -1204,13 +1248,20 @@ function syncToDetails(){
 
 /* Laskurin CTA vie kalenterivaiheeseen samalla kortilla; postinumero on jo
    kysytty ensimmäisessä vaiheessa. Vanhoilla sivuilla cpBtn on linkki
-   varaa.html:ään, jolloin tätä ei ole. */
+   varaa.html:ään, jolloin tätä ei ole.
+
+   B: postinumero on vasta edessä, joten CTA vie sinne — paitsi jos alue on jo
+   tiedossa (?pn= tai kävijä on käynyt vaiheessa aiemmin), jolloin sitä ei
+   kysytä kahdesti. Kalenteri näyttää vain oman alueen vapaat ajat, joten alue
+   on pakko olla ratkaistuna ennen sitä. */
 const cpBtnEl=document.getElementById('cpBtn');
 if(cpBtnEl && cpBtnEl.tagName==='BUTTON'){
   cpBtnEl.addEventListener('click',()=>{
     if(!(booking.count>0 && booking.total>0)) return;
     trackIntent();
-    goStep('cal');
+    const alueRatkaistu = avail.state==='ready' || avail.state==='none';
+    if(abLaskuriEnsin && !alueRatkaistu && stepIdx('postal')>=0) goStep('postal');
+    else goStep('cal');
   });
 }
 
@@ -1699,7 +1750,11 @@ if(document.getElementById('tabKoti')){
          näin varaus ei koskaan ohita palveluvalintaa (muuten hinta jäisi 0 €).
          Ennen tässä mentiin suoraan ajanvaraukseen (postinumero → aika) ohi
          laskurin, jolloin kohteita ei valittu ja varaus kaatui/jäi tyhjäksi. */
-      if(stepIdx('calc')>=0) goStep('calc');
+      /* B: laskuri on jo takana ja kohteet valittu, joten portista jatketaan
+         suoraan kalenteriin. A:ssa mennään laskuriin, koska hintaa ei ole
+         vielä nähty. */
+      if(abLaskuriEnsin && stepIdx('cal')>=0) goStep('cal');
+      else if(stepIdx('calc')>=0) goStep('calc');
       else location.href = `/?pn=${encodeURIComponent(avail.postal)}#laskuri`;
     }
   });
@@ -1750,7 +1805,12 @@ if(document.getElementById('fPostal') && document.getElementById('gShow') && ste
        siirtää laskurivaiheeseen (postinumero → laskuri → aika). Viive antaa
        aluetarkistuksen (250 ms debounce) ehtiä ennen klikkiä. */
     inp.dispatchEvent(new Event('input', { bubbles: true }));
-    setTimeout(() => { const b=document.getElementById('gShow'); if(b) b.click(); }, 600);
+    /* B: laskuri on jo ensimmäisenä eikä siihen tarvitse siirtyä. Klikki veisi
+       kalenteriin ilman valittuja kohteita, jolloin hinta jäisi nollaan —
+       aluetarkistus riittää, ja se lähti jo input-tapahtumasta. */
+    if(!abLaskuriEnsin){
+      setTimeout(() => { const b=document.getElementById('gShow'); if(b) b.click(); }, 600);
+    }
   }
 }
 
@@ -1793,6 +1853,11 @@ const yrEl=document.getElementById('yr'); if(yrEl) yrEl.textContent=new Date().g
 render(); renderCal(); renderSlots(); syncBookingSummary();
 if(document.getElementById('stepCard')){
   paintStepChrome();
+  /* 'card' = varauskortti näkyi. Tämä on A/B-testien yhteinen nimittäjä:
+     ensimmäisen vaiheen oma tapahtuma ei kelpaa siihen, koska juuri se vaihe
+     vaihtuu testissä ('postal' A:ssa, 'calc' B:ssä). Ilman yhteistä nimittäjää
+     versioiden osuuksia ei voi verrata toisiinsa lainkaan. */
+  if(window.tkTrack) window.tkTrack({type:'funnel', step:'card'});
   /* Funnelin ensimmäinen vaihe (näkyvissä jo latauksessa) analytiikkaan. */
   if(window.tkTrack && seq()[curIdx]) window.tkTrack({type:'funnel', step:seq()[curIdx].dataset.step});
 }

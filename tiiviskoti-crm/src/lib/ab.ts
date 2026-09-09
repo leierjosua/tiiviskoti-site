@@ -115,7 +115,12 @@ export async function getAbResults(now: Date = new Date()): Promise<AbTestResult
 
 /** Suppilon askeleet valikkoon. Nimet vastaavat sivustoanalytiikan vaiheita. */
 export const FUNNEL_STEPS: { key: string; label: string }[] = [
-  { key: 'postal', label: 'Näki varauskortin' },
+  /* 'card' on A/B-testien nimittäjä: se laukeaa kun varauskortti näkyy,
+     riippumatta siitä mikä vaihe on ensimmäisenä. Juuri ensimmäinen vaihe on
+     se mitä testeissä vaihdetaan, joten sen oma tapahtuma ei kelpaa
+     nimittäjäksi. */
+  { key: 'card',   label: 'Näki varauskortin' },
+  { key: 'postal', label: 'Postinumerovaihe' },
   { key: 'calc',   label: 'Avasi laskurin' },
   { key: 'pick',   label: 'Valitsi kohteen' },
   { key: 'cal',    label: 'Kalenteri' },
