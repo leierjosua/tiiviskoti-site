@@ -494,30 +494,7 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
    neljä kellonaikaa 390px leveydellä jää liian kapeaksi kosketettavaksi. */
 @media(max-width:620px){.tincl,.tform .row{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.slots{grid-template-columns:repeat(3,1fr)}}
 
-/* ---------- A/B-TESTI: TALOYHTIÖKUVA ----------
-   A = oman kuvauksen kuva (24.8.2026), B = aiempi kuvapankin kerrostalokuva.
-   Kumpi tuottaa enemmän etenemisiä taloyhtiöpolulla? Molemmat <img>:t ovat
-   DOM:ssa ja toinen piilotetaan, koska versio on tiedossa jo <head>issä —
-   näin kuva on oikein ensimmäisestä piirrosta eikä vaihdu kesken.
-   Oletus ilman data-ab:tä on A, jotta sivu ei jää kuvattomaksi jos JS estyy. */
-.ab-b{display:none}
-html[data-ab="b"] .ab-a{display:none}
-html[data-ab="b"] .ab-b{display:block}
 </style>
-<script>
-/* A/B-testin versio arvotaan TÄSSÄ eikä _analytics.js:ssä, koska se on defer
-   eikä ehtisi ennen kuin teksti on jo piirretty — versio välähtäisi.
-   Ei evästettä eikä localStoragea: arvonta on sivulatauskohtainen.
-   `?ab=a` / `?ab=b` pakottaa version testausta varten. */
-(function(){
-  var V=['a','b'], v;
-  try{ var f=new URLSearchParams(location.search).get('ab');
-       v = V.indexOf(f)>=0 ? f : V[Math.floor(Math.random()*V.length)]; }
-  catch(e){ v=V[0]; }
-  window.tkVariant=v;
-  document.documentElement.setAttribute('data-ab',v);
-})();
-</script>
 </head>
 <body>
 <nav class="top" id="nav"><div class="wrap">
@@ -547,8 +524,7 @@ html[data-ab="b"] .ab-b{display:block}
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä sopimushinta · kartoitus veloituksetta · työ mahdollisimman vähällä häiriöllä</p>
   </div>
   <div class="hero-card rv">
-    <img class="ab-a" src="img/taloyhtio-hero.webp?v=3" alt="TiivisKodin asentajat talon pihassa kartoituskäynnillä" width="1100" height="880" fetchpriority="high">
-    <img class="ab-b" src="img/taloyhtio-hero-b.webp?v=3" alt="Taloyhtiön valoisa julkisivu ja parvekkeet" width="1100" height="1191" fetchpriority="high">
+    <img src="img/taloyhtio-hero.webp?v=3" alt="TiivisKodin asentajat talon pihassa kartoituskäynnillä" width="1100" height="880" fetchpriority="high">
   </div>
 </div></header>
 

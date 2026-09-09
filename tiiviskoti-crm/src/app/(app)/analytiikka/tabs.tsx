@@ -1,14 +1,15 @@
 import Link from 'next/link';
 import { cx } from '@/components/ui';
 
-/* Analytiikka on kaksi eri kysymystä samasta yrityksestä: mistä asiakas
-   tulee (sivusto) ja mitä siitä jää käteen (talous). Ne ovat eri sivuja,
-   koska kumpikin on täysi näkymä — mutta saman valikkokohdan alla, jotta
-   toisesta pääsee toiseen ilman että pitää tietää kumpi niistä on
-   "Analytiikka". */
+/* Analytiikka on kolme eri kysymystä samasta yrityksestä: mitä siitä jää
+   käteen (talous), mistä asiakas tulee (sivusto) ja mikä muutos kannattaa
+   tehdä seuraavaksi (A/B). Ne ovat eri sivuja, koska kukin on täysi näkymä —
+   mutta saman valikkokohdan alla, jotta toisesta pääsee toiseen ilman että
+   pitää tietää kumpi niistä on "Analytiikka". */
 const TABS = [
   { href: '/analytiikka/talous',  label: 'Talous' },
   { href: '/analytiikka/sivusto', label: 'Sivusto' },
+  { href: '/analytiikka/ab',      label: 'A/B-testit' },
 ];
 
 export function AnalyticsTabs({ current }: { current: string }) {
