@@ -143,13 +143,20 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .stp.plus{background:var(--green);color:#fff;border-color:var(--green)}
 .qty{font-weight:800;font-size:20px;color:var(--ink);min-width:28px;text-align:center;font-variant-numeric:tabular-nums}
 .extras-hd{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);padding:14px 22px 2px}
-.extras{display:grid;grid-template-columns:1fr 1fr}
-.extra{display:flex;align-items:center;gap:10px;padding:11px 22px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;text-align:left;font-family:inherit}
+/* minmax(0,1fr) eikä 1fr: fr-radan automaattinen alaraja on sen sisällön
+   min-content, ja määrällisen lisätyön rivi (nimi + hinta + askellin +
+   sisennys) on leveämpi kuin kortti 320 px:n näytöllä — silloin koko
+   lisätyölaatikko työntyi kortin reunan yli. */
+.extras{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.extra{display:flex;align-items:center;gap:10px;min-width:0;padding:11px 22px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;text-align:left;font-family:inherit}
 .extra:nth-child(2n){border-left:1px solid var(--line)}
 .extra.on{background:var(--green-soft)}
 .extra-chk{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:11px;color:transparent;flex:0 0 auto}
 .extra.on .extra-chk{background:var(--green);border-color:var(--green);color:#fff}
-.extra-nm{font-size:14px;color:var(--text);flex:1}
+/* min-width:0 — ilman sitä flex-kohde ei kutistu tekstinsä alle, ja
+   pitkä lisätyön nimi levitti rivin kortin yli 320 px:n näytöillä
+   (mitattu iPhone SE: kortti 266 px, rivi 304 px). */
+.extra-nm{font-size:14px;color:var(--text);flex:1;min-width:0}
 .extra-pr{font-weight:700;font-size:13px;color:var(--green)}
 .quote{position:sticky;top:88px;background:var(--deep);color:var(--dtext);border-radius:var(--r-lg);padding:26px}
 .q-t{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dmute)}
@@ -366,7 +373,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   nav.top .btn-p{margin-left:auto;padding:9px 15px;font-size:14.5px}
   .burger{display:flex;margin-left:0}
   .nlinks.op{display:flex;position:absolute;top:74px;left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border-bottom:1px solid var(--line)}
-  .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
+  .extras{grid-template-columns:minmax(0,1fr)}.extra:nth-child(2n){border-left:none}
+  /* Sisennys pois kapealla: se oli varattu valintaruudun leveydelle,
+     mutta yhden palstan taitossa se vain vie tilaa askeltimelta. */
+  .extra.extra-q{padding-left:14px}
   .why-stats{grid-template-columns:1fr}
   .slots{grid-template-columns:repeat(3,1fr)}
 
@@ -413,6 +423,23 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
    muuttuu valinnan mukana ja on kehotus, ei staattinen tieto. */
 .wtype-next{display:block;margin-top:4px;padding:3px 8px;border-radius:6px;background:rgba(46,158,99,.12);color:var(--green);font-weight:700;font-size:13px;width:fit-content}
 .wtype-next[hidden]{display:none}
+/* Määräalennuksen sirut: portaikko toimintana eikä alaviitteenä. Napautus
+   asettaa määrän portaan alkuun, ja aktiivinen siru kertoo missä ollaan.
+   Sirut ovat oma rivinsä ikkunakortin alla, koska ne koskevat vain sitä. */
+.wtype-tiers{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 22px 11px;background:var(--card);border-bottom:1px solid var(--line)}
+.wtype-tiers .tl{font-size:12.5px;font-weight:700;color:var(--mute)}
+.tchip{font-family:inherit;font-size:13px;font-weight:700;color:var(--green);background:var(--green-soft);border:1.5px solid transparent;border-radius:999px;padding:5px 12px;cursor:pointer;white-space:nowrap;transition:.16s var(--ease)}
+.tchip b{font-weight:800}
+.tchip:hover{border-color:var(--green)}
+.tchip.on{background:var(--green);color:#fff}
+/* Harvinaisemmat kohteet avautuvat napista: neljä riviä näkyvissä, ei kuutta. */
+.morecats{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;font-family:inherit;font-size:14.5px;font-weight:700;color:var(--green);background:var(--card);border:none;border-bottom:1px solid var(--line);padding:14px 22px;cursor:pointer;text-align:left}
+.morecats .cv{flex:0 0 auto;transition:transform .2s var(--ease)}
+.morecats[aria-expanded="true"] .cv{transform:rotate(180deg)}
+/* Kirjoitettava määrä: luku on napautettava ja muuttuu kentäksi. */
+.qty.tap{cursor:text;border-bottom:1.5px dashed var(--line2)}
+.qty-edit{width:46px;border:1.5px solid var(--green);border-bottom:1.5px solid var(--green);border-radius:8px;text-align:center;padding:2px 0;font-family:inherit;background:var(--card);color:var(--ink)}
+
 .wtype-price s{opacity:.55;font-weight:600}
 .cp-unit{font-size:12px;color:var(--dmute);font-weight:600}
 .extra-note{font-weight:600;font-size:11.5px;color:var(--mute)}
@@ -439,7 +466,10 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .q-btn{grid-column:2;grid-row:1/span 2;width:auto;margin-top:0;padding:13px 18px;font-size:15px;white-space:nowrap}
   .q-btn-long{display:none}
   .order-note{display:block}
-  .extras{grid-template-columns:1fr}.extra:nth-child(2n){border-left:none}
+  .extras{grid-template-columns:minmax(0,1fr)}.extra:nth-child(2n){border-left:none}
+  /* Sisennys pois kapealla: se oli varattu valintaruudun leveydelle,
+     mutta yhden palstan taitossa se vain vie tilaa askeltimelta. */
+  .extra.extra-q{padding-left:14px}
 }
 
 
@@ -637,6 +667,9 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 
 
 
-<script src="_shared.js"></script>
+<!-- type="module" pakollinen: _shared.js on ES-moduuli (import pricing.mjs).
+     Ilman tätä selain heittää SyntaxErrorin ja KOKO sivun JS kuolee —
+     mm. mobiilivalikon burger-nappi lakkaa toimimasta. -->
+<script type="module" src="_shared.js"></script>
 </body>
 </html>
