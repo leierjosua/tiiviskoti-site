@@ -89,3 +89,59 @@ export async function getMetaStats(days = 30): Promise<MetaStats> {
     return { configured: true, rows: [], totals: zero(), error: e instanceof Error ? e.message : String(e) };
   }
 }
+
+/* =========================================================
+   Mainoskulut päivittäin. Talousnäkymä tarvitsee kulut mielivaltaiselta
+   jaksolta (tämä viikko, viime kuu, 12 kk) ja lisäksi kuukausisarjan.
+   Yksi päivätarkka haku kattaa molemmat: jakson summa on päivien summa,
+   ja kuukausi on päivien ryhmittely.
+
+   Erillään getMetaStatsista, koska tämä ei tarvitse mainoskohtaisia
+   rivejä eikä konversioita — pelkkä spend per päivä on murto-osa
+   vastauksesta ja kestää sitä myöten vähemmän.
+   ========================================================= */
+
+export type MetaSpendDays = {
+  configured: boolean;
+  error?: string;
+  /** 'YYYY-MM-DD' → sentit. Vain päivät joilla oli kulua. */
+  days: Record<string, number>;
+  totalCents: number;
+};
+
+export async function getMetaSpendDaily(since: string, until: string): Promise<MetaSpendDays> {
+  if (!TOKEN) return { configured: false, days: {}, totalCents: 0, error: 'META_ACCESS_TOKEN puuttuu' };
+
+  const timeRange = JSON.stringify({ since, until });
+  let url: string | null =
+    `https://graph.facebook.com/${GV}/act_${ACCOUNT}/insights` +
+    `?level=account&time_increment=1&time_range=${encodeURIComponent(timeRange)}` +
+    `&fields=spend,date_start&limit=500&access_token=${encodeURIComponent(TOKEN)}`;
+
+  const days: Record<string, number> = {};
+  try {
+    /* Sivutus: 12 kuukautta on 365 riviä eli enemmän kuin yksi sivu voi
+       palauttaa. Kierrosraja on varmistus siltä varalta, että `next`
+       osoittaisi ikuiseen ketjuun — mieluummin vajaa luku kuin jumi. */
+    for (let page = 0; page < 6 && url; page++) {
+      const res: Response = await fetch(url, { cache: 'no-store' });
+      const body = await res.json() as {
+        data?: { spend?: string; date_start?: string }[];
+        paging?: { next?: string };
+        error?: { message: string };
+      };
+      if (body.error) return { configured: true, days: {}, totalCents: 0, error: body.error.message };
+      for (const row of body.data || []) {
+        const key = row.date_start;
+        if (!key) continue;
+        days[key] = (days[key] ?? 0) + Math.round(Number(row.spend || 0) * 100);
+      }
+      url = body.paging?.next ?? null;
+    }
+  } catch (e) {
+    return { configured: true, days: {}, totalCents: 0, error: e instanceof Error ? e.message : String(e) };
+  }
+
+  const totalCents = Object.values(days).reduce((s, n) => s + n, 0);
+  return { configured: true, days, totalCents };
+}

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requireManager } from '@/lib/session';
 import { getSiteAnalytics, type Bucket } from '@/lib/analytics';
 import { Card, Empty, PageHead } from '@/components/ui';
+import { AnalyticsTabs } from '../tabs';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,6 +93,7 @@ export default async function SivustoAnalytics({
     return (
       <div className="space-y-6">
         <PageHead title="Analytiikka · Sivusto" sub="Evästeetön, anonyymi kävijäseuranta tiiviskoti.fi:stä." />
+        <AnalyticsTabs current="/analytiikka/sivusto" />
         <Empty>
           Seurantaa ei ole vielä alustettu. Aja tietokantamigraatio
           <code className="mx-1 rounded bg-line-soft px-1.5 py-0.5 text-xs">db/011_web_analytics.sql</code>
@@ -122,6 +124,8 @@ export default async function SivustoAnalytics({
           </div>
         }
       />
+
+      <AnalyticsTabs current="/analytiikka/sivusto" />
 
       {!hasData ? (
         <Empty>
