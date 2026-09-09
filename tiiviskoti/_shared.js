@@ -1875,15 +1875,52 @@ render(); renderCal(); renderSlots(); syncBookingSummary();
    kokeilla oikealla sivulla puhelimessa eikä vain kuvina — ja kun yksi
    valitaan, tämä lohko ja variaatiot.html poistetaan ja valittu jää pysyväksi.
 
-   Yhteinen kaikille: taloyhtiövalinta kutistuu yhdeksi riviksi, koska juuri
-   kahden ison napin pari teki B:stä ahtaan.                                */
+   TALOYHTIÖVALINNAN PAIKKA. Mitattu 60 pv: taloyhtiöpolun kalenteriin
+   edettiin 17 kertaa ETUSIVULTA ja 0 kertaa taloyhtio.html:ltä, ja molemmat
+   kartoitusvaraukset tulivat etusivulta — vaikka taloyhtiösivulla kävi 489
+   ihmistä. Etusivun valinta on siis koko taloyhtiöpolun oikea sisäänkäynti,
+   ei koriste, ja sen on oltava näkyvissä ENNEN kuin ihminen alkaa napsutella
+   ikkunoita: sen jälkeen hän on jo yhden kodin polulla.
+
+   Siksi valinta on yksirivinen segmentoitu valitsin kortin yläreunassa: yksi
+   rivi (~46 px) kahden pinotun laatikon (~96 px) sijaan, mutta yhä oikea
+   valinta eikä ohitettava tekstilinkki. `?yhtio=linkki` näyttää vertailuksi
+   sen kevyimmän muodon.                                                    */
 if(KOE && document.querySelector('.ab-gate')){
   const gate = document.querySelector('.ab-gate');
-  gate.classList.add('ab-gate-slim');
-  gate.style.cssText = 'grid-column:1/-1;margin:0 0 10px;text-align:right;font-size:14px';
-  gate.innerHTML = '<button type="button" class="ab-yhtio" style="background:none;border:0;'
-    + 'cursor:pointer;font:inherit;color:var(--green);font-weight:700">'
-    + 'Taloyhtiö? Varaa veloitukseton kartoitus →</button>';
+  const kevyt = (function(){
+    try { return new URLSearchParams(location.search).get('yhtio') === 'linkki'; }
+    catch(e){ return false; }
+  })();
+
+  if(kevyt){
+    gate.classList.add('ab-gate-slim');
+    gate.style.cssText = 'grid-column:1/-1;margin:0 0 10px;text-align:right;font-size:14px';
+    gate.innerHTML = '<button type="button" class="ab-yhtio" style="background:none;border:0;'
+      + 'cursor:pointer;font:inherit;color:var(--green);font-weight:700">'
+      + 'Taloyhtiö? Varaa veloitukseton kartoitus →</button>';
+  } else {
+    gate.className = 'ab-seg';
+    gate.style.cssText = 'grid-column:1/-1;margin:0 0 12px;display:grid;'
+      + 'grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--card);'
+      + 'border:1.5px solid var(--line);border-radius:12px';
+    /* Kaksi riviä napissa eikä yhtä: "Taloyhtiö · kartoitus 0 €" katkesi
+       puhelimessa kolmeen pisteeseen, ja juuri se veloituksettomuus on se
+       syy jonka takia taloyhtiöpäättäjä klikkaa. Kaksirivisenäkin valitsin
+       on noin puolet matalampi kuin kaksi pinottua laatikkoa. */
+    const nappi = (otsikko, ala, aktiivinen, luokka) =>
+      '<button type="button" class="' + luokka + '" style="border:0;border-radius:8px;'
+      + 'padding:9px 6px;cursor:pointer;font:inherit;line-height:1.25;text-align:center;'
+      + (aktiivinen ? 'background:var(--green-soft)' : 'background:none') + '">'
+      + '<b style="display:block;font-size:14.5px;font-weight:700;color:'
+      + (aktiivinen ? 'var(--green)' : 'var(--ink)') + '">' + otsikko + '</b>'
+      + '<span style="display:block;font-size:12px;margin-top:1px;color:'
+      + (aktiivinen ? 'var(--green)' : 'var(--mute)') + '">' + ala + '</span>'
+      + '</button>';
+    gate.innerHTML = nappi('Yksi koti', 'hinta heti alla', true, 'ab-koti')
+      + nappi('Taloyhtiö', 'ilmainen kartoitus', false, 'ab-yhtio');
+  }
+
   gate.addEventListener('click', (e)=>{
     if(!e.target.closest('.ab-yhtio')) return;
     const t=document.getElementById('tabYhtio'); if(t) t.click();
