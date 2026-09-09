@@ -364,6 +364,10 @@ html[data-ab="b"] .rc-lines,html[data-ab="b"] .rc-empty{color:var(--mute)}
 html[data-ab="b"] .q-btn{background:var(--green);color:#fff}
 /* Rivit hieman tiiviimmiksi: lista on ensimmäinen näkymä. */
 html[data-ab="b"] .wtype{padding-top:12px;padding-bottom:12px}
+/* Postinumerovaiheen välilehtipari pois yhden kodin polulla: valinta on jo
+   tehty kortin yläreunassa. Taloyhtiöpolulla pari jää, koska se on ainoa
+   tie takaisin. */
+html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
 .gate-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
 .gate-price{font-size:40px;font-weight:800;color:var(--ink);letter-spacing:-1px;line-height:1;
   font-variant-numeric:tabular-nums}

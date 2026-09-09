@@ -1073,6 +1073,24 @@ if(stepCard){
     _postal.dataset.sub='Kerro postinumero, niin näet vapaat ajat omalta alueeltasi.';
     _postal.hidden=true;
 
+    /* Vaiheen omat tekstit lupaavat A:n järjestyksen: "Laske hinta" ja
+       "näytämme oikean hinnan" ovat B:ssä jo tapahtuneet, ja hinta lukee
+       ruudulla siinä samassa. Nappi joka lupaa jo saadun asian saa
+       epäilemään ollaanko oikeassa paikassa — ja seuraavaksi tulee
+       kalenteri, joten se on se mitä napissa pitää lukea. */
+    const nappi=_postal.querySelector('#gShow');
+    if(nappi) nappi.textContent='Varaa aika';
+    const vihje=_postal.querySelector('.gate-hint');
+    if(vihje){
+      vihje.innerHTML='Syötä <b>kohteen postinumero</b> — tarvitsemme sen vain siihen, '
+        + 'että näytämme ne ajat jotka ovat vapaana sinun alueellasi.';
+    }
+    const otsikko=_postal.querySelector('label[for="fPostal"]');
+    if(otsikko){
+      const numero=otsikko.querySelector('.gate-step');
+      if(numero) numero.textContent='2';
+    }
+
     /* Taloyhtiövälilehti asuu postinumerovaiheessa, joka B:ssä ei ole enää
        ensimmäisenä. Ilman korviketta ilmainen kartoitus katoaisi kortin
        ensimmäiseltä ruudulta kokonaan — se olisi testin sivuvahinko eikä
@@ -1093,6 +1111,17 @@ if(stepCard){
       const t=document.getElementById('tabYhtio'); if(t) t.click();
     });
     _calc.insertBefore(valinta, _calc.firstChild);
+
+    /* Vaiheessa 2 näkyi vielä A:n välilehtipari, vaikka valinta on B:ssä jo
+       tehty kortin yläreunassa — kaksi eriltä näyttävää valitsinta samasta
+       asiasta, ja juuri sitä ylimääräistä B:ssä oli liikaa. Pari piilotetaan
+       VAIN yhden kodin polulla: taloyhtiöpolulla se on ainoa tie takaisin. */
+    const merkitsePolku = (polku)=>{ document.documentElement.dataset.abPath = polku; };
+    merkitsePolku('koti');
+    const yhtioTab=document.getElementById('tabYhtio');
+    const kotiTab=document.getElementById('tabKoti');
+    if(yhtioTab) yhtioTab.addEventListener('click', ()=>merkitsePolku('yhtio'));
+    if(kotiTab)  kotiTab.addEventListener('click', ()=>merkitsePolku('koti'));
   }
 }
 /* Vaiheet luetaan DOM:ista, jolloin sama moottori ajaa etusivun täyden polun
