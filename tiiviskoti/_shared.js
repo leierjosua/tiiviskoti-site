@@ -1892,7 +1892,7 @@ if(burger){ burger.addEventListener('click',()=>nl.classList.toggle('op'));
    CSS-muuttujaan, jotta viive lasketaan tyylitiedostossa (_anim.css) eikä
    kahdessa paikassa. Katto viidessä: pidempi jono alkaa tuntua
    odottamiselta eikä rytmiltä. */
-document.querySelectorAll('.calc-types,.revs,.steps,.grid-3,.cards,.grid-2,.mf-grid,.tgrid')
+document.querySelectorAll('.calc-types,.revs,.steps,.grid-3,.cards,.cards3,.grid-2,.mf-grid,.tgrid,.tbenefits,.why')
   .forEach(g=>[...g.children].forEach((ch,i)=>{
     ch.style.setProperty('--rv-i', String(Math.min(i,5)));
     ch.classList.add('stagger');

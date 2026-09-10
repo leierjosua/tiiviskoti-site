@@ -33,22 +33,22 @@
 }
 
 /* ---------- 1. SISÄÄNTULO ----------
-   .rv on jo sivujen käytössä; tässä sille annetaan pidempi matka ja pieni
-   skaalaus. Skaalaus 0.97 → 1 on se mikä erottaa "ilmestyy" liikkeestä
-   "asettuu paikalleen". */
-.rv{
-  opacity:0;
-  transform: translateY(18px) scale(.97);
-  transition: opacity .55s var(--anim-ease), transform .55s var(--anim-ease);
-  will-change: opacity, transform;
-}
-.rv.in{ opacity:1; transform:none; will-change:auto; }
+   Arvot ovat suoraan aaltoair.fi:ltä mitatut, koska juuri sen liike oli
+   se mitä haluttiin: elementti nousee 24 px ja häivähtää esiin 0,7
+   sekunnissa käyrällä cubic-bezier(.16,1,.3,1). Peräkkäiset kortit
+   porrastuvat 80 ms välein.
 
-/* Porrastus: ruudukon lapset tulevat peräkkäin eivätkä yhtenä möykkynä.
-   Viive tulee JS:stä (--rv-i), jotta sama sääntö toimii miten monella
-   kortilla tahansa. Katto 5 × 60 ms = 300 ms: pidempi jono alkaisi
-   tuntua odottamiselta. */
-.rv.stagger{ transition-delay: calc(var(--rv-i, 0) * 60ms); }
+   EI SKAALAUSTA. Kokeilin ensin 0.97 → 1 -skaalausta, mutta aaltoairilla
+   sitä ei ole, ja se on syystä: skaalaus saa tekstin sumenemaan liikkeen
+   ajaksi. Pelkkä nosto pysyy terävänä koko matkan.
+
+   Yksikkö on lohko, ei rivi: otsikko ja sen ylätunniste nousevat yhdessä
+   (.center.rv), ja jokainen kortti omanaan. Sama jako kuin aaltoairilla. */
+/* Säännöt ovat tiedoston LOPUSSA — ks. "sisääntulon säännöt" siellä.
+   Syy: .card ja .btn määrittelevät oman `transition`-listansa, ja
+   `transition` on yksi ominaisuus: myöhempi sääntö korvaa koko listan.
+   Jos reveal olisi tässä, korttien sisääntulo menettäisi siirtymänsä
+   kokonaan ja ne vain pomppaisivat esiin. */
 
 /* Hero: otsikko, alaotsikko ja napit porrastettuna heti latauksessa.
    Tämä EI odota vieritystä — hero on jo ruudussa. */
@@ -68,11 +68,17 @@
    Kortti nousee, reunus värittyy ja kuva zoomaa hitaammin kuin kortti
    liikkuu. Eri nopeudet tekevät liikkeestä orgaanisen; sama nopeus
    näyttäisi siltä että koko kortti on tarra. */
-.card{ transition: transform var(--anim-base) var(--anim-ease),
+/* HOVER KÄYTTÄÄ `translate`-OMINAISUUTTA, EI `transform`ia. Kortti on myös
+   .rv-elementti, jonka sisääntulo animoi transformia 0,7 sekunnissa. Jos
+   hover käyttäisi samaa ominaisuutta, myöhempi sääntö veisi voiton ja
+   sisääntulo kutistuisi hoverin 0,28 sekuntiin — juuri niin kävi ensin.
+   Erilliset ominaisuudet (translate/scale/rotate) yhdistyvät toisiinsa,
+   joten kumpikin liike saa oman kestonsa eivätkä ne kilpaile. */
+.card{ transition: translate var(--anim-base) var(--anim-ease),
                    border-color var(--anim-base) var(--anim-ease),
                    box-shadow var(--anim-base) var(--anim-ease); }
 .card:hover{
-  transform: translateY(-6px);
+  translate: 0 -6px;
   border-color: var(--green);
   box-shadow: 0 2px 4px rgba(24,58,40,.05), 0 26px 50px -28px rgba(24,58,40,.42);
 }
@@ -88,24 +94,26 @@
 /* Napit: kevyt nousu ja varjo, painallus takaisin alas. Painallus on se
    osa joka kertoo että klikki rekisteröityi — ilman sitä nappi tuntuu
    kuolleelta kosketusnäytöllä. */
-.btn{ transition: transform var(--anim-fast) var(--anim-ease),
+.btn{ transition: translate var(--anim-fast) var(--anim-ease),
+                  scale var(--anim-fast) var(--anim-ease),
                   background-color var(--anim-fast) var(--anim-ease),
                   box-shadow var(--anim-fast) var(--anim-ease),
                   border-color var(--anim-fast) var(--anim-ease); }
-.btn-p:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px -12px rgba(33,122,78,.65); }
-.btn:active{ transform: translateY(0) scale(.985); }
+.btn-p:hover{ translate: 0 -2px; box-shadow: 0 10px 24px -12px rgba(33,122,78,.65); }
+.btn:active{ translate: 0 0; scale: .985; }
 
 /* Laskurin määräpainikkeet: napautus tuntuu heti. */
-.stp{ transition: transform var(--anim-fast) var(--anim-ease),
+.stp{ transition: scale var(--anim-fast) var(--anim-ease),
                   background-color var(--anim-fast) var(--anim-ease); }
-.stp:active{ transform: scale(.9); }
+.stp:active{ scale: .9; }
 
 /* Kalenterin aika: valinta on tärkein klikki koko sivulla. */
-.slot{ transition: transform var(--anim-fast) var(--anim-ease),
+.slot{ transition: translate var(--anim-fast) var(--anim-ease),
+                   scale var(--anim-fast) var(--anim-ease),
                    border-color var(--anim-fast) var(--anim-ease),
                    background-color var(--anim-fast) var(--anim-ease); }
-.slot:hover{ transform: translateY(-2px); }
-.slot:active{ transform: scale(.96); }
+.slot:hover{ translate: 0 -2px; }
+.slot:active{ scale: .96; }
 
 /* Palveluruudukon ja hinnaston rivit: hienovarainen taustan kirkastuminen. */
 .wtype{ transition: background-color var(--anim-fast) var(--anim-ease); }
@@ -125,22 +133,6 @@
 }
 .q-total .pv.tk-paivittyi{ animation: tk-hinta .42s var(--anim-ease); }
 
-/* Kutsupainikkeen kiilto: kerran sivun avauduttua, kolmesti, sitten rauha.
-   Tämä on suoraan aaltoair.fi:n `ar-glint`-ideasta. Se kertoo että nappi
-   on toiminnallinen, ei koriste — ja lakkaa ennen kuin se alkaa ärsyttää. */
-@keyframes tk-kiilto{
-  0%  { transform: translateX(-140%) skewX(-18deg); }
-  60%, 100%{ transform: translateX(140%) skewX(-18deg); }
-}
-.tk-glint{ position:relative; overflow:hidden; }
-.tk-glint::after{
-  content:''; position:absolute; top:0; bottom:0; width:38%;
-  background: linear-gradient(100deg, transparent, rgba(255,255,255,.42), transparent);
-  animation: tk-kiilto 2.4s ease-in-out 3;
-  animation-delay: 1.2s;
-  pointer-events:none;
-}
-
 /* ---------- 4. PIENET ASIAT ---------- */
 /* Navin linkin alleviivaus kasvaa keskeltä. */
 .nlinks a{ position:relative; }
@@ -156,13 +148,29 @@ summary, .morecats{ transition: color var(--anim-fast) var(--anim-ease); }
 .morecats .cv, details summary svg{ transition: transform var(--anim-base) var(--anim-ease); }
 .morecats[aria-expanded="true"] .cv, details[open] summary svg{ transform: rotate(180deg); }
 
+/* ---------- SISÄÄNTULON SÄÄNNÖT (tarkoituksella viimeisenä) ----------
+   Nämä tulevat komponenttien jälkeen, jotta niiden `transition` voittaa
+   .cardin ja .btn:n oman listan. Reveal koskee jokaista .rv-elementtiä
+   riippumatta siitä mikä komponentti se on. */
+.rv{
+  opacity:0;
+  transform: translateY(24px);
+  transition: opacity .7s var(--anim-ease), transform .7s var(--anim-ease);
+  will-change: opacity, transform;
+}
+.rv.in{ opacity:1; transform:none; will-change:auto; }
+
+/* Porrastus: ruudukon kortit tulevat peräkkäin eivätkä yhtenä möykkynä.
+   Viive tulee JS:stä (--rv-i), jotta sama sääntö toimii miten monella
+   kortilla tahansa. Katto 5 × 80 ms = 400 ms. */
+.rv.stagger{ transition-delay: calc(var(--rv-i, 0) * 80ms); }
+
 /* ---------- 5. LIIKKUMATTOMUUS ----------
    Ei "vähemmän liikettä" vaan ei liikettä. Puolittainen animaatio on
    pahinta: se kestää yhtä kauan mutta näyttää rikkinäiseltä. */
 @media (prefers-reduced-motion: reduce){
   .rv, .rv.in{ opacity:1 !important; transform:none !important; transition:none !important; }
   .hero h1, .hero .hero-sub, .hero .hero-cta, .hero .rating{ animation:none !important; opacity:1 !important; transform:none !important; }
-  .tk-glint::after{ display:none !important; }
   .q-total .pv.tk-paivittyi{ animation:none !important; }
   *, *::before, *::after{
     animation-duration:.01ms !important; animation-iteration-count:1 !important;
