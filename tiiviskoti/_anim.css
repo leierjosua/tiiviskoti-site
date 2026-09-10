@@ -50,19 +50,41 @@
    Jos reveal olisi tässä, korttien sisääntulo menettäisi siirtymänsä
    kokonaan ja ne vain pomppaisivat esiin. */
 
-/* Hero: otsikko, alaotsikko ja napit porrastettuna heti latauksessa.
-   Tämä EI odota vieritystä — hero on jo ruudussa. */
+/* Hero: sisältö purkautuu rivi riviltä heti latauksessa. Tämä EI odota
+   vieritystä — hero on jo ruudussa.
+
+   HITAAMPI JA PIDEMPI KUIN MUU SIVU, ja se on tarkoitus. Mitattu
+   aaltoair.fi:ltä: 0,8 s per elementti ja viiveet 0,2 → 1,05 s, eli
+   koko hero avautuu vajaassa kahdessa sekunnissa. Ensimmäinen versioni
+   oli 0,5 s ja ohi 0,74 sekunnissa — tekninen ero on pieni, mutta
+   katsojalle toinen "välähtää paikalleen" ja toinen "laskeutuu".
+
+   Otsikko on jaettu riveihin (span.hl), koska juuri se tekee vaikutelman:
+   rivit tulevat peräkkäin eikä koko otsikko yhtenä palikkana. */
 @keyframes tk-nousu{
-  from{ opacity:0; transform: translateY(14px); }
+  from{ opacity:0; transform: translateY(20px); }
   to  { opacity:1; transform:none; }
 }
-.hero h1, .hero .hero-sub, .hero .hero-cta, .hero .rating{
-  animation: tk-nousu .5s var(--anim-ease) both;
+@keyframes tk-nousu-iso{
+  from{ opacity:0; transform: translateY(30px); }
+  to  { opacity:1; transform:none; }
 }
-.hero .rating   { animation-delay:.02s }
-.hero h1        { animation-delay:.08s }
-.hero .hero-sub { animation-delay:.16s }
-.hero .hero-cta { animation-delay:.24s }
+.hero .rating, .hero h1 .hl, .hero .hero-sub, .hero .hero-cta, .hero .hero-fine{
+  animation: tk-nousu .8s var(--anim-ease) both;
+}
+.hero h1 .hl{ display:inline-block; animation-name: tk-nousu-iso; }
+.hero .rating          { animation-delay:.20s }
+.hero h1 .hl:first-of-type   { animation-delay:.35s }
+.hero h1 .hl + br + .hl,
+.hero h1 .hl:last-of-type    { animation-delay:.55s }
+.hero .hero-sub        { animation-delay:.75s }
+.hero .hero-cta        { animation-delay:.90s }
+.hero .hero-fine       { animation-delay:1.05s }
+
+/* Sivuilla joilla otsikkoa ei ole jaettu riveihin, koko otsikko nousee
+   yhtenä samalla ajoituksella — hitaus on se mikä tekee vaikutelman,
+   ei riviin jako. */
+.hero h1:not(:has(.hl)){ animation: tk-nousu-iso .8s var(--anim-ease) .35s both; }
 
 /* ---------- 2. MIKROLIIKE ----------
    Kortti nousee, reunus värittyy ja kuva zoomaa hitaammin kuin kortti
@@ -200,7 +222,8 @@ summary, .morecats{ transition: color var(--anim-fast) var(--anim-ease); }
    pahinta: se kestää yhtä kauan mutta näyttää rikkinäiseltä. */
 @media (prefers-reduced-motion: reduce){
   .rv, .rv.in{ opacity:1 !important; transform:none !important; transition:none !important; }
-  .hero h1, .hero .hero-sub, .hero .hero-cta, .hero .rating{ animation:none !important; opacity:1 !important; transform:none !important; }
+  .hero h1, .hero h1 .hl, .hero .hero-sub, .hero .hero-cta, .hero .rating, .hero .hero-fine{
+    animation:none !important; opacity:1 !important; transform:none !important; }
   .q-total .pv.tk-paivittyi{ animation:none !important; }
   *, *::before, *::after{
     animation-duration:.01ms !important; animation-iteration-count:1 !important;
