@@ -31,6 +31,32 @@ export async function GET(request: Request) {
      rajaa, joten tarjottu aika ja varattu lohko ovat aina yhtä pitkät. */
   const minutes = Math.min(Math.max(Number(params.get('minutes') ?? 120) || 120, 15), MAX_BOOKING_BLOCK_MINUTES);
 
+  /* `?first=1` — aikaisin vapaa aika ilman postinumeroa.
+     Sivusto lupaa etusivulla "ensimmäinen vapaa aika jo huomenna klo 8",
+     ja se lupaus on annettava ENNEN kuin kävijältä on kysytty mitään:
+     juuri se on syy avata laskuri lainkaan. Postinumeroa ei siis voi
+     vaatia, joten katsotaan aikaisin aika kaikista varauskalentereista.
+
+     Kartoituskalenteri on rajattu pois: se on taloyhtiön veloituksettomia
+     käyntejä varten, sen työajat ovat eri, eikä sen aika ole se aika jonka
+     kuluttaja voi varata. Väärä lupaus olisi pahempi kuin ei lupausta. */
+  if (params.get('first') === '1') {
+    const kartoitusId = kartoitusCalendarId()?.toLowerCase() ?? null;
+    const groups = await availability({
+      durationMinutes: minutes,
+      until: new Date(Date.now() + days * 86_400_000),
+    });
+    let firstSlot: string | null = null;
+    for (const group of groups) {
+      if (kartoitusId && group.calendarId.toLowerCase() === kartoitusId) continue;
+      const slot = group.slots[0];
+      if (!slot) continue;
+      const iso = slot.start.toISOString();
+      if (!firstSlot || iso < firstSlot) firstSlot = iso;
+    }
+    return json({ firstSlot }, { origin });
+  }
+
   if (!/^\d{5}$/.test(postal)) {
     return json({ error: 'postal_required' }, { status: 400, origin });
   }
