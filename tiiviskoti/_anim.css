@@ -154,6 +154,11 @@ summary, .morecats{ transition: color var(--anim-fast) var(--anim-ease); }
    koska "vapaana" on tila eikä tapahtuma: sykkivä piste lukee
    "juuri nyt", pysähtynyt piste lukisi "joskus". */
 .tk-vapaa{
+  /* KOKO LEVEYS. Laskurivaihe on kaksipalstainen grid (.order + .quote).
+     Ilman tätä rivi menisi omaksi sarakkeekseen, kohdelista kutistuisi
+     oikeaan palstaan ja yhteenveto putoaisi kokonaan toiselle riville —
+     juuri niin kävi ensin. */
+  grid-column: 1 / -1;
   display:flex; align-items:center; gap:8px;
   margin:0 0 12px; font-size:14px; font-weight:700; color:var(--green);
 }
