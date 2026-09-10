@@ -1,0 +1,21 @@
+<!-- TiivisKoti — logo nimellä, VIHREÄ. Vaalealle pinnalle.
+
+     TIIVIS RAJAUS: kuvassa ei ole tyhjää marginaalia. Vanha vihreä logo oli
+     470 × 100 vaikka sisältö loppui 359:ään — neljännes leveydestä oli ilmaa.
+     Laskutus- ja some-työkalut sovittavat kuvan omaan laatikkoonsa, joten ne
+     skaalasivat myös sen tyhjän mukana ja logo piirtyi neljänneksen pienempänä
+     kuin olisi mahtunut. Siitä syntyi epätarkka jälki.
+
+     PAINOA VARTEN: nimi on <text>-elementtinä, ei polkuina. Pyydä painajaa
+     muuntamaan teksti poluiksi, tai käytä valmiiksi renderöityä PNG:tä. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 362.8 104" width="363" height="104">
+  <title>TiivisKoti</title>
+
+  <g fill="none" stroke="#217A4E" stroke-width="7">
+    <rect x="3.5" y="3.5" width="93" height="93" rx="22" />
+    <rect x="31" y="22" width="38" height="56" rx="3" stroke-width="6" />
+  </g>
+  <rect x="35" y="22" width="5" height="56" fill="#217A4E" />
+  <text x="122" y="69" fill="#217A4E" font-family="Manrope, 'Segoe UI', Arial, sans-serif"
+        font-size="55" font-weight="800" letter-spacing="-2">TiivisKoti</text>
+</svg>

@@ -1075,11 +1075,14 @@ if(stepCard){
 
     /* Vaiheen omat tekstit lupaavat A:n järjestyksen: "Laske hinta" ja
        "näytämme oikean hinnan" ovat B:ssä jo tapahtuneet, ja hinta lukee
-       ruudulla siinä samassa. Nappi joka lupaa jo saadun asian saa
-       epäilemään ollaanko oikeassa paikassa — ja seuraavaksi tulee
-       kalenteri, joten se on se mitä napissa pitää lukea. */
+       ruudulla siinä samassa.
+
+       Napissa lukee se mikä seuraavaksi tapahtuu, ei se mikä tapahtuu
+       lopuksi: tästä avautuu kalenteri, ja varaus syntyy vasta
+       yhteystietojen jälkeen. "Varaa aika" lupaisi kaupan kahta ruutua
+       liian aikaisin. */
     const nappi=_postal.querySelector('#gShow');
-    if(nappi) nappi.textContent='Varaa aika';
+    if(nappi) nappi.textContent='Näytä vapaat ajat';
     const vihje=_postal.querySelector('.gate-hint');
     if(vihje){
       vihje.innerHTML='Syötä <b>kohteen postinumero</b> — tarvitsemme sen vain siihen, '
