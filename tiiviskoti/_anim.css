@@ -148,6 +148,31 @@ summary, .morecats{ transition: color var(--anim-fast) var(--anim-ease); }
 .morecats .cv, details summary svg{ transition: transform var(--anim-base) var(--anim-ease); }
 .morecats[aria-expanded="true"] .cv, details[open] summary svg{ transform: rotate(180deg); }
 
+/* ---------- ENSIMMÄINEN VAPAA AIKA ----------
+   Vihreä piste + rivi varauskortin yläreunassa. Piste sykkii kerran
+   hitaasti — se on koko sivun ainoa toistuva liike, ja se on siinä
+   koska "vapaana" on tila eikä tapahtuma: sykkivä piste lukee
+   "juuri nyt", pysähtynyt piste lukisi "joskus". */
+.tk-vapaa{
+  display:flex; align-items:center; gap:8px;
+  margin:0 0 12px; font-size:14px; font-weight:700; color:var(--green);
+}
+.tk-vapaa-piste{
+  position:relative; flex:none; width:8px; height:8px; border-radius:50%;
+  background:var(--green-l);
+}
+.tk-vapaa-piste::after{
+  content:''; position:absolute; inset:0; border-radius:50%;
+  background:var(--green-l); animation: tk-syke 2.4s cubic-bezier(0,0,.2,1) infinite;
+}
+@keyframes tk-syke{
+  0%  { opacity:.55; transform: scale(1); }
+  70%,100%{ opacity:0; transform: scale(2.6); }
+}
+@media (prefers-reduced-motion: reduce){
+  .tk-vapaa-piste::after{ animation:none !important; opacity:0 !important; }
+}
+
 /* ---------- SISÄÄNTULON SÄÄNNÖT (tarkoituksella viimeisenä) ----------
    Nämä tulevat komponenttien jälkeen, jotta niiden `transition` voittaa
    .cardin ja .btn:n oman listan. Reveal koskee jokaista .rv-elementtiä

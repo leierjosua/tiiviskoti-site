@@ -1881,6 +1881,67 @@ if(document.getElementById('gridDays') && !document.getElementById('fPostal')){
    lähtee oikealla kestolla. */
 if(document.getElementById('gridDays')) loadAvailability();
 
+/* ---------- ENSIMMÄINEN VAPAA AIKA ----------
+   "Ensimmäinen vapaa aika jo huomenna klo 8.00" varauskortin yläreunassa.
+   Malli on aaltoair.fi:ltä, ja idea on sama: kalenteri on se asia jota
+   kävijä epäilee ("saanko aikaa lähipäiville?"), ja epäily ratkeaa
+   halvimmalla vastaamalla siihen ennen kuin sitä ehtii kysyä.
+
+   ILMAN POSTINUMEROA. Lupaus on annettava ennen kuin kävijältä on kysytty
+   mitään, joten CRM:n rajapinta katsoo aikaisimman ajan kaikista
+   varauskalentereista (?first=1). Kartoituskalenteri on siellä rajattu
+   pois — sen aikaa kuluttaja ei voi varata.
+
+   HILJAINEN VIRHE. Jos haku ei onnistu, riviä ei näytetä lainkaan.
+   Puuttuva lupaus on parempi kuin väärä, eikä varauskortti saa jäädä
+   odottamaan tätä hakua: se on täysin erillinen, eikä mikään muu odota
+   sitä.
+
+   Rivi asetetaan siihen vaiheeseen joka on ensimmäisenä näkyvissä, jotta
+   se näkyy kummassakin A/B-versiossa yhtä aikaisin. */
+(function ensimmainenVapaaAika(){
+  const kortti = document.getElementById('stepCard');
+  if(!kortti) return;
+
+  const muotoile = (iso) => {
+    const t = new Date(iso);
+    if(isNaN(t)) return null;
+    const kello = t.toLocaleTimeString('fi-FI', { hour:'2-digit', minute:'2-digit', hour12:false })
+                   .replace(':', '.');
+    const paiva = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const nyt = new Date();
+    const ero = Math.round((paiva(t) - paiva(nyt)) / 86400000);
+    if(ero <= 0) return `jo tänään klo ${kello}`;
+    if(ero === 1) return `jo huomenna klo ${kello}`;
+    const vp = ['su','ma','ti','ke','to','pe','la'][t.getDay()];
+    return `${vp} ${t.getDate()}.${t.getMonth()+1}. klo ${kello}`;
+  };
+
+  const piirra = (teksti) => {
+    /* Vaiheet ovat eri versioissa eri järjestyksessä, joten rivi laitetaan
+       molempiin ensimmäisiksi tuleviin: laskuriin ja postinumeroon. Vain
+       toinen niistä on kerrallaan näkyvissä. */
+    ['calc','postal'].forEach(nimi=>{
+      const vaihe = kortti.querySelector(`[data-step="${nimi}"]`);
+      if(!vaihe || vaihe.querySelector('.tk-vapaa')) return;
+      const rivi = document.createElement('p');
+      rivi.className = 'tk-vapaa';
+      rivi.innerHTML = '<span class="tk-vapaa-piste" aria-hidden="true"></span>Ensimmäinen vapaa aika '
+        + teksti.replace(/[<>&]/g,'');
+      const kohta = nimi === 'calc'
+        ? vaihe.querySelector('.ab-seg, .order')      // laskurin yläreuna
+        : vaihe.querySelector('.gate-tabs, .gate-field'); // portin yläreuna
+      if(kohta) kohta.parentNode.insertBefore(rivi, kohta);
+      else vaihe.insertBefore(rivi, vaihe.firstChild);
+    });
+  };
+
+  fetch(`${CRM_BASE}/api/public/availability?first=1&minutes=60&days=21`)
+    .then(r => r.ok ? r.json() : null)
+    .then(d => { const t = d && d.firstSlot && muotoile(d.firstSlot); if(t) piirra(t); })
+    .catch(()=>{ /* lupaus jää pois, kortti toimii silti */ });
+})();
+
 /* ---------- nav / burger / reveal ---------- */
 const nav=document.getElementById('nav'), nl=document.getElementById('nlinks');
 if(nav){ const onScroll=()=>nav.classList.toggle('scr',window.scrollY>10); onScroll();
