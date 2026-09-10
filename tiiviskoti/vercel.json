@@ -9,6 +9,12 @@
       "permanent": true
     },
     {
+      "comment": "Lyhyt osoite Googlen arvostelulomakkeeseen. Tämä on se mikä luetaan puhelimeen kuitista, tekstiviestistä tai käyntikortista — g.page/r/CQqhF8nOpRrqEBM/review ei ole sellainen jonka kukaan naputtelee. EI pysyva (308): jos Google joskus vaihtaa linkin, pysyva ohjaus jaisi selaimien valimuistiin eika sita saisi enaa korjattua.",
+      "source": "/arvostelu",
+      "destination": "https://g.page/r/CQqhF8nOpRrqEBM/review",
+      "permanent": false
+    },
+    {
       "source": "/(.*)",
       "has": [
         {
