@@ -9,6 +9,11 @@
       "permanent": true
     },
     {
+      "source": "/arvostelu",
+      "destination": "https://g.page/r/CQqhF8nOpRrqEBM/review",
+      "permanent": false
+    },
+    {
       "source": "/(.*)",
       "has": [
         {
