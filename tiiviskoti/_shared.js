@@ -537,6 +537,17 @@ let shownPrice = 0, rafId=null;
 function tweenPrice(target){
   cancelAnimationFrame(rafId);
   const el = document.getElementById('cpPrice');
+  /* Hinnan muutos on koko laskurin tulos, ja pelkkä numeron vaihtuminen
+     jää huomaamatta kun katse on juuri napissa jota painettiin. Luokka
+     poistetaan animaation päätyttyä, jotta sama liike toistuu seuraavalla
+     muutoksella. */
+  const laatikko = el && el.closest('.pv');
+  if(laatikko){
+    laatikko.classList.remove('tk-paivittyi');
+    void laatikko.offsetWidth;
+    laatikko.classList.add('tk-paivittyi');
+    laatikko.addEventListener('animationend', ()=>laatikko.classList.remove('tk-paivittyi'), { once:true });
+  }
   const start = shownPrice, t0 = performance.now(), dur = 450;
   function frame(now){
     const p = Math.min(1,(now-t0)/dur), eased = 1-Math.pow(1-p,3);
@@ -1877,7 +1888,15 @@ if(nav){ const onScroll=()=>nav.classList.toggle('scr',window.scrollY>10); onScr
 const burger=document.getElementById('burger');
 if(burger){ burger.addEventListener('click',()=>nl.classList.toggle('op'));
   nl.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nl.classList.remove('op'))); }
-document.querySelectorAll('.calc-types,.revs,.steps,.grid-3').forEach(g=>[...g.children].forEach((ch,i)=>ch.style.transitionDelay=i*55+'ms'));
+/* Porrastus: ruudukon lapset ilmestyvät peräkkäin. Indeksi menee
+   CSS-muuttujaan, jotta viive lasketaan tyylitiedostossa (_anim.css) eikä
+   kahdessa paikassa. Katto viidessä: pidempi jono alkaa tuntua
+   odottamiselta eikä rytmiltä. */
+document.querySelectorAll('.calc-types,.revs,.steps,.grid-3,.cards,.grid-2,.mf-grid,.tgrid')
+  .forEach(g=>[...g.children].forEach((ch,i)=>{
+    ch.style.setProperty('--rv-i', String(Math.min(i,5)));
+    ch.classList.add('stagger');
+  }));
 const rvEls=[...document.querySelectorAll('.rv')];
 if('IntersectionObserver' in window){
   const io=new IntersectionObserver((ents)=>{ents.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{rootMargin:'0px 0px -6% 0px',threshold:0.05});
