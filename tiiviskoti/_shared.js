@@ -8,6 +8,7 @@
    api/create-booking.mjs käyttää. Näin laskurin näyttämä ja veloitettava
    hinta lasketaan samasta koodista eivätkä voi erota toisistaan.
    ========================================================= */
+import { thinSlots } from './_slots.js';
 import { TYPES, EXTRAS, NET_FACTOR, WINDOW_TIERS, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
 
 const ico = {
@@ -855,6 +856,9 @@ async function loadAvailability(){
       if(!map.has(key)) map.set(key, []);
       map.get(key).push({ time:fiTime(d), startsAt:s.startsAt, calendarId:s.calendarId });
     });
+    /* Näytetään enintään viisi aikaa päivässä, eikä kahta lähes samaa
+       hetkeä peräkkäin — perustelu `_slots.js`:ssä. */
+    for (const [key, list] of map) map.set(key, thinSlots(list));
     avail.slotsByDay = map;
     avail.state = map.size ? 'ready' : 'none';
     /* Erotellaan "alue kelpaa mutta kalenteri on tyhjä" siitä että aikoja on:
