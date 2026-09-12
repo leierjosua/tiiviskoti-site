@@ -43,7 +43,11 @@ const KUVAT = [
   ['ikkunat.webp',       'Puutalon ikkuna ulkoa, valkoiset puitteet ja karmit'],
   ['ulko-ovet.webp',     'Puutalon valkoinen ulko-ovi ja katettu kuisti'],
   ['taloyhtiot.webp',    'TiivisKodin asentaja kävelee työvälineineen kohti taloa'],
-  ['miksi-tyo.webp',     'TiivisKodin asentaja kävelee tiivistetarvikkeineen kohti puutaloa'],
+  /* Viides kuva EI ole enää toinen kävelyotos: `taloyhtiot.webp` ja
+     `miksi-tyo.webp` olivat samasta sarjasta ja näyttivät samalta, jolloin
+     viiden kuvan kierto tarjosi käytännössä neljä. Tilalla tiivistekelan
+     lähikuva — ainoa kuvauksen otos joka ei ole talo, ikkuna tai ovi. */
+  ['hero-kela.webp',     'Asentaja kantaa tiivistekelaa työkohteeseen'],
 ];
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -1627,6 +1631,63 @@ for (const c of PALVELUT) {
   console.log('✓', c.slug + '.html');
 }
 
+/* ---------- 404 ----------
+
+   Vercel tarjoilee juuren `404.html`:n kaikille osoitteille joita ei ole.
+   Ilman tätä kävijä sai palvelimen paljaan oletusvirhesivun: ei navia, ei
+   yhteystietoja, ei paluulinkkiä — eli umpikuja keskellä myyntipolkua.
+   Yleisin tulija on vanha mainos- tai hakukonelinkki, joten sivun tehtävä on
+   kertoa lyhyesti mitä tapahtui ja tarjota ne kolme polkua joihin oltiin
+   matkalla: hinta, ajanvaraus ja puhelin. Ei laskuria — sivu ladataan
+   harvoin, ja laskuri on yhden klikkauksen päässä. */
+function virhesivu() {
+  const R = '';
+  return `<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sivua ei löytynyt — TiivisKoti</title>
+<meta name="description" content="Etsimääsi sivua ei löytynyt. Katso hinnat, varaa aika verkosta tai soita ${TEL}." />
+<meta name="robots" content="noindex, follow" />
+<meta name="theme-color" content="#F6F7F3" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="stylesheet" href="/_alueet.css" />
+<link rel="stylesheet" href="/_anim.css" />
+</head>
+<body>
+${nav(R, '/#laskuri')}
+
+<section class="sec" style="padding-top:clamp(96px,12vw,150px)"><div class="wrap">
+  <div class="kicker">Virhe 404</div>
+  <h1 style="font-size:clamp(30px,4.4vw,50px);max-width:18ch;letter-spacing:-.03em">Tätä sivua ei ole</h1>
+  <p class="sub" style="max-width:56ch">Osoite on voinut muuttua tai linkissä on kirjoitusvirhe. Alta pääset siihen mitä todennäköisimmin etsit — tai soita, niin hoidetaan asia puhelimessa.</p>
+  <div class="hero-cta" style="margin-top:26px">
+    <a href="/#laskuri" class="btn btn-p btn-lg">Laske hinta ja varaa aika</a>
+    <a href="tel:${TELH}" class="btn btn-o btn-lg">Soita ${TEL}</a>
+  </div>
+  <div class="aluegrid" style="margin-top:clamp(34px,5vw,52px)">
+    <a class="aluecard" href="/hinta.html"><b>Hinnasto</b><span>Ikkuna ${WINDOW_RANGE} €, ovi ${TYPES[1].price} €, pienin veloitus ${MIN_PRICE} € per käynti.</span></a>
+    <a class="aluecard" href="/taloyhtio.html"><b>Taloyhtiöt</b><span>Sopimushinta ja veloitukseton kartoituskäynti hallitukselle.</span></a>
+    <a class="aluecard" href="/toiminta-alueet.html"><b>Toiminta-alueet</b><span>${ALUEET.length} kuntaa Uudellamaalla ja Riihimäellä.</span></a>
+    <a class="aluecard" href="/ota-yhteytta.html"><b>Ota yhteyttä</b><span>Kerro tilanteesi lomakkeella, vastaamme mahdollisimman pian.</span></a>
+  </div>
+</div></section>
+
+${footer(R, null, '/#laskuri')}
+${skripti}
+<script defer src="/_analytics.js"></script>
+<script type="module" src="/_anchors.js"></script>
+</body>
+</html>
+`;
+}
+
 writeFileSync('toiminta-alueet.html', hubSivu());
 console.log('✓ toiminta-alueet.html');
 
@@ -1668,8 +1729,10 @@ function sitemapXml() {
     { loc: `${SITE}/hinta.html`, pri: '0.9', freq: 'monthly' },
     { loc: `${SITE}/ota-yhteytta.html`, pri: '0.7', freq: 'monthly' },
     { loc: `${SITE}/meista.html`, pri: '0.5', freq: 'yearly' },
+    /* ajanvaraus.html on TARKOITUKSELLA poissa: sen canonical osoittaa
+       varaa.html:ään, ja sitemapissa kuuluu olla vain kanonisia osoitteita.
+       Sivu itse toimii ja on linkitettävissä. */
     { loc: `${SITE}/varaa.html`, pri: '0.5', freq: 'monthly' },
-    { loc: `${SITE}/ajanvaraus.html`, pri: '0.5', freq: 'monthly' },
     { loc: `${SITE}/tietosuoja.html`, pri: '0.3', freq: 'yearly' },
     { loc: `${SITE}/kayttoehdot.html`, pri: '0.3', freq: 'yearly' },
   ];
@@ -1684,6 +1747,9 @@ ${sivut.map((s) => `  <url>
 </urlset>
 `;
 }
+writeFileSync('404.html', virhesivu());
+console.log('✓ 404.html');
+
 writeFileSync('sitemap.xml', sitemapXml());
 console.log('✓ sitemap.xml');
 
