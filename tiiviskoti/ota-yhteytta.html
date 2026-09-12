@@ -85,6 +85,7 @@
   border:1px solid var(--line2);border-radius:10px;padding:13px 14px}
 .yh-f textarea{min-height:110px;resize:vertical}
 .yh-f input:focus,.yh-f textarea:focus{outline:2px solid var(--green);outline-offset:1px;border-color:transparent}
+.yh-vihje{font-size:14px;color:var(--mute);margin:0 0 16px}
 .yh-err{display:none;margin-bottom:14px;font-size:14.5px;color:#B3261E;font-weight:600}
 .yh-ok{display:none;background:var(--green-soft);border:1px solid #BCDCC9;border-radius:var(--r-lg);
   padding:24px;margin-top:20px;max-width:640px}
@@ -175,14 +176,15 @@
 
   <div class="yh-formwrap" id="yhFormWrap"><div>
     <form class="yh-form" id="yhForm" novalidate>
+      <p class="yh-vihje">Anna nimi ja <b>joko puhelin tai sähköposti</b> — muu on vapaaehtoista.</p>
       <div class="yh-err" id="yhErr"></div>
       <div class="yh-row">
         <div class="yh-f"><label for="yhName">Nimi *</label><input id="yhName" name="contact" type="text" autocomplete="name" placeholder="Matti Meikäläinen" required></div>
-        <div class="yh-f"><label for="yhPhone">Puhelin *</label><input id="yhPhone" name="phone" type="tel" autocomplete="tel" placeholder="040 123 4567" required></div>
+        <div class="yh-f"><label for="yhPhone">Puhelin</label><input id="yhPhone" name="phone" type="tel" autocomplete="tel" placeholder="040 123 4567"></div>
       </div>
       <div class="yh-row">
-        <div class="yh-f"><label for="yhEmail">Sähköposti *</label><input id="yhEmail" name="email" type="email" autocomplete="email" placeholder="matti@esimerkki.fi" required></div>
-        <div class="yh-f"><label for="yhAddr">Osoite tai postinumero *</label><input id="yhAddr" name="addr" type="text" autocomplete="street-address" placeholder="Esimerkkitie 1, 00100 Helsinki" required></div>
+        <div class="yh-f"><label for="yhEmail">Sähköposti</label><input id="yhEmail" name="email" type="email" autocomplete="email" placeholder="matti@esimerkki.fi"></div>
+        <div class="yh-f"><label for="yhAddr">Osoite tai postinumero</label><input id="yhAddr" name="addr" type="text" autocomplete="street-address" placeholder="Esimerkkitie 1, 00100 Helsinki"></div>
       </div>
       <div class="yh-f"><label for="yhMsg">Viesti</label><textarea id="yhMsg" name="message" placeholder="Kerro lyhyesti mistä on kyse — esimerkiksi montako ovea tai ikkunaa vetää."></textarea></div>
       <button class="btn btn-p btn-lg" id="yhSubmit" type="submit">Lähetä viesti</button>
@@ -282,8 +284,18 @@ form.addEventListener('submit', async (ev) => {
   const v = (id) => document.getElementById(id).value.trim();
   const data = { kind:'yksityinen', contact:v('yhName'), phone:v('yhPhone'),
     email:v('yhEmail'), addr:v('yhAddr'), message:v('yhMsg'), pageUrl:location.href };
-  if (!data.contact || !data.phone || !data.addr || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) {
-    err.textContent = 'Tarkista nimi, puhelin, sähköposti ja osoite.';
+  /* Sama sääntö kuin palvelimella: nimi ja jompikumpi yhteystapa.
+     Kynnys pidetään matalana — puuttuva osoite ei estä yhteydenottoa. */
+  if (!data.contact) {
+    err.textContent = 'Kerro nimesi, niin tiedämme kenelle vastata.';
+    err.style.display = 'block'; return;
+  }
+  if (!data.phone && !data.email) {
+    err.textContent = 'Anna puhelinnumero tai sähköposti, jotta voimme vastata.';
+    err.style.display = 'block'; return;
+  }
+  if (data.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) {
+    err.textContent = 'Tarkista sähköpostiosoite.';
     err.style.display = 'block'; return;
   }
   nappi.disabled = true; nappi.textContent = 'Lähetetään…';

@@ -107,7 +107,8 @@ async function mirrorToCrmLeads(f, client) {
         email: f.email || '',
         phone: f.phone,
         postal_code: f.postalCode || '',
-        message: ['Taloyhtiö-tarjouspyyntö', f.message, extra].filter(Boolean).join('\n'),
+        message: [f.kind === 'yksityinen' ? 'Yhteydenotto verkkosivulta' : 'Taloyhtiö-tarjouspyyntö',
+                 f.message, extra].filter(Boolean).join('\n'),
         campaign: f.campaign || undefined,
         gclid: f.gclid || undefined,
         gclid_kind: f.gclidKind || undefined,
@@ -182,12 +183,29 @@ export default async function handler(req, res) {
       ? clean(body.gclidKind, 10)
       : 'gclid';
 
+    /* PAKOLLISET KENTÄT ERIKSEEN KAHDELLE LOMAKKEELLE.
+
+       Taloyhtiön tarjouspyyntö kysyy kaiken: yhtiön nimi, yhteyshenkilö,
+       sähköposti, puhelin ja osoite. Siellä tiedot tarvitaan tarjouksen
+       laatimiseen, eikä kynnys ole ongelma — isännöitsijä täyttää lomakkeen
+       loppuun asti.
+
+       Kuluttajan yhteydenotto on eri tilanne: kynnys ratkaisee. Riittää että
+       tiedämme kuka ja miten häneen saa yhteyden — puhelin TAI sähköposti.
+       Osoite on hyödyllinen mutta ei este. Aiemmin tämä tarkistus vaati
+       kaikki neljä ja hylkäsi jokaisen Ota yhteyttä -sivulta lähetetyn
+       viestin virheellä validation/yhtio. */
     const fields = [];
-    if (!yhtio) fields.push('yhtio');
     if (!contact) fields.push('contact');
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) fields.push('email');
-    if (!phone) fields.push('phone');
-    if (!addr) fields.push('addr');
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) fields.push('email');
+    if (kind === 'yksityinen') {
+      if (!phone && !email) fields.push('yhteystapa');
+    } else {
+      if (!yhtio) fields.push('yhtio');
+      if (!email) fields.push('email');
+      if (!phone) fields.push('phone');
+      if (!addr) fields.push('addr');
+    }
     if (fields.length) return res.status(400).json({ error: 'validation', fields });
 
     const created = await sb('form_submissions', {
@@ -224,14 +242,14 @@ export default async function handler(req, res) {
 
     await queueLeadNotification(row.id, {
       contact, email, phone, role, yhtio, addr, doors, when, message,
-      slug, nimi: kind === 'yksityinen' ? contact : `${yhtio} — ${contact}`,
+      slug, kind, nimi: kind === 'yksityinen' ? contact : `${yhtio} — ${contact}`,
       postalCode: postalFrom(addr), pageUrl,
     });
 
     // Peilaa CRM:n Liidit-sivulle (tk.leads) — sinne minne admin oikeasti katsoo.
     const mirrored = await mirrorToCrmLeads({
       contact, email, phone, role, yhtio, addr, doors, when, message,
-      slug, nimi: kind === 'yksityinen' ? contact : `${yhtio} — ${contact}`,
+      slug, kind, nimi: kind === 'yksityinen' ? contact : `${yhtio} — ${contact}`,
       postalCode: postalFrom(addr), campaign, gclid, gclidKind,
     }, {
       ip: (req.headers['x-forwarded-for'] || '').split(',')[0].trim(),
