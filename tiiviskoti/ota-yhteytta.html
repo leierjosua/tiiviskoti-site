@@ -94,6 +94,14 @@
 
 /* ---------- yhteystiedot ---------- */
 .yh-split{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}
+/* KUVA. Sama idea kuin aaltoair.fi:n /ota-yhteytta-sivulla: kasvot
+   yhteystietojen viereen, jotta lomakkeen täyttäjä näkee kenelle kirjoittaa.
+   Vasen palsta oli aiemmin pelkkä otsikko + yksi rivi, eli iso tyhjä alue
+   korkean yhteystietolaatikon vieressä — kuva täyttää sen. */
+.yh-kuva{margin:22px 0 0}
+.yh-kuva img{display:block;width:100%;height:auto;border-radius:var(--r-lg);
+  border:1px solid var(--line);background:var(--imgtop)}
+.yh-kuva figcaption{margin-top:10px;font-size:14px;line-height:1.5;color:var(--mute)}
 .yh-info{background:var(--alt);border-radius:var(--r-lg);padding:clamp(22px,3vw,30px)}
 .yh-info dl{display:grid;gap:16px}
 .yh-info dt{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:3px}
@@ -147,6 +155,11 @@
   /* Yhteystiedot omaksi lohkokseen: pelkkä 48 px:n väli ei riittänyt
      erottamaan sitä lomakkeesta. */
   .yh-split{gap:22px}
+  /* Puhelimessa palstat menevät allekkain, jolloin kuva jää otsikon ja
+     yhteystietolaatikon väliin. Tiiviimmät välit, ettei se työnnä
+     yhteystietoja liian kauas. */
+  .yh-kuva{margin-top:18px}
+  .yh-kuva figcaption{font-size:13.5px}
   .yh-info{padding:22px 20px}
   .yh-info dl{gap:20px}
 }
@@ -201,6 +214,10 @@
     <div class="rv">
       <h2 class="yh-h2">Yhteystiedot</h2>
       <p class="yh-lead" style="margin-bottom:0">Soitto on nopein tapa, jos haluat kysyä jotain ennen varausta.</p>
+      <figure class="yh-kuva">
+        <img src="img/meista-porukka.webp?v=3" alt="TiivisKodin asentajat työvälineineen asiakkaan pihassa" width="1100" height="619" loading="lazy" decoding="async">
+        <figcaption>Oma porukkamme vastaa puhelimeen ja tekee myös asennuksen — emme käytä alihankkijoita.</figcaption>
+      </figure>
     </div>
     <div class="yh-info rv">
       <dl>
