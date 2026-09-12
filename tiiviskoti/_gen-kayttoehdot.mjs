@@ -87,8 +87,8 @@ const body = `
 
     <h2>1. Palveluntarjoaja</h2>
     <div class="box">
-      <p><b>TiivisKoti</b><br />
-      Y-tunnus 3414418-4<br />
+      <p><b>Tiiviskoti Oy</b><br />
+      Y-tunnus 3652671-7<br />
       Järvipuistonkatu 5, 04400 Järvenpää<br />
       <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a> · <a href="tel:+358458755996">045 875 5996</a></p>
     </div>

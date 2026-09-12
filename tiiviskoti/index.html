@@ -505,6 +505,28 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
 .save-list li{margin-bottom:7px}
 .save-note{font-size:13.5px;color:var(--mute);margin-top:20px;max-width:78ch}
 
+/* ARVOSTELUT — omat arv-luokat, koska .rev on jo varattu Säästö-osion
+   korteille. Luvut ja tekstit ovat Google-yritysprofiilista (place_id
+   ChIJaT51gJWKmEkRCqEXyc6lGuo), eivät sivustolla kerättyjä.
+
+   EI aggregateRating-rakennedataa tarkoituksella: Google pitää yrityksen
+   omalla sivullaan esitettyä arviota itsestään self-serving-merkintänä eikä
+   näytä sitä rikkaana tuloksena. Tähtiluku kuuluu karttaprofiiliin, jossa se
+   jo on — täällä arvostelut tekevät työnsä myyntiargumenttina. */
+.arv-yht{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+.arv-luku{font-size:34px;font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1}
+.arv-tahdet{color:var(--star);font-size:19px;letter-spacing:2px}
+.arv-maara{font-size:15px;color:var(--mute)}
+.arv-maara a{color:var(--green);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.arv-lista{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:clamp(28px,3.5vw,40px)}
+.arv-kortti{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:24px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--sh)}
+.arv-kortti .arv-t{color:var(--star);font-size:15px;letter-spacing:1px}
+.arv-kortti p{font-size:15.5px;color:var(--text);flex:1;margin:0}
+.arv-nimi{font-size:14.5px;font-weight:700;color:var(--ink)}
+.arv-nimi span{display:block;font-weight:400;font-size:13px;color:var(--mute);margin-top:2px}
+@media(max-width:960px){.arv-lista{grid-template-columns:1fr}}
+
 /* CTA — syvänvihreä lohko (ryhtiä, luottamusta) */
 .cta{background:var(--deep);border-radius:var(--r-lg);padding:clamp(36px,5vw,60px);text-align:center;color:var(--dtext)}
 .cta h2{color:#fff;font-size:clamp(26px,3.4vw,38px)}
@@ -728,15 +750,15 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "HomeAndConstructionBusiness",
+      "@type": "HomeAndConstructionBusiness", "legalName": "Tiiviskoti Oy",
       "@id": "https://tiiviskoti.fi/#business",
       "name": "TiivisKoti",
       "url": "https://tiiviskoti.fi/",
       "description": "TiivisKoti vaihtaa ovien ja ikkunoiden tiivisteet kiinteään hintaan Uudellamaalla. Karmi- ja puitetiivisteet, kynnyskumi ja oven käynnin säätö samalla käynnillä.",
       "telephone": "+358458755996",
       "email": "info@tiiviskoti.fi",
-      "vatID": "FI34144184",
-      "taxID": "3414418-4",
+      "vatID": "FI36526717",
+      "taxID": "3652671-7",
       "priceRange": "€€",
       "image": [
         "https://tiiviskoti.fi/img/og-tiiviskoti.jpg",
@@ -744,7 +766,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
         "https://tiiviskoti.fi/img/ulko-ovet.jpg"
       ],
       "logo": "https://tiiviskoti.fi/img/logo-email.png",
-      "sameAs": ["https://www.facebook.com/profile.php?id=61573878654177"],
+      "sameAs": ["https://www.facebook.com/profile.php?id=61573878654177", "https://www.instagram.com/tiiviskoti/", "https://www.google.com/maps/place/?q=place_id:ChIJaT51gJWKmEkRCqEXyc6lGuo"],
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Järvipuistonkatu 5",
@@ -910,7 +932,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
       "name": "Miten kotitalousvähennys toimii?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Ovien ja ikkunoiden tiivistys on kotitaloustyötä. Saat meiltä laskun, jossa työn osuus on valmiiksi eritelty — ilmoitat sen OmaVerossa ja vähennät jopa 40 % työn osuudesta (enintään 2 250 € / henkilö vuonna 2026)."
+        "text": "Ovien ja ikkunoiden tiivistys on kotitaloustyötä. Saat meiltä laskun, jossa työn osuus on valmiiksi eritelty — ilmoitat sen OmaVerossa ja vähennät jopa 40 % työn osuudesta (enintään 2 100 € / henkilö vuosina 2026–2027, omavastuu 150 €)."
       }
     }
   ]
@@ -1261,6 +1283,36 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
   </div>
 </div></section>
 
+<!-- ARVOSTELUT -->
+<section class="sec" id="arvostelut"><div class="wrap">
+  <div class="center rv"><div class="kicker">Arvostelut</div>
+    <h2 class="title">Mitä asiakkaat sanovat</h2>
+    <div class="arv-yht" style="justify-content:center">
+      <span class="arv-luku">5,0</span>
+      <span class="arv-tahdet" aria-hidden="true">★★★★★</span>
+      <span class="arv-maara">9 arvostelua ·
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJaT51gJWKmEkRCqEXyc6lGuo" target="_blank" rel="noopener">Lue kaikki Googlessa</a></span>
+    </div>
+  </div>
+  <div class="arv-lista">
+    <div class="arv-kortti rv">
+      <span class="arv-t" aria-hidden="true">★★★★★</span>
+      <p>&rdquo;Asia hoitui sovitusti ja aikataulussa. Ahkerat ja asiantuntevat olivat tekijät. Voin suositella firmaa muillekin hommiin.&rdquo;</p>
+      <span class="arv-nimi">Markku Saarinen<span>Google-arvostelu</span></span>
+    </div>
+    <div class="arv-kortti rv">
+      <span class="arv-t" aria-hidden="true">★★★★★</span>
+      <p>&rdquo;Kaikki tekivät reippaasti töitä ja olivat asiallisia ja ystävällisiä.&rdquo;</p>
+      <span class="arv-nimi">Ilkka Musakka<span>Google-arvostelu</span></span>
+    </div>
+    <div class="arv-kortti rv">
+      <span class="arv-t" aria-hidden="true">★★★★★</span>
+      <p>&rdquo;Pojat tekivät työnsä ammattitaidolla.&rdquo;</p>
+      <span class="arv-nimi">Lilja Soini<span>Google-arvostelu · hyvä hinta</span></span>
+    </div>
+  </div>
+</div></section>
+
 <!-- SÄÄSTÖARVIO -->
 <section class="sec" id="saasto"><div class="wrap">
   <div class="center rv"><div class="kicker">Säästö</div><h2 class="title">Paljonko tiivistys säästää</h2>
@@ -1313,7 +1365,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
     <div class="q"><button type="button">Onko työllä takuu ja oletteko vakuutettuja?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Kyllä. Työlle ja asennetuille materiaaleille on kahden vuoden takuu. Meillä on toiminnan vastuuvakuutus, joka kattaa työn aikana kohteelle sattuvat vahingot.</p></div></div>
     <div class="q"><button type="button">Millä alueella toimitte?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Koko Uudenmaan alueella — Helsinki, Espoo, Vantaa ja kehyskunnat — sekä Riihimäellä. Kerro postinumerosi varauksen yhteydessä, niin vahvistamme, että palvelemme alueellasi.</p></div></div>
     <div class="q"><button type="button">Miten ajanvaraus toimii?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Valitset laskurista ovet ja ikkunat, näet kiinteän hinnan ja siirryt varaamaan vapaan ajan kalenterista. Saat vahvistuksen sähköpostiin. Hinta on kiinteä jo ennen varausta — tarkistamme sen vielä paikan päällä ennen työn aloitusta.</p></div></div>
-    <div class="q"><button type="button">Miten kotitalousvähennys toimii?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Ovien ja ikkunoiden tiivistys on kotitaloustyötä. Saat meiltä laskun, jossa työn osuus on valmiiksi eritelty — ilmoitat sen OmaVerossa ja vähennät jopa 40 % työn osuudesta (enintään 2 250 € / henkilö vuonna 2026).</p></div></div>
+    <div class="q"><button type="button">Miten kotitalousvähennys toimii?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Ovien ja ikkunoiden tiivistys on kotitaloustyötä. Saat meiltä laskun, jossa työn osuus on valmiiksi eritelty — ilmoitat sen OmaVerossa ja vähennät jopa 40 % työn osuudesta (enintään 2 100 € / henkilö vuosina 2026–2027, omavastuu 150 €).</p></div></div>
   </div>
   <!-- ukk:loppu -->
 </div></section>
@@ -1326,14 +1378,14 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
       <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="#palvelut">Ovet</a><a href="#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
-    <div class="mf-col"><h4>Yritys</h4><a href="#miksi">Miksi me</a><a href="/artikkelit.html">Artikkelit</a><a href="#saasto">Säästöarvio</a><a href="#ukk">UKK</a><a href="/ota-yhteytta.html">Ota yhteyttä</a><a href="#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="#miksi">Miksi me</a><a href="/hinta.html">Hinta</a><a href="/artikkelit.html">Artikkelit</a><a href="#saasto">Säästöarvio</a><a href="#ukk">UKK</a><a href="/ota-yhteytta.html">Ota yhteyttä</a><a href="#laskuri">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:+358458755996">045 875 5996</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
   <div class="mf-cities">
     <h4>Toiminta-alueet</h4>
     <div class="list"><a href="toiminta-alueet/helsinki.html">Helsinki</a><a href="toiminta-alueet/espoo.html">Espoo</a><a href="toiminta-alueet/vantaa.html">Vantaa</a><a href="toiminta-alueet/kauniainen.html">Kauniainen</a><a href="toiminta-alueet/kirkkonummi.html">Kirkkonummi</a><a href="toiminta-alueet/kerava.html">Kerava</a><a href="toiminta-alueet/jarvenpaa.html">Järvenpää</a><a href="toiminta-alueet/tuusula.html">Tuusula</a><a href="toiminta-alueet/nurmijarvi.html">Nurmijärvi</a><a href="toiminta-alueet/hyvinkaa.html">Hyvinkää</a><a href="toiminta-alueet/sipoo.html">Sipoo</a><a href="toiminta-alueet/vihti.html">Vihti</a><a href="toiminta-alueet/mantsala.html">Mäntsälä</a><a href="toiminta-alueet/pornainen.html">Pornainen</a><a href="toiminta-alueet/porvoo.html">Porvoo</a><a href="toiminta-alueet/askola.html">Askola</a><a href="toiminta-alueet/loviisa.html">Loviisa</a><a href="toiminta-alueet/lapinjarvi.html">Lapinjärvi</a><a href="toiminta-alueet/myrskyla.html">Myrskylä</a><a href="toiminta-alueet/pukkila.html">Pukkila</a><a href="toiminta-alueet/lohja.html">Lohja</a><a href="toiminta-alueet/karkkila.html">Karkkila</a><a href="toiminta-alueet/siuntio.html">Siuntio</a></div>
   </div>
-  <div class="mf-bot"><span>© <span id="yr"></span> TiivisKoti · Y-tunnus 3414418-4</span><span><a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span></div>
+  <div class="mf-bot"><span>© <span id="yr"></span> Tiiviskoti Oy · Y-tunnus 3652671-7</span><span><a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span></div>
 </div></footer>
 
 <div class="mcta">

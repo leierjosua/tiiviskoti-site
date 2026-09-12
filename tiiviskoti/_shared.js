@@ -339,7 +339,7 @@ const FAQ = [
   ['Onko työllä takuu ja oletteko vakuutettuja?','Kyllä. Työllä ja asennetuilla materiaaleilla on kahden vuoden takuu, yrityksillä asennustyön takuu on vuosi. Meillä on toiminnan vastuuvakuutus, joka kattaa työn aikana kohteelle sattuvat vahingot. Jos veto ei loppunut, tulemme uudestaan veloituksetta.'],
   ['Millä alueella toimitte?','Koko Uudenmaan alueella — Helsinki, Espoo, Vantaa ja kehyskunnat. Kerro postinumerosi varauksen yhteydessä, niin vahvistamme, että palvelemme alueellasi.'],
   ['Miten ajanvaraus toimii?','Valitset laskurista ovet ja ikkunat, näet kiinteän hinnan ja siirryt varaamaan vapaan ajan kalenterista. Saat vahvistuksen sähköpostiin. Hinta on kiinteä jo ennen varausta — tarkistamme sen vielä paikan päällä ennen työn aloitusta.'],
-  ['Miten kotitalousvähennys toimii?','Ovien ja ikkunoiden tiivistys on kotitaloustyötä. Saat meiltä laskun, jossa työn osuus on valmiiksi eritelty — ilmoitat sen OmaVerossa ja vähennät jopa 40 % työn osuudesta (enintään 2 250 € / henkilö vuonna 2026).']
+  ['Miten kotitalousvähennys toimii?','Ovien ja ikkunoiden tiivistys on kotitaloustyötä. Saat meiltä laskun, jossa työn osuus on valmiiksi eritelty — ilmoitat sen OmaVerossa ja vähennät jopa 40 % työn osuudesta (enintään 2 100 € / henkilö vuosina 2026–2027, omavastuu 150 €).']
 ];
 
 /* ---------- laskuri ----------

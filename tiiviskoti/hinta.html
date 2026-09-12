@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Paljonko ovien ja ikkunoiden tiivistys maksaa? — TiivisKoti</title>
+<meta name="description" content="Ikkunan tiivistys 75-90 euroa, ovi 99 euroa. Esimerkkilaskelmat kerrostaloon, rivitaloon ja omakotitaloon seka kotitalousvahennyksen todellinen vaikutus." />
+<link rel="canonical" href="https://tiiviskoti.fi/hinta.html" />
+<meta name="robots" content="index,follow" />
+<meta property="og:title" content="Paljonko ovien ja ikkunoiden tiivistys maksaa?" />
+<meta property="og:description" content="Kiinteat hinnat ja esimerkkilaskelmat oikeilla luvuilla. Ikkuna 75-90 euroa, ovi 99 euroa, pienin veloitus 149 euroa." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tiiviskoti.fi/hinta.html" />
+<meta property="og:site_name" content="TiivisKoti" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="_alueet.css" />
+<link rel="stylesheet" href="/_anim.css" />
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "WebPage",
+   "@id": "https://tiiviskoti.fi/hinta.html",
+   "url": "https://tiiviskoti.fi/hinta.html",
+   "name": "Paljonko ovien ja ikkunoiden tiivistys maksaa?",
+   "inLanguage": "fi-FI",
+   "about": {
+    "@id": "https://tiiviskoti.fi/#business"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Etusivu",
+     "item": "https://tiiviskoti.fi/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Hinta",
+     "item": "https://tiiviskoti.fi/hinta.html"
+    }
+   ]
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Paljonko ikkunan tiivistys maksaa?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Ikkunan tiivistys maksaa 75–90 € ikkunalta määrästä riippuen: 1–4 ikkunaa 90 €, 5–9 ikkunaa 85 €, 10–13 ikkunaa 80 € ja 14 ikkunasta ylöspäin 75 € kappaleelta. Alempi hinta koskee kaikkia ikkunoita. Pienin veloitus käynniltä on 149 €."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Paljonko oven tiivistys maksaa?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Ulko-oven ja parvekeoven tiivistys maksaa 99 € ovelta, liuku- tai pariovi 149 € ja väli- tai huoneovi 89 €, samaan käyntiin yhdistettynä 59 €. Pelkkä kynnyskumi 45 €. Pienin veloitus käynniltä on 149 €."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Mitä hintaan sisältyy?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Vanhojen tiivisteiden poisto, pintojen puhdistus, uudet silikonitiivisteet, oven käynnin säätö ja matkat. Ulko-oviin kuuluu kynnyskumi. Lämpökamerakartoitus tehdään veloituksetta ennen työtä. Hinnat sisältävät arvonlisäveron 25,5 %."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Paljonko kotitalousvähennys pienentää hintaa?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Vähennys on 40 % työn osuudesta, josta vähennetään 150 euron omavastuu, enintään 2 100 € henkilöltä vuosina 2026–2027. Käytännössä 510 euron työstä vähennys on noin 34 € ja 1 050 euron työstä noin 228 €. Alle noin 420 euron töissä omavastuu syö vähennyksen kokonaan."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Kannattaako tiivistää vai vaihtaa ikkunat?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Jos karmi ja puitteet ovat suorassa ja ikkuna toimii, tiivisteiden uusiminen riittää lähes aina. Koko talon ikkunoiden tiivistys maksaa tyypillisesti 500–1 300 €, kun ikkunaremontti maksaa kymmeniä tuhansia. Tiivistys ei riitä, jos puitteet ovat lahonneet tai lasit huurtuvat välistä."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+<style>
+/* Hintasivu. Vastaa hakuun "paljonko tiivistys maksaa": vastaus heti
+   ensimmäisessä kappaleessa, hinnasto taulukkona ja esimerkit LASKETTUINA
+   pricing.mjs:stä — ei käsin kirjoitettuja lukuja, jotka vanhenisivat. */
+.h-hero{padding-block:clamp(84px,10vw,128px) clamp(20px,3vw,32px)}
+.h-hero h1{font-size:clamp(28px,4.4vw,46px);letter-spacing:-.03em;line-height:1.1;max-width:18ch}
+.h-vastaus{font-size:clamp(17px,1.9vw,20px);color:var(--text);margin-top:18px;max-width:62ch;line-height:1.6}
+.h-vastaus b{color:var(--ink)}
+.h-sec{padding-bottom:clamp(40px,6vw,72px)}
+.h-h2{font-size:clamp(21px,2.6vw,30px);letter-spacing:-.025em;line-height:1.15;margin-bottom:6px}
+.h-lead{font-size:15.5px;color:var(--mute);max-width:62ch;margin:8px 0 22px}
+.h-tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--card)}
+.h-tbl table{width:100%;border-collapse:collapse;font-size:15.5px}
+.h-tbl th,.h-tbl td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--line)}
+.h-tbl thead th{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--mute);font-weight:700;background:var(--alt);white-space:nowrap}
+.h-tbl tbody tr:last-child td{border-bottom:0}
+.h-tbl td.num,.h-tbl th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.h-note{font-size:14px;color:var(--mute);margin-top:14px;max-width:70ch}
+.h-box{background:var(--alt);border-radius:var(--r-lg);padding:clamp(20px,3vw,28px);margin-top:24px}
+.h-box h3{font-size:18px;color:var(--ink);margin-bottom:8px}
+.h-box p{font-size:15.5px;margin-bottom:10px}
+.h-box p:last-child{margin-bottom:0}
+.h-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.h-faq{border-top:1px solid var(--line);margin-top:8px}
+.h-faq details{border-bottom:1px solid var(--line)}
+.h-faq summary{list-style:none;cursor:pointer;padding:18px 0;font-size:17px;font-weight:800;color:var(--ink)}
+.h-faq summary::-webkit-details-marker{display:none}
+.h-faq p{font-size:15.5px;padding-bottom:18px;max-width:68ch;margin:0}
+@media(max-width:620px){
+  .h-hero{padding-block:90px 18px}
+  .h-hero h1{font-size:30px}
+  .h-vastaus{font-size:16.5px}
+  .h-tbl th,.h-tbl td{padding:10px 12px;font-size:14.5px}
+}
+</style>
+</head>
+<body>
+<nav class="top" id="nav"><div class="wrap">
+  <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
+  <div class="nlinks" id="nlinks">
+    <a href="/#palvelut">Palvelut</a><a href="/#laskuri">Hinta</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="toiminta-alueet.html">Toiminta-alueet</a><a href="meista.html">Meistä</a><a href="/#saasto">Säästö</a>
+  </div>
+  <a href="tel:+358458755996" class="ntel">045 875 5996</a>
+  <a href="/#laskuri" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
+  <button class="burger" id="burger" aria-label="Valikko"><span></span><span></span><span></span></button>
+</div></nav>
+
+<main>
+<section class="wrap h-hero">
+  <div class="kicker rv">Hinta</div>
+  <h1 class="rv">Paljonko ovien ja ikkunoiden tiivistys maksaa?</h1>
+  <p class="h-vastaus rv"><b>Ikkunan tiivistys maksaa 75–90 € ikkunalta ja oven tiivistys 99 € ovelta.</b>
+  Pienin veloitus käynniltä on 149 €. Kerrostalokolmion kuusi ikkunaa maksaa 510 €, rivitalon kymmenen
+  ikkunaa 800 € ja omakotitalon 14 ikkunaa ja kaksi ulko-ovea 1 248 €. Hinnat ovat kiinteitä ja sisältävät
+  arvonlisäveron, tiivisteet, työn, matkat ja lämpökamerakartoituksen.</p>
+</section>
+
+<section class="wrap h-sec">
+  <h2 class="h-h2 rv">Hinnasto</h2>
+  <p class="h-lead rv">Sama hinta riippumatta siitä missä päin Uuttamaata kohde on. Ei tarjouspyyntöä eikä aloitusmaksua.</p>
+  <div class="h-tbl rv"><table>
+    <thead><tr><th>Kohde</th><th class="num">Hinta</th><th>Huomioita</th></tr></thead>
+    <tbody>
+      <tr><td>Ikkuna, 1–4 kpl</td><td class="num"><strong>90 €</strong> / kpl</td><td>Karmi- ja puitetiivisteet</td></tr>
+      <tr><td>Ikkuna, 5–9 kpl</td><td class="num"><strong>85 €</strong> / kpl</td><td>Alempi hinta koskee kaikkia ikkunoita</td></tr>
+      <tr><td>Ikkuna, 10–13 kpl</td><td class="num"><strong>80 €</strong> / kpl</td><td>Kymmenes ikkuna maksaa siis vain 35 €</td></tr>
+      <tr><td>Ikkuna, 14+ kpl</td><td class="num"><strong>75 €</strong> / kpl</td><td>Neljästoista maksaa 10 €</td></tr>
+      <tr><td>Ulko-ovi tai parvekeovi</td><td class="num"><strong>99 €</strong> / ovi</td><td>Sivutiivisteet, kynnyskumi ja käynnin säätö</td></tr>
+      <tr><td>Liuku- tai pariovi</td><td class="num"><strong>149 €</strong></td><td>Iso lasiovi, kiskon huolto</td></tr>
+      <tr><td>Väli- tai huoneovi</td><td class="num"><strong>89 €</strong></td><td>59 € samaan käyntiin muun työn kanssa</td></tr>
+      <tr><td>Pelkkä kynnyskumi</td><td class="num"><strong>45 €</strong></td><td>Alaslistan tiivisteen vaihto</td></tr>
+      <tr><td>Lämpökamerakartoitus</td><td class="num"><strong>0 €</strong></td><td>Tehdään aina ennen työtä</td></tr>
+      <tr><td>Pienin veloitus / käynti</td><td class="num"><strong>149 €</strong></td><td>Kattaa matkan ja työpisteen pystytyksen</td></tr>
+    </tbody>
+  </table></div>
+  <p class="h-note rv">Hinnat sisältävät arvonlisäveron 25,5 %. Määräporras lasketaan koko tilaukselle: jos tilaat kymmenen ikkunaa, kaikki kymmenen maksavat 80 € eikä vain kymmenes.</p>
+</section>
+
+<section class="wrap h-sec">
+  <h2 class="h-h2 rv">Mitä tiivistys maksaa oikeassa kodissa</h2>
+  <p class="h-lead rv">Nämä ovat samasta hinnastosta laskettuja esimerkkejä, eivät arvioita. Viimeinen sarake on hinta kotitalousvähennyksen jälkeen.</p>
+  <div class="h-tbl rv"><table>
+    <thead><tr><th>Kohde</th><th class="num">Hinta</th><th class="num">Kotitalousvähennys</th><th class="num">Jää maksettavaksi</th></tr></thead>
+    <tbody>
+      <tr><td>Yksi ikkuna</td><td class="num"><strong>149 €</strong></td><td class="num">—</td><td class="num">149 €</td></tr>
+      <tr><td>Neljä ikkunaa</td><td class="num"><strong>360 €</strong></td><td class="num">—</td><td class="num">360 €</td></tr>
+      <tr><td>Kuusi ikkunaa</td><td class="num"><strong>510 €</strong></td><td class="num">−34 €</td><td class="num">476 €</td></tr>
+      <tr><td>Kymmenen ikkunaa</td><td class="num"><strong>800 €</strong></td><td class="num">−138 €</td><td class="num">662 €</td></tr>
+      <tr><td>14 ikkunaa</td><td class="num"><strong>1050 €</strong></td><td class="num">−228 €</td><td class="num">822 €</td></tr>
+      <tr><td>Yksi ulko-ovi</td><td class="num"><strong>149 €</strong></td><td class="num">—</td><td class="num">149 €</td></tr>
+      <tr><td>Ulko-ovi + parvekeovi</td><td class="num"><strong>198 €</strong></td><td class="num">—</td><td class="num">198 €</td></tr>
+      <tr><td>Kerrostalokolmio: 6 ikkunaa + parvekeovi</td><td class="num"><strong>609 €</strong></td><td class="num">−69 €</td><td class="num">540 €</td></tr>
+      <tr><td>Rivitalo: 10 ikkunaa + ulko-ovi + parvekeovi</td><td class="num"><strong>998 €</strong></td><td class="num">−209 €</td><td class="num">789 €</td></tr>
+      <tr><td>Omakotitalo: 14 ikkunaa + 2 ulko-ovea</td><td class="num"><strong>1248 €</strong></td><td class="num">−299 €</td><td class="num">949 €</td></tr>
+    </tbody>
+  </table></div>
+  <p class="h-note rv">Vähennys on laskettu 40 %:n mukaan työn osuudesta, josta on vähennetty 150 euron omavastuu. Työn osuudeksi eritellään laskulla 90 % summasta. Omavastuu vähennetään kerran vuodessa — jos olet jo käyttänyt sen muuhun kotitaloustyöhön, vähennys on tätä suurempi.</p>
+  <div class="h-cta rv">
+    <a href="/#laskuri" class="btn btn-p btn-lg">Laske oma hintasi</a>
+    <a href="ota-yhteytta.html" class="btn btn-o btn-lg">Kysy meiltä</a>
+  </div>
+</section>
+
+<section class="wrap h-sec">
+  <h2 class="h-h2 rv">Kotitalousvähennys: mitä se oikeasti tuo</h2>
+  <p class="h-lead rv">Vähennystä markkinoidaan usein muodossa &rdquo;−40 %&rdquo;. Se ei tarkoita 40 % pois hinnasta.</p>
+  <div class="h-box rv">
+    <h3>Näin laskelma menee</h3>
+    <p>Vähennys on <b>40 % työn osuudesta</b>, ei koko laskusta. Työn osuudeksi eritellään laskullamme 90 % summasta — loput ovat tiivisteitä ja tarvikkeita. Summasta vähennetään vielä <b>150 euron omavastuu</b>, ja enimmäismäärä on <b>2 100 € henkilöä kohti</b> vuosina 2026–2027.</p>
+    <p>Käytännössä 510 euron työstä vähennys on <b>34 €</b> ja 1 050 euron työstä <b>228 €</b>. Alle noin 420 euron töissä omavastuu syö vähennyksen kokonaan.</p>
+    <p>Korotettu 40 %:n taso ja 2 100 euron katto perustuvat hallituksen esitykseen, jota sovelletaan takautuvasti vuoden 2026 alusta. Tarkista oma tilanteesi <a href="https://www.vero.fi/henkiloasiakkaat/verokortti-ja-veroilmoitus/tulot-ja-vahennykset/kotitalousvahennys/" target="_blank" rel="noopener">Verohallinnon sivuilta</a>.</p>
+  </div>
+</section>
+
+<section class="wrap h-sec">
+  <h2 class="h-h2 rv">Tiivistys vai uudet ikkunat?</h2>
+  <div class="h-box rv">
+    <p>Jos karmi ja puitteet ovat suorassa ja ikkuna toimii, <b>tiivisteiden uusiminen riittää lähes aina</b>. Koko talon ikkunoiden tiivistys maksaa tyypillisesti 500–1 300 €. Ikkunaremontti maksaa kymmeniä tuhansia.</p>
+    <p>Tiivistys <b>ei</b> korvaa remonttia, jos puitteet ovat lahonneet, lasit huurtuvat välistä tai karmi on vinossa. Sanomme sen paikan päällä suoraan — lämpökamera näyttää tilanteen ennen kuin mitään on tilattu.</p>
+  </div>
+</section>
+
+<section class="wrap h-sec">
+  <h2 class="h-h2 rv">Usein kysyttyä hinnasta</h2>
+  <div class="h-faq rv">
+    <details open><summary>Mitä hintaan sisältyy?</summary><p>Vanhojen tiivisteiden poisto, pintojen puhdistus, uudet silikonitiivisteet, oven käynnin säätö ja matkat. Ulko-oviin kuuluu myös kynnyskumi. Lämpökamerakartoitus tehdään ennen työtä veloituksetta.</p></details>
+    <details><summary>Tuleeko hintaan lisiä jälkikäteen?</summary><p>Ei. Laskurin näyttämä hinta on se mikä laskutetaan. Jos paikan päällä huomataan ettei tiivistys riitä, kerromme sen ennen työn aloittamista etkä maksa turhasta käynnistä.</p></details>
+    <details><summary>Miksi yksi ikkuna maksaa 149 € eikä 90 €?</summary><p>Pienin veloitus käynniltä on 149 €, koska matka ja työpisteen pystytys maksavat saman riippumatta siitä tehdäänkö yksi vai kuusi ikkunaa. Siksi useampi kohde samalla käynnillä on kappalehinnaltaan selvästi halvempi.</p></details>
+    <details><summary>Onko taloyhtiölle eri hinta?</summary><p>Taloyhtiöille tehdään sopimushinta kohteen laajuuden mukaan, ja kartoituskäynti on veloitukseton. Rappukäytävät ja yhteistilat hoidetaan kerralla.</p></details>
+    <details><summary>Millä alueella nämä hinnat pätevät?</summary><p>Koko Uudellamaalla ja Riihimäellä. Hinta ei muutu kunnan mukaan eikä matkasta veloiteta erikseen.</p></details>
+  </div>
+</section>
+</main>
+
+<footer class="mfoot"><div class="wrap">
+  <div class="mf-grid">
+    <div class="mf-brand">
+      <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
+      <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
+    </div>
+    <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="/ota-yhteytta.html">Ota yhteyttä</a><a href="#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Yhteys</h4><a href="tel:+358458755996">045 875 5996</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
+  </div>
+  <div class="mf-cities">
+    <h4>Toiminta-alueet</h4>
+    <div class="list"><a href="toiminta-alueet/helsinki.html">Helsinki</a><a href="toiminta-alueet/espoo.html">Espoo</a><a href="toiminta-alueet/vantaa.html">Vantaa</a><a href="toiminta-alueet/kauniainen.html">Kauniainen</a><a href="toiminta-alueet/kirkkonummi.html">Kirkkonummi</a><a href="toiminta-alueet/kerava.html">Kerava</a><a href="toiminta-alueet/jarvenpaa.html">Järvenpää</a><a href="toiminta-alueet/tuusula.html">Tuusula</a><a href="toiminta-alueet/nurmijarvi.html">Nurmijärvi</a><a href="toiminta-alueet/hyvinkaa.html">Hyvinkää</a><a href="toiminta-alueet/riihimaki.html">Riihimäki</a><a href="toiminta-alueet/sipoo.html">Sipoo</a><a href="toiminta-alueet/vihti.html">Vihti</a><a href="toiminta-alueet/mantsala.html">Mäntsälä</a><a href="toiminta-alueet/pornainen.html">Pornainen</a><a href="toiminta-alueet/porvoo.html">Porvoo</a><a href="toiminta-alueet/askola.html">Askola</a><a href="toiminta-alueet/loviisa.html">Loviisa</a><a href="toiminta-alueet/lapinjarvi.html">Lapinjärvi</a><a href="toiminta-alueet/myrskyla.html">Myrskylä</a><a href="toiminta-alueet/pukkila.html">Pukkila</a><a href="toiminta-alueet/lohja.html">Lohja</a><a href="toiminta-alueet/karkkila.html">Karkkila</a><a href="toiminta-alueet/siuntio.html">Siuntio</a></div>
+  </div>
+  <div class="mf-bot"><span>© <span id="yr"></span> Tiiviskoti Oy · Y-tunnus 3652671-7</span><span><a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span></div>
+</div></footer>
+<script defer src="_analytics.js"></script>
+<script type="module" src="_anchors.js"></script>
+<script src="_chat.js" defer></script>
+<script type="module">
+/* Sisääntulo — sama kevyt versio kuin Ota yhteyttä -sivulla, koska tämäkään
+   sivu ei lataa _shared.js:ää (koko varauslaskuri, jota täällä ei tarvita). */
+(() => {
+  const jaljella = new Set(document.querySelectorAll('.rv'));
+  if (!jaljella.size) return;
+  const nayta = (el, viive = 0) => {
+    if (!jaljella.has(el)) return;
+    jaljella.delete(el); io.unobserve(el);
+    viive ? setTimeout(() => el.classList.add('in'), viive) : el.classList.add('in');
+  };
+  const io = new IntersectionObserver(
+    (es) => es.filter(e => e.isIntersecting).forEach((e, i) => nayta(e.target, i * 60)),
+    { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+  jaljella.forEach(el => io.observe(el));
+  let jono = false;
+  const pyyhkaise = () => { jono = false;
+    for (const el of [...jaljella]) if (el.getBoundingClientRect().top < innerHeight) nayta(el); };
+  addEventListener('scroll', () => { if (!jono) { jono = true; requestAnimationFrame(pyyhkaise); } }, { passive: true });
+  addEventListener('resize', pyyhkaise, { passive: true });
+})();
+</script>
+</body>
+</html>

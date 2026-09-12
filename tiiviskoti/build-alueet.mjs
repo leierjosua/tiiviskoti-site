@@ -77,14 +77,14 @@ const footer = (R, paitsi) => `<footer class="mfoot"><div class="wrap">
       <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
-    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="${R}artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a><a href="#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="${R}hinta.html">Hinta</a><a href="${R}artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a><a href="#laskuri">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:${TELH}">${TEL}</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
   <div class="mf-cities">
     <h4>Toiminta-alueet</h4>
     <div class="list">${alueLinkit(R, paitsi)}</div>
   </div>
-  <div class="mf-bot"><span>© <span id="yr"></span> TiivisKoti · Y-tunnus 3414418-4</span><span><a href="${R}tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="${R}kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span></div>
+  <div class="mf-bot"><span>© <span id="yr"></span> Tiiviskoti Oy · Y-tunnus 3652671-7</span><span><a href="${R}tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="${R}kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span></div>
 </div></footer>`;
 
 /* Sama pieni skripti kuin muillakin sivuilla: burger + vuosiluku +
@@ -1240,7 +1240,7 @@ function meistaSivu() {
   /* Kasvokuvien rinnalle mitattavia lupauksia: taloyhtiön hallitus arvioi
      toimittajaa myös näillä. */
   const faktat = [
-    { iso: 'Y-tunnus', pieni: '3414418-4 · rekisteröity yritys' },
+    { iso: 'Y-tunnus', pieni: '3652671-7 · rekisteröity yritys' },
     { iso: 'Oma porukka', pieni: 'omat asentajat, ei alihankintaa' },
     { iso: 'Kiinteä hinta', pieni: 'näet summan ennen varausta' },
     { iso: '0 €', pieni: 'kartoituskäynti, ei sitoumusta' },
@@ -1489,7 +1489,7 @@ ${JSON.stringify(ld, null, 2)}
 <body>
 ${nav(R)}
 
-<div class="wrap crumb"><a href="/">Etusivu</a> › <a href="${R}artikkelit.html">Artikkelit</a> › ${esc(a.title)}</div>
+<div class="wrap crumb"><a href="/">Etusivu</a> › <a href="${R}hinta.html">Hinta</a><a href="${R}artikkelit.html">Artikkelit</a> › ${esc(a.title)}</div>
 
 <article class="sec"><div class="wrap" style="max-width:76ch">
   <div class="kicker">${esc(a.kicker)}</div>
@@ -1522,6 +1522,7 @@ ${nav(R)}
 
 ${footer(R, null)}
 ${skripti}
+<script defer src="${R}_analytics.js"></script>
 </body>
 </html>`;
 }
@@ -1604,6 +1605,7 @@ ${nav(R)}
 
 ${footer(R, null)}
 ${skripti}
+<script defer src="${R}_analytics.js"></script>
 </body>
 </html>`;
 }
@@ -1657,6 +1659,7 @@ function sitemapXml() {
     { loc: `${SITE}/artikkelit.html`, pri: '0.8', freq: 'weekly' },
     ...ARTIKKELIT.map((a) => ({ loc: artikkeliUrl(a.slug), pri: '0.7', freq: 'monthly', mod: a.julkaistu })),
     ...ALUEET.map((a) => ({ loc: `${SITE}/toiminta-alueet/${a.slug}.html`, pri: '0.7', freq: 'monthly' })),
+    { loc: `${SITE}/hinta.html`, pri: '0.9', freq: 'monthly' },
     { loc: `${SITE}/ota-yhteytta.html`, pri: '0.7', freq: 'monthly' },
     { loc: `${SITE}/meista.html`, pri: '0.5', freq: 'yearly' },
     { loc: `${SITE}/varaa.html`, pri: '0.5', freq: 'monthly' },
