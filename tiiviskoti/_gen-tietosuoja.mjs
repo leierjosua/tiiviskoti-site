@@ -270,6 +270,7 @@ ${mcta}
 <!-- type="module" pakollinen: _shared.js on ES-moduuli (import pricing.mjs).
      Ilman tätä selain heittää SyntaxErrorin ja KOKO sivun JS kuolee —
      mm. mobiilivalikon burger-nappi lakkaa toimimasta. -->
+<script defer src="_analytics.js"></script>
 <script type="module" src="_shared.js"></script>
 </body>
 </html>

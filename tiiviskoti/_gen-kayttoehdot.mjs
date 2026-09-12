@@ -256,6 +256,7 @@ ${mcta}
      Ilman tätä selain heittää SyntaxErrorin ja KOKO sivun JS kuolee —
      mm. mobiilivalikon burger-nappi lakkaa toimimasta. -->
 <script type="module" src="_shared.js"></script>
+<script defer src="_analytics.js"></script>
 </body>
 </html>
 `;

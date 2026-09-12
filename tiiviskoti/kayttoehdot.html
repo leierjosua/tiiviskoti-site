@@ -472,6 +472,18 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .extra.extra-q{padding-left:14px}
 }
 
+/* Yhteenveto vaaleana: sama laskuri, sama ilme joka sivulla. Tumma paneeli
+   luki "täytä lomake" siinä kohtaa jossa piti lukea "katso hinta". */
+.quote{background:var(--card);color:var(--text);border:1px solid var(--line);padding:20px;box-shadow:var(--sh)}
+.q-t,.q-total .pv,.q-meta b{color:var(--ink)}
+.q-total .pt,.q-note,.q-net,.q-meta span{color:var(--mute)}
+.q-total{border-top-color:var(--line)}
+.q-total .pv{font-size:38px}
+.q-total .pv small,.q-net b{color:var(--green)}
+.rc-lines,.rc-empty{color:var(--mute)}
+.q-btn{background:var(--green);color:#fff}
+.wtype{padding-top:12px;padding-bottom:12px}
+
 
 /* ---------- käyttöehdot (sama tyyli kuin tietosuojaseloste) ---------- */
 .lg{max-width:820px;margin-inline:auto}
@@ -497,20 +509,7 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
   .lg dl.kv div{flex-direction:column;gap:4px}
   .lg dl.kv dt,.lg dl.kv dd{flex:1 1 auto;text-align:left}
 }
-
-/* Yhteenveto vaaleana: sama laskuri, sama ilme joka sivulla. Tumma paneeli
-   luki "täytä lomake" siinä kohtaa jossa piti lukea "katso hinta". */
-.quote{background:var(--card);color:var(--text);border:1px solid var(--line);padding:20px;box-shadow:var(--sh)}
-.q-t,.q-total .pv,.q-meta b{color:var(--ink)}
-.q-total .pt,.q-note,.q-net,.q-meta span{color:var(--mute)}
-.q-total{border-top-color:var(--line)}
-.q-total .pv{font-size:38px}
-.q-total .pv small,.q-net b{color:var(--green)}
-.rc-lines,.rc-empty{color:var(--mute)}
-.q-btn{background:var(--green);color:#fff}
-.wtype{padding-top:12px;padding-bottom:12px}
 </style>
-  <link rel="stylesheet" href="/_anim.css">
 </head>
 <body>
 <nav class="top" id="nav"><div class="wrap">
@@ -684,5 +683,6 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
      Ilman tätä selain heittää SyntaxErrorin ja KOKO sivun JS kuolee —
      mm. mobiilivalikon burger-nappi lakkaa toimimasta. -->
 <script type="module" src="_shared.js"></script>
+<script defer src="_analytics.js"></script>
 </body>
 </html>
