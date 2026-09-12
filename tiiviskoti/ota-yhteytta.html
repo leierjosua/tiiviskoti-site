@@ -32,13 +32,29 @@
 .yh-hero p{font-size:clamp(17px,1.6vw,20px);color:var(--mute);margin-top:16px;max-width:52ch}
 
 /* ---------- osiot ---------- */
-.yh-sec{padding-bottom:clamp(48px,7vw,88px)}
+/* KAISTAT. Koko sivu oli yhdellä pohjavärillä, jolloin osiot valuivat
+   silmässä yhteen. Neljä sävyä sivuston omasta paletista: vaalea → valkoinen
+   → vihertävä → vaalea. Kortit ja lomake saavat aina vastavärin pohjaansa
+   nähden, jotta ne nousevat esiin joka kaistalla. */
+.yh-band{width:100%}
+.band-hero{background:var(--bg)}
+.band-triage{background:var(--card)}
+.band-lomake{background:var(--alt)}
+.band-yhteys{background:var(--bg)}
+.band-triage .yh-card{background:var(--bg)}
+.band-lomake .yh-form,.band-lomake .yh-ok{background:var(--card)}
+.band-lomake .yh-f input,.band-lomake .yh-f textarea{background:var(--bg)}
+.band-yhteys .yh-info{background:var(--card);border:1px solid var(--line)}
+.yh-sec{padding-block:clamp(40px,6vw,72px) clamp(48px,7vw,88px)}
 /* Osioiden otsikko OMANA LUOKKANAAN, ei inline-tyylinä: inline voittaa
    media-kyselyn, joten puhelimen suurempi koko ei tullut koskaan voimaan. */
 .yh-h2{font-size:clamp(22px,2.6vw,30px);letter-spacing:-.025em;line-height:1.15}
 .yh-lead{font-size:16px;color:var(--mute);max-width:60ch;margin:10px 0 28px}
 
-/* ---------- triage-kortit ---------- */
+/* ---------- triage-kortit (EI KÄYTÖSSÄ 12.9.2026 alkaen) ----------
+   "Mitä asiasi koskee?" -osio poistettiin: sivulle haluttiin pelkkä lomake
+   heti. Tyylit jätetään paikalleen, jotta osion voi palauttaa ilman että
+   ne pitää kirjoittaa uudelleen. Markup on gitissä commitissa 7891d93. */
 .yh-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .yh-card{position:relative;display:flex;flex-direction:column;gap:8px;background:var(--card);
   border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 22px;text-decoration:none;
@@ -59,8 +75,7 @@
    mutta piilotettu lomake vaatii ylimääräisen klikkauksen juuri siltä
    kävijältä joka ei halunnut varata itse — eli siltä jonka yhteydenotto on
    arvokkain. Triage on yhä ensin, lomake heti sen alla. */
-.yh-otsikko{margin-top:40px;padding-top:28px;border-top:1px solid var(--line);
-  font-size:clamp(20px,2.2vw,24px);color:var(--ink);letter-spacing:-.02em}
+.yh-otsikko{font-size:clamp(20px,2.2vw,24px);color:var(--ink);letter-spacing:-.02em}
 .yh-form{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
   padding:clamp(20px,3vw,30px);margin-top:20px;max-width:640px}
 .yh-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -110,7 +125,6 @@
   .yh-badge{top:-9px;left:14px;height:19px;padding-inline:8px;font-size:10px}
   .yh-first{font-size:14px;margin-top:14px}
   .yh-lead{font-size:15px;margin-bottom:20px}
-  .yh-otsikko{margin-top:30px;padding-top:22px}
   .yh-row{grid-template-columns:1fr}
   .yh-f{margin-bottom:13px}
 
@@ -126,12 +140,11 @@
   .yh-h2{font-size:26px}
   .yh-lead{font-size:15px;margin:12px 0 24px}
   .yh-first{margin-top:20px}
-  .yh-otsikko{margin-top:44px;padding-top:30px;font-size:22px}
+  .yh-otsikko{font-size:22px}
   .yh-otsikko + .yh-lead{margin-bottom:18px}
   .yh-form{margin-top:18px;padding:20px 18px}
   /* Yhteystiedot omaksi lohkokseen: pelkkä 48 px:n väli ei riittänyt
      erottamaan sitä lomakkeesta. */
-  .yh-sec + .yh-sec{padding-top:20px}
   .yh-split{gap:22px}
   .yh-info{padding:22px 20px}
   .yh-info dl{gap:20px}
@@ -150,45 +163,15 @@
 </div></nav>
 
 <main>
-<section class="wrap yh-hero">
+<section class="yh-band band-hero"><div class="wrap yh-hero">
   <div class="kicker rv">Ota yhteyttä</div>
   <h1 class="rv">Kerro tilanteesi, autamme mielellämme.</h1>
   <p class="rv">Vastaamme yhteydenottoihin mahdollisimman pian. Ma–pe 8–20, la–su 8–18.30.</p>
-</section>
+</div></section>
 
-<section class="wrap yh-sec">
-  <h2 class="yh-h2 rv">Mitä asiasi koskee?</h2>
-  <p class="yh-lead rv">Useimmat asiat hoituvat nopeimmin varaamalla ajan suoraan. Näet kiinteän hinnan ja vapaat ajat heti, etkä jää odottamaan vastausta.</p>
-
-  <div class="yh-cards rv">
-    <a class="yh-card" href="/#laskuri">
-      <span class="yh-badge">Suosituin</span>
-      <h3>Ikkunoiden tiivistys</h3>
-      <span class="yh-price">75–90 € / ikkuna</span>
-      <p>Karmi- ja puitetiivisteet uusiksi. Hinta laskee määrän mukaan.</p>
-      <span class="go">Laske hinta ja varaa aika →</span>
-    </a>
-    <a class="yh-card" href="/#laskuri">
-      <h3>Ovien tiivistys</h3>
-      <span class="yh-price">99 € / ovi</span>
-      <p>Sivutiivisteet, kynnyskumi ja oven käynnin säätö samalla käynnillä.</p>
-      <span class="go">Laske hinta ja varaa aika →</span>
-    </a>
-    <a class="yh-card" href="taloyhtio.html#varaa">
-      <h3>Taloyhtiö</h3>
-      <span class="yh-price">Kartoitus 0 €</span>
-      <p>Rappukäytävät ja yhteistilat kerralla. Kartoituskäynti veloituksetta.</p>
-      <span class="go">Varaa kartoitus →</span>
-    </a>
-  </div>
-
-  <p class="yh-first rv" id="yhFirst" hidden>
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    Ensimmäinen vapaa aika <b id="yhFirstTime"></b>
-  </p>
-
-  <h3 class="yh-otsikko rv">Muu asia? Kirjoita viesti</h3>
-  <p class="yh-lead rv" style="margin-bottom:0">Vastaamme mahdollisimman pian. Kiireisessä asiassa soitto on nopein.</p>
+<section class="yh-band band-lomake"><div class="wrap yh-sec">
+  <h2 class="yh-h2 rv">Lähetä viesti</h2>
+  <p class="yh-lead rv" style="margin-bottom:0">Kerro lyhyesti mistä on kyse, niin vastaamme mahdollisimman pian. Kiireisessä asiassa soitto on nopein.</p>
 
   <div class="yh-formwrap" id="yhFormWrap"><div>
     <form class="yh-form" id="yhForm" novalidate>
@@ -209,9 +192,9 @@
       <p>Olemme sinuun yhteydessä mahdollisimman pian. Jos asia on kiireinen, soita <a href="tel:+358458755996" style="font-weight:800;text-decoration:underline">045 875 5996</a>.</p>
     </div>
   </div></div>
-</section>
+</div></section>
 
-<section class="wrap yh-sec">
+<section class="yh-band band-yhteys"><div class="wrap yh-sec">
   <div class="yh-split">
     <div class="rv">
       <h2 class="yh-h2">Yhteystiedot</h2>
@@ -237,7 +220,7 @@
       </div>
     </div>
   </div>
-</section>
+</div></section>
 </main>
 
 <footer class="mfoot"><div class="wrap">
@@ -286,20 +269,6 @@
   addEventListener('scroll', () => { if (!jono) { jono = true; requestAnimationFrame(pyyhkaise); } }, { passive: true });
   addEventListener('resize', pyyhkaise, { passive: true });
 })();
-
-/* Ensimmäinen vapaa aika — sama rajapinta kuin etusivun varauskortissa.
-   Ei postinumeroa: lupaus annetaan ennen kuin kävijältä kysytään mitään. */
-const CRM = 'https://tiiviskoti-crm.vercel.app';
-fetch(`${CRM}/api/public/availability?first=1&minutes=60&days=21`)
-  .then(r => r.ok ? r.json() : null)
-  .then(d => {
-    if (!d || !d.firstSlot) return;
-    const t = new Date(d.firstSlot);
-    const teksti = t.toLocaleDateString('fi-FI', { weekday:'short', day:'numeric', month:'short' })
-      + ' klo ' + t.toLocaleTimeString('fi-FI', { hour:'2-digit', minute:'2-digit' });
-    document.getElementById('yhFirstTime').textContent = teksti;
-    document.getElementById('yhFirst').hidden = false;
-  }).catch(() => {});
 
 /* Lähetys. `kind:'yksityinen'` erottaa tämän taloyhtiön tarjouspyynnöstä,
    jottei kuluttajan yhteydenotto päädy CRM:ssä väärään jonoon. */
