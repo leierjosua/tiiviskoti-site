@@ -9,7 +9,7 @@
    hinta lasketaan samasta koodista eivätkä voi erota toisistaan.
    ========================================================= */
 import { thinSlots } from './_slots.js';
-import { TYPES, EXTRAS, NET_FACTOR, WINDOW_TIERS, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
+import { TYPES, EXTRAS, netAfterDeduction, WINDOW_TIERS, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
 
 const ico = {
   ulko:'<svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3" width="12" height="18" rx="1.5" stroke="currentColor" stroke-width="1.8"/><circle cx="14.5" cy="12" r="1.2" fill="currentColor"/></svg>',
@@ -693,7 +693,7 @@ function render(){
   }
   const naytettava = Math.max(0, q.total - ale);
   tweenPrice(naytettava);
-  document.getElementById('cpNet').textContent = (naytettava>0?Math.round(naytettava*NET_FACTOR).toLocaleString('fi-FI'):'0')+' €';
+  document.getElementById('cpNet').textContent = (naytettava>0?netAfterDeduction(naytettava).toLocaleString('fi-FI'):'0')+' €';
   document.getElementById('cpCount').textContent = q.count;
   const hrs = q.minutes/60;
   document.getElementById('cpTime').textContent = q.total===0?'0 h':(hrs<1?Math.round(q.minutes)+' min':(Math.round(hrs*2)/2).toLocaleString('fi-FI')+' h');
@@ -1484,7 +1484,7 @@ function syncBookingSummary(){
     const fee = (avail.travelFeeCents||0)/100;
     const ale = discount.state==='ok' ? discount.cents/100 : 0;
     const shown = Math.max(0, booking.total + fee - ale);
-    const net = Math.round(shown*NET_FACTOR);
+    const net = netAfterDeduction(shown);
     priceEl.innerHTML = `${shown.toLocaleString('fi-FI')} € `
       + (fee>0 ? `<span style="font-size:13px;opacity:.75;font-weight:600">· sis. matkalisä ${fee.toLocaleString('fi-FI')} €</span> ` : '')
       + (ale>0 ? `<span style="font-size:13px;opacity:.75;font-weight:600">· koodi ${discount.code} −${ale.toLocaleString('fi-FI')} €</span> ` : '')
@@ -1769,7 +1769,7 @@ if(document.getElementById('tabKoti')){
     const ale = discount.state==='ok' ? discount.cents/100 : 0;
     const total=Math.max(0, q.total+fee-ale);
     p.textContent=`${total.toLocaleString('fi-FI')} €`;
-    n.textContent=`~${Math.round(total*NET_FACTOR).toLocaleString('fi-FI')} € kotitalousväh. jälkeen`;
+    n.textContent=`~${netAfterDeduction(total).toLocaleString('fi-FI')} € kotitalousväh. jälkeen`;
     const hrs=q.minutes/60;
     const kesto = hrs<1 ? Math.round(q.minutes)+' min' : (Math.round(hrs*2)/2).toLocaleString('fi-FI')+' h';
     m.textContent = `sis. ALV 25,5 % · ${kesto}`

@@ -73,8 +73,40 @@ export const EXTRAS = [
   { id: 'kahva',  name: 'Kahvan vaihto',                         price: 29, per: 'kpl',    unit: 'kpl',    min: 15, note: '+ osa' },
 ];
 
-/* Kotitalousvähennys: 40 % työn osuudesta, työn osuus n. 70 % hinnasta. */
-export const NET_FACTOR = 1 - 0.40 * 0.70;
+/* ─────────────────────────────────────────────────────────────
+   KOTITALOUSVÄHENNYS.
+
+   Tämä oli aiemmin tasakerroin `NET_FACTOR = 1 - 0.40 * 0.70`, ja se antoi
+   asiakkaalle liian ison lupauksen kahdesta syystä:
+
+   1) Työn osuudeksi oletettiin 70 %, mutta lasku erittelee 90 %
+      (WORK_PORTION_RATE kuitti- ja laskupohjissa). Luvut eivät täsmänneet.
+   2) Kerroin ei vähentänyt OMAVASTUUTA lainkaan. 510 euron työssä kerroin
+      lupasi 143 euron hyödyn, kun todellinen vähennys on 34 €.
+
+   Nyt lasketaan sama kaava kuin verotuksessa: prosentti työn osuudesta,
+   miinus omavastuu, katto enimmäismäärässä. Pienissä töissä tulos on nolla —
+   ja se on totuus, jonka asiakas näkee mieluummin laskurista kuin laskusta.
+
+   LUVUT 2026–2027 (hallituksen esitys, sovelletaan takautuvasti 1.1.2026):
+   40 %, enintään 2 100 € / henkilö, omavastuu 150 € / henkilö / vuosi.
+   Jos laki muuttuu, muuta VAIN nämä neljä vakiota.
+   ───────────────────────────────────────────────────────────── */
+export const WORK_SHARE = 0.90;
+export const DEDUCTION_RATE = 0.40;
+export const DEDUCTIBLE = 150;
+export const DEDUCTION_MAX = 2100;
+
+/** Kotitalousvähennyksen määrä euroina annetulle loppusummalle. */
+export function householdDeduction(total) {
+  const work = Math.max(0, Number(total) || 0) * WORK_SHARE;
+  return Math.max(0, Math.min(DEDUCTION_MAX, work * DEDUCTION_RATE - DEDUCTIBLE));
+}
+
+/** Hinta kotitalousvähennyksen jälkeen, pyöristettynä euroiksi. */
+export function netAfterDeduction(total) {
+  return Math.round((Number(total) || 0) - householdDeduction(total));
+}
 
 const int = (v) => Math.max(0, parseInt(v, 10) || 0);
 
