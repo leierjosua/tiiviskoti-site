@@ -86,7 +86,21 @@ document.addEventListener('click', (ev) => {
   if (!a || a.target === '_blank') return;
   const id = a.getAttribute('href').slice(1);
   if (!id) return;
-  if (!scrollToId(id)) return;
+  if (!scrollToId(id)) {
+    /* VARMISTUS: ankkuri osoittaa kohtaan jota TÄLLÄ sivulla ei ole.
+       Ilman tätä klikkaus ei tee yhtään mitään — juuri näin kävi
+       12.9.2026 asti kymmenellä sivulla, joilla navin "Varaa aika" ja
+       footerin "Hintalaskuri" osoittivat #laskuriin vaikka laskuri on
+       vain etusivulla. Osoitteet on korjattu, mutta sama virhe syntyisi
+       uudelleen heti kun joku lisää uuden sivun samalla footerilla.
+       Kaikki sivuston ankkurikohteet (#laskuri, #palvelut, #saasto, #ukk,
+       #miksi) ovat etusivulla, joten sinne siirrytään. */
+    if (location.pathname !== '/' && location.pathname !== '/index.html') {
+      ev.preventDefault();
+      location.href = '/#' + id;
+    }
+    return;
+  }
   ev.preventDefault();
   /* Osoiterivi päivitetään silti: linkin voi kopioida ja paluu selaimen
      takaisin-napilla toimii kuten ennen. */
