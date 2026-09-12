@@ -85,8 +85,25 @@ a.btn-alt:hover{color:#fff}
 .on-deep.btn-o{background:transparent;color:#fff;border-color:rgba(246,247,243,.4)}.on-deep.btn-o:hover{border-color:#fff;color:#fff;background:rgba(246,247,243,.08)}
 
 /* nav */
-nav.top{position:sticky;top:0;z-index:60;background:rgba(246,247,243,.9);backdrop-filter:saturate(1.1);border-bottom:1px solid transparent;transition:.25s}
-nav.top.scr{border-color:var(--line);background:var(--bg)}
+/* Navi kelluu heron kuvan PÄÄLLÄ, ei sen yläpuolella: sticky varaisi 74 px
+   layoutista, jolloin hero ei voisi olla tasan ruudun korkuinen ja napit
+   valuisivat alemmas kuin on tarkoitus. */
+nav.top{position:fixed;top:0;left:0;right:0;z-index:60;background:transparent;border-bottom:1px solid transparent;transition:.25s}
+nav.top.scr{border-color:transparent;background:transparent}
+
+/* 621 px ja ylöspäin: navi on KELLUVA VALKOINEN palkki kuvan päällä.
+   Läpinäkyvä navi valkoisella tekstillä katosi vaaleaan valokuvaan — teksti
+   osui talon vaaleaan seinään eikä erottunut. Valkoinen palkki on luettava
+   minkä tahansa kuvan päällä eikä peitä koko heron yläreunaa.
+   Puhelinlohko (max-width:620px) hoitaa pienet näytöt omalla tavallaan. */
+@media(min-width:621px){
+  nav.top .wrap{background:rgba(255,255,255,.94);backdrop-filter:blur(14px);
+    border:1px solid rgba(24,58,40,.07);border-radius:999px;
+    margin-top:14px;height:64px;padding-inline:18px;
+    box-shadow:0 14px 34px -22px rgba(16,42,30,.55);
+    transition:background .25s,box-shadow .25s,margin-top .25s}
+  nav.top.scr .wrap{background:#fff;box-shadow:0 10px 26px -18px rgba(16,42,30,.45);margin-top:10px}
+}
 nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .logo{display:inline-flex;align-items:center;gap:11px;font-weight:800;font-size:23px;letter-spacing:-.03em;color:var(--ink)}
 .logo .mark{width:34px;height:34px}
@@ -111,6 +128,50 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .hero-fine svg{color:var(--green);flex:0 0 auto}
 .hero-card{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh);border:1px solid var(--line);aspect-ratio:5/4}
 .hero-card svg,.hero-card img{width:100%;height:100%;display:block;object-fit:cover}
+
+/* HERO ISOILLA NÄYTÖILLÄ — sama koko ruudun kuva kuin puhelimessa jo oli.
+   Pystyasettelu mitattu aaltoair.fi:stä (1440×900): merkki 25 %, otsikko 32 %,
+   ingressi 53 %, NAPIT 64 % ruudun korkeudesta. Aiemmin hero oli kaksipalstainen
+   ja mittarirIvi (hinta · varausaika · säästö) jäi kokonaan taitteen alle.
+   Ylä- ja alapehmusteen ERO siirtää keskitettyä pinoa: alapehmuste varaa tilan
+   mittarikortille, ylapehmuste säätää napit oikealle korkeudelle. */
+header.hero{position:relative;padding:0;min-height:100vh;min-height:100svh;display:flex;align-items:center}
+header.hero .wrap.hero-grid{display:block;text-align:center;
+  padding-top:clamp(112px,19vh,172px);padding-bottom:150px}
+.hero-grid>div:first-child{position:relative;z-index:1;max-width:920px;margin-inline:auto}
+.hero-card{position:absolute;inset:0;z-index:0;order:0;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none}
+.hero-card::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(16,42,30,.36),rgba(16,42,30,.58) 55%,rgba(16,42,30,.86))}
+.hero .rating{justify-content:center;color:#fff;background:rgba(255,255,255,.15);
+  padding:8px 16px;border-radius:999px;margin:0 auto 18px;width:max-content;max-width:100%;backdrop-filter:blur(8px)}
+.hero .rating svg{color:#8FE3B4}
+.hero h1{color:#fff;max-width:14ch;margin-inline:auto}
+.hero h1 .a{color:#8FE3B4}
+.hero-sub{color:rgba(255,255,255,.9);margin:20px auto 0;max-width:44ch}
+.hero-cta{justify-content:center}
+.hero-cta .btn-alt{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.5)}
+.hero-cta .btn-alt:hover{background:#fff;color:var(--ink);border-color:#fff}
+.hero-fine{justify-content:center;color:rgba(255,255,255,.82);margin-inline:auto;width:max-content;max-width:100%}
+.hero-fine svg{color:#8FE3B4}
+
+/* Mittarit heron alareunan päälle, jotta hinta, varausaika ja säästö ovat
+   ensimmäisellä ruudulla. Puhelinlohko tarkentaa oman arvonsa. */
+.metrics{margin-top:-140px;position:relative;z-index:3}
+
+/* CHAT-KUPLA NÄKYY HETI, mutta pelkkänä pyöreänä ikonina — sama kuin
+   aaltoair.fi:llä (mitattu 60×60 px, oikea alanurkka, ei tekstiä).
+   Leveä "Tarvitsetko apua?" -pilleri oli 182 px ja peitti mittarikorttien
+   tekstit puhelimessa. _chat.js injektoi tyylinsä ajonaikaisesti, joten
+   nämä valitsimet ovat tarkoituksella spesifisempiä. */
+body #tkChat .tkc-fab{border-radius:999px}
+body #tkChat .tkc-fab svg{width:22px;height:22px}
+/* Teksti näkyy siellä missä sille on tilaa. Puhelimessa pilleri on 150 px
+   leveä ja peittäisi mittarikorttien oikean reunan, joten siellä jää pelkkä
+   pyöreä 60×60 ikoni — sama mitta kuin aaltoair.fi:llä. */
+@media(max-width:620px){
+  body #tkChat .tkc-fab .t{display:none}
+  body #tkChat .tkc-fab{padding:19px}
+}
 
 /* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
@@ -492,9 +553,17 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
 .mcta .btn{flex:1;padding:14px}.mcta .btn.tel{flex:0 0 auto}
 
 @media(max-width:960px){
-  .hero-grid,.calc-wrap,.why{grid-template-columns:1fr;gap:36px}
-  .hero-card,.why-fig{order:-1;aspect-ratio:16/10}.quote{position:static}
-  .metrics,.cards3,.revs{grid-template-columns:1fr}
+  /* .hero-grid ja .hero-card EIVÄT ole enää tässä: hero on koko ruudun kuva
+     kaikilla leveyksillä, joten palstoitus ja 16:10-rajaus rikkoisivat sen.
+     .metrics pysyy kolmena sarakkeena — yhtenä palstana kortit olisivat niin
+     korkea pino ettei se mahdu heron alareunaan. */
+  .calc-wrap,.why{grid-template-columns:1fr;gap:36px}
+  .why-fig{order:-1;aspect-ratio:16/10}.quote{position:static}
+  .cards3,.revs{grid-template-columns:1fr}
+  .metrics{gap:12px}
+  .metric{padding:18px 14px}
+  .metric b{font-size:24px}
+  .metric>span{font-size:13px}
   .mf-grid{grid-template-columns:1fr 1fr}
   .ntel{display:none}
 }
@@ -548,11 +617,21 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
   .hero-cta .btn-o,.hero-cta .btn-alt{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.55)}
   /* Ilman tata check-ikoni jai roikkumaan kaksirivisen, keskitetyn
      hienotekstin vasempaan reunaan. */
-  .hero-fine{justify-content:center;text-align:center;color:rgba(255,255,255,.82);font-size:13px;max-width:330px;margin-inline:auto;line-height:1.5}
-  .hero-fine svg{display:none}
+  /* Hienoteksti pois puhelimesta: kolme väitettä pikkufontilla nappien alla
+     pidensivät heron pinoa eivätkä tulleet luetuksi. Samat asiat kerrotaan
+     mittarikorteissa ja palveluosiossa. Työpöydällä rivi jää paikalleen. */
+  .hero-fine{display:none}
 
   /* METRICS — läpinäkyvä statistiikkapalkki hero:n alareunaan */
-  .metrics{grid-template-columns:repeat(3,1fr);gap:9px;margin-top:-92px;position:relative;z-index:3}
+  /* Nosto -184px eikä -92px: -92px jätti hienotekstin ja korttien väliin
+     137 px tyhjää ja painoi kortit kiinni ruudun alareunaan, missä chat-kupla
+     peitti niiden tekstit. Molemmat mitattu 390×844. */
+  /* Nosto -184px eikä -92px: -92px jätti hienotekstin ja korttien väliin
+     137 px tyhjää ja painoi kortit kiinni ruudun alareunaan.
+     margin-bottom: nosto vetää KAIKEN alla olevan ylös, jolloin Palvelut-osio
+     tuli kiinni kortteihin (mitattu 16 px väli) ja näytti siltä kuin se olisi
+     osa heroa. Tämä palauttaa hengitystilan. */
+  .metrics{grid-template-columns:repeat(3,1fr);gap:9px;margin-top:-184px;margin-bottom:56px;position:relative;z-index:3}
   .metric{padding:15px 7px;text-align:center;border-radius:14px}
   .metric b{font-size:19px}
   .metric>span{font-size:10.5px;margin-top:6px;line-height:1.35}
@@ -631,6 +710,15 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
   /* Ei body-täytettä: palkki on piilossa footerin kohdalla, joten varattu
      76px jäi vain tyhjäksi kaistaleeksi sivun loppuun. */
   .mcta{display:flex}
+}
+
+/* MATALAT PUHELIMET (esim. iPhone SE, 375×667). Hero-teksti vie ruudun niin
+   tarkkaan, ettei korttirivi mahdu sen alle: -184px työnsi kortit hienotekstin
+   PÄÄLLE (mitattu −43 px limitys). Näillä näytöillä kortit jäävät taitteen
+   alapuolelle, jolloin ne eivät peitä tekstiä eikä chat-kupla peitä niitä.
+   HUOM: tämä on puhelinlohkon JÄLKEEN, ei sen sisällä. */
+@media (max-width:620px) and (max-height:740px){
+  .metrics{margin-top:8px}
 }
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
 
@@ -865,10 +953,14 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
   <div>
     <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 14.76V5a2 2 0 10-4 0v9.76a4 4 0 104 0z" stroke="currentColor" stroke-width="1.8"/></svg> <span class="r-txt">Arvioitu säästö <span class="r-long">lämmityskuluissa </span>10–15 %</span></div>
     <h1><span class="hl">Kylmä veto</span><br><span class="hl">ei kuulu <span class="a">kotiin.</span></span></h1>
-    <p class="hero-sub">Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan. Varaat ajan verkosta alle minuutissa.</p>
+    <p class="hero-sub">Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan.</p>
     <div class="hero-cta">
       <a href="#laskuri" class="btn btn-p btn-lg">Varaa aika</a>
-      <a href="#palvelut" class="btn btn-alt btn-lg">Katso palvelut</a>
+      <!-- Toinen kutsu vie yhteydenottoon eikä palveluosioon: mitattu 13.8.–11.9.
+           verkkovaraukset 7 kpl / 2 529 €, tarjouspolun kaupat 4 kpl / 7 684 €.
+           Iso kate tulee polusta joka alkaa yhteydenotosta, joten heron toinen
+           nappi avaa sen sen sijaan että vierittäisi vain alaspäin. -->
+      <a href="ota-yhteytta.html" class="btn btn-alt btn-lg">Ota yhteyttä</a>
     </div>
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta · lämpökamerakartoitus veloituksetta · kotitalousvähennys −40 %</p>
   </div>
@@ -1158,13 +1250,6 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
     <div class="kicker">Miksi TiivisKoti</div>
     <h2>Yksi käynti, ja ovet ovat tiiviit</h2>
     <p>Hinta on sama kuin laskurissa. Näet sen ennen varausta, eikä siihen tule jälkikäteen lisiä. Asentaja siivoaa jälkensä lähtiessään.</p>
-    <div class="tbadge">
-      <span class="tbadge-i"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <span class="tbadge-main">
-        <b>Oma porukka, ei alihankintaa</b>
-        <span>Työt tekee oma asentajamme alusta loppuun. Sama tekijä vastaa työstä myös jälkikäteen, jos jokin ei toimi kuten pitää.</span>
-      </span>
-    </div>
     <div class="why-stats">
       <div class="wstat"><b><span class="a">0 €</span></b><span>lämpökamerakartoitus</span></div>
       <div class="wstat"><b><span class="a">−40 %</span></b><span>kotitalousvähennys</span></div>
@@ -1204,7 +1289,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
 </div></section>
 
 <!-- CTA -->
-<section class="sec" style="padding-top:0"><div class="wrap">
+<section class="sec" id="yhteys" style="padding-top:0"><div class="wrap">
   <div class="cta rv">
     <h2>Kysy tai varaa aika</h2>
     <p>Laskurista näet hinnan itse. Jos on helpompi kysyä ensin, soita.</p>
@@ -1239,10 +1324,9 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
     <div class="mf-brand">
       <a href="#" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
       <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
-      <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="#palvelut">Ovet</a><a href="#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
-    <div class="mf-col"><h4>Yritys</h4><a href="#miksi">Miksi me</a><a href="/artikkelit.html">Artikkelit</a><a href="#saasto">Säästöarvio</a><a href="#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="#miksi">Miksi me</a><a href="/artikkelit.html">Artikkelit</a><a href="#saasto">Säästöarvio</a><a href="#ukk">UKK</a><a href="/ota-yhteytta.html">Ota yhteyttä</a><a href="#laskuri">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:+358458755996">045 875 5996</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
   <div class="mf-cities">

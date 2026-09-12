@@ -39,7 +39,43 @@ export function scrollToId(id) {
     window.scrollTo(0, top);
     html.style.scrollBehavior = prev;
   }, 350);
+  varmistaPerilla(id);
   return true;
+}
+
+/* Perillelaskeutumisen varmistus KLIKKAUKSILLE.
+
+   MIKSI: pehmeä vieritys on käynnissä satoja millisekunteja, ja sinä aikana
+   sivun korkeus yhä elää — laiskat kuvat, fontit ja laskurin vaiheet asettuvat
+   paikoilleen. Yksi laskettu kohde ei siis pidä paikkaansa enää perillä.
+   Mitattu etusivulla: #laskuri 53 px ohi, #miksi 99 px, #yhteys 305 px —
+   eli mitä alempana osio on, sitä pahemmin ohi. Alimmillaan kävijä laskeutui
+   kokonaan seuraavaan osioon eikä nähnyt sitä otsikkoa jota klikkasi.
+
+   Sama korjaus oli jo olemassa suoraan osoitteella saapumiselle (load-käsittelijä
+   alempana), mutta klikkauspolku jäi ilman. Tämä paikkaa sen.
+
+   Odotetaan ensin että vieritys PYSÄHTYY (kaksi samaa lukemaa peräkkäin) eikä
+   korjata kesken liikkeen: kesken korjaaminen käynnistäisi uuden pehmeän
+   vierityksen ja nykisi. Vasta pysähdyksen jälkeen tarkistetaan kohta ja
+   tehdään tarvittaessa yksi välitön hyppy. */
+function varmistaPerilla(id) {
+  let edellinen = null, kierros = 0;
+  const tarkista = () => {
+    if (++kierros > 24) return;                 // ~2,4 s, sitten luovutetaan
+    const nyt = Math.round(window.scrollY);
+    if (nyt !== edellinen) { edellinen = nyt; setTimeout(tarkista, 100); return; }
+    const t = document.getElementById(id);
+    if (!t) return;
+    const ero = t.getBoundingClientRect().top - OFFSET;
+    if (Math.abs(ero) <= 20) return;
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    window.scrollTo(0, Math.max(0, window.scrollY + ero));
+    html.style.scrollBehavior = prev;
+  };
+  setTimeout(tarkista, 120);
 }
 
 /* Yksi kuuntelija koko dokumentille: linkkejä on kymmeniä ja niitä

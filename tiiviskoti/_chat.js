@@ -127,7 +127,7 @@
     </div>
     <button class="tkc-fab" id="tkcFab" type="button"
             aria-expanded="false" aria-controls="tkcPanel">
-      <span class="c">${ico.chat}</span>${ico.close}<span class="t">Tarvitsetko apua?</span>
+      <span class="c">${ico.chat}</span>${ico.close}<span class="t">Kysy meiltä</span>
     </button>`;
   document.body.appendChild(root);
 

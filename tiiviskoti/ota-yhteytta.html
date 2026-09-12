@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ota yhteyttä — TiivisKoti</title>
+<meta name="description" content="Kerro tilanteesi, autamme mielellämme. Useimmat asiat hoituvat nopeimmin varaamalla ajan suoraan verkosta — tai jätä viesti, niin vastaamme mahdollisimman pian." />
+<link rel="canonical" href="https://tiiviskoti.fi/ota-yhteytta.html" />
+<meta name="robots" content="index,follow" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="_alueet.css" />
+<link rel="stylesheet" href="/_anim.css" />
+<style>
+/* Sivukohtaiset tyylit. Rakenne noudattaa aaltoair.fi:n /ota-yhteytta-sivua:
+   ensin triage ("mitä asiasi koskee"), joka ohjaa itsepalveluvaraukseen, ja
+   heti sen alla lomake muita asioita varten.
+
+   JÄRJESTYS ON MERKITSEVÄ: media-kyselyt ovat tiedoston LOPUSSA. Kun ne olivat
+   perussääntöjen yläpuolella, myöhempi sääntö voitti ja puhelimen kompaktit
+   kortit eivät tulleet voimaan lainkaan. */
+
+/* ---------- hero ---------- */
+/* padding-BLOCK, ei padding-lyhennettä: lyhenne nollasi .wrap:in
+   sivupehmusteen, jolloin otsikko ja ingressi olivat puhelimessa kiinni
+   ruudun reunassa (mitattu left:0, kun korttien reuna oli 26px). */
+.yh-hero{padding-block:clamp(84px,10vw,132px) clamp(28px,4vw,44px)}
+.yh-hero h1{font-size:clamp(30px,4.6vw,50px);letter-spacing:-.03em;line-height:1.08;max-width:16ch}
+.yh-hero p{font-size:clamp(17px,1.6vw,20px);color:var(--mute);margin-top:16px;max-width:52ch}
+
+/* ---------- osiot ---------- */
+.yh-sec{padding-bottom:clamp(48px,7vw,88px)}
+/* Osioiden otsikko OMANA LUOKKANAAN, ei inline-tyylinä: inline voittaa
+   media-kyselyn, joten puhelimen suurempi koko ei tullut koskaan voimaan. */
+.yh-h2{font-size:clamp(22px,2.6vw,30px);letter-spacing:-.025em;line-height:1.15}
+.yh-lead{font-size:16px;color:var(--mute);max-width:60ch;margin:10px 0 28px}
+
+/* ---------- triage-kortit ---------- */
+.yh-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.yh-card{position:relative;display:flex;flex-direction:column;gap:8px;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 22px;text-decoration:none;
+  transition:border-color .18s var(--ease),translate .18s var(--ease)}
+.yh-card:hover{border-color:var(--green);translate:0 -2px}
+.yh-card h3{font-size:19px;color:var(--ink);letter-spacing:-.02em}
+.yh-price{font-size:15px;font-weight:800;color:var(--green)}
+.yh-card p{font-size:14.5px;color:var(--mute)}
+.yh-card .go{margin-top:auto;padding-top:10px;font-size:14.5px;font-weight:800;color:var(--green)}
+.yh-badge{position:absolute;top:-10px;left:22px;height:22px;display:inline-flex;align-items:center;
+  padding-inline:10px;border-radius:999px;background:var(--green);color:#fff;
+  font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.yh-first{margin-top:18px;font-size:15px;color:var(--mute);display:flex;align-items:center;gap:8px}
+.yh-first b{color:var(--ink)}
+
+/* ---------- lomake ---------- */
+/* Lomake on VALMIIKSI AUKI. Se oli aluksi napin takana kuten aaltoairilla,
+   mutta piilotettu lomake vaatii ylimääräisen klikkauksen juuri siltä
+   kävijältä joka ei halunnut varata itse — eli siltä jonka yhteydenotto on
+   arvokkain. Triage on yhä ensin, lomake heti sen alla. */
+.yh-otsikko{margin-top:40px;padding-top:28px;border-top:1px solid var(--line);
+  font-size:clamp(20px,2.2vw,24px);color:var(--ink);letter-spacing:-.02em}
+.yh-form{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:clamp(20px,3vw,30px);margin-top:20px;max-width:640px}
+.yh-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.yh-f{margin-bottom:14px}
+.yh-f label{display:block;font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.yh-f input,.yh-f textarea{width:100%;font-family:inherit;font-size:16px;color:var(--ink);background:var(--bg);
+  border:1px solid var(--line2);border-radius:10px;padding:13px 14px}
+.yh-f textarea{min-height:110px;resize:vertical}
+.yh-f input:focus,.yh-f textarea:focus{outline:2px solid var(--green);outline-offset:1px;border-color:transparent}
+.yh-err{display:none;margin-bottom:14px;font-size:14.5px;color:#B3261E;font-weight:600}
+.yh-ok{display:none;background:var(--green-soft);border:1px solid #BCDCC9;border-radius:var(--r-lg);
+  padding:24px;margin-top:20px;max-width:640px}
+.yh-ok h3{font-size:19px;color:var(--ink);margin-bottom:6px}
+.yh-ok p{font-size:15px;color:var(--text)}
+
+/* ---------- yhteystiedot ---------- */
+.yh-split{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}
+.yh-info{background:var(--alt);border-radius:var(--r-lg);padding:clamp(22px,3vw,30px)}
+.yh-info dl{display:grid;gap:16px}
+.yh-info dt{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:3px}
+.yh-info dd{font-size:16px;color:var(--ink);font-weight:700}
+.yh-info dd a{color:var(--ink)}
+.yh-info dd span{display:block;font-size:14.5px;color:var(--mute);font-weight:400;margin-top:2px}
+.yh-hinnat{margin-top:22px;border-top:1px solid var(--line2);padding-top:18px}
+.yh-hinnat h4{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+.yh-hinnat li{list-style:none;display:flex;justify-content:space-between;gap:16px;font-size:14.5px;
+  padding:7px 0;border-bottom:1px solid var(--line)}
+.yh-hinnat li:last-child{border-bottom:0}
+.yh-hinnat b{color:var(--ink);white-space:nowrap}
+
+/* ---------- kapeat näytöt (media-kyselyt LOPUSSA) ---------- */
+@media(max-width:860px){
+  .yh-cards{grid-template-columns:1fr}
+  .yh-split{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  /* Kortit matalina riveinä. Pystysuuntaisina kolme korttia vei puolet
+     ruudusta ennen kuin lomake edes näkyi: otsikko ja hinta samalle riville,
+     kuvaus alle. Sama ratkaisu kuin aaltoair.fi:n mobiilisivulla. */
+  .yh-cards{gap:10px}
+  .yh-card{display:grid;grid-template-columns:1fr auto;align-items:baseline;
+    gap:3px 12px;padding:15px 16px;border-radius:14px}
+  .yh-card h3{grid-column:1;font-size:16.5px}
+  .yh-price{grid-column:2;grid-row:1;font-size:14px;text-align:right;white-space:nowrap}
+  .yh-card p{grid-column:1/-1;font-size:13.5px;line-height:1.45}
+  .yh-card .go{grid-column:1/-1;padding-top:8px;font-size:13.5px}
+  .yh-badge{top:-9px;left:14px;height:19px;padding-inline:8px;font-size:10px}
+  .yh-first{font-size:14px;margin-top:14px}
+  .yh-lead{font-size:15px;margin-bottom:20px}
+  .yh-otsikko{margin-top:30px;padding-top:22px}
+  .yh-row{grid-template-columns:1fr}
+  .yh-f{margin-bottom:13px}
+
+  /* RYTMI JA HIERARKIA puhelimessa.
+     Mitattu ennen: h1 30 px, h2 22 px, leipä 17 px — vain 8 px:n portaat,
+     joten otsikot eivät erottuneet tekstistä. Osioiden välit olivat 10–28 px,
+     eli lohkot valuivat yhteen ja sivu näytti ahtaalta. Portaat levennetään
+     ja jokaisen otsikon ylle annetaan kunnon tauko. */
+  .yh-hero{padding-block:92px 34px}
+  .yh-hero h1{font-size:34px;line-height:1.12}
+  .yh-hero p{font-size:16.5px;margin-top:14px}
+  .kicker{margin-bottom:12px}
+  .yh-h2{font-size:26px}
+  .yh-lead{font-size:15px;margin:12px 0 24px}
+  .yh-first{margin-top:20px}
+  .yh-otsikko{margin-top:44px;padding-top:30px;font-size:22px}
+  .yh-otsikko + .yh-lead{margin-bottom:18px}
+  .yh-form{margin-top:18px;padding:20px 18px}
+  /* Yhteystiedot omaksi lohkokseen: pelkkä 48 px:n väli ei riittänyt
+     erottamaan sitä lomakkeesta. */
+  .yh-sec + .yh-sec{padding-top:20px}
+  .yh-split{gap:22px}
+  .yh-info{padding:22px 20px}
+  .yh-info dl{gap:20px}
+}
+</style>
+</head>
+<body>
+<nav class="top" id="nav"><div class="wrap">
+  <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
+  <div class="nlinks" id="nlinks">
+    <a href="/#palvelut">Palvelut</a><a href="/#laskuri">Hinta</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="toiminta-alueet.html">Toiminta-alueet</a><a href="meista.html">Meistä</a><a href="/#saasto">Säästö</a>
+  </div>
+  <a href="tel:+358458755996" class="ntel">045 875 5996</a>
+  <a href="/#laskuri" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
+  <button class="burger" id="burger" aria-label="Valikko"><span></span><span></span><span></span></button>
+</div></nav>
+
+<main>
+<section class="wrap yh-hero">
+  <div class="kicker rv">Ota yhteyttä</div>
+  <h1 class="rv">Kerro tilanteesi, autamme mielellämme.</h1>
+  <p class="rv">Vastaamme yhteydenottoihin mahdollisimman pian. Ma–pe 8–20, la–su 8–18.30.</p>
+</section>
+
+<section class="wrap yh-sec">
+  <h2 class="yh-h2 rv">Mitä asiasi koskee?</h2>
+  <p class="yh-lead rv">Useimmat asiat hoituvat nopeimmin varaamalla ajan suoraan. Näet kiinteän hinnan ja vapaat ajat heti, etkä jää odottamaan vastausta.</p>
+
+  <div class="yh-cards rv">
+    <a class="yh-card" href="/#laskuri">
+      <span class="yh-badge">Suosituin</span>
+      <h3>Ikkunoiden tiivistys</h3>
+      <span class="yh-price">75–90 € / ikkuna</span>
+      <p>Karmi- ja puitetiivisteet uusiksi. Hinta laskee määrän mukaan.</p>
+      <span class="go">Laske hinta ja varaa aika →</span>
+    </a>
+    <a class="yh-card" href="/#laskuri">
+      <h3>Ovien tiivistys</h3>
+      <span class="yh-price">99 € / ovi</span>
+      <p>Sivutiivisteet, kynnyskumi ja oven käynnin säätö samalla käynnillä.</p>
+      <span class="go">Laske hinta ja varaa aika →</span>
+    </a>
+    <a class="yh-card" href="taloyhtio.html#varaa">
+      <h3>Taloyhtiö</h3>
+      <span class="yh-price">Kartoitus 0 €</span>
+      <p>Rappukäytävät ja yhteistilat kerralla. Kartoituskäynti veloituksetta.</p>
+      <span class="go">Varaa kartoitus →</span>
+    </a>
+  </div>
+
+  <p class="yh-first rv" id="yhFirst" hidden>
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    Ensimmäinen vapaa aika <b id="yhFirstTime"></b>
+  </p>
+
+  <h3 class="yh-otsikko rv">Muu asia? Kirjoita viesti</h3>
+  <p class="yh-lead rv" style="margin-bottom:0">Vastaamme mahdollisimman pian. Kiireisessä asiassa soitto on nopein.</p>
+
+  <div class="yh-formwrap" id="yhFormWrap"><div>
+    <form class="yh-form" id="yhForm" novalidate>
+      <div class="yh-err" id="yhErr"></div>
+      <div class="yh-row">
+        <div class="yh-f"><label for="yhName">Nimi *</label><input id="yhName" name="contact" type="text" autocomplete="name" placeholder="Matti Meikäläinen" required></div>
+        <div class="yh-f"><label for="yhPhone">Puhelin *</label><input id="yhPhone" name="phone" type="tel" autocomplete="tel" placeholder="040 123 4567" required></div>
+      </div>
+      <div class="yh-row">
+        <div class="yh-f"><label for="yhEmail">Sähköposti *</label><input id="yhEmail" name="email" type="email" autocomplete="email" placeholder="matti@esimerkki.fi" required></div>
+        <div class="yh-f"><label for="yhAddr">Osoite tai postinumero *</label><input id="yhAddr" name="addr" type="text" autocomplete="street-address" placeholder="Esimerkkitie 1, 00100 Helsinki" required></div>
+      </div>
+      <div class="yh-f"><label for="yhMsg">Viesti</label><textarea id="yhMsg" name="message" placeholder="Kerro lyhyesti mistä on kyse — esimerkiksi montako ovea tai ikkunaa vetää."></textarea></div>
+      <button class="btn btn-p btn-lg" id="yhSubmit" type="submit">Lähetä viesti</button>
+    </form>
+    <div class="yh-ok" id="yhOk">
+      <h3>Kiitos, viesti on perillä.</h3>
+      <p>Olemme sinuun yhteydessä mahdollisimman pian. Jos asia on kiireinen, soita <a href="tel:+358458755996" style="font-weight:800;text-decoration:underline">045 875 5996</a>.</p>
+    </div>
+  </div></div>
+</section>
+
+<section class="wrap yh-sec">
+  <div class="yh-split">
+    <div class="rv">
+      <h2 class="yh-h2">Yhteystiedot</h2>
+      <p class="yh-lead" style="margin-bottom:0">Soitto on nopein tapa, jos haluat kysyä jotain ennen varausta.</p>
+    </div>
+    <div class="yh-info rv">
+      <dl>
+        <div><dt>Puhelin</dt><dd><a href="tel:+358458755996">045 875 5996</a><span>Ma–pe 8–20 · la–su 8–18.30</span></dd></div>
+        <div><dt>Sähköposti</dt><dd><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a></dd></div>
+        <div><dt>Palvelualue</dt><dd>Uusimaa ja Riihimäki<span>Helsinki, Espoo, Vantaa ja kehyskunnat</span></dd></div>
+        <div><dt>Yritys</dt><dd>TiivisKoti<span>Y-tunnus 3414418-4 · vastuuvakuutus</span></dd></div>
+      </dl>
+      <div class="yh-hinnat">
+        <h4>Hinnat</h4>
+        <ul>
+          <li><span>Ikkuna</span><b>75–90 €</b></li>
+          <li><span>Ulko- tai parvekeovi</span><b>99 €</b></li>
+          <li><span>Liuku- tai pariovi</span><b>149 €</b></li>
+          <li><span>Väli- tai huoneovi</span><b>89 €</b></li>
+          <li><span>Pelkkä kynnyskumi</span><b>45 €</b></li>
+          <li><span>Pienin veloitus / käynti</span><b>149 €</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="mfoot"><div class="wrap">
+  <div class="mf-grid">
+    <div class="mf-brand">
+      <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
+      <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
+    </div>
+    <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="/ota-yhteytta.html">Ota yhteyttä</a><a href="#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Yhteys</h4><a href="tel:+358458755996">045 875 5996</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
+  </div>
+  <div class="mf-cities">
+    <h4>Toiminta-alueet</h4>
+    <div class="list"><a href="toiminta-alueet/helsinki.html">Helsinki</a><a href="toiminta-alueet/espoo.html">Espoo</a><a href="toiminta-alueet/vantaa.html">Vantaa</a><a href="toiminta-alueet/kauniainen.html">Kauniainen</a><a href="toiminta-alueet/kirkkonummi.html">Kirkkonummi</a><a href="toiminta-alueet/kerava.html">Kerava</a><a href="toiminta-alueet/jarvenpaa.html">Järvenpää</a><a href="toiminta-alueet/tuusula.html">Tuusula</a><a href="toiminta-alueet/nurmijarvi.html">Nurmijärvi</a><a href="toiminta-alueet/hyvinkaa.html">Hyvinkää</a><a href="toiminta-alueet/riihimaki.html">Riihimäki</a><a href="toiminta-alueet/sipoo.html">Sipoo</a><a href="toiminta-alueet/vihti.html">Vihti</a><a href="toiminta-alueet/mantsala.html">Mäntsälä</a><a href="toiminta-alueet/pornainen.html">Pornainen</a><a href="toiminta-alueet/porvoo.html">Porvoo</a><a href="toiminta-alueet/askola.html">Askola</a><a href="toiminta-alueet/loviisa.html">Loviisa</a><a href="toiminta-alueet/lapinjarvi.html">Lapinjärvi</a><a href="toiminta-alueet/myrskyla.html">Myrskylä</a><a href="toiminta-alueet/pukkila.html">Pukkila</a><a href="toiminta-alueet/lohja.html">Lohja</a><a href="toiminta-alueet/karkkila.html">Karkkila</a><a href="toiminta-alueet/siuntio.html">Siuntio</a></div>
+  </div>
+  <div class="mf-bot"><span>© <span id="yr"></span> TiivisKoti · Y-tunnus 3414418-4</span><span><a href="tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span></div>
+</div></footer>
+<script defer src="_analytics.js"></script>
+<script type="module" src="_anchors.js"></script>
+<script src="_chat.js" defer></script>
+<script type="module">
+/* SISÄÄNTULO. `.rv`-elementit ovat CSS:ssä opacity:0 ja ne paljastetaan
+   JS:llä. Etusivulla sen tekee `_shared.js`, jota tämä sivu ei lataa (se on
+   koko varauslaskuri, eikä sitä tarvita täällä). Ilman tätä KOKO SIVU jäi
+   näkymättömiin — mitattu: vain lomake ja footer renderöityivät.
+
+   Sama varmistus kuin muualla: pelkkä observer jättää nopealla vierityksellä
+   elementtejä piiloon, joten jokaisella vierityksellä paljastetaan kaikki jo
+   näkymän alarajan ylittäneet. */
+(() => {
+  const jaljella = new Set(document.querySelectorAll('.rv'));
+  if (!jaljella.size) return;
+  const nayta = (el, viive = 0) => {
+    if (!jaljella.has(el)) return;
+    jaljella.delete(el); io.unobserve(el);
+    viive ? setTimeout(() => el.classList.add('in'), viive) : el.classList.add('in');
+  };
+  const io = new IntersectionObserver(
+    (es) => es.filter(e => e.isIntersecting).forEach((e, i) => nayta(e.target, i * 60)),
+    { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+  jaljella.forEach(el => io.observe(el));
+  let jono = false;
+  const pyyhkaise = () => { jono = false;
+    for (const el of [...jaljella]) if (el.getBoundingClientRect().top < innerHeight) nayta(el); };
+  addEventListener('scroll', () => { if (!jono) { jono = true; requestAnimationFrame(pyyhkaise); } }, { passive: true });
+  addEventListener('resize', pyyhkaise, { passive: true });
+})();
+
+/* Ensimmäinen vapaa aika — sama rajapinta kuin etusivun varauskortissa.
+   Ei postinumeroa: lupaus annetaan ennen kuin kävijältä kysytään mitään. */
+const CRM = 'https://tiiviskoti-crm.vercel.app';
+fetch(`${CRM}/api/public/availability?first=1&minutes=60&days=21`)
+  .then(r => r.ok ? r.json() : null)
+  .then(d => {
+    if (!d || !d.firstSlot) return;
+    const t = new Date(d.firstSlot);
+    const teksti = t.toLocaleDateString('fi-FI', { weekday:'short', day:'numeric', month:'short' })
+      + ' klo ' + t.toLocaleTimeString('fi-FI', { hour:'2-digit', minute:'2-digit' });
+    document.getElementById('yhFirstTime').textContent = teksti;
+    document.getElementById('yhFirst').hidden = false;
+  }).catch(() => {});
+
+/* Lähetys. `kind:'yksityinen'` erottaa tämän taloyhtiön tarjouspyynnöstä,
+   jottei kuluttajan yhteydenotto päädy CRM:ssä väärään jonoon. */
+const form = document.getElementById('yhForm');
+const err = document.getElementById('yhErr');
+const ok = document.getElementById('yhOk');
+const nappi = document.getElementById('yhSubmit');
+form.addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  err.style.display = 'none';
+  const v = (id) => document.getElementById(id).value.trim();
+  const data = { kind:'yksityinen', contact:v('yhName'), phone:v('yhPhone'),
+    email:v('yhEmail'), addr:v('yhAddr'), message:v('yhMsg'), pageUrl:location.href };
+  if (!data.contact || !data.phone || !data.addr || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) {
+    err.textContent = 'Tarkista nimi, puhelin, sähköposti ja osoite.';
+    err.style.display = 'block'; return;
+  }
+  nappi.disabled = true; nappi.textContent = 'Lähetetään…';
+  try {
+    const r = await fetch('/api/create-lead', { method:'POST',
+      headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || 'fail');
+    form.style.display = 'none';
+    ok.style.display = 'block';
+  } catch (_) {
+    err.textContent = 'Viestin lähetys ei onnistunut. Yritä hetken kuluttua uudelleen tai soita 045 875 5996.';
+    err.style.display = 'block';
+    nappi.disabled = false; nappi.textContent = 'Lähetä viesti';
+  }
+});
+</script>
+</body>
+</html>

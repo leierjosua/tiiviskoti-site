@@ -77,7 +77,7 @@ const footer = (R, paitsi) => `<footer class="mfoot"><div class="wrap">
       <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     </div>
     <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="#laskuri">Hintalaskuri</a></div>
-    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="${R}artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="#laskuri">Varaa aika</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="${R}artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a><a href="#laskuri">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:${TELH}">${TEL}</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
   <div class="mf-cities">
@@ -279,6 +279,7 @@ function kuntaSivu(a, i) {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="${R}_alueet.css" />
+<link rel="stylesheet" href="${R}_anim.css" />
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
@@ -513,6 +514,7 @@ function palveluSivu(c) {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="${R}_alueet.css" />
+<link rel="stylesheet" href="${R}_anim.css" />
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
@@ -959,6 +961,7 @@ function kumppaniSivu(k) {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="${R}_alueet.css" />
+<link rel="stylesheet" href="${R}_anim.css" />
 </head>
 <body data-koodi="${k.koodi}">
 ${nav(R)}
@@ -1142,6 +1145,7 @@ function hubSivu() {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="_alueet.css" />
+<link rel="stylesheet" href="/_anim.css" />
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
@@ -1268,6 +1272,7 @@ function meistaSivu() {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="_alueet.css" />
+<link rel="stylesheet" href="/_anim.css" />
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
@@ -1476,6 +1481,7 @@ function artikkeliSivu(a) {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="${R}_alueet.css" />
+<link rel="stylesheet" href="${R}_anim.css" />
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
@@ -1572,6 +1578,7 @@ function artikkelitHub() {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="${R}_alueet.css" />
+<link rel="stylesheet" href="${R}_anim.css" />
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
@@ -1650,6 +1657,7 @@ function sitemapXml() {
     { loc: `${SITE}/artikkelit.html`, pri: '0.8', freq: 'weekly' },
     ...ARTIKKELIT.map((a) => ({ loc: artikkeliUrl(a.slug), pri: '0.7', freq: 'monthly', mod: a.julkaistu })),
     ...ALUEET.map((a) => ({ loc: `${SITE}/toiminta-alueet/${a.slug}.html`, pri: '0.7', freq: 'monthly' })),
+    { loc: `${SITE}/ota-yhteytta.html`, pri: '0.7', freq: 'monthly' },
     { loc: `${SITE}/meista.html`, pri: '0.5', freq: 'yearly' },
     { loc: `${SITE}/varaa.html`, pri: '0.5', freq: 'monthly' },
     { loc: `${SITE}/ajanvaraus.html`, pri: '0.5', freq: 'monthly' },

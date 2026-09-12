@@ -52,7 +52,7 @@ async function queueLeadNotification(submissionId, f) {
       body: JSON.stringify({
         type: 'contact',
         payload: {
-          formSlug: FORM_SLUG,
+          formSlug: f.slug || FORM_SLUG,
           name: f.contact,
           email: f.email,
           phone: f.phone,
@@ -103,7 +103,7 @@ async function mirrorToCrmLeads(f, client) {
         ...(clientUa ? { 'x-tk-client-ua': clientUa } : {}),
       },
       body: JSON.stringify({
-        full_name: `${f.yhtio} — ${f.contact}`,
+        full_name: f.nimi || `${f.yhtio} — ${f.contact}`,
         email: f.email || '',
         phone: f.phone,
         postal_code: f.postalCode || '',
@@ -152,6 +152,17 @@ export default async function handler(req, res) {
     const doors   = clean(body.doors, 100);
     const when    = clean(body.when, 200);
     const message = clean(body.message, 4000);
+
+    /* Kuluttajan yhteydenotto vs. taloyhtiön tarjouspyyntö.
+
+       MIKSI ERIKSEEN: tämä reitti rakennettiin taloyhtiöille, joten se leimasi
+       KAIKEN `taloyhtio-tarjouspyynto`-liidiksi ja nimesi rivin muodossa
+       "taloyhtiö — henkilö". Kuluttajan yhteydenotto näkyi CRM:ssä muodossa
+       " — Matti Meikäläinen" väärän otsikon alla, jolloin sitä olisi käsitelty
+       väärässä jonossa. `kind:'yksityinen'` antaa oman slugin ja pelkän nimen.
+       Ilman kenttää käytös on täsmälleen entinen. */
+    const kind = body.kind === 'yksityinen' ? 'yksityinen' : 'taloyhtio';
+    const slug = kind === 'yksityinen' ? 'yhteydenotto' : FORM_SLUG;
     const pageUrl = clean(body.pageUrl, 500);
 
     // Mainoskampanja ja Google Ads -klikin tunniste osoiterivistä. Sama
@@ -183,9 +194,10 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { Prefer: 'return=representation' },
       body: JSON.stringify({
-        form_slug: FORM_SLUG,
-        // `name` on adminin päänäyttökenttä — taloyhtiö + yhteyshenkilö kertoo eniten.
-        name: `${yhtio} — ${contact}`,
+        form_slug: slug,
+        // `name` on adminin päänäyttökenttä — taloyhtiöllä yhtiö + yhteyshenkilö
+        // kertoo eniten, yksityisellä pelkkä nimi.
+        name: kind === 'yksityinen' ? contact : `${yhtio} — ${contact}`,
         email,
         phone,
         postal_code: postalFrom(addr),
@@ -212,12 +224,14 @@ export default async function handler(req, res) {
 
     await queueLeadNotification(row.id, {
       contact, email, phone, role, yhtio, addr, doors, when, message,
+      slug, nimi: kind === 'yksityinen' ? contact : `${yhtio} — ${contact}`,
       postalCode: postalFrom(addr), pageUrl,
     });
 
     // Peilaa CRM:n Liidit-sivulle (tk.leads) — sinne minne admin oikeasti katsoo.
     const mirrored = await mirrorToCrmLeads({
       contact, email, phone, role, yhtio, addr, doors, when, message,
+      slug, nimi: kind === 'yksityinen' ? contact : `${yhtio} — ${contact}`,
       postalCode: postalFrom(addr), campaign, gclid, gclidKind,
     }, {
       ip: (req.headers['x-forwarded-for'] || '').split(',')[0].trim(),
