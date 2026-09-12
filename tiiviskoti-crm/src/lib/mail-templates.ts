@@ -21,7 +21,7 @@ const MUTED = '#5F6D68';
 const PHONE = '045 875 5996';
 const PHONE_HREF = '+358458755996';
 const COMPANY = 'TiivisKoti';
-const BUSINESS_ID = '3414418-4';
+const BUSINESS_ID = '3652671-7';
 const COMPANY_ADDRESS = 'Järvipuistonkatu 5, 04400 Järvenpää';
 
 export type MailLine = { name: string; qty: number; unit: number; sum: number; unitName?: string; note?: string };

@@ -35,8 +35,8 @@ const VAT_RATE = 0.255;
 const MYYJA = {
   nimi: 'TiivisKoti',
   yhtio: 'Josua Leier',
-  ytunnus: '3414418-4',
-  alvtunnus: 'FI34144184',
+  ytunnus: '3652671-7',
+  alvtunnus: 'FI36526717',
   osoite: 'Järvipuistonkatu 5',
   postitoimipaikka: '04400 Järvenpää',
   puhelin: '045 875 5996',

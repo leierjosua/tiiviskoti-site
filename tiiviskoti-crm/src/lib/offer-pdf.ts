@@ -260,7 +260,7 @@ export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
   // footer — yrityksen viralliset tiedot
   page.drawLine({ start: { x: margin, y: 62 }, end: { x: width - margin, y: 62 }, thickness: 0.5, color: LIGHT_GRAY });
   text('TiivisKoti', margin, 48, { font: bold, size: 9, color: BRAND_DARK });
-  text('Y-tunnus 3414418-4', width - margin - font.widthOfTextAtSize('Y-tunnus 3414418-4', 9), 48, { size: 9, color: GRAY });
+  text('Y-tunnus 3652671-7', width - margin - font.widthOfTextAtSize('Y-tunnus 3652671-7', 9), 48, { size: 9, color: GRAY });
   text('Järvipuistonkatu 5, 04400 Järvenpää', margin, 36, { size: 8, color: GRAY });
   text('info@tiiviskoti.fi · 045 875 5996 · tiiviskoti.fi', margin, 25, { size: 8, color: GRAY });
 
