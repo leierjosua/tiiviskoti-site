@@ -1,6 +1,6 @@
 import 'server-only';
 import { sql } from './db';
-import { createCalendarEvent, deleteCalendarEvent, googleConfigured, updateCalendarEvent } from './google';
+import { createCalendarEvent, deleteCalendarEvent, googleConfigured, moveCalendarEvent, updateCalendarEvent } from './google';
 import { sendMail } from './google';
 import {
   calendarDescription, confirmationHtml, confirmationSubject, confirmationText,
@@ -363,6 +363,60 @@ export async function syncCalendarEventForJob(jobId: string): Promise<void> {
     if (missing) await sql`update tk.jobs set google_event_id = null where id = ${jobId}`;
   } catch (e) {
     console.error('syncCalendarEventForJob:', jobId, msg(e));
+  }
+}
+
+/**
+ * Kalenteritapahtuma uudelle tekijälle, kun työ on siirretty toiselle
+ * asentajalle.
+ *
+ * Tapahtuma luodaan aikanaan niin että asentaja on siinä OSALLISTUJANA — sitä
+ * kautta keikka näkyy hänen omassa kalenterissaan. Pelkkä `calendar_id`:n
+ * vaihto kannassa ei siis riitä: ilman tätä vanha asentaja saisi yhä
+ * muistutuksen puhelimeensa eikä uusi näkisi keikkaa lainkaan.
+ *
+ * Kutsutaan siirron JÄLKEEN, kun `tk.jobs.calendar_id` osoittaa jo uuteen
+ * kalenteriin. `prevGoogleCalendarId` on edellisen kalenterin Google-tunnus,
+ * jotta tapahtuma osataan hakea sieltä mihin se jäi.
+ *
+ * Ei kaada siirtoa: kanta on totuus ja se on jo päivitetty. Google-puolen
+ * virhe kirjataan lokiin, kuten muissakin kalenterifunktioissa.
+ */
+export async function reassignCalendarEventForJob(
+  jobId: string, prevGoogleCalendarId: string | null,
+): Promise<void> {
+  if (!googleConfigured()) return;
+  const rows = await sql<{ google_event_id: string | null; google_calendar_id: string | null }[]>`
+    select j.google_event_id, c.google_calendar_id
+      from tk.jobs j join tk.calendars c on c.id = j.calendar_id
+     where j.id = ${jobId}
+  `;
+  const row = rows[0];
+  if (!row?.google_event_id) return;
+
+  const staff = await assignedStaff(jobId);
+  /* Käsin poistettu tapahtuma: tunniste kannassa osoittaa olemattomaan.
+     Tyhjennetään, jotta vahvistuksen uudelleenlähetys luo uuden. */
+  const forget = () => sql`update tk.jobs set google_event_id = null where id = ${jobId}`;
+
+  try {
+    if ((prevGoogleCalendarId ?? '') !== (row.google_calendar_id ?? '')) {
+      const moved = await moveCalendarEvent(
+        row.google_event_id, prevGoogleCalendarId ?? undefined, row.google_calendar_id ?? undefined,
+      );
+      if (moved.missing) { await forget(); return; }
+    }
+
+    /* Tyhjä lista poistaa vanhan tekijän. Fallback-tapauksessa (asentajalla ei
+       ole sähköpostia) tapahtuma jää yrityksen kalenteriin ilman osallistujaa
+       — sama tila kuin luonnissa. */
+    const { missing } = await updateCalendarEvent(row.google_event_id, {
+      calendarId: row.google_calendar_id ?? undefined,
+      attendees: staff.isFallback ? [] : [{ email: staff.email, displayName: staff.name }],
+    });
+    if (missing) await forget();
+  } catch (e) {
+    console.error('reassignCalendarEventForJob:', jobId, msg(e));
   }
 }
 

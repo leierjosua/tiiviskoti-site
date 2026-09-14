@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { requireManager, requireStaff } from '@/lib/session';
-import { deliverBooking, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
+import { deliverBooking, reassignCalendarEventForJob, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
 import { computePricing } from '@/lib/pricing';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
@@ -14,7 +14,7 @@ import { generateOfferPdf } from '@/lib/offer-pdf';
 import { sendMail } from '@/lib/google';
 import { parseBookingStart } from '@/lib/time';
 import { reportSaleToMeta } from '@/lib/meta-sale';
-import { receiptEmailSubject, receiptEmailHtml, receiptEmailText, offerEmailSubject, offerEmailHtml, offerEmailText } from '@/lib/mail-templates';
+import { receiptEmailSubject, receiptEmailHtml, receiptEmailText, offerEmailSubject, offerEmailHtml, offerEmailText, workOrderSubject, workOrderHtml, workOrderText } from '@/lib/mail-templates';
 
 const OFFER_VALID_DAYS = 14;
 
@@ -393,6 +393,300 @@ export async function rescheduleJob(_prev: ActionState, formData: FormData): Pro
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
   return { ok: ids.length > 1 ? 'Aika siirretty molemmilta asentajilta.' : 'Aika siirretty.' };
+}
+
+/** Keikan yksi rivi: yksi asentaja, yksi kalenteri. */
+type CrewRow = {
+  id: string; job_number: string; calendar_id: string; price_cents: number;
+  created_at: Date; status: string; google_calendar_id: string | null;
+  staff_id: string; staff_name: string; staff_email: string | null;
+};
+
+/**
+ * Keikan kaikki rivit — yksin tehdyllä keikalla pelkkä työ itse.
+ *
+ * Eri asia kuin `crewIds`: tämä palauttaa myös tekijän ja kalenterin, joita
+ * ryhmän muuttaminen tarvitsee.
+ */
+async function crewRows(id: string): Promise<CrewRow[]> {
+  const cols = sql`
+    j.id, j.job_number, j.calendar_id, j.price_cents, j.created_at,
+    j.status::text as status, c.google_calendar_id, c.staff_id,
+    s.full_name as staff_name, s.email as staff_email
+  `;
+  const join = sql`
+    from tk.jobs j
+    join tk.calendars c on c.id = j.calendar_id
+    join tk.staff s on s.id = c.staff_id
+  `;
+  try {
+    const rows = await sql<CrewRow[]>`
+      select ${cols} ${join}
+       where j.crew_group_id is not null
+         and j.crew_group_id = (select crew_group_id from tk.jobs where id = ${id})
+       order by j.price_cents desc, j.created_at
+    `;
+    if (rows.length > 0) return rows;
+  } catch (e) {
+    // db/026 ajamatta: paria ei ole olemassakaan.
+    if ((e as { code?: string })?.code !== '42703') throw e;
+  }
+  return sql<CrewRow[]>`select ${cols} ${join} where j.id = ${id}`;
+}
+
+/**
+ * Keikan tekijöiden asettaminen — yksi, kaksi tai useampi asentaja.
+ *
+ * Tekijä EI ole oma sarakkeensa vaan seuraa kalenterista: `jobs.calendar_id`
+ * -> `calendars.staff_id`. Yksi asentaja = yksi rivi omassa kalenterissaan,
+ * jotta HÄNEN aikansa on varattu; rivit sidotaan yhteen `crew_group_id`:llä.
+ * "Siirto" on siis rivien lisäämistä, poistamista ja kalenterin vaihtoa.
+ *
+ * Päärivi on se jolla on hinta ja työrivit — se säilyy aina ja kantaa
+ * laskutuksen, tarjouslinkin, kuvat ja mainostunnisteen. Lisätyt rivit ovat
+ * työpareja: hinta 0 eikä klikkitunnistetta, jottei sama kauppa näy
+ * liikevaihdossa tai Google Adsissa kahteen kertaan (ks. `createJob`).
+ *
+ * Aika ei muutu. Varattu asentaja torjutaan ennen kirjoitusta selkeällä
+ * viestillä, ja kannan `jobs_no_overlap` on viimeinen suoja.
+ */
+export async function transferJob(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireManager();
+
+  const id = String(formData.get('id') ?? '');
+  const wanted = [...new Set(
+    formData.getAll('calendarIds').map((v) => String(v)).filter(Boolean),
+  )];
+  const lahetaTyomaarain = !!formData.get('lahetaTyomaarain');
+  if (!id) return { error: 'Työtä ei löytynyt.' };
+  if (wanted.length === 0) return { error: 'Valitse vähintään yksi tekijä.' };
+
+  const rows = await crewRows(id);
+  if (rows.length === 0) return { error: 'Työtä ei löytynyt.' };
+  if (rows.some((r) => r.status === 'cancelled')) {
+    return { error: 'Peruttua työtä ei siirretä. Palauta se ensin.' };
+  }
+
+  /* Päärivi = suurin hinta, tasapelissä vanhin. Työparit luodaan nollahintaisina,
+     joten hinnallinen rivi on aina se jolla laskutus ja rivit ovat. */
+  const primary = rows[0];
+  const mates = rows.slice(1);
+
+  const targets = await sql<{
+    id: string; name: string; active: boolean; staff_id: string;
+    staff_name: string; staff_email: string | null; staff_active: boolean;
+  }[]>`
+    select c.id, c.name, c.active, c.staff_id, s.full_name as staff_name,
+           s.email as staff_email, s.active as staff_active
+      from tk.calendars c join tk.staff s on s.id = c.staff_id
+     where c.id = any(${wanted}::uuid[])
+  `;
+  if (targets.length !== wanted.length) return { error: 'Kalenteria ei löytynyt.' };
+  const pois = targets.find((t) => !t.active || !t.staff_active);
+  if (pois) return { error: `${pois.staff_name} tai hänen kalenterinsa ei ole käytössä.` };
+
+  /* Sama ihminen kahdessa kalenterissa olisi keikalla kahdesti. Kalenteri voi
+     olla eri (asennus/kartoitus), joten tarkistus on tekijäkohtainen. */
+  const staffIds = targets.map((t) => t.staff_id);
+  if (new Set(staffIds).size !== staffIds.length) {
+    return { error: 'Sama asentaja on valittu kahdesti — valitse jokainen kerran.' };
+  }
+
+  const keep = rows.filter((r) => wanted.includes(r.calendar_id));
+  const remove = mates.filter((r) => !wanted.includes(r.calendar_id));
+  const covered = new Set(keep.map((r) => r.calendar_id));
+  const add = targets.filter((t) => !covered.has(t.id));
+
+  /* Päärivi ei katoa koskaan. Jos sen nykyinen kalenteri ei ole valituissa,
+     se siirtyy ensimmäiseen vapaaksi jäävään — ja se paikka kuluu lisättävistä. */
+  const primaryMoves = !wanted.includes(primary.calendar_id);
+  const primaryTarget = primaryMoves ? add.shift() : null;
+  if (primaryMoves && !primaryTarget) {
+    return { error: 'Valitse vähintään yksi tekijä.' };
+  }
+
+  if (!primaryMoves && remove.length === 0 && add.length === 0) {
+    return { error: 'Tekijät ovat jo nämä.' };
+  }
+
+  /* Varattu asentaja kerrotaan nimellä ennen kirjoitusta. Kannan
+     exclusion-rajoite torjuisi tämän muutenkin, mutta vasta yhteisvirheenä
+     josta ei näe kuka oli varattu. */
+  const keepIds = [primary.id, ...keep.map((r) => r.id)];
+  for (const t of [...(primaryTarget ? [primaryTarget] : []), ...add]) {
+    const [clash] = await sql<{ job_number: string }[]>`
+      select j.job_number from tk.jobs j
+       where j.calendar_id = ${t.id}::uuid
+         and j.status <> 'cancelled'
+         and j.id <> all(${keepIds}::uuid[])
+         and tstzrange(j.starts_at, j.ends_at) && tstzrange(
+               (select starts_at from tk.jobs where id = ${primary.id}),
+               (select ends_at from tk.jobs where id = ${primary.id}))
+       limit 1
+    `;
+    if (clash) {
+      return { error: `${t.staff_name} on jo varattu tähän aikaan (työ ${clash.job_number}). Siirrä ensin aikaa tai valitse toinen tekijä.` };
+    }
+  }
+
+  /* Poistettavalta riviltä ei saa hävitä kuvia eikä viestihistoriaa: sellainen
+     rivi perutaan poiston sijaan, jolloin kalenteri vapautuu mutta jälki jää
+     (`jobs_no_overlap` ei koske peruttuja). */
+  const heavy = new Set<string>();
+  for (const r of remove) {
+    const [n] = await sql<{ photos: number; mails: number }[]>`
+      select (select count(*)::int from tk.job_photos where job_id = ${r.id}) as photos,
+             (select count(*)::int from tk.mail_log  where job_id = ${r.id}) as mails
+    `;
+    if (n && (n.photos > 0 || n.mails > 0)) heavy.add(r.id);
+  }
+
+  const prevPrimaryGoogleCal = primary.google_calendar_id;
+  const addedIds: { jobId: string; staffName: string; staffEmail: string | null }[] = [];
+
+  try {
+    await sql.begin(async (tx) => {
+      if (primaryTarget) {
+        await tx`update tk.jobs set calendar_id = ${primaryTarget.id}::uuid where id = ${primary.id}`;
+      }
+      for (const r of remove) {
+        if (heavy.has(r.id)) {
+          await tx`update tk.jobs set status = 'cancelled' where id = ${r.id}`;
+        } else {
+          await tx`delete from tk.jobs where id = ${r.id}`;
+        }
+      }
+      for (const t of add) {
+        const [mate] = await tx<{ id: string }[]>`
+          insert into tk.jobs (customer_id, calendar_id, starts_at, ends_at, status,
+                               title, address, postal_code, city, notes, source,
+                               campaign, gclid, price_cents, offer_id)
+          select p.customer_id, ${t.id}::uuid, p.starts_at, p.ends_at, 'confirmed',
+                 p.title || ' (työpari)', p.address, p.postal_code, p.city,
+                 ${`Työpari keikalla ${primary.job_number} — laskutus ja rivit siellä.`},
+                 p.source, p.campaign, null, 0, p.offer_id
+            from tk.jobs p where p.id = ${primary.id}
+          returning id
+        `;
+        addedIds.push({ jobId: mate.id, staffName: t.staff_name, staffEmail: t.staff_email });
+      }
+
+      /* Ryhmätunnus: useampi rivi jaetaan yhdellä, yksin jäänyt vapautetaan.
+         Ilman vapautusta yhden miehen keikka jäisi "pariksi" ilman paria. */
+      const lopulliset = [primary.id, ...keep.filter((r) => r.id !== primary.id).map((r) => r.id),
+                          ...addedIds.map((a) => a.jobId)];
+      if (lopulliset.length > 1) {
+        const crew = randomUUID();
+        await tx`update tk.jobs set crew_group_id = ${crew}::uuid where id = any(${lopulliset}::uuid[])`;
+      } else {
+        await tx`update tk.jobs set crew_group_id = null where id = ${primary.id}`;
+      }
+    });
+  } catch (err) {
+    if (isSlotTaken(err)) return { error: SLOT_TAKEN };
+    if ((err as { code?: string })?.code === '42703') {
+      return { error: 'Tietokannasta puuttuu sarake — aja db/026_offer_booking.sql Supabasen SQL-editorissa.' };
+    }
+    throw err;
+  }
+
+  /* Google-kalenteri perässä vain päärivillä: työpareilla ei ole omaa
+     tapahtumaa (`deliverBooking` ajetaan vain päätyölle). Poistetuilta
+     varmuuden vuoksi silti, jos sellainen on joskus syntynyt. */
+  if (primaryTarget) await reassignCalendarEventForJob(primary.id, prevPrimaryGoogleCal);
+  for (const r of remove) if (!heavy.has(r.id)) await removeCalendarEventForJob(r.id);
+
+  let mailNote = '';
+  if (lahetaTyomaarain) {
+    const saajat = [
+      ...(primaryTarget ? [{ jobId: primary.id, staffName: primaryTarget.staff_name, staffEmail: primaryTarget.staff_email }] : []),
+      ...addedIds,
+    ];
+    const lahti: string[] = [];
+    const eiLahtenyt: string[] = [];
+    for (const s of saajat) {
+      if (!s.staffEmail) { eiLahtenyt.push(`${s.staffName} (ei sähköpostia)`); continue; }
+      try {
+        await sendWorkOrder(s.jobId, s.staffEmail, s.staffName);
+        lahti.push(s.staffEmail);
+      } catch (e) {
+        eiLahtenyt.push(`${s.staffName} (${(e instanceof Error ? e.message : String(e)).slice(0, 120)})`);
+      }
+    }
+    if (lahti.length) mailNote += ` Työmääräin lähetetty: ${lahti.join(', ')}.`;
+    /* Siirto on jo tehty eikä sitä peruta postin takia — mutta hiljaa ei saa
+       jäädä, koska asentaja luulisi saaneensa tiedon. */
+    if (eiLahtenyt.length) mailNote += ` Työmääräin EI lähtenyt: ${eiLahtenyt.join('; ')}.`;
+  }
+
+  for (const jobId of [primary.id, ...keep.map((r) => r.id), ...addedIds.map((a) => a.jobId)]) {
+    revalidatePath(`/tyot/${jobId}`);
+  }
+  revalidatePath('/tyot');
+  revalidatePath('/kalenteri');
+
+  const tekijat = [
+    primaryTarget ? primaryTarget.staff_name : primary.staff_name,
+    ...keep.filter((r) => r.id !== primary.id).map((r) => r.staff_name),
+    ...addedIds.map((a) => a.staffName),
+  ];
+  const poistetut = remove.map((r) => r.staff_name);
+  const osat = [`Tekijät: ${tekijat.join(', ')}.`];
+  if (poistetut.length) {
+    osat.push(`Pois: ${poistetut.join(', ')}${remove.some((r) => heavy.has(r.id)) ? ' (rivi jolla oli kuvia tai viestejä peruttiin, ei poistettu)' : ''}.`);
+  }
+
+  /* Katsottu rivi saattoi juuri kadota — silloin sen sivua ei ole enää
+     olemassa, ja käyttäjä jäisi tuijottamaan 404:ää oman onnistumisensa
+     jälkeen. Siirretään päätyölle. */
+  if (remove.some((r) => r.id === id && !heavy.has(r.id))) {
+    redirect(`/tyot/${primary.id}`);
+  }
+  return { ok: `${osat.join(' ')}${mailNote}` };
+}
+
+/** Työmääräin yhdelle asentajalle. Kokoaa saman datan kuin vahvistus. */
+async function sendWorkOrder(jobId: string, to: string, staffName: string): Promise<void> {
+  const job = await getJob(jobId);
+  if (!job) throw new Error('Työtä ei löytynyt');
+  const lines = await sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
+    select name, quantity, unit_price_cents from tk.job_lines
+     where job_id = ${jobId} order by sort_order
+  `;
+  /* Rivitön työ saa yhden rivin työn nimellä — työparilla rivit ovat
+     päätyöllä, joten tämä on siellä normaali tila eikä puute. */
+  const mailLines = lines.length
+    ? lines.map((l) => ({
+        name: l.name, qty: l.quantity,
+        unit: l.unit_price_cents / 100,
+        sum: (l.quantity * l.unit_price_cents) / 100,
+      }))
+    : [{ name: job.title, qty: 1, unit: job.price_cents / 100, sum: job.price_cents / 100 }];
+
+  const data = {
+    jobNumber: job.job_number,
+    customerName: job.customer_name ?? 'Asiakas',
+    startsAt: job.starts_at,
+    endsAt: job.ends_at,
+    address: job.address ?? '',
+    postalCode: job.postal_code ?? '',
+    city: job.city,
+    lines: mailLines,
+    totalCents: job.price_cents,
+    // Kotitalousvähennys: 40 % työn osuudesta, työ n. 70 % hinnasta.
+    netCents: Math.round(job.price_cents * (1 - 0.4 * 0.7)),
+    notes: job.notes,
+    phone: job.customer_phone ?? '',
+    email: job.customer_email ?? '',
+    staffName,
+  };
+  const sent = await sendMail({
+    to, subject: workOrderSubject(data), html: workOrderHtml(data), text: workOrderText(data),
+  });
+  await sql`
+    insert into tk.mail_log (job_id, kind, to_email, subject, provider_id, sent_at)
+    values (${jobId}, 'work_order', ${to}, ${workOrderSubject(data)}, ${sent.id}, now())
+  `;
 }
 
 const editSchema = z.object({

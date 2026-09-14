@@ -305,6 +305,11 @@ export async function updateCalendarEvent(
   if (ev.location !== undefined) body.location = ev.location;
   if (ev.startsAt) body.start = { dateTime: ev.startsAt.toISOString(), timeZone: 'Europe/Helsinki' };
   if (ev.endsAt) body.end = { dateTime: ev.endsAt.toISOString(), timeZone: 'Europe/Helsinki' };
+  /* Osallistujat annetaan vain kun ne on nimenomaan tarkoitus vaihtaa. PATCH
+     jättää antamatta jätetyt kentät rauhaan, joten ajan siirto ei koske
+     osallistujiin — mutta työn siirto toiselle asentajalle koskee, ja silloin
+     tyhjä lista on oikea tapa poistaa vanha tekijä tapahtumasta. */
+  if (ev.attendees !== undefined) body.attendees = ev.attendees;
 
   const res = await fetch(
     `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=none`,
@@ -317,6 +322,37 @@ export async function updateCalendarEvent(
   if (res.status === 404 || res.status === 410) return { missing: true };
   if (!res.ok) {
     throw new Error(`Kalenteritapahtuman päivitys epäonnistui: ${res.status} ${(await res.text()).slice(0, 300)}`);
+  }
+  return { missing: false };
+}
+
+/* Tapahtuman siirto kalenterista toiseen.
+
+   Tarvitaan kun työ siirretään asentajalle jonka kalenterilla on oma
+   `google_calendar_id`. Pelkkä PATCH ei riitä: se päivittää tapahtuman siinä
+   kalenterissa jossa se jo on, joten työ jäisi vanhan asentajan kalenteriin.
+
+   Sama lähde ja kohde = ei tehtävää. Nykyisillä asetuksilla kaikilla
+   kalentereilla on `google_calendar_id = null`, jolloin molemmat osoittavat
+   samaan oletuskalenteriin eikä siirtoa tarvita — tämä on olemassa siltä
+   varalta että asentajille annetaan omat Google-kalenterit. */
+export async function moveCalendarEvent(
+  eventId: string, from?: string, to?: string,
+): Promise<{ missing: boolean }> {
+  const src = from || DEFAULT_CALENDAR_ID;
+  const dst = to || DEFAULT_CALENDAR_ID;
+  if (src === dst) return { missing: false };
+
+  const token = await accessToken();
+  const res = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(src)}`
+    + `/events/${encodeURIComponent(eventId)}/move`
+    + `?destination=${encodeURIComponent(dst)}&sendUpdates=none`,
+    { method: 'POST', headers: { Authorization: `Bearer ${token}` } },
+  );
+  if (res.status === 404 || res.status === 410) return { missing: true };
+  if (!res.ok) {
+    throw new Error(`Kalenteritapahtuman siirto epäonnistui: ${res.status} ${(await res.text()).slice(0, 300)}`);
   }
   return { missing: false };
 }

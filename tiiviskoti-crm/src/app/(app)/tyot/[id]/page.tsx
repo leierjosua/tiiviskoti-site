@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getJob, jobLinks } from '@/lib/data';
+import { getJob, jobLinks, listCalendars } from '@/lib/data';
 import { ownsJob, requireStaff, viewMode } from '@/lib/session';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib/time';
 import { sql } from '@/lib/db';
-import { DeleteJob, EditJobForm, RescheduleForm, SendConfirmation, SendOffer, SendReceipt, StatusButtons } from './ui';
+import { DeleteJob, EditJobForm, RescheduleForm, SendConfirmation, SendOffer, SendReceipt, StatusButtons, TransferJobForm } from './ui';
 import AsennusTyo from './asennus-tyo';
 import { JobPhotos } from './photos';
 import { listJobPhotos } from '@/lib/photos';
@@ -42,7 +42,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   );
 
   // Rivit, viestiloki ja liitokset ovat toisistaan riippumattomia — rinnakkain.
-  const [lines, mails, links, photos, deliveryRows] = await Promise.all([
+  const [lines, mails, links, photos, deliveryRows, calendars] = await Promise.all([
     sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
       select name, quantity, unit_price_cents from tk.job_lines
        where job_id = ${id} order by sort_order
@@ -58,6 +58,9 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     sql<{ confirmation_sent_at: Date | null; google_event_id: string | null }[]>`
       select confirmation_sent_at, google_event_id from tk.jobs where id = ${id}
     `,
+    /* Siirtolistan vaihtoehdot. Vain käytössä olevat, jottei työtä voi antaa
+       lopettaneelle asentajalle. */
+    listCalendars(true),
   ]);
   const delivery = deliveryRows[0];
   const lineSumCents = lines.reduce((s, l) => s + l.quantity * l.unit_price_cents, 0);
@@ -164,6 +167,20 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             id={job.id}
             startsAt={job.starts_at.toISOString()}
             durationMinutes={durationMinutes}
+          />
+        </Card>
+
+        {/* Tekijän vaihto on eri asia kuin ajan siirto: aika pysyy, kalenteri
+            vaihtuu. Oma korttinsa vieressä, koska nämä kaksi sekoitetaan
+            helposti toisiinsa. */}
+        <Card className="h-fit">
+          <CardHeader title="Tekijät" />
+          <TransferJobForm
+            id={job.id}
+            currentCalendarIds={[job.calendar_id, ...links.mates.map((m) => m.calendar_id)]}
+            calendars={calendars.map((c) => ({
+              id: c.id, name: c.name, staff_id: c.staff_id, staff_name: c.staff_name,
+            }))}
           />
         </Card>
 

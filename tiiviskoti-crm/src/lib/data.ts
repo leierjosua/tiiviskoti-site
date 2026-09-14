@@ -444,7 +444,10 @@ export async function getOffer(id: string): Promise<OfferRow | null> {
 /* Työn liitokset: mistä tarjouksesta se tuli ja kuka on työparina.
    Erillinen kysely eikä osa `getJob`ia, koska db/026 voi olla ajamatta —
    silloin työn sivu näyttää työn ilman näitä eikä kaadu. */
-export type JobCrewMate = { id: string; job_number: string; staff_name: string };
+/* `staff_id` on mukana, jotta työn siirto osaa estää keikan antamisen sille
+   asentajalle joka on jo sen työparina — pelkällä nimellä vertailu menisi
+   rikki kahdella samannimisellä. */
+export type JobCrewMate = { id: string; job_number: string; calendar_id: string; staff_id: string; staff_name: string };
 
 export async function jobLinks(jobId: string): Promise<{
   offer: { id: string; offer_number: string } | null;
@@ -464,7 +467,7 @@ export async function jobLinks(jobId: string): Promise<{
     if (!row) return none;
     const mates = row.crew_group_id
       ? await sql<JobCrewMate[]>`
-          select j.id, j.job_number, s.full_name as staff_name
+          select j.id, j.job_number, j.calendar_id, s.id as staff_id, s.full_name as staff_name
             from tk.jobs j
             join tk.calendars c on c.id = j.calendar_id
             join tk.staff s on s.id = c.staff_id
