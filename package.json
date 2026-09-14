@@ -5,7 +5,9 @@
   "type": "module",
   "description": "Loppusiivous.fi — brändi- ja mainosassettien renderöintipipeline (HTML/CSS + Playwright), sama malli kuin AaltoAir.",
   "scripts": {
-    "render": "node scripts/render.mjs"
+    "render": "node scripts/render.mjs",
+    "check": "node scripts/daily-check.mjs",
+    "check:varaus": "node scripts/varaus-testi.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
