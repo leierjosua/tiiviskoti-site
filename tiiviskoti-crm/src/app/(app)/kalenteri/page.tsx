@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { listCalendars, listJobs } from '@/lib/data';
+import { jobUnitCounts, listCalendars, listJobs } from '@/lib/data';
 import {
   addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, todayKey, weekdayShort,
 } from '@/lib/time';
@@ -71,10 +71,12 @@ export default async function WeekPage({
   const from = helsinkiDateTime(monday, '00:00');
   const to = helsinkiDateTime(addDays(monday, 7), '00:00');
 
-  const [jobs, calendars] = await Promise.all([
+  const [jobs, calendars, units] = await Promise.all([
     listJobs(from.toISOString(), to.toISOString()),
     listCalendars(true),
+    jobUnitCounts(from.toISOString(), to.toISOString()),
   ]);
+  const unitsOf = new Map(units.map((u) => [u.job_id, u]));
 
   const colorOf = new Map(calendars.map((c, i) => [c.id, COLORS[i % COLORS.length]]));
   const calToStaff = new Map(calendars.map((c) => [c.id, c.staff_id]));
@@ -105,6 +107,32 @@ export default async function WeekPage({
   const priced = shown.filter((j) => j.price_cents > 0);
   const total = priced.reduce((s, j) => s + j.price_cents, 0);
   const avg = priced.length ? Math.round(total / priced.length) : 0;
+
+  /* Ikkunat ja ovet viikolta, jaettuna tehtyihin ja vielä tuleviin.
+     'done' on ainoa tila joka tarkoittaa tehtyä työtä — kaikki muu
+     (confirmed, tentative, hold) on vielä edessä. */
+  const summa = (pred: (j: (typeof shown)[number]) => boolean) =>
+    shown.filter(pred).reduce(
+      (a, j) => {
+        const u = unitsOf.get(j.id);
+        return { ikkunat: a.ikkunat + (u?.ikkunat ?? 0), ovet: a.ovet + (u?.ovet ?? 0) };
+      },
+      { ikkunat: 0, ovet: 0 },
+    );
+  const tehty = summa((j) => j.status === 'done');
+  const tulossa = summa((j) => j.status !== 'done');
+  const kaikki = { ikkunat: tehty.ikkunat + tulossa.ikkunat, ovet: tehty.ovet + tulossa.ovet };
+
+  /* Keikkalohkon tiivis merkintä: "20 ikk · 2 ovea". Tyhjä kun työllä ei ole
+     rivejä — hallinnasta luodulle työlle niitä ei aina syötetä. */
+  const unitLabel = (jobId: string) => {
+    const u = unitsOf.get(jobId);
+    if (!u) return null;
+    const osat = [];
+    if (u.ikkunat > 0) osat.push(`${u.ikkunat} ikk`);
+    if (u.ovet > 0) osat.push(`${u.ovet} ${u.ovet === 1 ? 'ovi' : 'ovea'}`);
+    return osat.length ? osat.join(' · ') : null;
+  };
 
   const hours = Array.from({ length: DAY_END - DAY_START }, (_, i) => DAY_START + i);
 
@@ -144,13 +172,19 @@ export default async function WeekPage({
       </header>
 
       {/* Viikon yhteenveto — suodattuu valitun asentajan mukaan. */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
         <Metric label="Keikkoja" value={String(shown.length)}
                 sub={selectedName ?? 'tällä viikolla'} />
         <Metric label="Myynti" value={eur(total)} tone="accent"
                 sub={priced.length < shown.length ? `${priced.length}/${shown.length} hinnoiteltu` : 'tällä viikolla'} />
         <Metric label="Keskihinta" value={priced.length ? eur(avg) : '—'}
                 sub="per hinnoiteltu keikka" />
+        {/* Kappalemäärät kertovat viikon työkuorman toisin kuin euro: 20
+            ikkunaa on sama työ oli hinta mikä tahansa. */}
+        <Metric label="Ikkunat" value={String(kaikki.ikkunat)} tone="accent"
+                sub={`${tehty.ikkunat} huollettu · ${tulossa.ikkunat} tulossa`} />
+        <Metric label="Ovet" value={String(kaikki.ovet)} tone="accent"
+                sub={`${tehty.ovet} huollettu · ${tulossa.ovet} tulossa`} />
       </div>
 
       {staff.length > 0 && (
@@ -187,7 +221,16 @@ export default async function WeekPage({
                 </span>
                 <span className="text-xs text-faint tabular">{formatDateKey(day)}</span>
                 <span className="ml-auto text-xs text-faint">
-                  {dayJobs.length === 0 ? '—' : `${dayJobs.length} työtä`}
+                  {dayJobs.length === 0 ? '—' : (() => {
+                    const d = dayJobs.reduce((a, j) => {
+                      const u = unitsOf.get(j.id);
+                      return { i: a.i + (u?.ikkunat ?? 0), o: a.o + (u?.ovet ?? 0) };
+                    }, { i: 0, o: 0 });
+                    const osat = [`${dayJobs.length} työtä`];
+                    if (d.i) osat.push(`${d.i} ikk`);
+                    if (d.o) osat.push(`${d.o} ${d.o === 1 ? 'ovi' : 'ovea'}`);
+                    return osat.join(' · ');
+                  })()}
                 </span>
               </div>
               {dayJobs.length > 0 && (
@@ -199,6 +242,9 @@ export default async function WeekPage({
                         <span className="tabular font-semibold">{timeOf(job.starts_at)}</span>
                         <span className="min-w-0 flex-1 truncate">
                           {job.customer_name ?? job.title}
+                          {unitLabel(job.id) && (
+                            <span className="ml-2 text-xs text-faint">{unitLabel(job.id)}</span>
+                          )}
                         </span>
                         <span className="shrink-0 text-xs text-faint">{job.staff_name}</span>
                       </Link>
@@ -267,6 +313,12 @@ export default async function WeekPage({
                           <div className="truncate opacity-90">
                             {job.customer_name ?? job.title}
                           </div>
+                          {/* Kappalemäärä lohkon sisällä: lyhyt keikka leikkaa
+                              rivin pois (overflow-hidden), eikä se haittaa —
+                              viikkosumma on silti mittareissa. */}
+                          {unitLabel(job.id) && (
+                            <div className="truncate tabular opacity-70">{unitLabel(job.id)}</div>
+                          )}
                         </Link>
                       );
                     })}

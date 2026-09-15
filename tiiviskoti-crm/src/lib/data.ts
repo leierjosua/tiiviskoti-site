@@ -137,6 +137,40 @@ export function listJobs(fromIso: string, toIso: string, staffId?: string | null
   `;
 }
 
+/** Yhden työn ikkuna- ja ovimäärä työriveiltä. */
+export type JobUnits = { job_id: string; ikkunat: number; ovet: number };
+
+/**
+ * Ikkuna- ja ovimäärät annetun aikavälin töiltä.
+ *
+ * Luokittelu tehdään NIMESTÄ, koska `tk.job_lines` ei tallenna hinnaston
+ * tuotetunnusta — hallinnasta luodut rivit ovat vapaata tekstiä. Kaksi
+ * sääntöä pitävät laskennan oikeana, ja molemmat on todennettu oikeasta
+ * datasta:
+ *
+ *   1. Alennusrivit ovat negatiivisia ("Ilmainen ovi" −99 €). Ne rajataan
+ *      pois hinnalla, muuten ilmaiseksi annettu ovi laskettaisiin kahdesti:
+ *      kerran veloitettuna rivinä ja kerran alennuksena.
+ *   2. "Aukipitolaite / 2 per ikkuna" sisältää sanan *ikkuna* mutta ei ole
+ *      ikkuna. Siksi ikkuna täsmätään vain nimen ALUSTA.
+ *
+ * Kynnyskumi lasketaan oveksi: se on oven osa eikä sillä ole omaa lukuaan.
+ */
+export function jobUnitCounts(fromIso: string, toIso: string, staffId?: string | null) {
+  return sql<JobUnits[]>`
+    select jl.job_id,
+           coalesce(sum(jl.quantity) filter (where jl.name ~* '^ikkuna'), 0)::int as ikkunat,
+           coalesce(sum(jl.quantity) filter (where jl.name ~* '(ovi|kynnys)'), 0)::int as ovet
+      from tk.job_lines jl
+      join tk.jobs j on j.id = jl.job_id
+      join tk.calendars c on c.id = j.calendar_id
+     where j.starts_at >= ${fromIso} and j.starts_at < ${toIso}
+       and jl.unit_price_cents > 0
+       ${staffId ? sql`and c.staff_id = ${staffId}` : sql``}
+     group by jl.job_id
+  `;
+}
+
 export async function getJob(id: string) {
   const [job] = await sql<JobRow[]>`
     select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
