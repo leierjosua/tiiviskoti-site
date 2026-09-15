@@ -5,6 +5,7 @@ import {
   addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, todayKey, weekdayShort,
 } from '@/lib/time';
 import { Card, Empty, StatusBadge } from '@/components/ui';
+import { jobUnitCounts, unitLabel, type JobUnits } from '@/lib/data';
 
 /* =========================================================
    Asennusnäkymän kalenteri.
@@ -71,8 +72,9 @@ function Metric({ label, value, sub, tone = 'plain' }: {
 }
 
 /** Rivi listanäkymään ja puhelimeen. */
-function JobLine({ job, showDay }: { job: Job; showDay?: boolean }) {
+function JobLine({ job, showDay, units }: { job: Job; showDay?: boolean; units?: JobUnits }) {
   const address = [job.address, job.postal_code, job.city].filter(Boolean).join(', ');
+  const maara = unitLabel(units);
   return (
     <li>
       <Link href={`/tyot/${job.id}`}
@@ -89,7 +91,10 @@ function JobLine({ job, showDay }: { job: Job; showDay?: boolean }) {
           <div className="mt-1.5"><StatusBadge status={job.status} /></div>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-bold text-text">{job.customer_name ?? job.title}</p>
+          <p className="font-bold text-text">
+            {job.customer_name ?? job.title}
+            {maara && <span className="ml-2 text-sm font-semibold text-accent">{maara}</span>}
+          </p>
           <p className="truncate text-sm text-muted">{job.title}</p>
           <p className="truncate text-sm text-faint">{address || 'Ei osoitetta'}</p>
         </div>
@@ -175,7 +180,7 @@ export default async function AsennusKalenteri({
     j.calendar_id in (select c.id from tk.calendars c where c.staff_id = ${staff.id})
   `;
 
-  const [rows, unbilled] = await Promise.all([
+  const [rows, unbilled, units] = await Promise.all([
     sql<Job[]>`
       select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
              j.address, j.postal_code, j.city, j.price_cents,
@@ -188,7 +193,9 @@ export default async function AsennusKalenteri({
        order by j.starts_at
     `,
     unbilledFor(staff.id, helsinkiDateTime(addDays(today, -180), '00:00').toISOString()),
+    jobUnitCounts(from.toISOString(), to.toISOString(), staff.id),
   ]);
+  const unitsOf = new Map(units.map((u) => [u.job_id, u]));
 
   const needle = query.toLowerCase();
   const shown = rows
@@ -202,6 +209,19 @@ export default async function AsennusKalenteri({
   const avg = priced.length ? Math.round(total / priced.length) : 0;
   const count = (s: Job['status']) => shown.filter((j) => j.status === s).length;
   const bill = unbilled[0] ?? { kpl: 0, arvo: 0 };
+
+  /* Oma viikko kappaleina. Euro ei kerro asentajalle työkuormaa: 20 ikkunaa
+     on sama päivä oli hinta mikä tahansa. */
+  const summa = (pred: (j: Job) => boolean) =>
+    shown.filter(pred).reduce(
+      (a, j) => {
+        const u = unitsOf.get(j.id);
+        return { ikkunat: a.ikkunat + (u?.ikkunat ?? 0), ovet: a.ovet + (u?.ovet ?? 0) };
+      },
+      { ikkunat: 0, ovet: 0 },
+    );
+  const tehty = summa((j) => j.status === 'done');
+  const jaljella = summa((j) => j.status !== 'done');
 
   /* Ruudukon tuntiväli: 07–19 pohjana, levitettynä niin että viikon
      aikaisin alku ja myöhäisin loppu mahtuvat sisään. */
@@ -324,7 +344,7 @@ export default async function AsennusKalenteri({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         <Metric label="Keikat" value={String(shown.length)}
                 sub={`${count('confirmed')} vahv. · ${count('done')} tehty · ${count('tentative')} alustava`} />
         <Metric label="Myynti" value={eur(total)} tone="accent"
@@ -332,6 +352,10 @@ export default async function AsennusKalenteri({
                   ? `${priced.length}/${shown.length} hinnoiteltu`
                   : (searching ? 'hakutuloksista' : 'tällä viikolla')} />
         <Metric label="Keskihinta" value={priced.length ? eur(avg) : '—'} sub="per hinnoiteltu keikka" />
+        <Metric label="Ikkunat" value={String(tehty.ikkunat + jaljella.ikkunat)} tone="accent"
+                sub={`${tehty.ikkunat} tehty · ${jaljella.ikkunat} edessä`} />
+        <Metric label="Ovet" value={String(tehty.ovet + jaljella.ovet)} tone="accent"
+                sub={`${tehty.ovet} tehty · ${jaljella.ovet} edessä`} />
         <Metric label="Laskuttamatta" value={eur(bill.arvo)}
                 sub={`${bill.kpl} valmista keikkaa`} />
       </div>
@@ -344,7 +368,7 @@ export default async function AsennusKalenteri({
           <Empty>{searching ? 'Ei osumia.' : 'Ei keikkoja tällä viikolla.'}</Empty>
         ) : (
           <ul className="divide-y divide-line-soft">
-            {shown.map((job) => <JobLine key={job.id} job={job} showDay />)}
+            {shown.map((job) => <JobLine key={job.id} job={job} showDay units={unitsOf.get(job.id)} />)}
           </ul>
         )}
       </Card>
@@ -403,7 +427,11 @@ export default async function AsennusKalenteri({
                         >
                           <div className="tabular font-bold">{timeOf(job.starts_at)}</div>
                           <div className="truncate font-semibold">{job.customer_name ?? job.title}</div>
-                          <div className="truncate opacity-80">{job.title}</div>
+                          {/* Kappalemäärä työn nimen tilalle: asentajalle "20 ikk"
+                              kertoo päivästä enemmän kuin työn otsikko. */}
+                          <div className="truncate opacity-80">
+                            {unitLabel(unitsOf.get(job.id)) ?? job.title}
+                          </div>
                         </Link>
                       );
                     })}

@@ -137,37 +137,82 @@ export function listJobs(fromIso: string, toIso: string, staffId?: string | null
   `;
 }
 
-/** Yhden työn ikkuna- ja ovimäärä työriveiltä. */
-export type JobUnits = { job_id: string; ikkunat: number; ovet: number };
+/** Yhden työn ikkuna- ja ovimäärä työriveiltä. `ilmaiset` on osajoukko
+ *  vastaavasta kokonaisluvusta, ei sen lisäksi. */
+export type JobUnits = {
+  job_id: string;
+  ikkunat: number; ovet: number;
+  ilmaiset_ikkunat: number; ilmaiset_ovet: number;
+};
 
 /**
  * Ikkuna- ja ovimäärät annetun aikavälin töiltä.
  *
  * Luokittelu tehdään NIMESTÄ, koska `tk.job_lines` ei tallenna hinnaston
- * tuotetunnusta — hallinnasta luodut rivit ovat vapaata tekstiä. Kaksi
- * sääntöä pitävät laskennan oikeana, ja molemmat on todennettu oikeasta
+ * tuotetunnusta — hallinnasta luodut rivit ovat vapaata tekstiä. Kolme
+ * sääntöä pitävät laskennan oikeana, ja kaikki on todennettu oikeasta
  * datasta:
  *
- *   1. Alennusrivit ovat negatiivisia ("Ilmainen ovi" −99 €). Ne rajataan
- *      pois hinnalla, muuten ilmaiseksi annettu ovi laskettaisiin kahdesti:
- *      kerran veloitettuna rivinä ja kerran alennuksena.
- *   2. "Aukipitolaite / 2 per ikkuna" sisältää sanan *ikkuna* mutta ei ole
+ *   1. "Aukipitolaite / 2 per ikkuna" sisältää sanan *ikkuna* muttei ole
  *      ikkuna. Siksi ikkuna täsmätään vain nimen ALUSTA.
+ *   2. Alennusrivit ovat negatiivisia, joten veloitetut kohteet rajataan
+ *      hinnalla (`unit_price_cents > 0`).
+ *   3. ILMAINEN KOHDE lasketaan mukaan — se on tehtyä työtä vaikkei tuo
+ *      euroa — mutta VAIN jos työllä ei ole veloitettua saman lajin riviä.
+ *      Syy: käytännössä ilmainen kirjataan alennuksena jo veloitetulle
+ *      riville (työ 1046: `Ulko-ovi 99 €` + `Ilmainen ovi −99 €` = YKSI
+ *      ovi). Ilman tätä ehtoa sama ovi laskettaisiin kahdesti. Ehto kattaa
+ *      silti sen tapauksen, jossa ilmainen kohde on kirjattu yksinään.
  *
  * Kynnyskumi lasketaan oveksi: se on oven osa eikä sillä ole omaa lukuaan.
  */
+/**
+ * Kappalemäärä lohkoon ja listaan: "20 ikk · 1 ovi (ilmainen)".
+ *
+ * Ilmainen kohde merkitään näkyviin, koska se on tehtyä työtä jolla ei ole
+ * euroa vastassa — sitä ei saa joutua arvailemaan kun keikkoja katsotaan
+ * työkuorman tai palkan näkökulmasta.
+ */
+export function unitLabel(u: JobUnits | undefined): string | null {
+  if (!u) return null;
+  const osa = (n: number, ilmaisia: number, yksi: string, moni: string) => {
+    if (n <= 0) return null;
+    const teksti = `${n} ${n === 1 ? yksi : moni}`;
+    if (ilmaisia <= 0) return teksti;
+    return `${teksti} (${ilmaisia === n ? 'ilmainen' : `${ilmaisia} ilmainen`})`;
+  };
+  const osat = [
+    osa(u.ikkunat, u.ilmaiset_ikkunat, 'ikk', 'ikk'),
+    osa(u.ovet, u.ilmaiset_ovet, 'ovi', 'ovea'),
+  ].filter(Boolean);
+  return osat.length ? osat.join(' · ') : null;
+}
+
 export function jobUnitCounts(fromIso: string, toIso: string, staffId?: string | null) {
   return sql<JobUnits[]>`
-    select jl.job_id,
-           coalesce(sum(jl.quantity) filter (where jl.name ~* '^ikkuna'), 0)::int as ikkunat,
-           coalesce(sum(jl.quantity) filter (where jl.name ~* '(ovi|kynnys)'), 0)::int as ovet
-      from tk.job_lines jl
-      join tk.jobs j on j.id = jl.job_id
-      join tk.calendars c on c.id = j.calendar_id
-     where j.starts_at >= ${fromIso} and j.starts_at < ${toIso}
-       and jl.unit_price_cents > 0
-       ${staffId ? sql`and c.staff_id = ${staffId}` : sql``}
-     group by jl.job_id
+    with rivit as (
+      select jl.job_id,
+             coalesce(sum(jl.quantity) filter (
+               where jl.name ~* '^ikkuna' and jl.unit_price_cents > 0), 0)::int as ikk_maksettu,
+             coalesce(sum(jl.quantity) filter (
+               where jl.name ~* 'ilmain' and jl.name ~* 'ikkuna'), 0)::int as ikk_ilmainen,
+             coalesce(sum(jl.quantity) filter (
+               where jl.name ~* '(ovi|kynnys)' and jl.unit_price_cents > 0), 0)::int as ovi_maksettu,
+             coalesce(sum(jl.quantity) filter (
+               where jl.name ~* 'ilmain' and jl.name ~* '(ovi|kynnys)'), 0)::int as ovi_ilmainen
+        from tk.job_lines jl
+        join tk.jobs j on j.id = jl.job_id
+        join tk.calendars c on c.id = j.calendar_id
+       where j.starts_at >= ${fromIso} and j.starts_at < ${toIso}
+         ${staffId ? sql`and c.staff_id = ${staffId}` : sql``}
+       group by jl.job_id
+    )
+    select job_id,
+           ikk_maksettu + case when ikk_maksettu = 0 then ikk_ilmainen else 0 end as ikkunat,
+           ovi_maksettu + case when ovi_maksettu = 0 then ovi_ilmainen else 0 end as ovet,
+           case when ikk_maksettu = 0 then ikk_ilmainen else 0 end as ilmaiset_ikkunat,
+           case when ovi_maksettu = 0 then ovi_ilmainen else 0 end as ilmaiset_ovet
+      from rivit
   `;
 }
 

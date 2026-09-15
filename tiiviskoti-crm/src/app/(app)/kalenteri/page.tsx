@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { jobUnitCounts, listCalendars, listJobs } from '@/lib/data';
+import { jobUnitCounts, listCalendars, listJobs, unitLabel } from '@/lib/data';
 import {
   addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, todayKey, weekdayShort,
 } from '@/lib/time';
@@ -123,16 +123,9 @@ export default async function WeekPage({
   const tulossa = summa((j) => j.status !== 'done');
   const kaikki = { ikkunat: tehty.ikkunat + tulossa.ikkunat, ovet: tehty.ovet + tulossa.ovet };
 
-  /* Keikkalohkon tiivis merkintä: "20 ikk · 2 ovea". Tyhjä kun työllä ei ole
-     rivejä — hallinnasta luodulle työlle niitä ei aina syötetä. */
-  const unitLabel = (jobId: string) => {
-    const u = unitsOf.get(jobId);
-    if (!u) return null;
-    const osat = [];
-    if (u.ikkunat > 0) osat.push(`${u.ikkunat} ikk`);
-    if (u.ovet > 0) osat.push(`${u.ovet} ${u.ovet === 1 ? 'ovi' : 'ovea'}`);
-    return osat.length ? osat.join(' · ') : null;
-  };
+  /* Keikkalohkon tiivis merkintä. Tyhjä kun työllä ei ole rivejä —
+     hallinnasta luodulle työlle niitä ei aina syötetä. */
+  const merkinta = (jobId: string) => unitLabel(unitsOf.get(jobId));
 
   const hours = Array.from({ length: DAY_END - DAY_START }, (_, i) => DAY_START + i);
 
@@ -242,8 +235,8 @@ export default async function WeekPage({
                         <span className="tabular font-semibold">{timeOf(job.starts_at)}</span>
                         <span className="min-w-0 flex-1 truncate">
                           {job.customer_name ?? job.title}
-                          {unitLabel(job.id) && (
-                            <span className="ml-2 text-xs text-faint">{unitLabel(job.id)}</span>
+                          {merkinta(job.id) && (
+                            <span className="ml-2 text-xs text-faint">{merkinta(job.id)}</span>
                           )}
                         </span>
                         <span className="shrink-0 text-xs text-faint">{job.staff_name}</span>
@@ -316,8 +309,8 @@ export default async function WeekPage({
                           {/* Kappalemäärä lohkon sisällä: lyhyt keikka leikkaa
                               rivin pois (overflow-hidden), eikä se haittaa —
                               viikkosumma on silti mittareissa. */}
-                          {unitLabel(job.id) && (
-                            <div className="truncate tabular opacity-70">{unitLabel(job.id)}</div>
+                          {merkinta(job.id) && (
+                            <div className="truncate tabular opacity-70">{merkinta(job.id)}</div>
                           )}
                         </Link>
                       );
