@@ -112,6 +112,28 @@ export function isoWeekday(dateKey: string): number {
   return dow === 0 ? 7 : dow;
 }
 
+/**
+ * Päiväavain n TYÖPÄIVÄÄ eteenpäin (ma–pe).
+ *
+ * Varausikkuna lasketaan työpäivinä eikä kalenteripäivinä, jotta "kuukausi
+ * eteenpäin" tarkoittaa samaa riippumatta siitä osuuko jakso viikonlopun
+ * yli. Arkipyhiä ei huomioida — ne ovat kalenterikohtaisia poikkeuksia
+ * (`tk.calendar_exceptions`), eikä niitä tunneta tässä puhtaassa funktiossa.
+ *
+ * `n = 0` palauttaa lähtöpäivän sellaisenaan. Lähtöpäivä ei kuluta
+ * työpäivää, vaikka se olisi arkipäivä: laskenta on "n työpäivää TÄSTÄ
+ * eteenpäin".
+ */
+export function addWorkdays(dateKey: string, n: number): string {
+  let day = dateKey;
+  let left = n;
+  while (left > 0) {
+    day = addDays(day, 1);
+    if (isoWeekday(day) <= 5) left--;
+  }
+  return day;
+}
+
 /** Päiväavain n päivää eteenpäin. Kalenteripäivää siirretään UTC-keskipäivän
  *  kautta, jottei kesäaika koskaan hyppää päivän yli. */
 export function addDays(dateKey: string, days: number): string {

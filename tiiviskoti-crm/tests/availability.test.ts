@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { freeSlots, type CalendarException, type WeeklyHour } from '../src/lib/availability';
-import { dateKeyOf, helsinkiDateTime, timeOf } from '../src/lib/time';
+import { addWorkdays, dateKeyOf, helsinkiDateTime, timeOf } from '../src/lib/time';
 
 /* Kaikki testit antavat `now`:n itse, joten tulokset eivät riipu
    ajohetkestä. Kellonajat tarkistetaan Suomen aikana — se on se mitä
@@ -109,6 +109,29 @@ describe('freeSlots', () => {
     });
     const days = new Set(slots.map((s) => dateKeyOf(s.start)));
     expect([...days].sort()).toEqual(['2026-08-03', '2026-08-04', '2026-08-05']);
+  });
+
+  /* Varausikkuna on TYÖPÄIVIÄ, ei kalenteripäiviä. Perjantailta katsottuna
+     kahden kalenteripäivän ikkuna olisi la–su eli käytännössä tyhjä; kahden
+     työpäivän ikkuna ulottuu tiistaihin. */
+  it('horisontti lasketaan työpäivinä viikonlopun yli', () => {
+    const slots = freeSlots({
+      hours: MON_FRI_8_16, exceptions: [], busy: [], durationMinutes: 120,
+      now: helsinkiDateTime('2026-08-07', '00:00'),   // perjantai
+      until: helsinkiDateTime('2026-12-31', '00:00'),
+      settings: { ...settings, horizonDays: 2 },
+    });
+    const days = new Set(slots.map((s) => dateKeyOf(s.start)));
+    expect([...days].sort()).toEqual(['2026-08-07', '2026-08-10', '2026-08-11']);
+  });
+
+  it('addWorkdays hyppää viikonlopun yli eikä laske lähtöpäivää', () => {
+    expect(addWorkdays('2026-08-07', 0)).toBe('2026-08-07'); // pe, ei siirtoa
+    expect(addWorkdays('2026-08-07', 1)).toBe('2026-08-10'); // pe -> ma
+    expect(addWorkdays('2026-08-07', 3)).toBe('2026-08-12'); // pe -> ke
+    expect(addWorkdays('2026-08-08', 1)).toBe('2026-08-10'); // la -> ma
+    // 22 työpäivää ~ kuukausi: 16.9.2026 (ke) -> 16.10.2026 (pe)
+    expect(addWorkdays('2026-09-16', 22)).toBe('2026-10-16');
   });
 
   it('kellonaika pysyy samana kesä- ja talviajassa', () => {

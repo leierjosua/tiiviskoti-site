@@ -70,7 +70,10 @@ export function CalendarSettingsForm({ calendar }: {
           <Input name="leadTimeHours" type="number" min={0} max={2000}
                  defaultValue={calendar.lead_time_hours} required />
         </Field>
-        <Field label="Kalenteri auki" hint="vrk">
+        {/* Työpäivinä eikä kalenteripäivinä: "kuukausi eteenpäin" tarkoittaa
+            samaa määrää varattavia päiviä riippumatta siitä montako
+            viikonloppua jaksoon osuu. 22 työpäivää ~ 1 kk. */}
+        <Field label="Kalenteri auki" hint="työpäivää (ma–pe)">
           <Input name="horizonDays" type="number" min={1} max={365}
                  defaultValue={calendar.horizon_days} required />
         </Field>

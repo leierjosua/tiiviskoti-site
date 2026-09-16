@@ -37,7 +37,7 @@ export default async function CalendarsPage() {
                     <span className="truncate text-muted sm:w-40 sm:shrink-0">{cal.staff_name}</span>
                     <span className="text-xs text-faint tabular sm:flex-1">
                       {cal.slot_minutes} min välein · aikaisintaan {cal.lead_time_hours} h päästä ·{' '}
-                      {cal.horizon_days} vrk eteenpäin
+                      {cal.horizon_days} työpäivää eteenpäin
                     </span>
                     {!cal.active && <span className="text-xs text-faint">pois käytöstä</span>}
                   </Link>

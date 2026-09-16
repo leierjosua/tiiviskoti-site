@@ -7,7 +7,7 @@
    viikkoaikataulun laajentamiseen.
    ========================================================= */
 
-import { addDays, dateKeyOf, helsinkiDateTime, isoWeekday } from './time';
+import { addDays, addWorkdays, dateKeyOf, helsinkiDateTime, isoWeekday } from './time';
 
 export type WeeklyHour = {
   weekday: number;      // 1=ma … 7=su
@@ -27,6 +27,7 @@ export type Interval = { start: Date; end: Date };
 export type CalendarSettings = {
   slotMinutes: number;
   leadTimeHours: number;
+  /** Varausikkunan pituus TYÖPÄIVINÄ (ma–pe), ei kalenteripäivinä. */
   horizonDays: number;
 };
 
@@ -167,8 +168,14 @@ export function freeSlots(input: FreeSlotsInput): Interval[] {
   if (durationMinutes <= 0) return [];
 
   const earliest = new Date(now.getTime() + settings.leadTimeHours * 60 * MIN);
+  /* Varausikkuna lasketaan TYÖPÄIVINÄ. Kalenteripäivinä "kuukausi eteenpäin"
+     tarkoittaa eri asiaa riippuen siitä montako viikonloppua jaksoon osuu;
+     työpäivinä se on aina sama määrä varattavia päiviä.
+
+     Loppuraja on viimeisen työpäivän LOPPU, siksi +1 kalenteripäivä sen
+     päälle — muuten viimeisen päivän ajat jäisivät tarjoamatta. */
   const horizonEnd = helsinkiDateTime(
-    addDays(dateKeyOf(now), settings.horizonDays + 1), '00:00',
+    addDays(addWorkdays(dateKeyOf(now), settings.horizonDays), 1), '00:00',
   );
   const latest = until < horizonEnd ? until : horizonEnd;
   if (latest <= earliest) return [];
