@@ -130,6 +130,62 @@ export async function saveJobPhoto(
   return null;
 }
 
+/* ---------- suora lataus selaimesta ---------- */
+
+/**
+ * Latauskohde yhdelle kuvalle: polku ja allekirjoitettu osoite.
+ *
+ * MIKSI TÄMÄ ON OLEMASSA: kuva EI kulje palvelimen kautta. Server actionin
+ * rungolle on Next.js:ssä oletusraja 1 MB ja Vercelin funktiolla oma
+ * kattonsa, ja puhelimen kamerakuva on 2–8 MB. Lopputulos oli että lataus
+ * epäonnistui hiljaa: pieni kuva meni läpi, iso ei tuottanut edes
+ * virheilmoitusta. Selain lataa nyt suoraan Storageen, jolloin kumpikaan
+ * raja ei ole tiellä.
+ *
+ * Allekirjoitus on kertakäyttöinen ja koskee vain tätä polkua, joten se ei
+ * anna oikeutta muuhun ämpärin sisältöön.
+ */
+export async function createPhotoUpload(
+  jobId: string, contentType: string,
+): Promise<{ error: string } | { path: string; token: string }> {
+  if (!adminAuthConfigured()) return { error: 'SUPABASE_SECRET_KEY puuttuu — kuvia ei voi tallentaa.' };
+  if (!SALLITUT.has(contentType)) return { error: 'vain kuvatiedostot käyvät' };
+
+  const path = `job/${jobId}/${randomUUID()}.${EXT[contentType] ?? 'jpg'}`;
+  const { data, error } = await supabaseAdmin().storage.from(BUCKET).createSignedUploadUrl(path);
+  if (error || !data) return { error: error?.message ?? 'allekirjoitus epäonnistui' };
+  return { path, token: data.token };
+}
+
+/**
+ * Kirjaa ladatun kuvan riviksi.
+ *
+ * Polku tarkistetaan kuuluvaksi TÄLLE työlle: `confirm` on oma
+ * päätepisteensä, ja ilman tarkistusta sillä voisi liittää työhön minkä
+ * tahansa ämpärin tiedoston.
+ */
+export async function recordJobPhoto(
+  jobId: string, path: string, staffId: string | null,
+): Promise<string | null> {
+  if (!path.startsWith(`job/${jobId}/`)) return 'Kuvan polku ei kuulu tähän työhön.';
+  try {
+    await sql`
+      insert into tk.job_photos (job_id, path, sort_order, created_by)
+      values (
+        ${jobId}::uuid, ${path},
+        coalesce((select max(sort_order) + 1 from tk.job_photos where job_id = ${jobId}::uuid), 0),
+        ${staffId}
+      )
+    `;
+  } catch (e) {
+    /* Rivi jäi syntymättä: poistetaan tiedosto, ettei ämpäriin jää orpoa. */
+    if (adminAuthConfigured()) await supabaseAdmin().storage.from(BUCKET).remove([path]).catch(() => {});
+    if (missingTable(e)) return 'Tietokannasta puuttuu taulu — aja db/028_job_photos.sql.';
+    throw e;
+  }
+  return null;
+}
+
 /** Poista kuva: ensin rivi, sitten tiedosto. Orpo tiedosto on
  *  vaarattomampi kuin rivi joka osoittaa tyhjään. */
 export async function removeJobPhoto(id: string): Promise<void> {

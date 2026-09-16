@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { ownsJob, requireStaff } from '@/lib/session';
-import { photoJobId, removeJobPhoto, saveJobPhoto, setJobPhotoCaption } from '@/lib/photos';
+import { createPhotoUpload, photoJobId, recordJobPhoto, removeJobPhoto, setJobPhotoCaption } from '@/lib/photos';
 
 /* =========================================================
    Työn kuvien palvelinactionit.
@@ -17,31 +17,33 @@ import { photoJobId, removeJobPhoto, saveJobPhoto, setJobPhotoCaption } from '@/
 
 export type PhotoState = { error?: string; ok?: string };
 
-export async function uploadJobPhotos(
-  _prev: PhotoState, formData: FormData,
+/**
+ * Latauslupa yhdelle kuvalle.
+ *
+ * Kuva EI kulje tämän läpi — selain lataa sen suoraan Storageen. Täältä
+ * tulee vain polku ja kertakäyttöinen allekirjoitus. Syy on kova raja:
+ * server actionin runko on Next.js:ssä oletuksena 1 MB, ja puhelimen
+ * kamerakuva on moninkertainen. Aiemmin iso kuva epäonnistui HILJAA, ilman
+ * mitään virheilmoitusta käyttäjälle.
+ */
+export async function prepareJobPhoto(
+  jobId: string, contentType: string,
+): Promise<{ error: string } | { path: string; token: string }> {
+  const staff = await requireStaff();
+  if (!(await ownsJob(staff, jobId))) return { error: 'Työtä ei löytynyt.' };
+  return createPhotoUpload(jobId, contentType);
+}
+
+/** Kirjaa selaimen lataaman kuvan riviksi. Polun kuuluminen työhön
+ *  tarkistetaan `recordJobPhoto`:ssa. */
+export async function confirmJobPhoto(
+  jobId: string, path: string,
 ): Promise<PhotoState> {
   const staff = await requireStaff();
-  const jobId = String(formData.get('jobId') ?? '');
   if (!(await ownsJob(staff, jobId))) return { error: 'Työtä ei löytynyt.' };
-
-  const files = formData.getAll('kuvat').filter((f): f is File => f instanceof File && f.size > 0);
-  if (files.length === 0) return { error: 'Valitse ainakin yksi kuva.' };
-
-  /* Yksi epäonnistunut kuva ei saa kaataa muita: kymmenen kuvan erästä
-     yksi HEIC-jättiläinen jättäisi loputkin lataamatta. Viat kerätään
-     ja kerrotaan yhdessä. */
-  const viat: string[] = [];
-  let onnistui = 0;
-  for (const file of files) {
-    const virhe = await saveJobPhoto(jobId, file, staff.id);
-    if (virhe) viat.push(virhe); else onnistui++;
-  }
-
+  const virhe = await recordJobPhoto(jobId, path, staff.id);
   revalidatePath(`/tyot/${jobId}`);
-  if (viat.length > 0) {
-    return { error: viat.join(' '), ok: onnistui > 0 ? `${onnistui} kuvaa tallennettu.` : undefined };
-  }
-  return { ok: `${onnistui} kuva${onnistui === 1 ? '' : 'a'} tallennettu.` };
+  return virhe ? { error: virhe } : { ok: 'Kuva tallennettu.' };
 }
 
 export async function deleteJobPhoto(formData: FormData) {
