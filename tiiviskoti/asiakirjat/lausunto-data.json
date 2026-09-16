@@ -1,0 +1,14 @@
+{
+  "numero": "L-0001",
+  "paivays": "",
+  "tarkastuspaiva": "",
+  "paikka": "",
+  "tarkastaja": { "nimi": "", "asema": "TiivisKoti" },
+  "kohde": { "taloyhtio": "", "osoite": "", "huoneisto": "" },
+  "tilaaja": "",
+  "vastaanottaja": "Isännöitsijä ja hallitus",
+  "ikkunoita": "",
+  "havainto": "Huoneiston ikkunoiden tiivisteet ovat kauttaaltaan kuluneet loppuun. Tiiviste on menettänyt joustonsa eikä enää palaudu puristuksesta, joten se ei tiivistä puitteen ja karmin väliä. Vastaavaa kuntoa ei ollut yksittäisissä ikkunoissa vaan huoneiston kaikissa ikkunoissa.",
+  "suositus": "Suosittelemme huoneiston kaikkien ikkunoiden tiivisteiden uusimista. Työ tehdään yhdellä käynnillä eikä se edellytä ikkunoiden vaihtamista, koska puitteet ja karmit ovat ehjät.",
+  "huomiot": ""
+}
