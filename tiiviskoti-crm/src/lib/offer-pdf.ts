@@ -236,10 +236,14 @@ export async function generateOfferPdf(input: OfferInput): Promise<Uint8Array> {
      viesti, ja vakiotekstin alle jäädessään se luettaisiin pikkupränttinä. */
   if (input.customerNote) {
     const wrapped = wrap(input.customerNote, font, 10, width - margin * 2);
-    /* Katkaistaan jos teksti ei mahdu: mieluummin lyhennetty saateteksti
-       kuin tarjous jonka rivit työntyvät toiselle sivulle saatteen alta.
-       2000 merkin raja tekee tästä harvinaisen. */
-    const MAX_LINES = 12;
+    /* Katkaisu on viimeinen suoja absurdia syötettä vastaan, ei asettelun
+       rajoite: saate piirretään vasta rivien ja summien JÄLKEEN, ja `ensure`
+       lisää tarvittaessa uuden sivun — tarjouksen rivit eivät siis voi
+       työntyä saatteen alta.
+
+       Raja oli 12 riviä, mikä katkaisi tavallisen nelikappaleisen saatteen
+       kesken lausetta ("…vahvistete…"). Se näkyi asiakkaalle asti. */
+    const MAX_LINES = 40;
     const shown = wrapped.slice(0, MAX_LINES);
     if (wrapped.length > MAX_LINES) shown[MAX_LINES - 1] = shown[MAX_LINES - 1].slice(0, 80) + '…';
 
