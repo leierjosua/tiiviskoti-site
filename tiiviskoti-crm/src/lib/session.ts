@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
@@ -20,7 +21,9 @@ export type Staff = {
   role: 'owner' | 'admin' | 'installer';
 };
 
-export async function supabaseServer() {
+/* `cache()` deduplikoi kutsun YHDEN pyynnön sisällä. Ilman sitä jokainen
+   `currentStaff()` rakensi oman clientinsä ja teki oman verkkokutsunsa. */
+export const supabaseServer = cache(async function supabaseServer() {
   const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,7 +41,7 @@ export async function supabaseServer() {
       },
     },
   );
-}
+});
 
 /**
  * Kirjautunut työntekijä, tai null.
@@ -47,7 +50,21 @@ export async function supabaseServer() {
  * kutsuttaessa tiedetään vain sähköposti, `user_id` täytetään vasta kun
  * henkilö oikeasti kirjautuu.
  */
-export async function currentStaff(): Promise<Staff | null> {
+/* VÄLIMUISTITETTU PYYNNÖN AJAKSI — tämä oli adminin hitauden syy.
+
+   `supabase.auth.getUser()` ei pura JWT:tä paikallisesti vaan tekee
+   verkkokutsun Supabasen auth-palvelimelle. Sama kutsu ajettiin joka
+   sivulatauksella vähintään kolmesti: middlewaressa, layoutissa ja
+   sivulla — ja moni sivu kutsuu vielä `requireManager()`:ia päälle.
+   Jokainen kierros oli auth-kutsu + `tk.staff`-kysely, kaikki peräkkäin.
+   Kanta ei ollut koskaan pullonkaula (34 työtä, 27 liidiä); odotus oli
+   lähes kokonaan tätä.
+
+   `cache()` deduplikoi kutsun yhden pyynnön renderöinnin ajaksi, joten
+   kutsuja voi olla koodissa montakin mutta verkkokutsu tehdään kerran.
+   Suojaus ei löysty: server actionit ja jokainen uusi pyyntö ovat oma
+   renderöintinsä, joten tunnistus tarkistetaan niissä yhä uudestaan. */
+export const currentStaff = cache(async function currentStaff(): Promise<Staff | null> {
   const supabase = await supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.email) return null;
@@ -73,7 +90,7 @@ export async function currentStaff(): Promise<Staff | null> {
   }
 
   return { id: row.id, email: row.email, fullName: row.full_name, role: row.role };
-}
+});
 
 export async function requireStaff(): Promise<Staff> {
   const staff = await currentStaff();

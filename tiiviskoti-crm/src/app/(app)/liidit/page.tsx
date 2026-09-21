@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
@@ -17,26 +18,6 @@ type Lead = {
 
 export default async function LeadsPage() {
   await requireManager();
-
-  /* Metan liidit haetaan myös sivua avattaessa, ei pelkän cronin varassa:
-     Vercelin Hobby-tili sallii vain päivittäisen ajon, ja vuorokauden
-     vanha liidi on käytännössä menetetty. Tämä on se hetki jolloin
-     liidejä oikeasti katsotaan, joten haku kannattaa tehdä tässä.
-     Virhe ei saa estää sivun näyttämistä — kannassa olevat liidit ovat
-     tärkeämpiä kuin Metan uusimmat. */
-  /* Tuonnin tulos otetaan talteen ja NÄYTETÄÄN. Aiemmin virhe vain
-     niellään: importMetaLeads palauttaa vian virhekenttänä eikä heitä
-     poikkeusta, joten catch ei laukea, ja sivu näytti normaalilta samalla
-     kun yhtään liidiä ei tullut perille. Se jäi huomaamatta kolmeksi
-     päiväksi. Nyt vika lukee sivun yläreunassa. */
-  let tuontiVirhe: string | null = null;
-  try {
-    const tulos = await importMetaLeads();
-    if (tulos.error) tuontiVirhe = tulos.error;
-  } catch (e) {
-    tuontiVirhe = e instanceof Error ? e.message : String(e);
-  }
-  if (tuontiVirhe) console.error('liidit: Metan liidien haku epäonnistui', tuontiVirhe);
 
   const leads = await sql<Lead[]>`
     select id, full_name, email, phone, postal_code, city, message, status, created_at
@@ -63,14 +44,11 @@ export default async function LeadsPage() {
         </p>
       </header>
 
-      {/* Metan haku on hiljainen taustatoiminto: jos se ei toimi, sivu
-          näyttää muuten täysin normaalilta ja liidit jäävät Metaan. */}
-      {tuontiVirhe && (
-        <ErrorNote>
-          Metan liidien haku ei onnistunut: {tuontiVirhe}. Alla olevat liidit ovat kannasta —
-          Metassa voi olla uudempia, jotka eivät ole tulleet perille.
-        </ErrorNote>
-      )}
+      {/* Metan haku EI enää blokkaa sivua. Se striimataan omana palanaan,
+          joten liidilista piirtyy heti ja hakutulos ilmestyy kun se valmistuu. */}
+      <Suspense fallback={null}>
+        <MetanHaku />
+      </Suspense>
 
       {demand.length > 0 && (
         <Card className="overflow-x-auto">
@@ -155,4 +133,51 @@ export default async function LeadsPage() {
       </Card>
     </div>
   );
+}
+
+/* Metan liidien haku — omana striimattuna palanaan.
+
+   MIKSI EI ENÄÄ SUORAAN RENDERÖINNISSÄ: `importMetaLeads()` alkaa
+   Graphin `/me/accounts`-kutsulla, joka mitattiin 21.9.2026 **2,1
+   sekunniksi**. Se ajettiin ennen liidilistaa, joten koko sivu odotti
+   Metaa joka avauksella — se oli adminin selvästi hitain yksittäinen
+   kohta.
+
+   Alkuperäinen perustelu ("Vercelin Hobby sallii vain päivittäisen
+   ajon") on vanhentunut: haku ajetaan pg_cronilla 5 min välein, mikä
+   näkyy siinä että Meta-liidejä saapuu kantaan ympäri vuorokauden
+   (04:20, 01:10, 21:50) ilman että kukaan avaa tätä sivua.
+
+   Haku tehdään silti sivua avattaessa, koska virheen näkyminen on
+   arvokasta: hiljainen vika jäi kerran huomaamatta kolmeksi päiväksi.
+   Ero on vain se, ettei liidilista enää odota sitä. Tässä haussa
+   löytyneet uudet liidit näkyvät listassa seuraavalla latauksella,
+   joten se sanotaan ääneen. */
+async function MetanHaku() {
+  let virhe: string | null = null;
+  let uusia = 0;
+  try {
+    const tulos = await importMetaLeads();
+    if (tulos.error) virhe = tulos.error;
+    else uusia = tulos.imported;
+  } catch (e) {
+    virhe = e instanceof Error ? e.message : String(e);
+  }
+  if (virhe) {
+    console.error('liidit: Metan liidien haku epäonnistui', virhe);
+    return (
+      <ErrorNote>
+        Metan liidien haku ei onnistunut: {virhe}. Alla olevat liidit ovat kannasta —
+        Metassa voi olla uudempia, jotka eivät ole tulleet perille.
+      </ErrorNote>
+    );
+  }
+  if (uusia > 0) {
+    return (
+      <ErrorNote>
+        Metasta haettiin {uusia} uutta liidiä. Päivitä sivu, niin ne tulevat listaan.
+      </ErrorNote>
+    );
+  }
+  return null;
 }
