@@ -237,6 +237,37 @@ export async function getJob(id: string) {
   return job ?? null;
 }
 
+/**
+ * Avoimet laskut: lasku lähetetty, maksua ei ole kirjattu.
+ *
+ * EI RAJATTU AIKAJAKSOON, toisin kuin `listJobs`. Neljä kuukautta vanha
+ * maksamaton lasku on nimenomaan se jonka pitää näkyä — jos tämäkin
+ * näyttäisi vain "viimeiset 120 päivää", vanhin ja pahin tapaus katoaisi
+ * juuri kun se alkaa olla oikeasti myöhässä.
+ *
+ * Järjestys on vanhin ensin: lista on tekemättömien töiden jono, ja
+ * kärjessä kuuluu olla se jota on odotettu pisimpään.
+ */
+export function listOpenInvoices(staffId?: string | null) {
+  return sql<JobRow[]>`
+    select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
+           j.address, j.postal_code, j.city, j.price_cents, j.notes, j.source, j.campaign,
+           j.invoiced_at, j.paid,
+           j.calendar_id, c.name as calendar_name, s.full_name as staff_name,
+           j.customer_id, cu.full_name as customer_name,
+           cu.email as customer_email, cu.phone as customer_phone
+      from tk.jobs j
+      join tk.calendars c on c.id = j.calendar_id
+      join tk.staff s on s.id = c.staff_id
+      left join tk.customers cu on cu.id = j.customer_id
+     where j.invoiced_at is not null
+       and not j.paid
+       and j.status <> 'cancelled'
+       ${staffId ? sql`and c.staff_id = ${staffId}` : sql``}
+     order by j.invoiced_at asc
+  `;
+}
+
 /* ---------- vapaat ajat ---------- */
 
 /** Poistaa vanhentuneet hold-varaukset. Ajetaan ennen jokaista

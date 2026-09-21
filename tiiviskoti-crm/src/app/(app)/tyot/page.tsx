@@ -1,17 +1,33 @@
 import Link from 'next/link';
-import { listJobs } from '@/lib/data';
+import { listJobs, listOpenInvoices } from '@/lib/data';
 import { requireStaff, viewMode } from '@/lib/session';
 import { addDays, dateKeyOf, formatDateKey, helsinkiDateTime, timeOf } from '@/lib/time';
 import { Card, CardHeader, Empty, StatusBadge, jobBadge } from '@/components/ui';
 
 export const dynamic = 'force-dynamic';
 
+/* Kolme näkymää samaan listaan. Kaksi ensimmäistä ovat aikajaksoja,
+   kolmas on suodatin: "lasku lähetetty, maksua ei ole kirjattu".
+
+   Laskuja EI rajata aikajaksoon (ks. listOpenInvoices) — vanhin
+   maksamaton on juuri se joka pitää nähdä. */
 const RANGES = {
   tulevat: { label: 'Tulevat', from: 0, to: 120 },
   menneet: { label: 'Menneet', from: -120, to: 0 },
 } as const;
 
+const TABS = ['tulevat', 'menneet', 'laskut'] as const;
+const TAB_LABELS: Record<Tab, string> = {
+  tulevat: 'Tulevat', menneet: 'Menneet', laskut: 'Lasku lähetetty',
+};
+
 type RangeKey = keyof typeof RANGES;
+type Tab = (typeof TABS)[number];
+
+/** Kuinka monta vuorokautta laskun lähetyksestä on kulunut. */
+function paiviaSitten(d: Date): number {
+  return Math.max(0, Math.floor((Date.now() - new Date(d).getTime()) / 86_400_000));
+}
 
 export default async function JobsPage({
   searchParams,
@@ -24,22 +40,39 @@ export default async function JobsPage({
   const staff = await requireStaff();
   const asennus = await viewMode(staff) === 'asennus';
   const { jakso } = await searchParams;
-  const key: RangeKey = jakso === 'menneet' ? 'menneet' : 'tulevat';
-  const range = RANGES[key];
+  const key: Tab = (TABS as readonly string[]).includes(jakso ?? '') ? (jakso as Tab) : 'tulevat';
+  const oma = asennus ? staff.id : null;
 
-  const today = dateKeyOf(new Date());
-  const from = helsinkiDateTime(addDays(today, range.from), '00:00');
-  const to = helsinkiDateTime(addDays(today, range.to), '00:00');
+  let ordered;
+  if (key === 'laskut') {
+    ordered = await listOpenInvoices(oma);
+  } else {
+    const range = RANGES[key as RangeKey];
+    const today = dateKeyOf(new Date());
+    const from = helsinkiDateTime(addDays(today, range.from), '00:00');
+    const to = helsinkiDateTime(addDays(today, range.to), '00:00');
+    const jobs = await listJobs(from.toISOString(), to.toISOString(), oma);
+    ordered = key === 'menneet' ? [...jobs].reverse() : jobs;
+  }
 
-  const jobs = await listJobs(from.toISOString(), to.toISOString(), asennus ? staff.id : null);
-  const ordered = key === 'menneet' ? [...jobs].reverse() : jobs;
+  /* Avoimien laskujen summa on se luku jota tällä sivulla oikeasti
+     katsotaan: montako euroa on ulkona. */
+  const avoinnaCents = key === 'laskut'
+    ? ordered.reduce((a, j) => a + j.price_cents, 0)
+    : 0;
 
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-[22px] font-extrabold tracking-tight text-text">Työt</h1>
-          <p className="text-sm text-muted">{ordered.length} työtä</p>
+          <p className="text-sm text-muted">
+            {key === 'laskut'
+              ? ordered.length === 0
+                ? 'Ei avoimia laskuja'
+                : `${ordered.length} avointa laskua · ${(avoinnaCents / 100).toLocaleString('fi-FI')} € ulkona`
+              : `${ordered.length} työtä`}
+          </p>
         </div>
         {/* Varauksen tekeminen on toimiston työtä: asennusnäkymässä nappi
             johtaisi sivulle jota `requireManager` ei päästä auki. */}
@@ -58,7 +91,7 @@ export default async function JobsPage({
           title="Varaukset"
           action={
             <div className="flex gap-1 text-xs">
-              {(Object.keys(RANGES) as RangeKey[]).map((r) => (
+              {TABS.map((r) => (
                 <Link
                   key={r}
                   href={`/tyot?jakso=${r}`}
@@ -68,7 +101,7 @@ export default async function JobsPage({
                       : 'rounded px-2 py-1 text-muted hover:text-text'
                   }
                 >
-                  {RANGES[r].label}
+                  {TAB_LABELS[r]}
                 </Link>
               ))}
             </div>
@@ -76,7 +109,11 @@ export default async function JobsPage({
         />
 
         {ordered.length === 0 ? (
-          <Empty>Ei töitä tällä jaksolla.</Empty>
+          <Empty>
+            {key === 'laskut'
+              ? 'Ei avoimia laskuja — kaikki lähetetyt laskut on merkitty maksetuiksi.'
+              : 'Ei töitä tällä jaksolla.'}
+          </Empty>
         ) : (
           <>
             {/* Puhelin: korttilista. Taulukko oli 640 px leveä ja vaati
@@ -102,6 +139,15 @@ export default async function JobsPage({
                       <span className="tabular">{job.job_number}</span>
                       <span>·</span>
                       <span className="truncate">{job.staff_name}</span>
+                      {/* Laskunäkymässä olennaisin luku on odotusaika, ei työn päivä. */}
+                      {key === 'laskut' && job.invoiced_at && (
+                        <>
+                          <span>·</span>
+                          <span className={paiviaSitten(job.invoiced_at) >= 14 ? 'text-warn' : undefined}>
+                            lasku {paiviaSitten(job.invoiced_at)} vrk sitten
+                          </span>
+                        </>
+                      )}
                     </div>
                   </Link>
                 </li>
@@ -112,7 +158,7 @@ export default async function JobsPage({
             <thead>
               <tr className="border-b border-line text-left text-xs text-faint">
                 <th className="px-4 py-2 font-medium">Numero</th>
-                <th className="px-4 py-2 font-medium">Päivä</th>
+                <th className="px-4 py-2 font-medium">{key === 'laskut' ? 'Lasku lähetetty' : 'Päivä'}</th>
                 <th className="px-4 py-2 font-medium">Aika</th>
                 <th className="px-4 py-2 font-medium">Asiakas</th>
                 <th className="px-4 py-2 font-medium">Osoite</th>
@@ -129,7 +175,17 @@ export default async function JobsPage({
                     </Link>
                   </td>
                   <td className="px-4 py-2.5 text-muted tabular">
-                    {formatDateKey(dateKeyOf(job.starts_at))}
+                    {key === 'laskut' && job.invoiced_at ? (
+                      <>
+                        {formatDateKey(dateKeyOf(job.invoiced_at))}
+                        {' '}
+                        <span className={paiviaSitten(job.invoiced_at) >= 14 ? 'text-warn' : 'text-faint'}>
+                          ({paiviaSitten(job.invoiced_at)} vrk)
+                        </span>
+                      </>
+                    ) : (
+                      formatDateKey(dateKeyOf(job.starts_at))
+                    )}
                   </td>
                   <td className="px-4 py-2.5 tabular">
                     {timeOf(job.starts_at)}–{timeOf(job.ends_at)}
