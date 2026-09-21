@@ -84,7 +84,7 @@ export const ARTIKKELIT = [
         'Näiden päälle tulee vielä kotitalousvähennys, joka pienentää työn osuutta. Siitä kerrotaan tarkemmin omassa artikkelissaan.',
       ]],
       ['Mitä työhön sisältyy', [
-        'Sisältö on sama jokaisessa kohteessa: aukkojen tarkastus ja oikean tiivistetyypin valinta, vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus, silikonimassan levitys tarvittaessa, uusien tiivisteiden asennus, ovien käynnin säätö ja saranoiden rasvaus, toimivuuden tarkastus työn jälkeen sekä työalueen suojaus ja siivous.',
+        'Sisältö on sama jokaisessa kohteessa: aukkojen tarkastus ja oikean tiivistetyypin valinta, vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus, silikonimassan levitys tarvittaessa, uusien tiivisteiden asennus, ikkunoiden ja ovien käynnin säätö sekä saranoiden öljyäminen, toimivuuden tarkastus työn jälkeen sekä työalueen suojaus ja siivous.',
         'Vanhat tiivisteet ja jätteet viedään pois. Käynnin päätteeksi jää kirjallinen raportti huollon vaiheista ja käytetyistä tuotteista.',
         'Tiivisteet ja tarvikkeet sisältyvät hintaan. Erillistä materiaalilaskua ei tule.',
       ]],
