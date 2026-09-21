@@ -32,7 +32,7 @@ export type OfferType = {
 };
 
 export const TYPES: OfferType[] = [
-  { id: 'ikkuna',  name: 'Ikkuna',                  desc: 'Karmi- ja puitetiivisteet, per ikkuna',      tiers: WINDOW_TIERS, price: 90, min: 20 },
+  { id: 'ikkuna',  name: 'Ikkuna',                  desc: 'Karmi- ja puitetiivisteet, säätö ja öljyäminen',      tiers: WINDOW_TIERS, price: 90, min: 25 },
   { id: 'ulko',    name: 'Ulko-ovi',                desc: 'Sivutiivisteet + kynnyskumi, käynnin säätö', price: 99,  min: 30 },
   { id: 'parveke', name: 'Parvekeovi',              desc: 'Puu-/alumiiniparvekeovi, koko kehä',         price: 99,  min: 30 },
   { id: 'terassi', name: 'Liuku- tai pariovi', desc: 'Iso lasiovi tai liukuovi, kiskon huolto',    price: 149, min: 30 },
@@ -52,7 +52,6 @@ export type OfferExtra = {
 
 export const EXTRAS: OfferExtra[] = [
   { id: 'sauma', name: 'Karmin ja seinän välin akryylisaumaus', price: 19, per: 'aukko',  unit: 'aukko',  min: 10 },
-  { id: 'helat', name: 'Helojen ja käyntivälyksen säätö',       price: 15, per: 'ikkuna', unit: 'ikkuna', min: 5 },
   { id: 'kahva', name: 'Kahvan vaihto',                         price: 29, per: 'kpl',    unit: 'kpl',    min: 15, note: '+ osa' },
 ];
 

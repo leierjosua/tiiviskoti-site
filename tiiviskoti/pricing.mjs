@@ -51,7 +51,7 @@ export const WINDOW_TIERS = [
    `tiers`   = määräporrastus, korvaa `price`n kokonaan
    `min`     = arvioitu työaika minuutteina per kappale (= kalenterivaraus) */
 export const TYPES = [
-  { id: 'ikkuna',  name: 'Ikkuna',                   desc: 'Karmi- ja puitetiivisteet, per ikkuna',      tiers: WINDOW_TIERS, price: 90, min: 20 },
+  { id: 'ikkuna',  name: 'Ikkuna',                   desc: 'Karmi- ja puitetiivisteet, säätö ja öljyäminen',      tiers: WINDOW_TIERS, price: 90, min: 25 },
   { id: 'ulko',    name: 'Ulko-ovi',                 desc: 'Sivutiivisteet + kynnyskumi, käynnin säätö', price: 99,  min: 30 },
   { id: 'parveke', name: 'Parvekeovi',               desc: 'Puu-/alumiiniparvekeovi, koko kehä',         price: 99,  min: 30 },
   { id: 'terassi', name: 'Liuku- tai pariovi',       desc: 'Iso lasiovi tai liukuovi, kiskon huolto',    price: 149, min: 30 },
@@ -65,9 +65,19 @@ export const TYPES = [
      'kpl'    → asiakas valitsee määrän itse (oma askellin)
      'kerta'  → kertaveloitus koko käynnistä
    `note` näytetään hinnan perässä, kun lopullinen summa ei ole kiinteä. */
+/* POISTETTU 18.9.2026: 'helat' — "Helojen ja käyntivälyksen säätö",
+   15 € / ikkuna, 5 min. Josua vahvisti että ikkunan säätö ja öljyäminen
+   kuuluvat perushintaan, ja syyskuun videomainokset lupaavat sen ääneen
+   ("Hintaan kuuluu myös ikkunan säätö ja öljyäminen"). Lisätyön jättäminen
+   hinnastoon olisi tarkoittanut, että laskuri myy 15 €:lla sen minkä mainos
+   lupaa ilmaiseksi.
+
+   Työ ei kadonnut, vain sen veloitus: ikkunan `min` nostettiin 20 → 25
+   minuuttiin, jotta kalenterivaraus kattaa edelleen saman työn. Öljyämiseen
+   kuluvaa aikaa ei ole erikseen arvioitu — tarkista luku Josualta jos
+   varaukset alkavat venyä. */
 export const EXTRAS = [
   { id: 'sauma',  name: 'Karmin ja seinän välin akryylisaumaus', price: 19, per: 'aukko',  unit: 'aukko',  min: 10 },
-  { id: 'helat',  name: 'Helojen ja käyntivälyksen säätö',       price: 15, per: 'ikkuna', unit: 'ikkuna', min: 5 },
   /* Määrällinen lisätyö viimeisenä: se vie laskurissa oman koko rivinsä,
      joten muut lisätyöt saavat täyttää kaksi saraketta rauhassa. */
   { id: 'kahva',  name: 'Kahvan vaihto',                         price: 29, per: 'kpl',    unit: 'kpl',    min: 15, note: '+ osa' },
@@ -139,7 +149,7 @@ export function extraQtyFor(extra, counts, totalItems) {
  * @param {Object} counts   kohdemäärät tyypin id:llä, esim. {ikkuna: 6, ulko: 1}.
  *                          Askeltimella valittavat lisätyöt tulevat samasta
  *                          oliosta avaimella `extra_<id>`, esim. {extra_kahva: 2}.
- * @param {Object} extras   valitut lisätyöt, esim. {sauma: true, helat: false}.
+ * @param {Object} extras   valitut lisätyöt, esim. {sauma: true, kahva: false}.
  *                          'kpl'-tyyppinen lisätyö on päällä kun sen määrä > 0.
  * @param {Object} [opts]   `travelFee` = palvelualueen matkalisä euroina.
  *                          Se EI ole tämän moduulin tiedossa vaan tulee CRM:n

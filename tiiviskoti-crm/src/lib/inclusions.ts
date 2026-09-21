@@ -10,11 +10,12 @@
 
    TÄRKEÄ RAJA HINNASTOON: listalla saa luvata vain sen mikä sisältyy
    perushintaan. `pricing.ts`:n lisätyöt ovat maksullisia — erityisesti
-   "Helojen ja käyntivälyksen säätö" (15 €/ikkuna) ja "Karmin ja seinän
-   välin akryylisaumaus" (19 €/aukko). Siksi säätörivi puhuu ovista
-   (ovissa käynnin säätö kuuluu hintaan) ja silikonirivi kiinnityspinnan
-   pohjustuksesta — ei karmisaumasta. Jos näitä sanamuotoja löysää, myyt
-   lisätyöt ilmaiseksi jokaisessa tarjouksessa.
+   "Karmin ja seinän välin akryylisaumaus" (19 €/aukko). Siksi silikonirivi
+   puhuu kiinnityspinnan pohjustuksesta — ei karmisaumasta. Jos tätä
+   sanamuotoa löysää, myyt lisätyön ilmaiseksi jokaisessa tarjouksessa.
+
+   18.9.2026: ikkunan säätö ja öljyäminen SIIRTYIVÄT perushintaan (lisätyö
+   'helat' poistettiin), joten säätörivi saa nyt puhua myös ikkunoista.
 
    TAKUU EIKÄ VASTUUVAKUUTUS OLE LISTALLA — tietoinen valinta (25.8.2026).
    Molemmat ovat olemassa ja lukevat sivuston FAQ:ssa, mutta lista kertoo
@@ -31,7 +32,7 @@ export const DEFAULT_INCLUSIONS: string[] = [
   'Vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus',
   'Silikonimassan levitys kiinnityspinnalle tarvittaessa',
   'Uusien tiivisteiden asennus — tiivisteet ja tarvikkeet sisältyvät hintaan',
-  'Ovien käynnin säätö ja saranoiden rasvaus',
+  'Ikkunoiden ja ovien käynnin säätö sekä saranoiden öljyäminen',
   'Ikkunoiden ja ovien toimivuuden tarkastus työn jälkeen',
   'Työalueen suojaus ja siivous — vanhat tiivisteet ja jätteet viedään pois',
   'Kirjallinen raportti huollon vaiheista ja käytetyistä tuotteista',

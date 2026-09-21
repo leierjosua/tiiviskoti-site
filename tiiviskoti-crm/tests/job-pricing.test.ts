@@ -59,7 +59,7 @@ describe('työn laskuri', () => {
   it('laskee laskurin lähettämästä muodosta', () => {
     const lahetetty = JSON.stringify({
       counts: { ikkuna: 3, extra_kahva: 2 },
-      extras: { helat: true },
+      extras: { sauma: true },
       custom: [{ name: 'Lukon sarjoitus', qty: 1, unit: 40 }],
     });
     const v = JSON.parse(lahetetty);

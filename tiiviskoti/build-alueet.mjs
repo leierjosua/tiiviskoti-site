@@ -400,8 +400,8 @@ const PALVELUT = [
     hintaMin: WINDOW_LOW,
     hintaMax: WINDOW_HIGH,
     hintaSelite: 'per ikkuna, määrän mukaan',
-    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_RANGE} € / ikkuna. Karmi- ja puitetiivisteet, helojen säätö ja toimivuuden tarkistus. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
-    lead: 'Vaihdamme karmi- ja puitetiivisteet, säädämme helat ja tarkistamme että ikkuna sulkeutuu tiiviisti. Näet hinnan laskurista ilman tarjouspyyntöä.',
+    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_RANGE} € / ikkuna. Karmi- ja puitetiivisteet, ikkunan säätö ja öljyäminen. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
+    lead: 'Vaihdamme karmi- ja puitetiivisteet, säädämme ja öljyämme ikkunan ja tarkistamme että se sulkeutuu tiiviisti. Näet hinnan laskurista ilman tarjouspyyntöä.',
     oireetOtsikko: 'Milloin ikkunat kannattaa tiivistää',
     oireet: [
       ['Ikkunalaudalta tuntuu veto', 'Kylmä ilmavirta lattian rajassa tai ikkunapenkillä on tavallisin merkki painuneesta tiivisteestä.'],
@@ -456,7 +456,11 @@ const SISALTYY = [
   'Vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus',
   'Silikonimassan levitys kiinnityspinnalle tarvittaessa',
   'Uusien tiivisteiden asennus — tiivisteet ja tarvikkeet sisältyvät hintaan',
-  'Ovien käynnin säätö ja saranoiden rasvaus',
+  /* 18.9.2026: ikkunan säätö ja öljyäminen siirtyivät perushintaan
+     (lisätyö 'helat' poistettiin pricing.mjs:stä), joten rivi ei saa
+     enää puhua vain ovista. Sama sanamuoto kuin tiiviskoti-crm:n
+     inclusions.ts:ssä — ne kaksi listaa on pidettävä samoina. */
+  'Ikkunoiden ja ovien käynnin säätö sekä saranoiden öljyäminen',
   'Ikkunoiden ja ovien toimivuuden tarkastus työn jälkeen',
   'Työalueen suojaus ja siivous — vanhat tiivisteet ja jätteet viedään pois',
   'Kirjallinen raportti huollon vaiheista ja käytetyistä tuotteista',
