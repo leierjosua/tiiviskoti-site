@@ -5,7 +5,7 @@ import { ownsJob, requireStaff, viewMode } from '@/lib/session';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib/time';
 import { sql } from '@/lib/db';
-import { DeleteJob, EditJobForm, RescheduleForm, SendConfirmation, SendOffer, SendReceipt, StatusButtons, TransferJobForm } from './ui';
+import { DeleteJob, EditJobForm, InvoiceMark, RescheduleForm, SendConfirmation, SendOffer, SendReceipt, StatusButtons, TransferJobForm } from './ui';
 import AsennusTyo from './asennus-tyo';
 import { JobPhotos } from './photos';
 import { listJobPhotos } from '@/lib/photos';
@@ -197,6 +197,9 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             </div>
             <div className="border-t border-line pt-4">
               <SendOffer id={job.id} alreadySent={mails.some((m) => m.kind === 'offer' && m.sent_at)} />
+            </div>
+            <div className="border-t border-line pt-4">
+              <InvoiceMark id={job.id} invoicedAt={job.invoiced_at} paid={job.paid} />
             </div>
             <div className="border-t border-line pt-4">
               <SendReceipt id={job.id} alreadySent={mails.some((m) => m.kind === 'receipt' && m.sent_at)} />

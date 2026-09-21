@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { appendJobNote, deleteJob, rescheduleJob, sendConfirmation, sendOffer, sendReceipt, setJobStatus, transferJob, updateJob, type ActionState } from '../actions';
+import { appendJobNote, deleteJob, rescheduleJob, sendConfirmation, sendOffer, sendReceipt, setJobStatus, toggleInvoiced, transferJob, updateJob, type ActionState } from '../actions';
 import { Button, ErrorNote, Field, Input, Select, Textarea, cx } from '@/components/ui';
 import { SubmitButton } from '@/components/submit';
 import { dateKeyOf, timeOf } from '@/lib/time';
@@ -254,6 +254,40 @@ export function MarkDone({ id }: { id: string }) {
 }
 
 /** Merkitse maksetuksi & lähetä kuitti asiakkaalle (PDF sähköpostiin). */
+/* "Lasku lähetetty" -merkintä.
+
+   Järjestelmä ei tee laskuja; tämä kertoo että lasku on lähetetty muualta.
+   Merkintä on peruttavissa, koska se on ihmisen muistiinpano.
+
+   Maksetulla työllä nappia ei näytetä lainkaan: maksu on laskutusta
+   myöhempi vaihe, eikä merkintä enää näkyisi missään. */
+export function InvoiceMark({ id, invoicedAt, paid }: {
+  id: string; invoicedAt: Date | null; paid: boolean;
+}) {
+  const [state, action, pending] = useActionState<ActionState, FormData>(toggleInvoiced, {});
+  if (paid) return <p className="text-xs text-accent">✓ Työ on maksettu — laskua ei tarvita.</p>;
+  const merkitty = !!invoicedAt;
+  return (
+    <div className="space-y-2">
+      {merkitty && (
+        <p className="text-xs text-warn">
+          Lasku lähetetty {new Intl.DateTimeFormat('fi-FI', {
+            timeZone: 'Europe/Helsinki', day: 'numeric', month: 'numeric', year: 'numeric',
+          }).format(new Date(invoicedAt))} — maksua odotetaan.
+        </p>
+      )}
+      <form action={action}>
+        <input type="hidden" name="id" value={id} />
+        <Button type="submit" variant={merkitty ? 'outline' : undefined} disabled={pending} className="text-sm">
+          {pending ? 'Tallennetaan…' : merkitty ? 'Peru laskumerkintä' : 'Merkitse: lasku lähetetty'}
+        </Button>
+      </form>
+      {state.error && <ErrorNote>{state.error}</ErrorNote>}
+      {state.ok && <p className="text-xs text-green-600">{state.ok}</p>}
+    </div>
+  );
+}
+
 export function SendReceipt({ id, alreadySent }: { id: string; alreadySent?: boolean }) {
   const [state, action, pending] = useActionState<ActionState, FormData>(sendReceipt, {});
   return (

@@ -107,7 +107,30 @@ const STATUS_STYLES: Record<string, { chip: string; dot: string; label: string }
   confirmed: { chip: 'border-accent/35 bg-accent-dim text-accent',  dot: 'bg-accent',  label: 'Vahvistettu' },
   done:      { chip: 'border-info/35 bg-info/12 text-info',         dot: 'bg-info',    label: 'Tehty' },
   cancelled: { chip: 'border-line bg-ink-700 text-muted line-through', dot: 'bg-faint', label: 'Peruttu' },
+  /* Nämä kaksi EIVÄT ole job_status-arvoja vaan johdettuja: ks. jobBadge(). */
+  invoiced:  { chip: 'border-warn/35 bg-warn/12 text-warn',         dot: 'bg-warn',    label: 'Lasku lähetetty' },
+  paid:      { chip: 'border-accent/35 bg-accent-dim text-accent',  dot: 'bg-accent',  label: 'Maksettu' },
 };
+
+/* Työn NÄYTETTÄVÄ tila.
+
+   Kannassa laskutus ja maksu ovat omat kenttänsä (`invoiced_at`, `paid`)
+   eivätkä `job_status`-arvoja — muuten jokainen `status = 'done'` -kysely
+   olisi alkanut ohittaa laskutetut työt (ks. db/032). Käyttäjälle ne ovat
+   silti saman jonon vaiheita, joten ne yhdistetään vasta tässä.
+
+   Järjestys on tarkoituksellinen: maksettu voittaa laskutetun, koska
+   käteisellä maksettu työ ei käy laskutuksen kautta lainkaan. */
+export function jobBadge(job: {
+  status: string;
+  invoiced_at?: Date | string | null;
+  paid?: boolean | null;
+}): string {
+  if (job.status !== 'done') return job.status;
+  if (job.paid) return 'paid';
+  if (job.invoiced_at) return 'invoiced';
+  return 'done';
+}
 
 export function StatusBadge({ status }: { status: string }) {
   const s = STATUS_STYLES[status] ?? {

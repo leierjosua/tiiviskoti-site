@@ -891,6 +891,38 @@ export async function sendConfirmation(_prev: ActionState, formData: FormData): 
 /* Merkitse maksetuksi & lähetä kuitti asiakkaalle.
    Kuitti = keikan tiedoista koostettu PDF (työn osuus 90 %, uusi logo), joka
    lähetetään Gmaililla ja kirjataan tk.mail_log:iin (kind='receipt'). */
+/* "Lasku lähetetty" -merkintä.
+
+   Tämä EI lähetä laskua — järjestelmä ei tee laskuja. Se merkitsee että
+   lasku on lähetetty muualta, jotta avoimet laskut erottuvat töistä joita
+   ei ole vielä laskutettu lainkaan. Siksi myös peruminen on mahdollista:
+   merkintä on ihmisen muistiinpano ja ihminen voi erehtyä.
+
+   Maksettua työtä ei merkitä laskutetuksi: `paid` voittaa näytössä
+   (`jobBadge`), joten merkintä jäisi näkymättömäksi ja hämäisi. */
+export async function toggleInvoiced(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireManager();
+  const id = String(formData.get('id') ?? '');
+  if (!id) return { error: 'Työtä ei löytynyt.' };
+
+  const [job] = await sql<{ status: string; paid: boolean; invoiced_at: Date | null }[]>`
+    select status, paid, invoiced_at from tk.jobs where id = ${id}
+  `;
+  if (!job) return { error: 'Työtä ei löytynyt.' };
+  if (job.status !== 'done' && !job.invoiced_at) {
+    return { error: 'Merkitse työ ensin tehdyksi — laskua ei lähetetä keskeneräisestä työstä.' };
+  }
+
+  const poista = !!job.invoiced_at;
+  await sql`
+    update tk.jobs set invoiced_at = ${poista ? null : new Date()}, updated_at = now()
+     where id = ${id}
+  `;
+  revalidatePath(`/tyot/${id}`);
+  revalidatePath('/tyot');
+  return { ok: poista ? 'Laskumerkintä poistettu.' : 'Merkitty: lasku lähetetty.' };
+}
+
 export async function sendReceipt(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requireManager();
   const id = String(formData.get('id') ?? '');

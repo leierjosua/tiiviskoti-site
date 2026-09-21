@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { listJobs } from '@/lib/data';
 import { requireStaff, viewMode } from '@/lib/session';
 import { addDays, dateKeyOf, formatDateKey, helsinkiDateTime, timeOf } from '@/lib/time';
-import { Card, CardHeader, Empty, StatusBadge } from '@/components/ui';
+import { Card, CardHeader, Empty, StatusBadge, jobBadge } from '@/components/ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,7 +92,7 @@ export default async function JobsPage({
                       <span className="text-sm tabular text-muted">
                         {timeOf(job.starts_at)}–{timeOf(job.ends_at)}
                       </span>
-                      <span className="ml-auto"><StatusBadge status={job.status} /></span>
+                      <span className="ml-auto"><StatusBadge status={jobBadge(job)} /></span>
                     </div>
                     <p className="mt-1 text-sm font-semibold">{job.customer_name ?? job.title}</p>
                     <p className="truncate text-xs text-muted">
@@ -139,7 +139,7 @@ export default async function JobsPage({
                     {[job.address, job.postal_code, job.city].filter(Boolean).join(', ') || '—'}
                   </td>
                   <td className="px-4 py-2.5 text-muted">{job.staff_name}</td>
-                  <td className="px-4 py-2.5"><StatusBadge status={job.status} /></td>
+                  <td className="px-4 py-2.5"><StatusBadge status={jobBadge(job)} /></td>
                 </tr>
               ))}
             </tbody>

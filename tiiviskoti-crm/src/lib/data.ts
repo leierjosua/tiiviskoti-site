@@ -47,6 +47,9 @@ export type JobRow = {
   status: 'hold' | 'tentative' | 'confirmed' | 'done' | 'cancelled';
   title: string; address: string | null; postal_code: string | null; city: string | null;
   price_cents: number; notes: string | null; source: string;
+  /* Laskutus ja maksu ovat omat kenttänsä eivätkä job_status-arvoja — ks.
+     db/032. Näytettävä tila johdetaan näistä `jobBadge()`:lla. */
+  invoiced_at: Date | null; paid: boolean;
   /* Mainoskampanja josta asiakas tuli, esim. qr-a6. null = ei tiedossa.
      Eri asia kuin `source`, joka kertoo syntyikö työ adminissa vai verkossa. */
   campaign: string | null;
@@ -124,6 +127,7 @@ export function listJobs(fromIso: string, toIso: string, staffId?: string | null
   return sql<JobRow[]>`
     select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
            j.address, j.postal_code, j.city, j.price_cents, j.notes, j.source, j.campaign,
+           j.invoiced_at, j.paid,
            j.calendar_id, c.name as calendar_name, s.full_name as staff_name,
            j.customer_id, cu.full_name as customer_name,
            cu.email as customer_email, cu.phone as customer_phone
@@ -220,6 +224,7 @@ export async function getJob(id: string) {
   const [job] = await sql<JobRow[]>`
     select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
            j.address, j.postal_code, j.city, j.price_cents, j.notes, j.source, j.campaign,
+           j.invoiced_at, j.paid,
            j.calendar_id, c.name as calendar_name, s.full_name as staff_name,
            j.customer_id, cu.full_name as customer_name,
            cu.email as customer_email, cu.phone as customer_phone
