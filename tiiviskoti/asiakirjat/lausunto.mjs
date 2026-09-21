@@ -8,9 +8,9 @@
  * yhtiökokouksessa — siinä ei saa olla tyhjiä viivoja eikä ohjetekstiä.
  * Jos pakollinen tieto puuttuu, generaattori kaatuu ennen renderöintiä.
  *
- * MENETELMÄ: silmämääräinen tarkastus paikan päällä. Lämpökameraa EI mainita
- * (Josua 16.9.2026: käynnillä ei kuvattu lämpökameralla). Älä lisää sitä
- * takaisin ilman että kuvaus on oikeasti tehty.
+ * MENETELMÄÄ EI KUVATA. Lausunnossa ei mainita lämpökameraa (käynnillä ei
+ * kuvattu) eikä sitä, että tarkastus tehtiin silmämääräisesti — Josua pyysi
+ * molemmat pois 16.9.2026. Älä lisää kumpaakaan takaisin omasta aloitteesta.
  */
 import { chromium } from 'playwright'
 import fs from 'fs'
@@ -23,10 +23,9 @@ const d = JSON.parse(fs.readFileSync(dataFile, 'utf8'))
 const outFile = process.argv[3] || path.join(__dirname, `lausunto-${d.numero}.pdf`)
 
 const PAKOLLISET = [
-  ['numero', d.numero], ['paivays', d.paivays], ['tarkastuspaiva', d.tarkastuspaiva],
-  ['tarkastaja.nimi', d.tarkastaja?.nimi], ['kohde.osoite', d.kohde?.osoite],
+  ['tarkastuspaiva', d.tarkastuspaiva], ['kohde.osoite', d.kohde?.osoite],
   ['kohde.huoneisto', d.kohde?.huoneisto], ['tilaaja', d.tilaaja],
-  ['ikkunoita', d.ikkunoita], ['havainto', d.havainto], ['suositus', d.suositus],
+  ['tarkastaja.nimi', d.tarkastaja?.nimi],
 ]
 const puuttuu = PAKOLLISET.filter(([, v]) => !String(v ?? '').trim() || /^TÄYTÄ/i.test(String(v)))
 if (puuttuu.length) {
@@ -75,40 +74,34 @@ const html = `<!doctype html><html lang="fi"><head><meta charset="utf-8">
   </div>
 
   <h1>Lausunto ikkunoiden tiivisteiden kunnosta</h1>
-  <div class="meta">Lausunto ${esc(d.numero)} · ${esc(d.paivays)} · tarkastus tehty ${esc(d.tarkastuspaiva)}</div>
+  <div class="meta">Lausunto ${esc(d.paivays || d.tarkastuspaiva)}</div>
 
   <div class="osoitelohko">
     <div><b>Kohde</b>${d.kohde.taloyhtio ? esc(d.kohde.taloyhtio) + '<br>' : ''}${esc(d.kohde.osoite)}<br>Huoneisto ${esc(d.kohde.huoneisto)}</div>
     <div><b>Lausunnon tilaaja</b>${esc(d.tilaaja)}<br><b style="margin-top:8px">Vastaanottaja</b>${esc(d.vastaanottaja || 'Isännöitsijä ja hallitus')}</div>
   </div>
 
-  <h2><span class="n">1</span>Tarkastus</h2>
-  <p>Kävimme tarkastamassa huoneiston ikkunat paikan päällä ${esc(d.tarkastuspaiva)}. Tarkastus tehtiin
-  silmämääräisesti: tarkastimme tiivisteiden kunnon ja kiinnityksen, tiivisteen puristuksen puitteen ja
-  karmin välissä sekä ikkunoiden käynnin. Tarkastus kattoi huoneiston kaikki ikkunat, ${esc(d.ikkunoita)}.</p>
+  <p>Kävimme tarkastamassa huoneiston ikkunat ${esc(d.tarkastuspaiva)}.</p>
 
-  <h2><span class="n">2</span>Havainnot</h2>
-  <p>${esc(d.havainto)}</p>
+  <p><b>Huoneiston kaikkien ikkunoiden tiivisteet ovat kuluneet loppuun.</b> Ne eivät enää tiivistä
+  puitteen ja karmin väliä, joten ikkunoista pääsee lämmitettyä sisäilmaa ulos ja kylmää ilmaa sisään.</p>
 
-  <h2><span class="n">3</span>Johtopäätös</h2>
-  <p>Tiivisteet ovat tulleet käyttöikänsä päähän eivätkä enää täytä tehtäväänsä: ne eivät tiivistä puitteen
-  ja karmin väliä, jolloin ikkunoista pääsee lämmitettyä sisäilmaa ulos ja kylmää ilmaa sisään. Tilanne ei
-  korjaannu säätämällä eikä huoltamalla, vaan tiivisteet on uusittava.</p>
+  <p>Tilanne ei korjaannu säätämällä eikä huoltamalla. Huoneiston ikkunat ovat kiinteitä eikä niitä saa
+  auki, joten tiivisteitä ei päästä huoltamaan paikallaan — ainoa tapa palauttaa ikkunoiden tiiviys on
+  uusia tiivisteet.</p>
 
-  <h2><span class="n">4</span>Suositeltu toimenpide</h2>
-  <p>${esc(d.suositus)}</p>
-  ${d.huomiot ? `<p>${esc(d.huomiot)}</p>` : ''}
+  <p>Suosittelemme huoneiston kaikkien ikkunoiden tiivisteiden uusimista. Työ ei edellytä ikkunoiden
+  vaihtamista, koska puitteet ja karmit ovat ehjät.</p>
 
   <div class="rajaus">
-    <b>Lausunnon rajaus.</b> Lausunto koskee ainoastaan huoneiston ikkunoiden tiivisteiden kuntoa ja niiden
-    vaikutusta ilmanpitävyyteen. Lausunto ei ota kantaa ikkunoiden muuhun kuntoon, rakenteiden kuntoon eikä
-    siihen, miten kunnossapitovastuu jakautuu taloyhtiön ja osakkaan välillä — vastuunjako ratkaistaan
-    yhtiöjärjestyksen ja asunto-osakeyhtiölain perusteella.
+    <b>Lausunnon rajaus.</b> Lausunto koskee ainoastaan ikkunoiden tiivisteiden kuntoa. Se ei ota kantaa
+    ikkunoiden muuhun kuntoon eikä siihen, miten kunnossapitovastuu jakautuu taloyhtiön ja osakkaan
+    välillä — vastuunjako ratkaistaan yhtiöjärjestyksen ja asunto-osakeyhtiölain perusteella.
   </div>
 
   <div class="allekirjoitus">
     <div class="viiva">${esc(d.tarkastaja.nimi)}<br>${esc(d.tarkastaja.asema || 'TiivisKoti')}</div>
-    <div class="viiva">${esc(d.paikka || 'Helsinki')} ${esc(d.paivays)}</div>
+    <div class="viiva">${esc(d.paikka || '')} ${esc(d.paivays || d.tarkastuspaiva)}</div>
   </div>
 
   <div class="foot">Tiiviskoti Oy · Y-tunnus 3652671-7 · info@tiiviskoti.fi · 045 875 5996 · tiiviskoti.fi<br>
