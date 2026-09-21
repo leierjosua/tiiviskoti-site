@@ -1,0 +1,114 @@
+/* TiivisKoti — videomainoksen tekstitasot (läpinäkyvä PNG → ffmpeg overlay).
+
+   Tämä on _niukka.css:n sisarus: sama typografia ja sama hierarkia, mutta
+   tausta on läpinäkyvä ja teksti asemoidaan videon turva-alueelle.
+
+   HIERARKIA (sama sääntö kuin _niukka.css:ssä, ks. sen .anchor-kommentti):
+   tarjous on ISO, ankkuri (kalliin vaihtoehdon hinta) on PIENI. Alkuperäinen
+   video teki tämän toisin päin — "1200 €" oli suurin elementti ruudulla —
+   jolloin ohi selaava lukee ensin kalleimman luvun ja luulee että myymme
+   ikkunan vaihtoa. Siksi 75 € on nyt otsikko ja 1 200 € alarivi. */
+
+@font-face { font-family: "ManropeLocal"; src: local("Manrope"); }
+
+html, body { margin: 0; padding: 0; background: transparent; }
+body {
+  position: relative; overflow: hidden;
+  font-family: "Manrope", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Kuvasuhteet. Molemmat 1080 px leveitä, joten kaikki pikseliarvot pätevät
+   sellaisenaan kumpaankin. */
+body.r916 { width: 1080px; height: 1920px; }
+body.r45  { width: 1080px; height: 1350px; }
+
+/* Varjostin. Alkuperäisessä videossa valkoinen teksti kellui suoraan
+   kuvamateriaalin päällä ja lakin "TiivisKoti"-teksti näkyi sen läpi.
+   Pehmeä liuku pitää tekstin luettavana myös vaalealla ikkunapinnalla,
+   mutta jättää yläosan kuvan kokonaan rauhaan. */
+.scrim { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
+  background: linear-gradient(180deg,
+    rgba(11,34,20,0)   0%,
+    rgba(11,34,20,.24) 26%,
+    rgba(11,34,20,.58) 58%,
+    rgba(11,34,20,.76) 100%); }
+body.r916 .scrim { height: 1180px; }
+body.r45  .scrim { height:  900px; }
+
+/* Tekstilohko. Alareunan etäisyys on eri kuvasuhteissa eri: 9:16 menee
+   Reels/Stories-syötteeseen, jossa Metan oma käyttöliittymä (kuvaus, nimi,
+   painikkeet) peittää alimmat ~420 px. 4:5 on syötemainos, jossa peittoa on
+   vain vähän. */
+.block { position: absolute; left: 72px; right: 72px; z-index: 2; }
+body.r916 .block { bottom: 560px; }
+body.r45  .block { bottom: 250px; }
+
+h1 { margin: 0; font-weight: 800; font-size: 88px; line-height: 1.04;
+  letter-spacing: -.035em; color: #fff;
+  text-shadow: 0 4px 30px rgba(0,0,0,.55); }
+
+/* Korostus on brändin mintunvihreä, EI alkuperäisen videon kirkas
+   neonvihreä (#3ADB6B). Mintty erottuu valkoisesta tekstistä mutta pysyy
+   samassa sävymaailmassa kuin logo ja lopputaulu. */
+h1 .hl { color: #A8E3C4; }
+
+.sub { margin: 26px 0 0; font-size: 40px; font-weight: 700; line-height: 1.3;
+  letter-spacing: -.015em; color: rgba(255,255,255,.93);
+  max-width: 880px; text-shadow: 0 3px 20px rgba(0,0,0,.6); }
+
+/* Lopputaulun korjattu hintarivi. Mitat vastaavat videoon poltettua riviä,
+   jotta korjaus istuu samaan kohtaan. */
+body.strip { width: 1080px; height: 64px; background: transparent; }
+.hinnat { position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: center; font-weight: 700; font-size: 31px;
+  letter-spacing: -.01em; color: rgba(233,245,238,.94); }
+
+/* ─────────────────────────────────────────────────────────────
+   HINTAKULMA (kaikki lyhytversiot).
+
+   Josua: "make sure it says ikkunan tiivistys alk. 75 / uusi ikkuna
+   maksaisi 1200 like where they can see it clearly". Tarjous on siis
+   isompi kuin tavallisessa iskussa, ja ankkuri saa oman pillerinsä
+   ettei se huku kuvaan — pilleri kantaa oman taustansa, joten se on
+   luettava myös vaalealla ikkunapinnalla.
+
+   Ankkuria EI yliviivata, vaikka se olisi houkuttelevaa: yliviivaus
+   lukisi "ennen 1 200 €, nyt 75 €", ja ne ovat eri työ. "Maksaisi"
+   tekee vertailun jo sanana. */
+.block.hero h1 { font-size: 104px; line-height: 1.0; }
+.block.hero .anchor-pill {
+  display: inline-block; margin: 30px 0 0;
+  background: rgba(11,34,20,.72);
+  border: 2px solid rgba(255,255,255,.30);
+  border-radius: 999px; padding: 18px 34px;
+  font-size: 41px; font-weight: 700; letter-spacing: -.015em;
+  color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.5);
+}
+
+/* Sisältyvyysrivi hintakortin alla (Josua 18.9.): hintaan kuuluu myös
+   ikkunan säätö ja öljyäminen. Pienempi kuin ankkuri, koska se on
+   tarkennus tarjoukseen — ei kolmas kilpaileva viesti.
+
+   HUOM: pricing.mjs veloittaa "Helojen ja käyntivälyksen säädön" 15 €
+   lisätyönä per ikkuna (EXTRAS.helat). Jos tämä rivi on mainoksessa,
+   laskuri ja mainos lupaavat eri asian — korjattava toinen. */
+.block.hero .incl {
+  margin: 22px 0 0; font-size: 36px; font-weight: 700; line-height: 1.28;
+  letter-spacing: -.015em; color: rgba(255,255,255,.92); max-width: 900px;
+  text-shadow: 0 3px 20px rgba(0,0,0,.6);
+}
+
+/* CTA viimeisessä iskussa (Josua 18.9.: "laita videot loppumaan pyydä
+   tarjous näkymään"). Valkoinen painike vihreällä tekstillä, kuten
+   _niukka.css:n .btn — se on ruudun ainoa kirkas pinta ja vetää katseen
+   viimeisenä.
+
+   EI omaa loppuruutua: vihreä lopputaulu poistettiin tarkoituksella, joten
+   CTA ladotaan viimeisen tekstin alle oikean kuvamateriaalin päälle. */
+.cta { display: inline-flex; align-items: center; gap: 16px; margin-top: 30px;
+  background: #fff; color: #217A4E; font-weight: 800; font-size: 38px;
+  letter-spacing: -.01em; padding: 24px 42px; border-radius: 18px;
+  box-shadow: 0 20px 46px -16px rgba(0,0,0,.5); }
+.cta svg { width: 30px; height: 30px; stroke: #217A4E; fill: none;
+  stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }

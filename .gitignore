@@ -38,3 +38,10 @@ tiiviskoti-admin/
 # ovat työpöydällä kansiossa tiiviskoti-shorts/. Lähdemateriaali on Drivessa.
 # Repo on jo 198 MB, eikä binäärejä kannata kasvattaa.
 tiiviskoti/mainokset/out/*.mp4
+
+# Videomainosten tekstitasot: renderöityjä PNG-kuvia (6,7 MB) ja
+# lopputaulun paikka. Kaikki syntyy uudelleen ajamalla
+# tiiviskoti/mainokset/video/render-overlays.mjs + make-patch.py,
+# joten binäärejä ei kannata versioida. Lähteet (HTML/CSS/skriptit)
+# ovat mukana, valmiit videot työpöydällä tiiviskoti-mainosvideot/.
+tiiviskoti/mainokset/video/out/
