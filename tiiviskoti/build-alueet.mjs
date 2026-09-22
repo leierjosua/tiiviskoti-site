@@ -1283,17 +1283,31 @@ function meistaSivu() {
      vastuuhenkilöt, ja siksi otsikko on "Vastuuhenkilöt" eikä "Tiimi". */
   const tiimi = [
     {
-      kuva: 'meista-josua.jpg',
+      kuva: 'tiimi-josua.webp',
       name: 'Josua',
       role: 'Omistaja &amp; asentaja',
       bio: 'Vastaa yrityksestä ja hinnoittelusta — ja siitä että jokainen käynti hoidetaan juuri niin kuin on luvattu.',
     },
     {
-      kuva: 'meista-daniel.jpg',
+      kuva: 'tiimi-daniel.webp',
       name: 'Daniel',
       role: 'Omistaja &amp; asentaja',
       bio: 'Tekee kartoitukset ja tiivisteasennukset itse työmaalla. Työn hoitaa oma porukkamme alusta loppuun.',
     },
+  ];
+
+  /* ASENTAJAT. Nämä olivat sivulla 16.9.2026 kuvauksen jälkeen, mutta ne
+     elivät vain generoidussa meista.html:ssä — eivät täällä lähteessä.
+     Kun sivu generoitiin uudelleen 21.9., generaattori kirjoitti vanhan
+     kahden hengen version päälle ja Eelis, Nestori ja Akseli katosivat.
+     Siksi he ovat nyt TÄÄLLÄ: generoitua tiedostoa ei saa käsin muokata,
+     koska seuraava ajo pyyhkii sen.
+
+     Uusi asentaja lisätään tähän listaan ja kuva kansioon img/. */
+  const asentajat = [
+    { kuva: 'tiimi-eelis.webp', name: 'Eelis' },
+    { kuva: 'tiimi-nestori.webp', name: 'Nestori' },
+    { kuva: 'tiimi-akseli.webp', name: 'Akseli' },
   ];
 
   /* Kasvokuvien rinnalle mitattavia lupauksia: taloyhtiön hallitus arvioi
@@ -1348,7 +1362,7 @@ ${nav(R, '/#laskuri')}
 </div></header>
 
 <div class="wrap" style="padding-top:clamp(18px,2.6vw,26px)">
-  <img class="rv" src="img/meista-porukka.webp?v=3" alt="TiivisKodin asentajat työvälineineen asiakkaan pihassa" width="1100" height="619" loading="lazy" style="width:100%;max-width:820px;height:auto;display:block;border-radius:20px;border:1px solid var(--line)">
+  <img class="rv" src="img/tiimi-porukka.webp" alt="TiivisKodin viisi asentajaa asiakkaan pihalla" width="1100" height="619" loading="lazy" style="width:100%;max-width:820px;height:auto;display:block;border-radius:20px;border:1px solid var(--line)">
 </div>
 
 <section class="sec" style="padding-top:clamp(20px,3vw,32px)"><div class="wrap">
@@ -1363,6 +1377,20 @@ ${nav(R, '/#laskuri')}
         <span style="display:block;margin-top:9px;font-size:14.5px;line-height:1.55;color:var(--text)">${t.bio}</span>
       </figcaption>
     </figure>`).join('\n    ')}
+  </div>
+
+  <div class="rv" style="margin-top:clamp(30px,4vw,44px)">
+    <h2 style="font-size:clamp(22px,2.6vw,28px);max-width:24ch;margin-bottom:6px">Asentajat</h2>
+    <p style="font-size:15px;color:var(--mute);max-width:56ch;margin-bottom:20px">Nämä kaverit tulevat kotiisi. Kaikki ovat TiivisKodin omia asentajia — emme käytä alihankkijoita, joten sama porukka tekee jokaisen käynnin.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;max-width:1100px">
+      ${asentajat.map((t) => `<figure style="margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;gap:16px;align-items:flex-start;padding:20px">
+        <img src="img/${t.kuva}" alt="${t.name}, TiivisKodin asentaja" width="104" height="130" loading="lazy" style="flex:0 0 auto;width:104px;height:130px;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:var(--green-soft)">
+        <figcaption style="min-width:0">
+          <b style="display:block;font-size:18px;color:var(--ink)">${t.name}</b>
+          <span style="display:block;margin-top:2px;font-size:14px;font-weight:700;color:var(--green)">Asentaja</span>
+        </figcaption>
+      </figure>`).join('\n      ')}
+    </div>
   </div>
 
   <div class="rv" style="margin-top:clamp(30px,4vw,44px)">
