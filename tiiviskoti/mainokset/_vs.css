@@ -1,52 +1,59 @@
-/* VS-kortti — Kilpilasin kaava, mutta omalla hinnastolla ja talon mittakaavassa.
-
-   MIKSI TALON MITTAKAAVA: nykyinen ankkurimme on YKSI ikkuna (75 € vs 1 200 €).
-   Luku on tosi mutta pieni. Kilpilasi ajaa samaa logiikkaa koko talolla
-   (27 000 € vs 3 000 €) ja se on dramaattisempi. 15 ikkunaa on TiivisKodin
-   MEDIAANITILAUS, joten esimerkki ei ole keksitty vaan tyypillinen asiakas.
+/* VS-kortti — Kilpilasin kaava, omalla hinnastolla ja talon mittakaavassa.
 
    LUVUT (pricing.mjs, 22.9.2026): 15 ikkunaa = porras 14+ = 15 × 75 € = 1 125 €.
    Vaihdon 18 000 € = 15 × 1 200 €, sama yksikköhinta kuin livemainosten
-   ankkurissa. Jos hinnasto muuttuu, laske molemmat uudelleen. */
+   ankkurissa. 15 ikkunaa on TiivisKodin MEDIAANITILAUS, eli esimerkki on
+   tyypillinen asiakas eikä keksitty. Jos hinnasto muuttuu, laske uudelleen.
+
+   ASETTELU: kuva on HERO ylälaidassa, ei kaista alalaidassa. Ensimmäisessä
+   versiossa kuva oli alareunassa täytteenä: kädet rajautuivat katki, tausta
+   oli sekava ja kova vaakaviiva erotti sen kortista — se näytti liimatulta.
+   Talokuva ylhäällä sen sijaan KERTOO aiheen ("15 ikkunan talo") ennen kuin
+   lukuja näytetään, joten se ansaitsee paikkansa. */
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
 
 html, body { width: 1080px; height: 1350px; margin: 0; }
 body { font-family: "Manrope", system-ui, sans-serif; background: #F6F7F3;
   display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
 
-.mark { display: flex; align-items: center; gap: 14px; padding: 54px 60px 0; }
-.mark svg { width: 54px; height: 54px; }
-.mark span { font-weight: 800; font-size: 34px; letter-spacing: -.03em; color: #16351F; }
+.hero { position: relative; height: 580px; overflow: hidden; flex: none; }
+/* object-position osuu ikkunoihin: pelkkä keskirajaus näyttäisi enimmäkseen
+   ulkovuorausta eikä talo erottuisi. */
+.hero img { width: 100%; height: 100%; object-fit: cover;
+  object-position: center 20%; display: block; }
+/* Kevyt tummennus vain yläreunaan, jotta logo erottuu vaaleasta talosta. */
+.hero::after { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(12,30,18,.45) 0%, rgba(12,30,18,.10) 34%, rgba(12,30,18,0) 60%); }
 
-h1 { margin: 34px 60px 6px; font-weight: 800; font-size: 74px; line-height: 1.02;
+.mark { position: absolute; top: 40px; left: 56px; z-index: 2;
+  display: flex; align-items: center; gap: 13px; }
+.mark svg { width: 50px; height: 50px; }
+.mark span { font-weight: 800; font-size: 32px; letter-spacing: -.03em; color: #fff;
+  text-shadow: 0 2px 14px rgba(0,0,0,.4); }
+
+.body { padding: 40px 56px 0; }
+h1 { margin: 0; font-weight: 800; font-size: 66px; line-height: 1.02;
   letter-spacing: -.035em; color: #16351F; }
-.sub { margin: 0 60px; font-size: 31px; font-weight: 700; color: #5A6B5E; }
+.sub { margin: 14px 0 0; font-size: 30px; font-weight: 700; color: #5A6B5E; }
 
-.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; padding: 40px 60px 0; }
-.panel { border-radius: 26px; padding: 40px 34px; }
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+.panel { border-radius: 24px; padding: 30px 28px; }
 
 /* Kallis vaihtoehto on HARMAA, ei punainen: punainen lukee varoituksena ja
-   kiinnittää katseen väärään lukuun. Harmaa vain kuolettaa sen. */
+   vetäisi katseen väärään lukuun. Harmaa vain kuolettaa sen. */
 .bad  { background: #E7E7E2; color: #6B6B63; }
 .good { background: #217A4E; color: #fff; }
 
-.tag { font-size: 27px; font-weight: 700; letter-spacing: -.01em; opacity: .9; }
-.eur { font-weight: 800; letter-spacing: -.04em; line-height: 1; margin: 16px 0 0; }
-.bad .eur  { font-size: 78px; text-decoration: line-through; text-decoration-thickness: 5px; }
-.good .eur { font-size: 92px; }
-.note { margin: 14px 0 0; font-size: 24px; font-weight: 600; line-height: 1.3; opacity: .85; }
+.tag { font-size: 26px; font-weight: 700; opacity: .9; }
+.eur { font-weight: 800; letter-spacing: -.04em; line-height: 1; margin: 14px 0 0; }
+.bad .eur  { font-size: 70px; text-decoration: line-through; text-decoration-thickness: 5px; }
+.good .eur { font-size: 82px; }
+.note { margin: 12px 0 0; font-size: 23px; font-weight: 600; line-height: 1.3; opacity: .85; }
 
-.save { margin: 34px 60px 0; background: #16351F; color: #fff; border-radius: 22px;
-  padding: 32px 38px; }
-.save b { display: block; font-size: 52px; font-weight: 800; letter-spacing: -.03em; }
-.save span { display: block; margin-top: 8px; font-size: 27px; font-weight: 700;
-  color: #A8E3C4; }
+.save { margin-top: 22px; background: #16351F; color: #fff; border-radius: 22px;
+  padding: 30px 34px; }
+.save b { display: block; font-size: 48px; font-weight: 800; letter-spacing: -.03em; }
+.save span { display: block; margin-top: 7px; font-size: 26px; font-weight: 700; color: #A8E3C4; }
 
-.foot { padding: 26px 60px 0; font-size: 26px; font-weight: 700;
-  color: #5A6B5E; line-height: 1.35; }
-
-/* Kuva alareunaan: ilman sitä korttiin jäi iso tyhjä alue, ja pelkkä
-   grafiikka näyttää syötteessä bannerilta. Oikea työkuva kertoo että
-   luvut liittyvät oikeaan työhön. */
-.photo { margin-top: auto; height: 330px; overflow: hidden; }
-.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.foot { margin-top: auto; padding: 20px 56px 36px; font-size: 25px; font-weight: 700;
+  color: #5A6B5E; }
