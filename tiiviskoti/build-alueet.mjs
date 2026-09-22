@@ -20,7 +20,7 @@
 import { writeFileSync, mkdirSync, readFileSync, readdirSync, unlinkSync } from 'node:fs';
 import { ALUEET, SITE } from './_alueet-data.mjs';
 import { ARTIKKELIT } from './_artikkelit-data.mjs';
-import { TYPES, MIN_PRICE, WINDOW_TIERS } from './pricing.mjs';
+import { TYPES, MIN_PRICE, WINDOW_TIERS, computePricing } from './pricing.mjs';
 
 /* Ikkunaportaiden rajat ja haarukka johdetaan hinnastosta, ei kirjoiteta
    käsin. Aiemmin sivuilla luki "20+" myös sen jälkeen kun viimeinen porras
@@ -29,6 +29,48 @@ const TIER_FROM = WINDOW_TIERS.map((_, i) => (i === 0 ? 1 : WINDOW_TIERS[i - 1].
 const tierRange = (i) => (i === WINDOW_TIERS.length - 1
   ? `${TIER_FROM[i]}+`
   : `${TIER_FROM[i]}\u2013${WINDOW_TIERS[i].upTo}`);
+/* KOKO KODIN HINTAESIMERKIT.
+
+   Hintataulukko kertoo yksikköhinnat, mutta asiakas kysyy "paljonko tämä
+   maksaa MINUN taloooni". Kilpilasi vastaa siihen paikkakuntasivuillaan
+   (40 m² 900 €, 100 m² 2 500 €) ja me emme vastanneet lainkaan — se on
+   myös juuri se kysymys jonka tekoälyhaku poimii.
+
+   Summat lasketaan computePricing():lla eikä kirjoiteta käsin, joten ne
+   eivät voi vanhentua hinnaston mukana. Porrastus tulee mukaan
+   automaattisesti: 15 ikkunaa osuu 75 €:n portaaseen. */
+const KOTIESIMERKIT = [
+  ['Kerrostalokolmio', 'parvekeovi ja 5 ikkunaa', { ikkuna: 5, parveke: 1 }],
+  ['Rivitaloasunto', 'ulko-ovi, parvekeovi ja 8 ikkunaa', { ikkuna: 8, ulko: 1, parveke: 1 }],
+  ['Omakotitalo', 'kaksi ulko-ovea ja 15 ikkunaa', { ikkuna: 15, ulko: 2 }],
+  ['Iso omakotitalo', 'kolme ovea ja 22 ikkunaa', { ikkuna: 22, ulko: 2, parveke: 1 }],
+];
+
+const kotiHinnat = () => `<div class="htbl-wrap"><table class="htbl">
+    <thead><tr><th>Kohde</th><th style="text-align:right">Hinta</th></tr></thead>
+    <tbody>
+      ${KOTIESIMERKIT.map(([nimi, erittely, counts]) => {
+        const p = computePricing(counts, {}, {});
+        return `<tr><td><b>${nimi}</b><span class="mut">${erittely}</span></td>`
+             + `<td>${p.total.toLocaleString('fi-FI')} €</td></tr>`;
+      }).join('\n      ')}
+    </tbody>
+  </table></div>`;
+
+/* Jaettu UKK, joka lisätään JOKAISEN alueen omien kysymysten perään.
+   Nämä vastaavat suoraan siihen mitä haussa kysytään, ja ne menevät myös
+   FAQPage-rakennedataan — eli ne ovat sitä mitä tekoäly siteeraa. */
+const YHTEINEN_FAQ = [
+  ['Paljonko ikkunoiden tiivistys maksaa koko taloon?',
+   `Yksittäinen ikkuna maksaa ${WINDOW_TIERS[0].price} €, ja kappalehinta laskee määrän mukaan aina ${WINDOW_TIERS[WINDOW_TIERS.length - 1].price} €:oon asti. Käytännössä ${(() => { const p = computePricing({ ikkuna: 15, ulko: 2 }, {}, {}); return `15 ikkunan ja kahden ulko-oven omakotitalo maksaa ${p.total.toLocaleString('fi-FI')} €`; })()}, ja viiden ikkunan sekä parvekeoven kerrostaloasunto ${computePricing({ ikkuna: 5, parveke: 1 }, {}, {}).total} €. Näet oman summasi laskurista ennen varausta.`],
+  ['Kannattaako tiivistys vai ikkunoiden vaihto?',
+   'Jos lasi ja karmi ovat ehjät eikä puussa ole lahoa, tiivistys riittää. Uusi ikkuna asennettuna maksaa noin 1 200 €, kun saman ikkunan tiivistäminen maksaa alkaen 75 € — eli vaihtaminen on kymmeniä kertoja kalliimpaa. Jos tiivistys ei sinun kohteessasi riitä, sanomme sen käynnillä emmekä veloita turhasta.'],
+  ['Kuuluuko ikkunan säätö ja öljyäminen hintaan?',
+   'Kyllä. Ikkunan käynnin säätö ja saranoiden öljyäminen sisältyvät ikkunan hintaan, eikä niistä veloiteta erikseen. Ovissa hintaan kuuluu lisäksi kynnyskumi.'],
+  ['Saako työstä kotitalousvähennyksen?',
+   'Saa. Työ on kotitaloustyötä, ja lasku erittelee työn osuuden valmiiksi vähennystä varten. Vähennys on 40 % työn osuudesta.'],
+];
+
 const WINDOW_HIGH = WINDOW_TIERS[0].price;
 const WINDOW_LOW = WINDOW_TIERS[WINDOW_TIERS.length - 1].price;
 const WINDOW_RANGE = `${WINDOW_LOW}\u2013${WINDOW_HIGH}`;
@@ -201,7 +243,7 @@ function kuntaSivu(a, i) {
   /* Alle 155 merkkiä: pidempi katkeaa hakutuloksessa kesken lauseen. */
   const desc = `Ovien ja ikkunoiden tiivistys ${a.ine} kiinteään hintaan: ikkuna ${WINDOW_RANGE} €, ovi ${TYPES[1].price} €. Näet hinnan laskurista ja varaat ajan heti.`;
 
-  const faqLd = a.faq.map(([q, v]) => ({
+  const faqLd = [...a.faq, ...YHTEINEN_FAQ].map(([q, v]) => ({
     '@type': 'Question',
     name: q,
     acceptedAnswer: { '@type': 'Answer', text: v },
@@ -342,6 +384,9 @@ ${nav(R)}
   <h2 class="title">Kiinteät hinnat ${a.ine}</h2>
   <p class="sub">Samat hinnat koko toiminta-alueella. Kaikki hinnat sisältävät ALV 25,5 %, tiivisteet ja työn.</p>
   ${hintaTaulukko()}
+  <h3 class="title" style="font-size:22px;margin-top:34px">Mitä koko koti maksaa ${a.ine}</h3>
+  <p class="sub">Todellisia summia hinnastosta laskettuna — kappalehinta laskee ikkunoiden määrän mukaan.</p>
+  ${kotiHinnat()}
   <p class="sub" style="margin-top:18px;font-size:15px">Mahdollinen matkalisä määräytyy postinumeron mukaan ja näkyy laskurissa ennen varauksen vahvistamista — sitä ei lisätä jälkikäteen laskuun.</p>
 </div></section>
 
@@ -350,7 +395,7 @@ ${laskuriOsio(R, a)}
 <section class="sec alt"><div class="wrap">
   <div class="kicker">Kysyttyä</div>
   <h2 class="title">Usein kysyttyä — ${a.name}</h2>
-  ${a.faq.map(([q, v]) => `<details class="faq-d"><summary>${esc(q)}</summary><p>${esc(v)}</p></details>`).join('\n  ')}
+  ${[...a.faq, ...YHTEINEN_FAQ].map(([q, v]) => `<details class="faq-d"><summary>${esc(q)}</summary><p>${esc(v)}</p></details>`).join('\n  ')}
 </div></section>
 
 <section class="sec"><div class="wrap">
