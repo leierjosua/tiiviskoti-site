@@ -16,6 +16,14 @@ type DayJob = {
   staff_name: string; customer_name: string | null; customer_phone: string | null;
 };
 
+/* Tänään saapunut varaus: kuka varasi ja mille päivälle. Pelkkä kappalemäärä
+   kertoi että jotain tuli, muttei mihin se meni — sen näki vasta kalenterista. */
+type NewBooking = {
+  id: string; job_number: string; created_at: Date; starts_at: Date;
+  price_cents: number; source: string | null;
+  customer_name: string | null; title: string; staff_name: string;
+};
+
 const eur = (cents: number) => (cents / 100).toLocaleString('fi-FI', { maximumFractionDigits: 0 }) + ' €';
 
 /* Tunnusluku. Vertailuluku alle kertoo mihin lukua verrataan — pelkkä
@@ -105,7 +113,7 @@ export default async function TodayPage() {
   const monthAgo = helsinkiDateTime(addDays(today, -30), '00:00');
   const weekAhead = helsinkiDateTime(addDays(today, 8), '00:00');
 
-  const [jobs, stats, health] = await Promise.all([
+  const [jobs, newBookings, stats, health] = await Promise.all([
     sql<DayJob[]>`
       select j.id, j.job_number, j.starts_at, j.ends_at, j.status::text as status, j.title,
              j.address, j.postal_code, j.city, j.price_cents, j.notes,
@@ -115,6 +123,20 @@ export default async function TodayPage() {
         join tk.staff s on s.id = c.staff_id
         left join tk.customers cu on cu.id = j.customer_id
        where j.starts_at >= ${dayStart.toISOString()} and j.starts_at < ${weekAhead.toISOString()}
+         and j.status <> 'cancelled'
+       order by j.starts_at
+    `,
+    /* Tänään SAAPUNEET varaukset koko riveinä, ei pelkkänä lukumääränä.
+       Järjestys on varauspäivän mukaan eikä saapumisjärjestyksessä: kysymys
+       johon tämä lista vastaa on "mihin päiville ne menivät". */
+    sql<NewBooking[]>`
+      select j.id, j.job_number, j.created_at, j.starts_at, j.price_cents, j.source,
+             j.title, cu.full_name as customer_name, s.full_name as staff_name
+        from tk.jobs j
+        join tk.calendars c on c.id = j.calendar_id
+        join tk.staff s on s.id = c.staff_id
+        left join tk.customers cu on cu.id = j.customer_id
+       where j.created_at >= ${dayStart.toISOString()}
          and j.status <> 'cancelled'
        order by j.starts_at
     `,
@@ -137,11 +159,15 @@ export default async function TodayPage() {
         count(*) filter (where j.created_at >= ${dayStart.toISOString()})::int as uudet_varaukset,
         coalesce(sum(case when j.created_at >= ${dayStart.toISOString()}
                           then j.price_cents end), 0)::int          as uudet_arvo,
-        -- Viimeiset 30 päivää: tehtävät työt, ei saapuneet
-        count(*) filter (where j.starts_at >= ${monthAgo.toISOString()}
-                           and j.starts_at <  ${dayEnd.toISOString()})::int  as kpl_30pv,
-        coalesce(sum(case when j.starts_at >= ${monthAgo.toISOString()}
-                           and j.starts_at <  ${dayEnd.toISOString()}
+        /* Viimeiset 30 päivää = KIRJAUSHETKI, ei työn päivä.
+
+           Mittari vastaa kysymykseen "paljonko kauppaa on syntynyt viime
+           kuussa". Työn päivämäärään sidottuna se jätti laskuista jokaisen
+           varauksen joka on jo myyty mutta tehdään vasta ensi kuussa — eli
+           juuri ne joista kalenteri on täynnä. Samasta syystä yläraja on
+           poistettu: tulevalle päivälle kirjattu kauppa on silti kauppa. */
+        count(*) filter (where j.created_at >= ${monthAgo.toISOString()})::int as kpl_30pv,
+        coalesce(sum(case when j.created_at >= ${monthAgo.toISOString()}
                           then j.price_cents end), 0)::int          as myynti_30pv,
         count(*) filter (where j.starts_at >= ${dayEnd.toISOString()})::int   as tulevat,
         (select count(*)::int from tk.leads where status = 'new')             as liidit_uudet
@@ -193,9 +219,9 @@ export default async function TodayPage() {
               sub={`${s.uudet_varaukset} varausta tänään`}
             />
             <Metric
-              label="Varaukset 30 pv"
+              label="Myynti 30 pv"
               value={eur(s.myynti_30pv)}
-              sub={`${s.kpl_30pv} varausta`}
+              sub={`${s.kpl_30pv} varausta kirjattu`}
             />
             <Metric
               label="Keikat tänään"
@@ -203,6 +229,39 @@ export default async function TodayPage() {
               sub={`myynti ${eur(s.myynti_tanaan)}`}
             />
           </div>
+
+          {/* Tunnuslukujen alla, ei kalenterissa: "3 varausta tänään" ei kerro
+              kenelle eikä millekään päivälle, ja juuri se on ensimmäinen asia
+              joka aamulla halutaan tietää. */}
+          {newBookings.length > 0 && (
+            <Card>
+              <CardHeader
+                title="Tänään saapuneet varaukset"
+                action={<span className="text-xs font-semibold tabular text-muted">
+                  {eur(s.uudet_arvo)}
+                </span>}
+              />
+              <ul className="divide-y divide-line-soft">
+                {newBookings.map((b) => (
+                  <li key={b.id}>
+                    <Link href={`/tyot/${b.id}`}
+                          className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 px-4 py-2.5 text-sm hover:bg-ink-700">
+                      <span className="min-w-0 flex-1 truncate font-semibold">
+                        {b.customer_name ?? b.title}
+                      </span>
+                      <span className="shrink-0 tabular text-xs text-faint">
+                        {eur(b.price_cents)}
+                      </span>
+                      <span className="w-full text-xs text-muted">
+                        {formatInstant(b.starts_at)} · {b.staff_name}
+                        {b.source && <span className="text-faint"> · {b.source}</span>}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
 
           {s.liidit_uudet > 0 && (
             <Link href="/liidit"
