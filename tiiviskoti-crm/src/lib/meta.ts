@@ -16,11 +16,22 @@ const GV = process.env.META_GRAPH_VERSION || 'v21.0';
 const TOKEN = process.env.META_ACCESS_TOKEN;
 const ACCOUNT = process.env.META_AD_ACCOUNT_ID || '205952163658187';
 
-// Meta-toiminnon tyypit → konversioluokat. Pikselin CAPI-tapahtumat tulevat
-// "offsite_conversion.fb_pixel_*" -muodossa; lyhyet muodot varalta mukana.
-const PURCHASE = ['offsite_conversion.fb_pixel_purchase', 'purchase', 'onsite_web_purchase'];
-const LEAD = ['offsite_conversion.fb_pixel_lead', 'lead', 'onsite_conversion.lead_grouped'];
-const SCHEDULE = ['offsite_conversion.fb_pixel_schedule', 'schedule'];
+/* Meta-toiminnon tyypit → konversioluokat.
+
+   ÄLÄ LASKE NÄITÄ YHTEEN. Metan `actions` sisältää saman tapahtuman
+   USEAAN KERTAAN eri tarkkuudella: lyhyt `lead` on koontiluku, ja sen
+   rinnalla tulevat lähdekohtaiset `onsite_conversion.lead_grouped`
+   (lomakemainos) ja `offsite_conversion.fb_pixel_lead` (pikseli).
+   Yhteenlasku tuplasi liidit — 38 liidiä näkyi 76:na ja hinta per liidi
+   puolittui 22 eurosta 11:een, eli sivu valehteli juuri siihen suuntaan
+   joka saa lisäämään budjettia.
+
+   Siksi koontiluku voittaa jos se on olemassa, ja vasta sen puuttuessa
+   lasketaan lähteet yhteen. Ensimmäinen alkio on koontiluku, loput
+   lähteitä. */
+const PURCHASE = ['purchase', 'offsite_conversion.fb_pixel_purchase', 'onsite_web_purchase'];
+const LEAD = ['lead', 'onsite_conversion.lead_grouped', 'offsite_conversion.fb_pixel_lead'];
+const SCHEDULE = ['schedule', 'offsite_conversion.fb_pixel_schedule'];
 
 export type MetaAdRow = {
   adId: string; adName: string;
@@ -38,9 +49,15 @@ type InsightRow = {
 
 const zero = (): MetaTotals => ({ spendCents: 0, impressions: 0, clicks: 0, linkClicks: 0, purchases: 0, leads: 0, schedules: 0 });
 
-function sumActions(actions: Action[] | undefined, types: string[]): number {
+/** Konversioiden määrä yhdelle luokalle. `types[0]` on Metan koontiluku ja
+ *  loput sen lähteitä; ks. ylläolevan vakion kommentti siitä miksi näitä ei
+ *  lasketa yhteen. */
+function countActions(actions: Action[] | undefined, types: string[]): number {
   if (!Array.isArray(actions)) return 0;
-  return actions.reduce((n, a) => (types.includes(a.action_type) ? n + Number(a.value || 0) : n), 0);
+  const arvo = (t: string) => Number(actions.find((a) => a.action_type === t)?.value ?? 0);
+  const koonti = arvo(types[0]);
+  if (koonti > 0) return koonti;
+  return types.slice(1).reduce((n, t) => n + arvo(t), 0);
 }
 
 /** Hakee mainoskohtaiset insightsit viimeisiltä `days` päivältä (ml. tänään).
@@ -70,9 +87,9 @@ export async function getMetaStats(days = 30): Promise<MetaStats> {
       impressions: Number(r.impressions || 0),
       clicks: Number(r.clicks || 0),
       linkClicks: Number(r.inline_link_clicks || 0),
-      purchases: sumActions(r.actions, PURCHASE),
-      leads: sumActions(r.actions, LEAD),
-      schedules: sumActions(r.actions, SCHEDULE),
+      purchases: countActions(r.actions, PURCHASE),
+      leads: countActions(r.actions, LEAD),
+      schedules: countActions(r.actions, SCHEDULE),
     }));
     const totals = rows.reduce<MetaTotals>((t, r) => ({
       spendCents: t.spendCents + r.spendCents,
