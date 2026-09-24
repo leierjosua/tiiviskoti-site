@@ -97,8 +97,8 @@ const body = `
     <p>Tiivistevaihtoon kuuluu vanhojen tiivisteiden poisto, pintojen puhdistus, uudet
       silikonitiivisteet sekä oven käynnin säätö niin, että ovi painuu tasaisesti tiivisteitä vasten.
       Ulko-oviin kuuluu lisäksi kynnyskumi. Työ tehdään asiakkaan osoitteessa sovittuna aikana.</p>
-    <p>Toiminta-alue on Uusimaa. Vahvistamme varauksen yhteydessä, että palvelemme antamassasi
-      postinumerossa.</p>
+    <p>Toiminta-alue on Uusimaa ja Riihimäki. Vahvistamme varauksen yhteydessä, että palvelemme
+      antamassasi postinumerossa.</p>
 
     <h2>3. Hinnat</h2>
     <p>Hinta muodostuu valitsemistasi kohteista kiinteillä hinnoilla:</p>
