@@ -37,10 +37,12 @@ const env = Object.fromEntries(
 /* ---------- Mitä luodaan ---------- */
 
 const ASENTAJA = {
-  /* Kirjoitusasu varmistettu Josualta 24.9.2026: Schwartz, ei Swarchz.
-     Nimi menee asiakkaalle työmääräimessä ja kalenterikutsussa, joten
-     tämä on se yksi kenttä joka kannattaa olla oikein heti. */
-  fullName: 'Joel Schwartz',
+  /* Kirjoitusasu: SCHWARZ, ei Schwartz eikä Swarchz. Kaikki kolme olivat
+     liikkeellä — pyynnössä luki "Swarchz", arvasin "Schwartz", mutta
+     hänen oma sähköpostinsa on `joel.s.schwarz@` eli ilman t:tä. Oma
+     osoite on paras saatavilla oleva todiste omasta nimestä. Nimi menee
+     asiakkaalle työmääräimessä ja kalenterikutsussa. */
+  fullName: 'Joel Schwarz',
   email: process.env.JOEL_EMAIL || '',        // annetaan ajossa
   phone: null,
   /* Sama kuin muilla asentajilla. Supabasen minimipituus on 6 merkkiä,
