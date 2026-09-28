@@ -2,9 +2,14 @@
 /* =========================================================
    Karsinta + saastotekstin tarkennus.
 
-   1. TK53 (kuva) ja TK56 (video) uusiksi: otsikossa lukee nyt
-      "10-15 % LAMMITYSKULUISTA" eika pelkka "10-15 %". Josua:
-      prosentti pitaa sitoa siihen mista se on prosentti.
+   1. TK53 (kuva) ja TK56 (video) uusiksi. Saastomainosten teksti
+      elaa tassa tiedostossa - aja skripti uudelleen kun se muuttuu,
+      sammutusosio ei tee mitaan jos ne on jo sammutettu.
+      28.9. v3: "Ikkunoiden tiivistys voi saastaa 10-15 %
+      lammityskuluissa." Aiempi "Vetava ikkuna maksaa 10-15 %
+      lammityskuluista" oli Josuan mielesta liian pitka, eika se
+      kertonut ensimmaisella sanalla mista palvelusta on kyse.
+      Lampokamerakuvaus pois kuvasta ja tekstista.
    2. TK31 karsitaan yhdestatoista neljaan. Josua vaihtoi TK47:n
       (oma porukka) tilalle TK58:n (video, saastaa 200-300 e/v).
       Sammutetaan 7, ei poisteta - ne saa takaisin yhdella ajolla.
@@ -39,14 +44,14 @@ const FORM = '1505410584942736';
 
 /* Prosentti sidottu siihen mista se on prosentti - kolmessa kohdassa:
    kuvan otsikko, mainoksen otsikko ja leipateksti. */
-const SAASTO_OTSIKKO = 'Vetävä ikkuna maksaa 10–15 % lämmityskuluista';
+const SAASTO_OTSIKKO = 'Ikkunoiden tiivistys voi säästää 10–15 % lämmityskuluissa';
 const SAASTO_KUVAUS = 'Tiivistys alk. 75 €. Kotitalousvähennys −40 %. Oma porukka.';
 const SAASTO_TEKSTI =
-`Vetävä ikkuna maksaa sinulle joka kuukausi. Tiivisteiden uusiminen leikkaa lämmityskuluja tyypillisesti 10–15 %.
+`Ikkunoiden tiivistys voi säästää 10–15 % lämmityskuluissa. Emme lupaa enempää — se on se mitä tiivistys oikeasti tekee.
 
-Emme lupaa enempää. Se on se mitä tiivistys oikeasti tekee, ja sen näkee lämpökamerasta ennen ja jälkeen.
+Jos lasi ja karmi ovat ehjät, riittää että tiivisteet uusitaan ja ikkunan käynti säädetään. Ikkunat jäävät paikoilleen.
 
-Ikkunan tiivistys alkaen 75 €. Pienin käynti 149 €, joka sisältää käynnin, matkat ja lämpökamerakuvauksen. Uusi ikkuna maksaisi noin 1 200 €.
+Ikkunan tiivistys 75–90 € / kpl määrän mukaan. Pienin käynti 149 €. Uusi ikkuna maksaisi noin 1 200 €.
 
 Jätä numerosi, niin lasketaan hinta sinun ikkunoillesi. Sanomme suoraan, jos tiivistys ei sinun kohdallasi riitä.`;
 
