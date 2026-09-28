@@ -35,5 +35,8 @@ export async function GET(request: Request) {
   }
 
   const result = await importMetaLeads();
-  return Response.json(result, { status: result.error ? 500 : 200 });
+  /* Myös ilmoituksen epäonnistuminen on 500. Liidi on kannassa, mutta
+     jos kukaan ei saa siitä tietoa, se on käytännössä menetetty — ja
+     juuri se vika jäi ennen huomaamatta, koska virhe vain logitettiin. */
+  return Response.json(result, { status: result.error || result.notifyError ? 500 : 200 });
 }

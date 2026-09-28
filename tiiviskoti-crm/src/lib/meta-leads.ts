@@ -32,6 +32,12 @@ export type MetaLeadsResult = {
   fetched: number;
   imported: number;
   skipped: number;
+  /* Kuinka monelle vastaanottajalle ilmoitus lähti. */
+  notified?: number;
+  /* Ilmoituksen epäonnistuminen EI kaada tuontia, mutta se palautetaan
+     tässä: hiljainen epäonnistuminen oli juuri se vika joka jäi
+     huomaamatta viikoiksi. Cron-reitti nostaa tämän 500:ksi. */
+  notifyError?: string;
   error?: string;
 };
 
@@ -81,6 +87,8 @@ export async function importMetaLeads(): Promise<MetaLeadsResult> {
     let imported = 0;
     let skipped = 0;
     const uudet: { nimi: string; puhelin: string; email: string | null; pn: string | null; viesti: string }[] = [];
+    let notified = 0;
+    let notifyError: string | undefined;
 
     for (const formId of lomakkeet) {
       const res = await graph<{ data?: MetaLead[] }>(`${formId}/leads`, {
@@ -129,8 +137,19 @@ export async function importMetaLeads(): Promise<MetaLeadsResult> {
     }
 
     /* Ilmoitus toimistolle. Liidi joka jää vain kantaan on käytännössä
-       menetetty: soitto samana päivänä ratkaisee kaupan. Lähetys ei saa
-       kaataa tuontia — liidi on jo tallessa, ilmoitus on lisäpalvelu. */
+       menetetty: soitto samana päivänä ratkaisee kaupan.
+
+       VASTAANOTTAJA ON PAKKO OLLA ERI KUIN LÄHETTÄJÄ. Ilmoitus meni
+       ennen info@ -> info@, ja Gmail käsittelee itselle lähetettyä
+       API-postia epäjohdonmukaisesti: osa viesteistä sai vain SENT-
+       tunnisteen eikä näkynyt saapuneissa lainkaan. Tarkistettu
+       28.9.2026 postilaatikosta — 24.9. lähtenyt ilmoitus oli pelkkä
+       SENT. Siksi LEAD_NOTIFY_TO, johon voi antaa pilkulla erotellun
+       listan oikeita vastaanottajia.
+
+       Lähetys ei saa kaataa tuontia — liidi on jo tallessa. Virhe
+       palautetaan silti kutsujalle, koska hiljainen epäonnistuminen on
+       juuri se vika jota etsittiin: liidejä tuli, postia ei. */
     if (uudet.length) {
       const rivit = uudet.map((u) => [
         u.nimi,
@@ -139,19 +158,23 @@ export async function importMetaLeads(): Promise<MetaLeadsResult> {
         u.pn ? `postinumero ${u.pn}` : null,
         u.viesti.split('\n').slice(1).join(' · '),
       ].filter(Boolean).join(' — '));
+      const vastaanottajat = (process.env.LEAD_NOTIFY_TO ?? SENDER_EMAIL)
+        .split(',').map((x) => x.trim()).filter(Boolean);
       try {
         await sendMail({
-          to: SENDER_EMAIL,
+          to: vastaanottajat.join(', '),
           subject: `${uudet.length} uutta liidiä Metan mainoksesta`,
           text: `Uudet liidit näkyvät myös adminissa: https://admin.tiiviskoti.fi/liidit\n\n${rivit.join('\n')}`,
           html: `<p>Uudet liidit näkyvät myös <a href="https://admin.tiiviskoti.fi/liidit">adminin Liidit-sivulla</a>.</p><ul>${rivit.map((r) => `<li>${r.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string))}</li>`).join('')}</ul>`,
         });
+        notified = vastaanottajat.length;
       } catch (e) {
+        notifyError = e instanceof Error ? e.message : String(e);
         console.error('meta-leads: ilmoituksen lähetys epäonnistui', e);
       }
     }
 
-    return { forms: lomakkeet.length, fetched, imported, skipped };
+    return { forms: lomakkeet.length, fetched, imported, skipped, notified, notifyError };
   } catch (e) {
     return { forms: 0, fetched: 0, imported: 0, skipped: 0, error: e instanceof Error ? e.message : String(e) };
   }
