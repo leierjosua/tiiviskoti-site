@@ -43,13 +43,20 @@ mkdirSync(OUT, { recursive: true });
    liikaa ja vaihdot liian nopeita. */
 const PALA = {
   avaus:    [0.05, 3.90],   // kasi tyontaa puitteen auki, laaja - 3,85 s
-  nauha:    [4.05, 6.30],   // TIIVISTENAUHA kadessa, roikkuu - 2,25 s
+  puristin: [13.35, 15.00], // SAUMAPURISTIN vedetaan ikkunan karmia pitkin - 1,65 s
   tiiviste: [17.00, 18.85], // SORMI PAINAA TIIVISTETTA PYSTYURAAN - 1,85 s
 };
-/* Jarjestys kertoo tyon: ikkuna auki -> tassa on tiiviste -> nauha
-   painetaan uraan. Kolmas pala tuli mukaan koska kahdella video jai
-   4,9 sekuntiin, mika oli liian lyhyt. */
-const PALAT = ['avaus', 'nauha', 'tiiviste'];
+/* Kolmas pala tuli mukaan koska kahdella video jai 4,9 sekuntiin.
+
+   ENSIMMAINEN YRITYS OLI 4,05-6,30 (tiivistenauha roikkuu kadessa) ja
+   Josua tyrmasi sen. Se on tuotekuva eika tyota: kasi vain pitelee
+   nauhaa. Tilalle saumapuristin, jossa tyokalu liikkuu karmia pitkin
+   eli kuvassa TAPAHTUU jotain.
+
+   Keskimmainen paikka on tarkoituksellinen. Puristinpala on lyhin
+   (1,65 s) ja kaksi haivytysta syo siita eniten; nain se ei vie tilaa
+   siita urapalasta jonka Josua nimenomaan valitsi. */
+const PALAT = ['avaus', 'puristin', 'tiiviste'];
 
 /* KAIKISSA SAMA KUVA, ERI TEKSTI. Kun kuva on vakio, ero tuloksissa
    kertoo vaitteesta eika materiaalista. Jarjestys avaus -> tiiviste:
@@ -69,7 +76,7 @@ const VIDEOT = [
    lyhin pala on 1,85 s, ja kahden 0,80 s haivytyksen jalkeen siita
    nakyisi teravana enaa puoli sekuntia. Nyt sulautuksia on 1,4 s eli
    noin viidennes videosta. */
-const XFADE = 0.70;
+const XFADE = 0.60;
 
 /* Lahde on 25 fps. Ala aja sita lapi muulla ruutunopeudella: 25->30
    monistaa joka viidennen ruudun ja nykii. Samasta syysta ei myoskaan
@@ -77,7 +84,7 @@ const XFADE = 0.70;
 const FPS = 25;
 
 const FADE_IN = 0.25;
-const FADE_OUT = 0.35;
+const FADE_OUT = 0.30;
 
 /* Musiikki tulee lahteen omasta aaniraidasta - sama kappale joka on
    muissakin TiivisKoti-videoissa. Tarkistettu spektrogrammista ettei
