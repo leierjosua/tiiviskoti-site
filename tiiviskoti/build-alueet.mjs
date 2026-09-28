@@ -460,6 +460,8 @@ const PALVELUT = [
       ['Mitä tiivisteitä käytätte?', 'Aukon mukaan valittu silikonitiiviste. Paksuus valitaan mitatun välyksen mukaan — liian ohut ei tiivistä ja liian paksu estää ikkunaa sulkeutumasta.'],
       ['Voiko tiivisteet vaihtaa talvella?', 'Kyllä. Työ tehdään sisäkautta eikä se vaadi lämpimiä olosuhteita. Syksy on silti helpoin aika, koska vedon huomaa heti ensimmäisillä pakkasilla.'],
       ['Kannattaako vanhat ikkunat tiivistää vai vaihtaa?', 'Jos puitteet ja karmit ovat kunnossa, tiivistys maksaa murto-osan ikkunaremontista ja poistaa vedon. Lahonneita rakenteita se ei korjaa — kerromme rehellisesti jos vaihto on järkevämpi.'],
+      ['Tiivistetäänkö myös ulkopuite?', 'Tarvittaessa kyllä. Ulkopuite tiivistetään urallisella tiivisteellä uraan — ei massalla. Ulkopuitteeseen jätetään aina noin 5 cm:n rako, jotta ikkunoiden välinen tila pääsee tuulettumaan eikä kosteus jää lasien väliin.'],
+      ['Vaihdatteko karmitiivisteen vai puitetiivisteen?', 'Molemmat kuuluvat samaan hintaan. Kumpi on kulunut, selviää vasta paikan päällä: tiiviste voi olla karmissa, puitteessa tai molemmissa, ja paksuus valitaan mitatun välyksen mukaan.'],
     ],
     ctaOtsikko: 'Näet ikkunoiden hinnan heti — ilman tarjouspyyntöä',
   },
@@ -628,7 +630,7 @@ ${nav(R)}
 <section class="sec"><div class="wrap">
   <div class="kicker">Hinnasto</div>
   <h2 class="title">Kiinteät hinnat</h2>
-  <p class="sub">Samat hinnat koko Uudellamaalla. Kaikki hinnat sisältävät ALV 25,5 %, tiivisteet ja työn.</p>
+  <p class="sub">Samat hinnat koko Uudellamaalla ja Riihimäellä. Kaikki hinnat sisältävät ALV 25,5 %, tiivisteet ja työn.</p>
   ${hintaTaulukko()}
   <p class="sub" style="margin-top:18px;font-size:15px">Mahdollinen matkalisä määräytyy postinumeron mukaan ja näkyy laskurissa ennen varauksen vahvistamista — sitä ei lisätä jälkikäteen laskuun.</p>
 </div></section>
