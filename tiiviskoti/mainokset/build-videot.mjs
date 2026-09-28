@@ -42,21 +42,35 @@ mkdirSync(OUT, { recursive: true });
    pitaydytaan kahdessa otoksessa: Josua sanoi etta kolme palaa oli
    liikaa ja vaihdot liian nopeita. */
 const PALA = {
-  avaus:    [0.05, 3.90],   // kasi tyontaa puitteen auki, laaja - 3,85 s
-  puristin: [13.35, 15.00], // SAUMAPURISTIN vedetaan ikkunan karmia pitkin - 1,65 s
-  tiiviste: [17.00, 18.85], // SORMI PAINAA TIIVISTETTA PYSTYURAAN - 1,85 s
+  avaus:      [1.55, 3.90],   // ikkunan avaus, laaja - LYHENNETTY 3,85 -> 2,35 s
+  massaLaaja: [11.55, 13.20], // saumapuristin karmia pitkin, profiili - 1,65 s
+  massaLahi:  [13.32, 15.05], // sama tyo lahempaa - 1,73 s
+  uraPysty:   [17.00, 18.85], // tiiviste painetaan PYSTYURAAN - 1,85 s
+  uraAla:     [18.95, 20.70], // tiiviste painetaan ALAKARMIIN - 1,75 s
 };
-/* Kolmas pala tuli mukaan koska kahdella video jai 4,9 sekuntiin.
 
-   ENSIMMAINEN YRITYS OLI 4,05-6,30 (tiivistenauha roikkuu kadessa) ja
-   Josua tyrmasi sen. Se on tuotekuva eika tyota: kasi vain pitelee
-   nauhaa. Tilalle saumapuristin, jossa tyokalu liikkuu karmia pitkin
-   eli kuvassa TAPAHTUU jotain.
+/* KOLME OSIOTA, EI VIITTA LEIKKAUSTA. Josua halusi massan laitosta ja
+   tiivisteesta pidempaa ja avauksesta lyhyempaa. Yksittaiset otokset
+   ovat kaikki vain 1,6-1,9 s, joten pituutta saa vain liittamalla
+   kaksi rajausta samasta tyosta yhteen.
 
-   Keskimmainen paikka on tarkoituksellinen. Puristinpala on lyhin
-   (1,65 s) ja kaksi haivytysta syo siita eniten; nain se ei vie tilaa
-   siita urapalasta jonka Josua nimenomaan valitsi. */
-const PALAT = ['avaus', 'puristin', 'tiiviste'];
+   Siksi haivytyksia on kahta pituutta:
+     0,55 s OSIOIDEN valilla (ikkuna -> massa -> tiiviste). Iso
+       visuaalinen hyppy, tarvitsee kunnon sulautuksen.
+     0,25 s OSION SISALLA (laaja -> lahi samasta tyosta). Kuva on
+       melkein sama, joten lyhyt sulautus riittaa peittamaan leikkauksen
+       ja osio lukee yhtena jatkuvana otoksena.
+   Katsojalle tama on kolme kuvaa, ei viitta.
+
+   ALA KAYTA 20,9 s ETEENPAIN: siina leikataan nauhaa saksilla.
+   ALA KAYTA 4,05-6,30: kasi vain pitelee nauhaa, tuotekuva eika tyota. */
+const PALAT = [
+  { p: 'avaus' },
+  { p: 'massaLaaja', hv: 0.55 },
+  { p: 'massaLahi',  hv: 0.25 },
+  { p: 'uraPysty',   hv: 0.55 },
+  { p: 'uraAla',     hv: 0.25 },
+];
 
 /* KAIKISSA SAMA KUVA, ERI TEKSTI. Kun kuva on vakio, ero tuloksissa
    kertoo vaitteesta eika materiaalista. Jarjestys avaus -> tiiviste:
@@ -68,15 +82,6 @@ const VIDEOT = [
   { nimi: 'video-euro',      overlay: 'overlay-euro',      miksi: 'Euro: 200-300 e vuodessa.' },
 ];
 
-/* PITKA ristihaivytys. 0,35 s luki Josualle yha "todella sharppina":
-   otokset ovat visuaalisesti kaukana toisistaan (laaja huone vs.
-   kasimakro), joten lyhyt haivytys nayttaa silti leikkaukselta.
-   0,70 s on sulautus eika siirtyma - kaksinkertainen siihen 0,35
-   sekuntiin joka yha luki leikkauksena. Pidempaan ei kannata menna:
-   lyhin pala on 1,85 s, ja kahden 0,80 s haivytyksen jalkeen siita
-   nakyisi teravana enaa puoli sekuntia. Nyt sulautuksia on 1,4 s eli
-   noin viidennes videosta. */
-const XFADE = 0.60;
 
 /* Lahde on 25 fps. Ala aja sita lapi muulla ruutunopeudella: 25->30
    monistaa joka viidennen ruudun ja nykii. Samasta syysta ei myoskaan
@@ -102,13 +107,13 @@ for (const v of VIDEOT) {
     continue;
   }
 
-  const kestot = PALAT.map((p) => PALA[p][1] - PALA[p][0]);
-  const kesto = kestot.reduce((a, b) => a + b, 0) - XFADE * (PALAT.length - 1);
+  const kestot = PALAT.map((x) => PALA[x.p][1] - PALA[x.p][0]);
+  const kesto = kestot.reduce((a, b) => a + b, 0) - PALAT.reduce((n, x) => n + (x.hv || 0), 0);
 
   /* Jokainen pala omaksi haarakseen: rajaus, koko ja ruutunopeus on
      pakko yhtenaistaa ennen xfadea, muuten se kieltaytyy. */
-  const haarat = PALAT.map((p, i) =>
-    `[0:v]trim=start=${PALA[p][0]}:end=${PALA[p][1]},setpts=PTS-STARTPTS,` +
+  const haarat = PALAT.map((x, i) =>
+    `[0:v]trim=start=${PALA[x.p][0]}:end=${PALA[x.p][1]},setpts=PTS-STARTPTS,` +
     `scale=1080:1350,fps=${FPS},format=yuv420p[c${i}]`).join(';');
 
   /* xfaden offset lasketaan YHDISTETYN virran alusta, ei palan alusta:
@@ -117,9 +122,10 @@ for (const v of VIDEOT) {
   let edellinen = 'c0';
   let pituus = kestot[0];
   for (let i = 1; i < PALAT.length; i++) {
+    const hv = PALAT[i].hv;
     const ulos = i === PALAT.length - 1 ? 'cat' : `x${i}`;
-    ketju.push(`[${edellinen}][c${i}]xfade=transition=fade:duration=${XFADE}:offset=${(pituus - XFADE).toFixed(3)}[${ulos}]`);
-    pituus = pituus + kestot[i] - XFADE;
+    ketju.push(`[${edellinen}][c${i}]xfade=transition=fade:duration=${hv}:offset=${(pituus - hv).toFixed(3)}[${ulos}]`);
+    pituus = pituus + kestot[i] - hv;
     edellinen = ulos;
   }
 
@@ -148,6 +154,6 @@ for (const v of VIDEOT) {
     dest,
   ], { stdio: 'inherit' });
 
-  console.log(`✓ ${v.nimi}.mp4  ${kesto.toFixed(1)} s  (${PALAT.join(' → ')}) + musiikki`);
+  console.log(`✓ ${v.nimi}.mp4  ${kesto.toFixed(1)} s  (${PALAT.map((x) => x.p).join(' → ')}) + musiikki`);
   console.log(`   ${v.miksi}`);
 }
