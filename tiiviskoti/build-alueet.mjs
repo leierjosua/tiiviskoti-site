@@ -453,9 +453,10 @@ const PALVELUT = [
       ['Tiiviste on kova tai halkeillut', 'Kumi kovettuu 10–15 vuodessa. Kun sitä painaa sormella eikä se jousta takaisin, se ei enää tiivistä.'],
       ['Lasin alareuna huurtuu', 'Sisäilman kosteus tiivistyy kylmään kohtaan. Vuotava tiiviste tuo kylmän pinnan lähemmäs sisätilaa.'],
       ['Ikkuna vinkuu tai on jäykkä', 'Helojen välykset ovat muuttuneet. Pelkkä uusi tiiviste ei riitä, jos puite ei purista sitä tasaisesti.'],
+      ['Paperi irtoaa ilman vastusta', 'Nopein oma testi: sulje ikkuna paperiarkin päälle ja vedä arkkia. Jos se tulee ulos vastuksetta, tiiviste ei enää purista siitä kohtaa.'],
     ],
     faq: [
-      ['Paljonko ikkunoiden tiivistys maksaa?', `Ikkuna maksaa ${WINDOW_HIGH} € kappaleelta, ja hinta laskee määrän mukaan: ${WINDOW_TIERS.slice(1).map((t, i) => `${TIER_FROM[i + 1]} ikkunasta ${t.price} €`).join(', ')}. Pienin veloitus käynniltä on ${MIN_PRICE} €. Hinnat sisältävät tiivisteet, työn ja ALV 25,5 %.`],
+      ['Paljonko ikkunoiden tiivistys maksaa?', `Ikkuna maksaa ${WINDOW_HIGH} € kappaleelta riippumatta ikkunan koosta ja mallista — ainoa hintaan vaikuttava asia on ikkunoiden määrä samalla käynnillä: ${WINDOW_TIERS.slice(1).map((t, i) => `${TIER_FROM[i + 1]} ikkunasta ${t.price} €`).join(', ')}. Pienin veloitus käynniltä on ${MIN_PRICE} €. Hinnat sisältävät tiivisteet, työn ja ALV 25,5 %.`],
       ['Kuinka kauan yhden ikkunan tiivistys kestää?', 'Noin 20 minuuttia ikkunaa kohti. Tavallinen omakotitalon kierros on 2–4 tuntia, ja työ tehdään yhdellä käynnillä.'],
       ['Mitä tiivisteitä käytätte?', 'Aukon mukaan valittu silikonitiiviste. Paksuus valitaan mitatun välyksen mukaan — liian ohut ei tiivistä ja liian paksu estää ikkunaa sulkeutumasta.'],
       ['Voiko tiivisteet vaihtaa talvella?', 'Kyllä. Työ tehdään sisäkautta eikä se vaadi lämpimiä olosuhteita. Syksy on silti helpoin aika, koska vedon huomaa heti ensimmäisillä pakkasilla.'],
