@@ -45,3 +45,6 @@ tiiviskoti/mainokset/out/*.mp4
 # joten binäärejä ei kannata versioida. Lähteet (HTML/CSS/skriptit)
 # ovat mukana, valmiit videot työpöydällä tiiviskoti-mainosvideot/.
 tiiviskoti/mainokset/video/out/
+
+# minterpolate-valituote, syntyy uudelleen build-videot.mjs:lla
+tiiviskoti/mainokset/out/_pohja.mp4

@@ -66,11 +66,27 @@ const PALA = {
    ALA KAYTA 4,05-6,30: kasi vain pitelee nauhaa, tuotekuva eika tyota. */
 const PALAT = [
   { p: 'avaus' },
-  { p: 'massaLaaja', hv: 0.55 },
-  { p: 'massaLahi',  hv: 0.25 },
-  { p: 'uraPysty',   hv: 0.55 },
-  { p: 'uraAla',     hv: 0.25 },
+  { p: 'massaLaaja', hv: 1.20 },
+  { p: 'massaLahi',  hv: 0.45 },
+  { p: 'uraPysty',   hv: 1.20 },
+  { p: 'uraAla',     hv: 0.45 },
 ];
+
+/* KEVYT HIDASTUS, JOTTA HAIVYTYKSET MAHTUVAT. Josua on sanonut kolme
+   kertaa etta vaihdot ovat liian nopeita. Olin menossa vaaraan
+   suuntaan: lyhensin niita 0,90 -> 0,55, koska palat ovat lyhyita
+   eivatka kestaneet pitkaa haivytysta. Oikea ratkaisu on tehda
+   paloista pidempia.
+
+   Hylkasin hidastuksen aiemmin koska se monisti ruutuja ja nykii.
+   minterpolate valttaa sen: se LASKEE valiruudut liikkeesta sen
+   sijaan etta monistaisi olemassa olevia. Tarkistettu ruuduittain,
+   kasissa ei nay vaantymaa. 0,85x ei lue hidastukseksi mutta antaa
+   17 % lisaa aikaa joka palaan.
+
+   Hinta on renderointiaika: minterpolate on hidas, joten pohja
+   rakennetaan KERRAN ja nelja tekstitasoa lisataan siihen erikseen. */
+const NOPEUS = 0.85;
 
 /* KAIKISSA SAMA KUVA, ERI TEKSTI. Kun kuva on vakio, ero tuloksissa
    kertoo vaitteesta eika materiaalista. Jarjestys avaus -> tiiviste:
@@ -88,8 +104,8 @@ const VIDEOT = [
    hidastusta ilman liikkeen interpolointia. */
 const FPS = 25;
 
-const FADE_IN = 0.25;
-const FADE_OUT = 0.30;
+const FADE_IN = 0.40;
+const FADE_OUT = 0.60;
 
 /* Musiikki tulee lahteen omasta aaniraidasta - sama kappale joka on
    muissakin TiivisKoti-videoissa. Tarkistettu spektrogrammista ettei
@@ -100,60 +116,62 @@ const MUSA_ALKU = 0.0;
 const MUSA_TASO = 0.5;   // n. -6 dB: kuuluu, muttei peita mitaan
 const MUSA_OUT = 0.8;
 
+/* ---------- 1. Pohja (kuva + musiikki) kerran ---------- */
+
+const kestot = PALAT.map((x) => (PALA[x.p][1] - PALA[x.p][0]) / NOPEUS);
+const kesto = kestot.reduce((a, b) => a + b, 0) - PALAT.reduce((n, x) => n + (x.hv || 0), 0);
+
+const haarat = PALAT.map((x, i) =>
+  `[0:v]trim=start=${PALA[x.p][0]}:end=${PALA[x.p][1]},setpts=(PTS-STARTPTS)/${NOPEUS},` +
+  `minterpolate=fps=${FPS}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1,` +
+  `scale=1080:1350,format=yuv420p[c${i}]`).join(';');
+
+/* xfaden offset lasketaan YHDISTETYN virran alusta, ei palan alusta:
+   jokainen haivytys lyhentaa tulosta oman kestonsa verran. */
+const ketju = [];
+let edellinen = 'c0';
+let pituus = kestot[0];
+for (let i = 1; i < PALAT.length; i++) {
+  const hv = PALAT[i].hv;
+  const ulos = i === PALAT.length - 1 ? 'cat' : `x${i}`;
+  ketju.push(`[${edellinen}][c${i}]xfade=transition=fade:duration=${hv}:offset=${(pituus - hv).toFixed(3)}[${ulos}]`);
+  pituus = pituus + kestot[i] - hv;
+  edellinen = ulos;
+}
+
+const pohja = path.join(OUT, '_pohja.mp4');
+console.log(`Rakennetaan pohja (${kesto.toFixed(1)} s, minterpolate — kestää hetken)…`);
+execFileSync('ffmpeg', [
+  '-loglevel', 'error', '-y', '-i', SRC,
+  '-filter_complex', [
+    haarat, ...ketju,
+    `[cat]fade=t=in:st=0:d=${FADE_IN},fade=t=out:st=${(kesto - FADE_OUT).toFixed(2)}:d=${FADE_OUT}[out]`,
+    /* Musiikki YHTENA palana: paloiteltuna saumaan tulisi naksahdus. */
+    `[0:a]atrim=start=${MUSA_ALKU}:end=${(MUSA_ALKU + kesto).toFixed(3)},asetpts=PTS-STARTPTS,` +
+      `afade=t=in:st=0:d=0.4,afade=t=out:st=${(kesto - MUSA_OUT).toFixed(2)}:d=${MUSA_OUT},` +
+      `volume=${MUSA_TASO},aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[aout]`,
+  ].join(';'),
+  '-map', '[out]', '-map', '[aout]',
+  '-c:v', 'libx264', '-crf', '18', '-preset', 'medium', '-c:a', 'aac', '-b:a', '128k',
+  pohja,
+], { stdio: 'inherit' });
+
+/* ---------- 2. Tekstitaso jokaiseen ---------- */
+
 for (const v of VIDEOT) {
   const ov = path.join(OUT, `${v.overlay}.png`);
   if (!existsSync(ov)) {
     console.error(`✗ tekstitaso puuttuu: ${ov}\n  aja ensin: RENDER_ALPHA=1 node tiiviskoti/mainokset/render.mjs ${v.overlay}`);
     continue;
   }
-
-  const kestot = PALAT.map((x) => PALA[x.p][1] - PALA[x.p][0]);
-  const kesto = kestot.reduce((a, b) => a + b, 0) - PALAT.reduce((n, x) => n + (x.hv || 0), 0);
-
-  /* Jokainen pala omaksi haarakseen: rajaus, koko ja ruutunopeus on
-     pakko yhtenaistaa ennen xfadea, muuten se kieltaytyy. */
-  const haarat = PALAT.map((x, i) =>
-    `[0:v]trim=start=${PALA[x.p][0]}:end=${PALA[x.p][1]},setpts=PTS-STARTPTS,` +
-    `scale=1080:1350,fps=${FPS},format=yuv420p[c${i}]`).join(';');
-
-  /* xfaden offset lasketaan YHDISTETYN virran alusta, ei palan alusta:
-     jokainen haivytys lyhentaa tulosta XFADEn verran. */
-  const ketju = [];
-  let edellinen = 'c0';
-  let pituus = kestot[0];
-  for (let i = 1; i < PALAT.length; i++) {
-    const hv = PALAT[i].hv;
-    const ulos = i === PALAT.length - 1 ? 'cat' : `x${i}`;
-    ketju.push(`[${edellinen}][c${i}]xfade=transition=fade:duration=${hv}:offset=${(pituus - hv).toFixed(3)}[${ulos}]`);
-    pituus = pituus + kestot[i] - hv;
-    edellinen = ulos;
-  }
-
-  const filter = [
-    haarat,
-    ...ketju,
-    `[cat]fade=t=in:st=0:d=${FADE_IN},fade=t=out:st=${(kesto - FADE_OUT).toFixed(2)}:d=${FADE_OUT}[base]`,
-    `[1:v]scale=1080:1350[ov]`,
-    `[base][ov]overlay=0:0:format=auto,format=yuv420p[out]`,
-    /* Musiikki YHTENA yhtenaisena palana. Jos sen leikkaisi kuvan
-       mukana kahtia, saumaan tulisi naksahdus. */
-    `[0:a]atrim=start=${MUSA_ALKU}:end=${(MUSA_ALKU + kesto).toFixed(3)},asetpts=PTS-STARTPTS,` +
-      `afade=t=in:st=0:d=0.3,afade=t=out:st=${(kesto - MUSA_OUT).toFixed(2)}:d=${MUSA_OUT},` +
-      `volume=${MUSA_TASO},aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[aout]`,
-  ].join(';');
-
   const dest = path.join(OUT, `${v.nimi}.mp4`);
   execFileSync('ffmpeg', [
-    '-loglevel', 'error', '-y',
-    '-i', SRC, '-i', ov,
-    '-filter_complex', filter,
-    '-map', '[out]', '-map', '[aout]',
-    '-c:v', 'libx264', '-crf', '20', '-preset', 'medium',
-    '-c:a', 'aac', '-b:a', '128k',
-    '-movflags', '+faststart',
-    dest,
+    '-loglevel', 'error', '-y', '-i', pohja, '-i', ov,
+    '-filter_complex', '[1:v]scale=1080:1350[ov];[0:v][ov]overlay=0:0:format=auto,format=yuv420p[out]',
+    '-map', '[out]', '-map', '0:a',
+    '-c:v', 'libx264', '-crf', '20', '-preset', 'medium', '-c:a', 'copy',
+    '-movflags', '+faststart', dest,
   ], { stdio: 'inherit' });
 
-  console.log(`✓ ${v.nimi}.mp4  ${kesto.toFixed(1)} s  (${PALAT.map((x) => x.p).join(' → ')}) + musiikki`);
-  console.log(`   ${v.miksi}`);
+  console.log(`✓ ${v.nimi}.mp4  ${kesto.toFixed(1)} s  ${v.miksi}`);
 }
