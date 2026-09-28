@@ -35,36 +35,44 @@ const SRC = path.join(homedir(), 'Desktop', 'tiiviskoti-mainosvideot', 'tiivisko
 if (!existsSync(SRC)) { console.error(`Lähdevideo puuttuu: ${SRC}`); process.exit(1); }
 mkdirSync(OUT, { recursive: true });
 
-/* Puhtaat jaksot lähdevideosta. Rajat on vedetty hieman sisäänpäin
-   todellisista, jotta tekstin häivytys ei vilahda reunoilla. */
-const PALA = {
-  avaus:    [0.35, 3.30],   // asentaja kurottaa ikkunalle, laaja
-  massa:    [9.25, 11.55],  // lippalakki ja massapuristin lähellä
-  /* Rajaus on tarkoituksella tiukka: 15,3-17,0 s on asentajan kasvot
-     lahikuvassa, ja kadet tulevat vasta 17,1 s jalkeen. Josua ei halua
-     pelkkia kasvokuvia, ja videon ENSIMMAINEN RUUTU on sen pikkukuva —
-     eli vaara aloitus on sama virhe kuin kasvomainos. */
-  uraan:    [17.15, 18.45], // tiiviste painetaan uraan — paras makro
-  kasi:     [22.65, 26.30], // käsi karmilla, asentaja ikkunan ääressä
-};
+/* Puhtaat jaksot lähdevideosta, kartoitettu 0,15 s tarkkuudella 28.9.2026.
+   Rajat on vedetty sisäänpäin siitä mihin vanhan tekstin HÄIVYTYS alkaa,
+   ei siitä missä teksti on täysin näkyvissä. Haamu jää helposti
+   huomaamatta tavallisesta pysäytyskuvasta mutta näkyy liikkeessä —
+   tarkista rajat KIRKASTETTUNA:
+     ffmpeg -ss <t> -i lahde.mp4 -frames:v 1 \
+       -vf "eq=brightness=0.14:contrast=1.3" tarkistus.jpg
+   Näin löytyi kaksi vuotoa jotka menivät ensin läpi: massan loppu
+   (11,25 s -> 10,95) ja kaden alku (22,65 s -> 23,15).
 
+   KOLME VIIDESTÄ ON ITSE TIIVISTYSTYÖTÄ (kela, massa, uraan). Leikkaukset
+   painotetaan niihin: Josua halusi nähdä enemmän sitä kohtaa jossa
+   tiivistettä laitetaan, vähemmän yleiskuvaa. */
+const PALA = {
+  avaus:      [0.35, 3.90],   // asentaja kurottaa ikkunalle, laaja
+  avausLyhyt: [1.20, 3.40],   // sama tiiviimmin, kun kuvaa tarvitaan vain aloitukseen
+  kela:       [4.10, 4.68],   // TIIVISTE kädessä, nauha roikkuu — löytyi vasta tiheässä skannauksessa
+  massa:      [9.25, 10.95],  // TIIVISTYSMASSAN puristus karmiin
+  uraan:      [17.15, 18.70], // TIIVISTE painetaan uraan — paras makro
+  kasi:       [23.15, 25.10], // käsi karmilla; alkaa vasta kun 'Lämmityskausi' on häipynyt, loppuu ennen korttia
+};
 /* Jokaiselle kulmalle oma leikkaus. Sama materiaali, eri järjestys:
    kulma ratkaisee millä kuvalla aloitetaan. Tiivistysmakro ensin
    silloin kun väite koskee itse työtä, laaja kuva silloin kun väite
    koskee koko taloa. */
 const VIDEOT = [
   { nimi: 'video-ankkuri',   overlay: 'overlay-ankkuri',
-    palat: ['massa', 'uraan', 'avaus'],
-    miksi: 'Ankkuri: työ ensin, koska väite on ikkunan hinnasta.' },
+    palat: ['massa', 'uraan', 'kela', 'kasi'],
+    miksi: 'Ankkuri: massa → uraan → kela, eli kolme tiivistysotosta peräkkäin.' },
   { nimi: 'video-prosentti', overlay: 'overlay-prosentti',
-    palat: ['avaus', 'uraan', 'kasi'],
-    miksi: 'Suhdeluku: laaja kuva ensin, koska väite koskee koko taloa.' },
+    palat: ['avausLyhyt', 'massa', 'uraan', 'kela'],
+    miksi: 'Suhdeluku: lyhyt yleiskuva taloväitteelle, sitten pelkkää työtä.' },
   { nimi: 'video-menetys',   overlay: 'overlay-menetys',
-    palat: ['kasi', 'avaus', 'massa'],
-    miksi: 'Menetys: käsi karmilla ensin — kohta josta vetää.' },
+    palat: ['kasi', 'massa', 'uraan', 'kela'],
+    miksi: 'Menetys: käsi karmilla — se kohta josta vetää — sitten korjaus.' },
   { nimi: 'video-euro',      overlay: 'overlay-euro',
-    palat: ['massa', 'kasi', 'uraan'],
-    miksi: 'Euro: työ käynnissä ensin, luku tulee tekstistä.' },
+    palat: ['kela', 'massa', 'uraan', 'kasi'],
+    miksi: 'Euro: tiiviste heti kädessä, luku tulee tekstistä.' },
 ];
 
 const FADE_IN = 0.4;
