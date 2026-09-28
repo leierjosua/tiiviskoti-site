@@ -18,6 +18,11 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = path.join(__dirname, 'out')
 const DSF = Number(process.env.RENDER_DSF) || 2
+/* RENDER_ALPHA=1 jattaa taustan lapinakyvaksi. Kaytetaan videoiden
+   tekstitasoihin: _overlay.css:n liuku muuttuu silloin alfaliu'uksi,
+   joten sama brandipohja voidaan latoa liikkuvan kuvan paalle ilman
+   etta tekstia tarvitsee piirtaa ffmpegilla. */
+const ALPHA = process.env.RENDER_ALPHA === '1'
 
 let names = process.argv.slice(2)
 if (names.length === 0) { console.error('usage: node tiiviskoti/mainokset/render.mjs <name...|all>'); process.exit(1) }
@@ -43,7 +48,7 @@ for (const name of names) {
   await page.setViewportSize({ width: dims.w, height: dims.h })
   await page.waitForTimeout(80)
   const out = path.join(OUT_DIR, `${name}.png`)
-  await page.screenshot({ path: out, clip: { x: 0, y: 0, width: dims.w, height: dims.h } })
+  await page.screenshot({ path: out, omitBackground: ALPHA, clip: { x: 0, y: 0, width: dims.w, height: dims.h } })
   console.log(`✓ ${out}  (${dims.w}×${dims.h} @ ${DSF}x)`)
   await page.close()
 }
