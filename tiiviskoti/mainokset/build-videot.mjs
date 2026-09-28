@@ -42,7 +42,7 @@ mkdirSync(OUT, { recursive: true });
    pitaydytaan kahdessa otoksessa: Josua sanoi etta kolme palaa oli
    liikaa ja vaihdot liian nopeita. */
 const PALA = {
-  avaus:      [1.55, 3.90],   // ikkunan avaus, laaja - LYHENNETTY 3,85 -> 2,35 s
+  avaus:      [1.90, 3.90],   // ikkunan avaus, laaja - LYHENNETTY 3,85 -> 2,00 s
   massaLaaja: [11.55, 13.20], // saumapuristin karmia pitkin, profiili - 1,65 s
   massaLahi:  [13.32, 15.05], // sama tyo lahempaa - 1,73 s
   uraPysty:   [17.00, 18.85], // tiiviste painetaan PYSTYURAAN - 1,85 s
@@ -86,7 +86,7 @@ const PALAT = [
 
    Hinta on renderointiaika: minterpolate on hidas, joten pohja
    rakennetaan KERRAN ja nelja tekstitasoa lisataan siihen erikseen. */
-const NOPEUS = 0.85;
+const NOPEUS = 0.65;
 
 /* KAIKISSA SAMA KUVA, ERI TEKSTI. Kun kuva on vakio, ero tuloksissa
    kertoo vaitteesta eika materiaalista. Jarjestys avaus -> tiiviste:
