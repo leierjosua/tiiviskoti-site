@@ -43,9 +43,13 @@ mkdirSync(OUT, { recursive: true });
    liikaa ja vaihdot liian nopeita. */
 const PALA = {
   avaus:    [0.05, 3.90],   // kasi tyontaa puitteen auki, laaja - 3,85 s
+  nauha:    [4.05, 6.30],   // TIIVISTENAUHA kadessa, roikkuu - 2,25 s
   tiiviste: [17.00, 18.85], // SORMI PAINAA TIIVISTETTA PYSTYURAAN - 1,85 s
 };
-const PALAT = ['avaus', 'tiiviste'];
+/* Jarjestys kertoo tyon: ikkuna auki -> tassa on tiiviste -> nauha
+   painetaan uraan. Kolmas pala tuli mukaan koska kahdella video jai
+   4,9 sekuntiin, mika oli liian lyhyt. */
+const PALAT = ['avaus', 'nauha', 'tiiviste'];
 
 /* KAIKISSA SAMA KUVA, ERI TEKSTI. Kun kuva on vakio, ero tuloksissa
    kertoo vaitteesta eika materiaalista. Jarjestys avaus -> tiiviste:
@@ -60,10 +64,12 @@ const VIDEOT = [
 /* PITKA ristihaivytys. 0,35 s luki Josualle yha "todella sharppina":
    otokset ovat visuaalisesti kaukana toisistaan (laaja huone vs.
    kasimakro), joten lyhyt haivytys nayttaa silti leikkaukselta.
-   0,80 s on sulautus eika siirtyma. Pidempaan ei kannata menna:
-   urapala on 1,85 s, ja 0,90 s haivytys sois siita jo niin ison osan
-   ettei itse tyota ehdi nahda teravana. */
-const XFADE = 0.80;
+   0,70 s on sulautus eika siirtyma - kaksinkertainen siihen 0,35
+   sekuntiin joka yha luki leikkauksena. Pidempaan ei kannata menna:
+   lyhin pala on 1,85 s, ja kahden 0,80 s haivytyksen jalkeen siita
+   nakyisi teravana enaa puoli sekuntia. Nyt sulautuksia on 1,4 s eli
+   noin viidennes videosta. */
+const XFADE = 0.70;
 
 /* Lahde on 25 fps. Ala aja sita lapi muulla ruutunopeudella: 25->30
    monistaa joka viidennen ruudun ja nykii. Samasta syysta ei myoskaan
