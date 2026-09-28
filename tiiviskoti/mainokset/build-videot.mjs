@@ -43,7 +43,7 @@ mkdirSync(OUT, { recursive: true });
    liikaa ja vaihdot liian nopeita. */
 const PALA = {
   avaus:    [0.05, 3.90],   // kasi tyontaa puitteen auki, laaja - 3,85 s
-  tiiviste: [19.10, 22.40], // MOLEMMAT KADET painavat tiivistenauhaa alakarmiin - 3,30 s
+  tiiviste: [17.00, 18.85], // SORMI PAINAA TIIVISTETTA PYSTYURAAN - 1,85 s
 };
 const PALAT = ['avaus', 'tiiviste'];
 
@@ -59,9 +59,11 @@ const VIDEOT = [
 
 /* PITKA ristihaivytys. 0,35 s luki Josualle yha "todella sharppina":
    otokset ovat visuaalisesti kaukana toisistaan (laaja huone vs.
-   kasimakro), joten lyhyt haivytys nayttaa silti leikkaukselta. 0,90 s
-   on lahes kuudesosa videosta - se ei ole siirtyma vaan sulautus. */
-const XFADE = 0.90;
+   kasimakro), joten lyhyt haivytys nayttaa silti leikkaukselta.
+   0,80 s on sulautus eika siirtyma. Pidempaan ei kannata menna:
+   urapala on 1,85 s, ja 0,90 s haivytys sois siita jo niin ison osan
+   ettei itse tyota ehdi nahda teravana. */
+const XFADE = 0.80;
 
 /* Lahde on 25 fps. Ala aja sita lapi muulla ruutunopeudella: 25->30
    monistaa joka viidennen ruudun ja nykii. Samasta syysta ei myoskaan
@@ -69,7 +71,7 @@ const XFADE = 0.90;
 const FPS = 25;
 
 const FADE_IN = 0.25;
-const FADE_OUT = 0.5;
+const FADE_OUT = 0.35;
 
 /* Musiikki tulee lahteen omasta aaniraidasta - sama kappale joka on
    muissakin TiivisKoti-videoissa. Tarkistettu spektrogrammista ettei
