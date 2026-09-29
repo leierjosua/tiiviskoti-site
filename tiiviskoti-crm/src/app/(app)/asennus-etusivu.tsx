@@ -25,11 +25,9 @@ import { jobUnitCounts, type JobUnits } from '@/lib/data';
 type Job = {
   id: string; job_number: string; starts_at: Date; ends_at: Date; status: string;
   title: string; address: string | null; postal_code: string | null; city: string | null;
-  price_cents: number; notes: string | null;
+  notes: string | null;
   customer_name: string | null; customer_phone: string | null;
 };
-
-const eur = (cents: number) => (cents / 100).toLocaleString('fi-FI', { maximumFractionDigits: 0 }) + ' €';
 
 const addressOf = (j: Job) => [j.address, j.postal_code, j.city].filter(Boolean).join(', ');
 
@@ -114,10 +112,6 @@ function JobRow({ job, showDay, children }: {
             {address ? `◎ ${address}` : 'Ei osoitetta'}
           </p>
         </div>
-
-        <div className="shrink-0 text-right text-sm font-bold tabular text-text">
-          {eur(job.price_cents)}
-        </div>
       </div>
 
       {job.notes && (
@@ -150,7 +144,7 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
 
   const columns = () => sql`
     j.id, j.job_number, j.starts_at, j.ends_at, j.status::text as status, j.title,
-    j.address, j.postal_code, j.city, j.price_cents, j.notes,
+    j.address, j.postal_code, j.city, j.notes,
     cu.full_name as customer_name, cu.phone as customer_phone
   `;
 
@@ -178,16 +172,13 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
          and j.status in ('hold', 'tentative', 'confirmed')
        order by j.starts_at desc
     `,
-    sql<{ valmiit: number; valmiit_arvo: number; tulevat_arvo: number }[]>`
-      select
-        count(*) filter (where j.status = 'done'
-                           and j.starts_at >= ${monthAgo.toISOString()}
-                           and j.starts_at <  ${dayEnd.toISOString()})::int          as valmiit,
-        coalesce(sum(j.price_cents) filter (where j.status = 'done'
-                           and j.starts_at >= ${monthAgo.toISOString()}
-                           and j.starts_at <  ${dayEnd.toISOString()}), 0)::int      as valmiit_arvo,
-        coalesce(sum(j.price_cents) filter (where j.status <> 'cancelled'
-                           and j.starts_at >= ${dayStart.toISOString()}), 0)::int    as tulevat_arvo
+    /* Vain kappalemäärä. Euroja ei haeta lainkaan: ne poistettiin
+       asennusnäkymästä 29.9.2026, eikä summaa kannata laskea kantaan
+       vain jotta se heitetään pois. */
+    sql<{ valmiit: number }[]>`
+      select count(*) filter (where j.status = 'done'
+                                and j.starts_at >= ${monthAgo.toISOString()}
+                                and j.starts_at <  ${dayEnd.toISOString()})::int as valmiit
       from tk.jobs j
       where ${mine()}
     `,
@@ -209,7 +200,7 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
   const viikko = summaa(unitsWeek);
   const edessa = summaa(unitsAhead);
 
-  const s = stats[0] ?? { valmiit: 0, valmiit_arvo: 0, tulevat_arvo: 0 };
+  const s = stats[0] ?? { valmiit: 0 };
   const todayJobs = upcoming.filter((j) => dateKeyOf(j.starts_at) === today);
   const laterJobs = upcoming.filter((j) => dateKeyOf(j.starts_at) !== today);
 
@@ -250,15 +241,13 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
 
       {/* Neljä lukua: päivä, edessä, takana ja raha. Kaksi saraketta jo
           puhelimessa, koska nämä katsotaan pakettiauton penkillä. */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-3 gap-3">
         <Metric label="Tänään" value={String(todayJobs.length)} tone="accent"
                 sub={todayJobs.length === 0 ? 'ei keikkoja' : 'keikkaa tänään'} />
         <Metric label="Tulevat" value={String(laterJobs.length)}
                 sub="tästä eteenpäin" />
         <Metric label="Valmiit" value={String(s.valmiit)}
                 sub="viimeiset 30 pv" />
-        <Metric label="Valmiiden arvo" value={eur(s.valmiit_arvo)}
-                sub={`Sovittu yhteensä ${eur(s.tulevat_arvo)}`} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

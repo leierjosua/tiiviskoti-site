@@ -25,12 +25,11 @@ type Job = {
   id: string; job_number: string; starts_at: Date; ends_at: Date;
   status: 'hold' | 'tentative' | 'confirmed' | 'done' | 'cancelled';
   title: string; address: string | null; postal_code: string | null; city: string | null;
-  price_cents: number; customer_name: string | null;
+  customer_name: string | null;
 };
 
 const HOUR_PX = 52;
 
-const eur = (cents: number) => (cents / 100).toLocaleString('fi-FI', { maximumFractionDigits: 0 }) + ' €';
 
 /* Lohkon väri tilan mukaan. Sama merkitys kuin StatusBadgessa, jotta
    ruudukon väri ja rivin merkki eivät kerro eri tarinaa. */
@@ -98,9 +97,6 @@ function JobLine({ job, showDay, units }: { job: Job; showDay?: boolean; units?:
           <p className="truncate text-sm text-muted">{job.title}</p>
           <p className="truncate text-sm text-faint">{address || 'Ei osoitetta'}</p>
         </div>
-        <div className="shrink-0 text-right text-sm font-bold tabular text-text">
-          {eur(job.price_cents)}
-        </div>
       </Link>
     </li>
   );
@@ -147,7 +143,7 @@ export default async function AsennusKalenteri({
   const [rows, units] = await Promise.all([
     sql<Job[]>`
       select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
-             j.address, j.postal_code, j.city, j.price_cents,
+             j.address, j.postal_code, j.city,
              cu.full_name as customer_name
         from tk.jobs j
         left join tk.customers cu on cu.id = j.customer_id

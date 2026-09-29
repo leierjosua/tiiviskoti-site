@@ -17,7 +17,6 @@ import { NoteForm } from './ui';
    eikä poistoa — vain tiedot, yhteystiedot ja se yksi nappi.
    ========================================================= */
 
-const eur = (cents: number) => (cents / 100).toLocaleString('fi-FI', { maximumFractionDigits: 2 }) + ' €';
 
 type Completion = { paid: boolean; satisfaction: number | null; completed_at: Date | null } | null;
 
@@ -62,8 +61,8 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
   const address = [job.address, job.postal_code, job.city].filter(Boolean).join(', ');
 
   const [lines, mails, completion, kuvat] = await Promise.all([
-    sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
-      select name, quantity, unit_price_cents from tk.job_lines
+    sql<{ name: string; quantity: number }[]>`
+      select name, quantity from tk.job_lines
        where job_id = ${job.id} order by sort_order
     `,
     sql<{ kind: string; sent_at: Date | null }[]>`
@@ -149,14 +148,10 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
             <Fact icon="◎">{address || 'Ei osoitetta'}</Fact>
           </div>
 
-          <p className="mt-5 text-[17px] font-bold text-text">
-            Hinta: <span className="tabular">{eur(job.price_cents)}</span>
-          </p>
-
           <SectionLabel>Tuotteet ja palvelut</SectionLabel>
           {lines.length === 0 ? (
             <p className="text-sm text-faint">
-              Ei erittelyä — hinta on kokonaissumma. Viimeistely tekee rivit.
+              Ei erittelyä vielä — viimeistely tekee rivit.
             </p>
           ) : (
             <ul className="divide-y divide-line-soft">
@@ -164,9 +159,6 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
                 <li key={i} className="flex items-center gap-3 py-2 text-sm">
                   <span className="flex-1">
                     {l.quantity > 1 && <b>{l.quantity}× </b>}{l.name}
-                  </span>
-                  <span className="tabular text-muted">
-                    {eur(l.quantity * l.unit_price_cents)}
                   </span>
                 </li>
               ))}
