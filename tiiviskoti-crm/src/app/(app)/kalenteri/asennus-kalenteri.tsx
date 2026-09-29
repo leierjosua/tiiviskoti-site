@@ -107,42 +107,6 @@ function JobLine({ job, showDay, units }: { job: Job; showDay?: boolean; units?:
 }
 
 
-/* Laskuttamatta: tehty keikka jota ei ole merkitty maksetuksi.
-
-   `paid` tulee migraatiosta 016, joka ajetaan käsin postgres-roolilla.
-   Ennen sitä maksutilaa ei ole olemassa, ja paras saatavilla oleva
-   arvaus on lähtenyt kuitti — se on väärä mittari (käteisellä maksettu
-   keikka ilman sähköpostia näyttää maksamattomalta), mutta parempi kuin
-   kaatunut sivu. Kun migraatio on ajettu, tätä haaraa ei enää käytetä.
-
-   Ei viikkorajausta: vanhin laskuttamaton on juuri se joka pitää nähdä. */
-async function unbilledFor(staffId: string, sinceIso: string): Promise<{ kpl: number; arvo: number }[]> {
-  const mine = sql`
-    j.calendar_id in (select c.id from tk.calendars c where c.staff_id = ${staffId})
-  `;
-  try {
-    return await sql<{ kpl: number; arvo: number }[]>`
-      select count(*)::int as kpl, coalesce(sum(j.price_cents), 0)::int as arvo
-        from tk.jobs j
-       where ${mine}
-         and j.status = 'done' and not j.paid
-         and j.starts_at >= ${sinceIso}
-    `;
-  } catch (err) {
-    if (typeof err !== 'object' || err === null || (err as { code?: string }).code !== '42703') throw err;
-    return sql<{ kpl: number; arvo: number }[]>`
-      select count(*)::int as kpl, coalesce(sum(j.price_cents), 0)::int as arvo
-        from tk.jobs j
-       where j.calendar_id in (select c.id from tk.calendars c where c.staff_id = ${staffId})
-         and j.status = 'done'
-         and j.starts_at >= ${sinceIso}
-         and not exists (
-           select 1 from tk.mail_log m
-            where m.job_id = j.id and m.kind = 'receipt' and m.error is null
-         )
-    `;
-  }
-}
 
 export default async function AsennusKalenteri({
   staff, viikko, tila, haku, nakyma,
@@ -180,7 +144,7 @@ export default async function AsennusKalenteri({
     j.calendar_id in (select c.id from tk.calendars c where c.staff_id = ${staff.id})
   `;
 
-  const [rows, unbilled, units] = await Promise.all([
+  const [rows, units] = await Promise.all([
     sql<Job[]>`
       select j.id, j.job_number, j.starts_at, j.ends_at, j.status, j.title,
              j.address, j.postal_code, j.city, j.price_cents,
@@ -192,7 +156,6 @@ export default async function AsennusKalenteri({
          and j.starts_at <  ${to.toISOString()}
        order by j.starts_at
     `,
-    unbilledFor(staff.id, helsinkiDateTime(addDays(today, -180), '00:00').toISOString()),
     jobUnitCounts(from.toISOString(), to.toISOString(), staff.id),
   ]);
   const unitsOf = new Map(units.map((u) => [u.job_id, u]));
@@ -204,11 +167,7 @@ export default async function AsennusKalenteri({
       j.customer_name, j.title, j.address, j.city, j.postal_code, j.job_number,
     ].some((v) => v?.toLowerCase().includes(needle)));
 
-  const priced = shown.filter((j) => j.price_cents > 0);
-  const total = priced.reduce((s, j) => s + j.price_cents, 0);
-  const avg = priced.length ? Math.round(total / priced.length) : 0;
   const count = (s: Job['status']) => shown.filter((j) => j.status === s).length;
-  const bill = unbilled[0] ?? { kpl: 0, arvo: 0 };
 
   /* Oma viikko kappaleina. Euro ei kerro asentajalle työkuormaa: 20 ikkunaa
      on sama päivä oli hinta mikä tahansa. */
@@ -268,7 +227,6 @@ export default async function AsennusKalenteri({
                          px-3.5 py-2 text-sm font-bold text-accent">
           <span aria-hidden className="h-2 w-2 rounded-full bg-accent" />
           {staff.fullName}
-          <span className="tabular">{eur(total)}</span>
         </span>
       </header>
 
@@ -344,20 +302,18 @@ export default async function AsennusKalenteri({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      {/* Kolme lukua, ei kuutta. Myynti, keskihinta ja laskuttamatta
+          poistettiin 29.9.2026: ne ovat toimiston mittareita eivätkä
+          kerro asentajalle mitään siitä mitä hänen pitää tehdä. Työkuorma
+          on kappaleissa — 20 ikkunaa on sama päivä oli hinta mikä
+          tahansa. Luvut ovat edelleen toimiston näkymässä. */}
+      <div className="grid grid-cols-3 gap-3">
         <Metric label="Keikat" value={String(shown.length)}
                 sub={`${count('confirmed')} vahv. · ${count('done')} tehty · ${count('tentative')} alustava`} />
-        <Metric label="Myynti" value={eur(total)} tone="accent"
-                sub={priced.length < shown.length
-                  ? `${priced.length}/${shown.length} hinnoiteltu`
-                  : (searching ? 'hakutuloksista' : 'tällä viikolla')} />
-        <Metric label="Keskihinta" value={priced.length ? eur(avg) : '—'} sub="per hinnoiteltu keikka" />
         <Metric label="Ikkunat" value={String(tehty.ikkunat + jaljella.ikkunat)} tone="accent"
                 sub={`${tehty.ikkunat} tehty · ${jaljella.ikkunat} edessä`} />
         <Metric label="Ovet" value={String(tehty.ovet + jaljella.ovet)} tone="accent"
                 sub={`${tehty.ovet} tehty · ${jaljella.ovet} edessä`} />
-        <Metric label="Laskuttamatta" value={eur(bill.arvo)}
-                sub={`${bill.kpl} valmista keikkaa`} />
       </div>
 
       {/* Lista: haussa aina, muuten valinnan mukaan. Puhelimessa ruudukko ei
