@@ -23,14 +23,21 @@
       "maara": 1,
       "yksikko": "erä",
       "hinta": 5000,
-      "huom": "Karmi- ja puitetiivisteet, ikkunan käynnin säätö ja saranoiden öljyäminen. Sovittu kiinteä kokonaishinta."
+      "huom": "Karmi- ja puitetiivisteet, ikkunan käynnin säätö ja saranoiden öljyäminen."
     },
     {
       "nimi": "Aukipitolaite",
       "maara": 40,
       "yksikko": "kpl",
       "hinta": 78,
-      "huom": "Asennus ja säätö. Laskutetaan vain asennetut kappaleet; lopullinen määrä todetaan asennuksen yhteydessä."
+      "huom": "Asennus ja säätö."
+    },
+    {
+      "nimi": "Taloyhtiöalennus — aukipitolaitteet veloituksetta",
+      "maara": 1,
+      "yksikko": "erä",
+      "hinta": -3120,
+      "huom": "Aukipitolaitteet sisältyvät kokonaishintaan eikä niistä veloiteta erikseen."
     }
   ],
   "sisaltyy": [
@@ -41,7 +48,7 @@
   ],
   "maksuehto": {
     "paivia": 14,
-    "lisatieto": "Aukipitolaitteista laskutetaan asennettujen kappaleiden mukaan, joten loppusumma voi olla sovittua pienempi. Sovittua suuremmaksi se ei voi muuttua ilman tilaajan erillistä hyväksyntää."
+    "lisatieto": "Aukipitolaitteet sisältyvät kokonaishintaan. Niiden lopullinen määrä tarkistetaan asennuksen yhteydessä, eikä määrä muuta laskun loppusummaa."
   },
   "aikataulu": "Työ tehdään osapuolten erikseen sopimana ajankohtana. Toimittaja ilmoittaa asennusviikon vähintään kaksi viikkoa etukäteen, ja tilaaja tiedottaa asukkaille.",
   "tilaajanVastuut": [
