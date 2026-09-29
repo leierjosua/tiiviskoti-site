@@ -53,6 +53,33 @@ async function graph<T>(path: string, params: Record<string, string>): Promise<T
   return j;
 }
 
+/* Sivuttava haku. Graph palauttaa enintään `limit` riviä kerralla ja
+   loput `paging.next`-osoitteen takaa.
+
+   MIKSI TÄMÄ ON TÄRKEÄ: ilman sivutusta haku näki vain uusimmat 100
+   liidiä lomaketta kohti. Vilkkaimmalla lomakkeella on nyt 34, joten
+   vikaa ei näkynyt — mutta jos tuonti olisi ollut alhaalla riittävän
+   kauan, sen yli menevä häntä olisi jäänyt kannan ulkopuolelle
+   PYSYVÄSTI, koska seuraavakaan ajo ei olisi enää nähnyt niitä.
+   Juuri sitä vikaa ei huomaa mistään: liidit vain eivät ole siellä.
+
+   Katto on 50 sivua. Ilman sitä rikkinäinen paging-linkki jumittaisi
+   cron-ajon ikuiseksi silmukaksi. */
+async function graphAll<T>(path: string, params: Record<string, string>): Promise<T[]> {
+  type Sivu = { data?: T[]; paging?: { next?: string } };
+  const eka = await graph<Sivu>(path, params);
+  let rivit = eka.data ?? [];
+  let seuraava = eka.paging?.next;
+  for (let sivu = 1; seuraava && sivu < 50; sivu++) {
+    const r = await fetch(seuraava, { cache: 'no-store' });
+    const j = (await r.json()) as Sivu & { error?: { message: string } };
+    if (j.error) throw new Error(j.error.message);
+    rivit = rivit.concat(j.data ?? []);
+    seuraava = j.paging?.next;
+  }
+  return rivit;
+}
+
 /** Kenttien nimet vaihtelevat lomakkeittain, joten haetaan ensimmäinen osuma. */
 const arvo = (kentat: Kentta[], ...nimet: string[]): string | null => {
   for (const n of nimet) {
@@ -80,8 +107,8 @@ export async function importMetaLeads(): Promise<MetaLeadsResult> {
     const kiinteat = (process.env.META_LEAD_FORM_IDS || '').split(',').map((s) => s.trim()).filter(Boolean);
     const lomakkeet = kiinteat.length
       ? kiinteat
-      : (await graph<{ data?: { id: string }[] }>(`${PAGE_ID}/leadgen_forms`, { access_token: pageToken, limit: '50' }))
-          .data?.map((f) => f.id) ?? [];
+      : (await graphAll<{ id: string }>(`${PAGE_ID}/leadgen_forms`, { access_token: pageToken, limit: '100' }))
+          .map((f) => f.id);
 
     let fetched = 0;
     let imported = 0;
@@ -91,12 +118,12 @@ export async function importMetaLeads(): Promise<MetaLeadsResult> {
     let notifyError: string | undefined;
 
     for (const formId of lomakkeet) {
-      const res = await graph<{ data?: MetaLead[] }>(`${formId}/leads`, {
+      const res = await graphAll<MetaLead>(`${formId}/leads`, {
         access_token: pageToken,
         fields: 'id,created_time,field_data',
         limit: '100',
       });
-      for (const lead of res.data || []) {
+      for (const lead of res) {
         fetched++;
         const kentat = lead.field_data || [];
         const nimi = arvo(kentat, 'full_name', 'first_name') || 'Nimi puuttuu';
