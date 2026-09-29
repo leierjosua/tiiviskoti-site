@@ -5,6 +5,7 @@ import {
   addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, weekdayShort,
 } from '@/lib/time';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
+import { jobUnitCounts, type JobUnits } from '@/lib/data';
 
 /* =========================================================
    Asennusnäkymän etusivu.
@@ -52,6 +53,29 @@ function Metric({ label, value, sub, tone = 'plain' }: {
       }`}>
         {value}
       </p>
+      {sub && <p className="mt-2 text-xs text-faint">{sub}</p>}
+    </Card>
+  );
+}
+
+/* Ikkunat ja ovet rinnakkain yhdessä ruudussa. Kaksi lukua eikä yksi
+   summa, koska ovi ja ikkuna ovat eri työtä ja eri kesto — yhteenlaskettu
+   "31 kohdetta" ei kerro kummasta se koostuu. */
+function UnitMetric({ label, ikkunat, ovet, sub, tone = 'plain' }: {
+  label: string; ikkunat: number; ovet: number; sub?: string; tone?: 'plain' | 'accent';
+}) {
+  const vari = tone === 'accent' ? 'text-accent' : 'text-text';
+  return (
+    <Card className="p-4">
+      <p className="text-xs font-semibold text-muted sm:text-sm">{label}</p>
+      <div className="mt-2 flex items-baseline gap-3">
+        <span className={`text-[26px] leading-none font-extrabold tabular ${vari}`}>{ikkunat}</span>
+        <span className="text-xs font-semibold text-faint">ikkunaa</span>
+      </div>
+      <div className="mt-1.5 flex items-baseline gap-3">
+        <span className={`text-[26px] leading-none font-extrabold tabular ${vari}`}>{ovet}</span>
+        <span className="text-xs font-semibold text-faint">ovea</span>
+      </div>
       {sub && <p className="mt-2 text-xs text-faint">{sub}</p>}
     </Card>
   );
@@ -112,6 +136,9 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
   const dayStart = helsinkiDateTime(today, '00:00');
   const dayEnd = helsinkiDateTime(addDays(today, 1), '00:00');
   const monthAgo = helsinkiDateTime(addDays(today, -30), '00:00');
+  /* Viikko alkaa maanantaista, koska niin työviikko alkaa. */
+  const weekStart = helsinkiDateTime(addDays(today, -(isoWeekday(today) - 1)), '00:00');
+  const weekEnd = helsinkiDateTime(addDays(today, 8 - isoWeekday(today)), '00:00');
   const horizon = helsinkiDateTime(addDays(today, 60), '00:00');
 
   /* Palasina eikä muuttujina: postgres.js:n fragmentti on kyselyolio, ja
@@ -127,7 +154,7 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
     cu.full_name as customer_name, cu.phone as customer_phone
   `;
 
-  const [upcoming, overdue, stats] = await Promise.all([
+  const [upcoming, overdue, stats, unitsToday, unitsWeek, unitsAhead] = await Promise.all([
     sql<Job[]>`
       select ${columns()}
         from tk.jobs j
@@ -164,7 +191,23 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
       from tk.jobs j
       where ${mine()}
     `,
+    /* Ikkuna- ja ovimäärät omilta keikoilta. Sama laskenta kuin
+       kalenterissa (tk.job_lines nimen perusteella, ilmainen kohde vain
+       kerran) — jos tämä laskisi toisin, luvut riitelisivät keskenään
+       samalla ruudulla. */
+    jobUnitCounts(dayStart.toISOString(), dayEnd.toISOString(), staff.id),
+    jobUnitCounts(weekStart.toISOString(), weekEnd.toISOString(), staff.id),
+    jobUnitCounts(dayStart.toISOString(), horizon.toISOString(), staff.id),
   ]);
+
+  /* Summa riveiltä: jobUnitCounts palauttaa työkohtaiset luvut. */
+  const summaa = (rows: JobUnits[]) => rows.reduce(
+    (a, r) => ({ ikkunat: a.ikkunat + r.ikkunat, ovet: a.ovet + r.ovet }),
+    { ikkunat: 0, ovet: 0 },
+  );
+  const tanaan = summaa(unitsToday);
+  const viikko = summaa(unitsWeek);
+  const edessa = summaa(unitsAhead);
 
   const s = stats[0] ?? { valmiit: 0, valmiit_arvo: 0, tulevat_arvo: 0 };
   const todayJobs = upcoming.filter((j) => dateKeyOf(j.starts_at) === today);
@@ -193,6 +236,17 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
           </a>
         )}
       </header>
+
+      {/* Kappalemäärät ensimmäisenä. Keikkojen LUKUMÄÄRÄ ei kerro
+          työmäärästä mitään — yksi keikka voi olla yksi ikkuna tai
+          kolmekymmentä. Tämä rivi kertoo mitä päivä ja viikko oikeasti
+          sisältävät, ja se on se luku jota asentaja tarvitsee kun hän
+          arvioi ehtiikö. */}
+      <div className="grid grid-cols-3 gap-3">
+        <UnitMetric label="Tänään" ikkunat={tanaan.ikkunat} ovet={tanaan.ovet} tone="accent" />
+        <UnitMetric label="Tällä viikolla" ikkunat={viikko.ikkunat} ovet={viikko.ovet} />
+        <UnitMetric label="Edessä yhteensä" ikkunat={edessa.ikkunat} ovet={edessa.ovet} sub="60 vrk" />
+      </div>
 
       {/* Neljä lukua: päivä, edessä, takana ja raha. Kaksi saraketta jo
           puhelimessa, koska nämä katsotaan pakettiauton penkillä. */}

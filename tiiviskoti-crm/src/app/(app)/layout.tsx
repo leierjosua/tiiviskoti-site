@@ -21,8 +21,13 @@ const NAV = [
   { href: '/', label: 'Tänään', asennusLabel: 'Etusivu', asennus: true },
   { href: '/kalenteri', label: 'Kalenteri', asennus: true },
   { href: '/tyot', label: 'Työt', asennus: true },
+  /* Omat ajat on asentajan oma sivu, joten se on navissa heti töiden
+     jälkeen — ei asetusten seassa. Toimistokin näkee sen: myös heillä on
+     kalenteri, ja saman sivun käyttäminen pitää ilmoitustavan yhtenä. */
+  { href: '/omat-ajat', label: 'Omat ajat', asennus: true },
   { href: '/tarjoukset', label: 'Tarjoukset', managerOnly: true },
   { href: '/asiakkaat', label: 'Asiakkaat', managerOnly: true, asennus: true },
+  { href: '/saatavuus', label: 'Saatavuus', managerOnly: true },
   { href: '/kalenterit', label: 'Työajat', managerOnly: true },
   { href: '/alueet', label: 'Palvelualueet', managerOnly: true },
   { href: '/liidit', label: 'Liidit', managerOnly: true },

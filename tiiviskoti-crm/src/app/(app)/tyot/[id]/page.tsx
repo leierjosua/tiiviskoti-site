@@ -69,9 +69,18 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     <div className="space-y-6">
       <header className="space-y-1">
         <Link href="/tyot" className="text-xs text-muted hover:text-text">← Työt</Link>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl font-semibold tracking-tight tabular">{job.job_number}</h1>
           <StatusBadge status={job.status} />
+          {/* Jatkotarjous samalle asiakkaalle. Asiakastiedot tulevat
+              valmiiksi, hinnat eivät — ks. tarjoukset/uusi/page.tsx. */}
+          <Link
+            href={`/tarjoukset/uusi?tyo=${job.id}`}
+            className="ml-auto rounded-lg border border-accent/50 px-3 py-1.5 text-xs
+                       font-bold text-accent transition-colors hover:bg-accent/10"
+          >
+            + Uusi tarjous
+          </Link>
         </div>
         <p className="text-sm text-muted">
           {weekdayName(isoWeekday(dayKey))} {formatDateKey(dayKey)} klo{' '}

@@ -16,9 +16,45 @@ type DraftRow = {
 
 export default async function NewOfferPage({
   searchParams,
-}: { searchParams: Promise<{ luonnos?: string }> }) {
+}: { searchParams: Promise<{ luonnos?: string; tyo?: string }> }) {
   await requireManager();
-  const { luonnos } = await searchParams;
+  const { luonnos, tyo } = await searchParams;
+
+  /* Työstä avattu tarjous: asiakkaan tiedot tulevat valmiiksi, kaikki muu
+     on tyhjää ja muokattavissa.
+
+     MIKSI VAIN ASIAKASTIEDOT EIKÄ HINTOJA: työn rivit ovat jo tehtyä työtä,
+     tarjous on tulevaa. Jos laskuri esitäytettäisiin työn summalla, se
+     näyttäisi tarjoukselta samasta työstä — ja se on juuri se virhe josta
+     syntyy kahteen kertaan laskutus. Asiakkaan nimi ja osoite sen sijaan
+     ovat aina samat, ja niiden käsin kopiointi on se vaihe joka jää
+     tekemättä tai menee väärin. */
+  let fromJob: {
+    customerName?: string; email?: string; phone?: string;
+    address?: string; city?: string; notes?: string;
+  } | null = null;
+  if (tyo && !luonnos) {
+    const [j] = await sql<{
+      job_number: string; address: string | null; postal_code: string | null; city: string | null;
+      customer_name: string | null; customer_email: string | null; customer_phone: string | null;
+    }[]>`
+      select j.job_number, j.address, j.postal_code, j.city,
+             cu.full_name as customer_name, cu.email as customer_email, cu.phone as customer_phone
+        from tk.jobs j
+        left join tk.customers cu on cu.id = j.customer_id
+       where j.id = ${tyo}
+    `;
+    if (j) {
+      fromJob = {
+        customerName: j.customer_name ?? undefined,
+        email: j.customer_email ?? undefined,
+        phone: j.customer_phone ?? undefined,
+        address: [j.address, j.postal_code].filter(Boolean).join(', ') || undefined,
+        city: j.city ?? undefined,
+        notes: `Jatkotarjous työlle ${j.job_number}.`,
+      };
+    }
+  }
 
   /* Avattu luonnos haetaan tässä palvelimella: laskurin tila tulee
      draft_state-sarakkeesta ja asiakastiedot tarjouksen omilta kentiltä.
@@ -49,7 +85,7 @@ export default async function NewOfferPage({
         kind={draft?.kind ?? 'asiakas'}
         offerId={draft?.id}
         draft={draft?.draft_state ?? undefined}
-        asiakas={draft ? {
+        asiakas={fromJob ? fromJob : draft ? {
           customerName: draft.customer_name ?? undefined,
           contactName: draft.contact_name ?? undefined,
           email: draft.email ?? undefined,
