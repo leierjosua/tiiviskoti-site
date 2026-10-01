@@ -237,7 +237,28 @@ await check('google', 'terveystarkistus', async () => {
   else ok('google', `Google-yhteys kunnossa (tarkistettu ${tunnit} h sitten)`);
 });
 
-/* ========== 7. HINNASTON YHTENÄISYYS ==========
+/* ========== 7. METAN LIIDITUONTI ==========
+   Maksettu liidi on kannassa vasta kun tuonti on hakenut sen Metasta.
+   Tuonti kirjaa jokaisen ajon tk.health_checks:iin (kind = 'meta_leads'),
+   ja tässä luetaan se merkintä.
+
+   MIKSI MYÖS IKÄ EIKÄ VAIN TULOS: varsinainen ajastus on Supabasen
+   pg_cronissa 5 minuutin välein. Pysähtynyt ajastin ei kirjaa virhettä —
+   se ei kirjaa mitään — joten pelkkä `ok` näyttäisi vanhaa hyvää uutista
+   loputtomiin. Onnistuminen kirjataan korkeintaan puolen tunnin välein,
+   joten tuore merkintä ei koskaan ole kolmea tuntia vanhempi. */
+await check('meta', 'liidituonti', async () => {
+  const [r] = await sql`select ok, detail, checked_at from tk.health_checks
+     where kind = 'meta_leads' order by checked_at desc limit 1`;
+  if (!r) return warn('meta', 'liidituonnista ei ole yhtään merkintää — onko uusi versio julkaistu?');
+  const tunnit = (Date.now() - new Date(r.checked_at)) / 3600000;
+  const ika = tunnit < 1 ? `${Math.round(tunnit * 60)} min` : `${Math.round(tunnit)} h`;
+  if (!r.ok) fail('meta', `Metan liidituonti POIKKI: ${r.detail ?? ''} (${ika} sitten)`);
+  else if (tunnit > 3) fail('meta', `liidituontia ei ole ajettu ${ika} — ajastus poikki, liidit jäävät Metaan`);
+  else ok('meta', `liidituonti kunnossa (${r.detail ?? ''}, ${ika} sitten)`);
+});
+
+/* ========== 8. HINNASTON YHTENÄISYYS ==========
    `pricing.ts` on KÄSINKOPIO `pricing.mjs`:stä. Jos ne eroavat, verkkosivun
    laskuri ja CRM:n tarjous antavat eri hinnan samalle työlle — ja ero
    huomataan vasta kun asiakas vertaa. Verrataan rakenteellisesti, ei
@@ -272,7 +293,7 @@ await check('hinnasto', 'kopiot samassa', async () => {
   else ok('hinnasto', `hinnastot täsmäävät (min ${A.min} €, portaat ${A.tiers})`);
 });
 
-/* ========== 8. MAINOSTEN LASKEUTUMISSIVUT ==========
+/* ========== 9. MAINOSTEN LASKEUTUMISSIVUT ==========
    Rikkinäinen laskeutumissivu palaa suoraan rahana: klikki maksetaan silti.
    Osoitteet haetaan Adsista, jotta muutos mainoksessa ei jää huomaamatta. */
 await check('mainokset', 'laskeutumissivut', async () => {
