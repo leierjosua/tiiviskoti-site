@@ -87,7 +87,21 @@ export default async function LeadsPage() {
               {leads.map((lead) => (
                 <tr key={lead.id} className="hover:bg-ink-700">
                   <td className="px-4 py-2.5 text-muted tabular">{fmt(lead.created_at)}</td>
-                  <td className="px-4 py-2.5">{lead.full_name}</td>
+                  {/* Tarjous tehdään nimen vierestä, koska se on se kohta
+                      johon katse osuu liidiä luettaessa. Linkki vie laskurin
+                      alkuun yhteystiedot valmiiksi täytettynä — hintoja se ei
+                      esitäytä, koska liidissä ei ole yhtään hinnoiteltua riviä. */}
+                  <td className="px-4 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span>{lead.full_name}</span>
+                      <Link
+                        href={{ pathname: '/tarjoukset/uusi', query: { liidi: lead.id } }}
+                        className="shrink-0 rounded border border-line px-2 py-0.5 text-xs text-accent hover:bg-ink-700"
+                      >
+                        Tee tarjous
+                      </Link>
+                    </div>
+                  </td>
                   <td className="px-4 py-2.5 tabular">
                     {lead.phone
                       ? <a href={`tel:${lead.phone}`} className="text-accent hover:underline">{lead.phone}</a>
