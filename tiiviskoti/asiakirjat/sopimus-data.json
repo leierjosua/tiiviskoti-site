@@ -1,6 +1,6 @@
 {
   "numero": "S-0001",
-  "paiva": "29.9.2026",
+  "paiva": "30.9.2026",
   "alv": "25,5",
   "toimittaja": {
     "nimi": "TiivisKoti Oy",
@@ -50,17 +50,17 @@
     "paivia": 14,
     "lisatieto": "Aukipitolaitteista laskutetaan asennettujen kappaleiden mukaan, joten loppusumma voi olla sovittua pienempi. Sovittua suuremmaksi se ei voi muuttua ilman tilaajan erillistä hyväksyntää."
   },
-  "aikataulu": "Työ tehdään osapuolten erikseen sopimana ajankohtana. Toimittaja ilmoittaa asennusviikon vähintään kaksi viikkoa etukäteen, ja tilaaja tiedottaa asukkaille.",
+  "aikataulu": "Työ tehdään osapuolten erikseen sopimana ajankohtana.",
   "tilaajanVastuut": [
     "Tilaaja huolehtii, että asuntoihin päästään sovittuina päivinä.",
-    "Ikkunoiden edustat tyhjennetään siten, että ikkunan luo pääsee työskentelemään.",
     "Tilaaja nimeää yhteyshenkilön, jolta asentaja saa tarvittaessa avaimet ja opastuksen."
   ],
   "muutEhdot": [
     "Työ tehdään sisäkautta. Telineitä ei tarvita eikä sää vaikuta aikatauluun.",
+    "Asukkaiden ei tarvitse tyhjentää ikkunoiden edustoja. Asentaja siirtää kevyet tavarat sivuun työn ajaksi ja palauttaa ne paikalleen.",
     "Jos asuntoon ei päästä sovittuna päivänä, kyseisen asunnon ikkunat tehdään erikseen sovittavana ajankohtana eikä niistä laskuteta ennen kuin työ on tehty.",
-    "Mikäli kohteessa havaitaan ikkunan rakenteellinen vika, joka estää tiivisteen asentamisen, toimittaja ilmoittaa siitä tilaajalle. Rakenteelliset korjaukset eivät sisälly tähän sopimukseen.",
-    "Sopimus on tehty kahtena samasanaisena kappaleena, yksi kummallekin osapuolelle."
+    "Mikäli kohteessa havaitaan ikkunan rakenteellinen vika, joka estää tiivisteen asentamisen, toimittaja ilmoittaa siitä tilaajalle. Rakenteelliset korjaukset eivät sisälly tähän sopimukseen."
   ],
-  "allekirjoittaja": "Josua Leier"
+  "allekirjoittaja": "Josua Leier",
+  "hyvaksynta": "sahkoposti"
 }

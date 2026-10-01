@@ -15,6 +15,18 @@
  * sisältöä ei ole vahvistettu. Jos takuu halutaan sopimukseen, sen
  * pituus ja kattavuus on saatava Josualta ensin.
  *
+ * HYVÄKSYNTÄ ON SÄHKÖINEN, EI PAPERINEN. data.hyvaksynta = 'sahkoposti'
+ * (oletus) korvaa allekirjoitusviivat kohdalla, jossa kerrotaan tarkalleen
+ * millä viestillä tilaaja hyväksyy sopimuksen. Tyhjiä viivoja ei tulosteta,
+ * koska niitä ei ole tarkoitus täyttää kynällä. Jos sopimus halutaan
+ * poikkeuksellisesti allekirjoittaa paperille, aseta 'allekirjoitus' —
+ * silloin myös ehto kahdesta kappaleesta on kirjoitettava takaisin
+ * muutEhdot-listaan, sillä generaattori ei keksi ehtoja itse.
+ *
+ * SÄHKÖPOSTIHYVÄKSYNTÄ EDELLYTTÄÄ TILAAJAN OSOITTEEN. Ilman sitä sopimuksessa
+ * lukisi "vastaa viestiin" osoittamatta mihin — siksi kenttä on pakollinen
+ * juuri tässä tilassa.
+ *
  * MAKSUEHTO ON SOPIMUKSEN YDIN. Josua pyysi nimenomaan ehdon, jossa
  * tilaaja sitoutuu maksamaan työn valmistuttua. Se on oma kohtansa ja
  * kirjoitettu niin ettei siitä voi olla kahta mieltä: laskutusperuste on
@@ -40,6 +52,10 @@ const PAKOLLISET = [
 ]
 const puuttuu = PAKOLLISET.filter(([, v]) => !String(v ?? '').trim() || /^TÄYTÄ/i.test(String(v)))
 if (!Array.isArray(d.tyot) || d.tyot.length === 0) puuttuu.push(['tyot'])
+const hyvaksynta = d.hyvaksynta || 'sahkoposti'
+if (hyvaksynta === 'sahkoposti' && !String(d.tilaaja?.sahkoposti ?? '').trim()) {
+  puuttuu.push(['tilaaja.sahkoposti (sähköpostihyväksyntä)'])
+}
 if (puuttuu.length) {
   console.error('✗ Sopimusta ei renderöity, koska näitä tietoja ei ole:')
   for (const [k] of puuttuu) console.error('   · ' + k)
@@ -94,6 +110,16 @@ const html = `<!doctype html><html lang="fi"><head><meta charset="utf-8">
   .maksu h2 { margin-top:0 }
   ol { margin:0; padding-left:16px }
   ol li { margin-bottom:4px }
+  .hyvaksy { border:2px solid #1F7A4C; border-radius:7px; padding:11px 13px;
+             background:#EAF4EE; margin-top:6px; page-break-inside:avoid }
+  .hyvaksy h2 { margin-top:0 }
+  .lause { display:block; margin:6px 0; padding:8px 11px; background:#fff;
+           border:1px solid #1F7A4C; border-radius:5px; font-weight:700; font-size:11pt }
+  .osapuolet { display:flex; gap:26px; margin-top:16px; page-break-inside:avoid }
+  .osapuolet > div { flex:1; border-top:2px solid #16231C; padding-top:6px }
+  .osapuolet .k { font-size:8.4pt; text-transform:uppercase; letter-spacing:.06em; color:#5C6B62 }
+  .osapuolet .n { font-weight:700; margin-top:2px }
+  .osapuolet .r { font-size:9.3pt; color:#32423A }
   .allek { display:flex; gap:26px; margin-top:26px; page-break-inside:avoid }
   .allek > div { flex:1 }
   .viiva { border-bottom:1px solid #16231C; height:34px; margin-bottom:5px }
@@ -166,6 +192,34 @@ ${d.sisaltyy?.length ? `<p style="margin-top:5px">Työhön sisältyy: ${d.sisalt
   ${(d.muutEhdot || []).map(v => `<li>${esc(v)}</li>`).join('')}
 </ol>
 
+${hyvaksynta === 'sahkoposti' ? `
+<div class="hyvaksy">
+  <h2>8. Sopimuksen hyväksyminen</h2>
+  <p><b>Tämä sopimus hyväksytään sähköisesti. Paperisia kappaleita ei tarvita
+  eikä sopimusta tarvitse tulostaa tai allekirjoittaa käsin.</b></p>
+  <p>Toimittaja on hyväksynyt sopimuksen lähettäessään sen tilaajalle ${esc(d.paiva)}.
+  Tilaaja hyväksyy sopimuksen vastaamalla osoitteesta ${esc(d.tilaaja.sahkoposti)}
+  siihen sähköpostiviestiin, jonka liitteenä tämä sopimus on toimitettu, viestillä:</p>
+  <span class="lause">Hyväksyn sopimuksen ${esc(d.numero)}.</span>
+  <p>Tilaajan lähettämä hyväksyntäviesti sitoo osapuolia samalla tavalla kuin
+  allekirjoitettu paperisopimus. Molemmat osapuolet säilyttävät viestin. Jos
+  sopimukseen halutaan muutoksia, ne sovitaan kirjallisesti ennen hyväksyntää.</p>
+</div>
+
+<div class="osapuolet">
+  <div>
+    <div class="k">Toimittaja</div>
+    <div class="n">${esc(d.allekirjoittaja)}</div>
+    <div class="r">${esc(d.toimittaja.nimi)}</div>
+    <div class="r">Hyväksytty sähköisesti ${esc(d.paiva)}</div>
+  </div>
+  <div>
+    <div class="k">Tilaaja</div>
+    <div class="n">${esc(d.tilaaja.edustaja)}</div>
+    <div class="r">${esc(d.tilaaja.nimi)}</div>
+    <div class="r">Hyväksyntä sähköpostivastauksella osoitteesta ${esc(d.tilaaja.sahkoposti)}</div>
+  </div>
+</div>` : `
 <div class="allek">
   <div>
     <div class="k">Paikka ja aika</div>
@@ -183,7 +237,7 @@ ${d.sisaltyy?.length ? `<p style="margin-top:5px">Työhön sisältyy: ${d.sisalt
     <div class="n">${esc(d.tilaaja.edustaja)}</div>
     <div class="k">${esc(d.tilaaja.nimi)}</div>
   </div>
-</div>
+</div>`}
 
 <footer>
   <span>${esc(d.toimittaja.nimi)} · Y-tunnus ${esc(d.toimittaja.ytunnus)}</span>
