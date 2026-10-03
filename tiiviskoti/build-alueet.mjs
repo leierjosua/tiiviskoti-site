@@ -105,37 +105,49 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const nav = (R, calc = '#laskuri') => `<nav class="top" id="nav"><div class="wrap">
   <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
   <div class="nlinks" id="nlinks">
-    <a href="/#palvelut">Palvelut</a><a href="${calc}">Hinta</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="${R}meista.html">Meistä</a><a href="/#saasto">Säästö</a>
+    <a href="${R}ikkunoiden-tiivistys.html">Ikkunoiden tiivistys</a><a href="${R}ovien-tiivistys.html">Ovien tiivistys</a><a href="${R}taloyhtio.html">Taloyhtiöille</a><a href="${calc}">Hinta</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a>
   </div>
   <a href="tel:${TELH}" class="ntel">${TEL}</a>
   <a href="${calc}" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
   <button class="burger" id="burger" aria-label="Valikko"><span></span><span></span><span></span></button>
 </div></nav>`;
 
-/* Footerin aluelista linkittää kaikkiin aluesivuihin. Ristiinlinkitys on
-   se mekanismi jolla Google löytää sivut ilman että kukaan linkittää
-   niihin ulkopuolelta. */
+/* Aluelista linkittää kaikkiin aluesivuihin. Ristiinlinkitys on se
+   mekanismi jolla Google löytää sivut ilman että kukaan linkittää niihin
+   ulkopuolelta — mutta 3.10.2026 alkaen lista on vain hub-sivun
+   footerissa, ei joka sivulla. Kuntasivut ovat yhä sivukartassa ja
+   linkittyvät toisiinsa, joten löydettävyys säilyy; poistunut on se
+   massalinkitys joka teki niistä sivuston linkitetyimmät sivut. */
 const alueLinkit = (R, paitsi) => ALUEET
   .map((a) => a.slug === paitsi
     ? `<span style="opacity:.55">${a.name}</span>`
     : `<a href="${R}toiminta-alueet/${a.slug}.html">${a.name}</a>`)
   .join('');
 
-const footer = (R, paitsi, calc = '#laskuri') => `<footer class="mfoot"><div class="wrap">
+/* `kaupungit` lisää footeriin 23 kuntalinkin listan. Se on PÄÄLLÄ VAIN
+   toiminta-alueet.html:ssä. Aiemmin lista oli jokaisen sivun footerissa,
+   jolloin kuntasivut olivat ylivoimaisesti sivuston linkitetyimmät sivut —
+   ja Google nosti juuri ne hakutuloksen sitelinkeiksi palvelusivujen sijaan
+   (mitattu 3.10.2026 kuvakaappauksesta: Espoo ja Helsinki sitelinkkeinä,
+   ikkunoiden ja ovien tiivistys ei kummallakaan). Kuntasivut löytyvät yhä
+   hub-sivulta, sivukartasta ja toisistaan — vain footerin massalinkitys on
+   poistettu. Jos sitelinkit halutaan takaisin entiselleen, aseta tämä
+   oletuksena todeksi. */
+const footer = (R, paitsi, calc = '#laskuri', kaupungit = false) => `<footer class="mfoot"><div class="wrap">
   <div class="mf-grid">
     <div class="mf-brand">
       <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="rgba(246,247,243,.14)"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#2E9E63"/></svg><span><span class="d">Tiivis</span><span class="b" style="color:#2E9E63">Koti</span></span></a>
       <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
       <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     </div>
-    <div class="mf-col"><h4>Palvelut</h4><a href="/#palvelut">Ovet</a><a href="/#palvelut">Ikkunat</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${calc}">Hintalaskuri</a></div>
-    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="${R}hinta.html">Hinta</a><a href="${R}artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a><a href="${calc}">Varaa aika</a></div>
+    <div class="mf-col"><h4>Palvelut</h4><a href="${R}ikkunoiden-tiivistys.html">Ikkunoiden tiivistys</a><a href="${R}ovien-tiivistys.html">Ovien tiivistys</a><a href="${R}taloyhtio.html">Taloyhtiöille</a><a href="${calc}">Hintalaskuri</a></div>
+    <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="${R}hinta.html">Hinta</a><a href="${R}meista.html">Meistä</a><a href="${R}artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a><a href="${R}varaa.html">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:${TELH}">${TEL}</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
-  <div class="mf-cities">
+  ${kaupungit ? `<div class="mf-cities">
     <h4>Toiminta-alueet</h4>
     <div class="list">${alueLinkit(R, paitsi)}</div>
-  </div>
+  </div>` : ''}
   <div class="mf-bot"><span>© <span id="yr"></span> Tiiviskoti Oy · Y-tunnus 3652671-7</span><span><a href="${R}tietosuoja.html" style="text-decoration:underline;text-underline-offset:3px">Tietosuoja</a> · <a href="${R}kayttoehdot.html" style="text-decoration:underline;text-underline-offset:3px">Käyttöehdot</a></span></div>
 </div></footer>`;
 
@@ -1243,7 +1255,7 @@ ${laskuriOsio(R, null)}
   </div>
 </div></section>
 
-${footer(R, null)}
+${footer(R, null, '#laskuri', true)}
 ${skripti}
 <script defer src="${R}_analytics.js"></script><script type="module" src="${R}_shared.js"></script>
 <script type="module" src="${R}_anchors.js"></script>
@@ -1809,9 +1821,12 @@ function sitemapXml() {
     { loc: `${SITE}/hinta.html`, pri: '0.9', freq: 'monthly' },
     { loc: `${SITE}/ota-yhteytta.html`, pri: '0.7', freq: 'monthly' },
     { loc: `${SITE}/meista.html`, pri: '0.5', freq: 'yearly' },
-    /* ajanvaraus.html on TARKOITUKSELLA poissa: sen canonical osoittaa
-       varaa.html:ään, ja sitemapissa kuuluu olla vain kanonisia osoitteita.
-       Sivu itse toimii ja on linkitettävissä. */
+    /* ajanvaraus.html on TARKOITUKSELLA poissa: se on varausPOLUN vaihe
+       ("Valitse vapaa aika"), ei oma laskeutumissivu, ja sen canonical
+       osoittaa varaa.html:ään. Sitemapissa kuuluu olla vain kanonisia
+       osoitteita. HUOM: canonical PUUTTUI sivulta 3.10.2026 asti — tämä
+       kommentti kuvasi tilaa jota ei ollut, ja kaksi lähes samaa
+       varaussivua kilpaili hakutuloksissa keskenään. */
     { loc: `${SITE}/varaa.html`, pri: '0.5', freq: 'monthly' },
     { loc: `${SITE}/tietosuoja.html`, pri: '0.3', freq: 'yearly' },
     { loc: `${SITE}/kayttoehdot.html`, pri: '0.3', freq: 'yearly' },
