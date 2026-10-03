@@ -45,7 +45,7 @@ const outFile = process.argv[3] || path.join(__dirname, `sopimus-${d.numero}.pdf
 const PAKOLLISET = [
   ['numero', d.numero], ['paiva', d.paiva],
   ['toimittaja.nimi', d.toimittaja?.nimi], ['toimittaja.ytunnus', d.toimittaja?.ytunnus],
-  ['tilaaja.nimi', d.tilaaja?.nimi], ['tilaaja.edustaja', d.tilaaja?.edustaja],
+  ['tilaaja.nimi', d.tilaaja?.nimi],
   ['kohde.osoite', d.kohde?.osoite],
   ['maksuehto.paivia', d.maksuehto?.paivia],
   ['allekirjoittaja', d.allekirjoittaja],
@@ -61,6 +61,16 @@ if (puuttuu.length) {
   for (const [k] of puuttuu) console.error('   · ' + k)
   process.exit(1)
 }
+
+/* Edustaja on vain organisaatiolla. Yksityishenkilö on itse tilaaja, eikä
+   sopimukseen saa tulostaa riviä "Edustaja: Matti Meikäläinen" kun tilaaja
+   on sama Matti Meikäläinen — se näyttää siltä että joku kolmas osapuoli
+   puuttuisi. Siksi kenttä on valinnainen ja rivi jätetään pois, jos sitä
+   ei ole tai se on sama kuin tilaajan nimi. Allekirjoittajaksi kelpaa
+   silloin tilaaja itse. */
+const tilaajanEdustaja = String(d.tilaaja?.edustaja ?? '').trim()
+const onErillinenEdustaja = !!tilaajanEdustaja && tilaajanEdustaja !== String(d.tilaaja?.nimi ?? '').trim()
+const tilaajanAllekirjoittaja = onErillinenEdustaja ? tilaajanEdustaja : String(d.tilaaja?.nimi ?? '').trim()
 
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))
 const eur = n => Number(n).toLocaleString('fi-FI', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
@@ -149,7 +159,7 @@ const html = `<!doctype html><html lang="fi"><head><meta charset="utf-8">
     <div class="k">Tilaaja</div>
     <div class="v">${esc(d.tilaaja.nimi)}</div>
     ${d.tilaaja.ytunnus ? `<div class="r">Y-tunnus ${esc(d.tilaaja.ytunnus)}</div>` : ''}
-    <div class="r">Edustaja: ${esc(d.tilaaja.edustaja)}</div>
+    ${onErillinenEdustaja ? `<div class="r">Edustaja: ${esc(tilaajanEdustaja)}</div>` : ''}
     ${d.tilaaja.sahkoposti ? `<div class="r">${esc(d.tilaaja.sahkoposti)}</div>` : ''}
   </div>
 </div>
@@ -215,8 +225,8 @@ ${hyvaksynta === 'sahkoposti' ? `
   </div>
   <div>
     <div class="k">Tilaaja</div>
-    <div class="n">${esc(d.tilaaja.edustaja)}</div>
-    <div class="r">${esc(d.tilaaja.nimi)}</div>
+    <div class="n">${esc(tilaajanAllekirjoittaja)}</div>
+    ${onErillinenEdustaja ? `<div class="r">${esc(d.tilaaja.nimi)}</div>` : ''}
     <div class="r">Hyväksyntä sähköpostivastauksella osoitteesta ${esc(d.tilaaja.sahkoposti)}</div>
   </div>
 </div>` : `
@@ -234,8 +244,8 @@ ${hyvaksynta === 'sahkoposti' ? `
     <div class="viiva"></div>
     <div class="k">Tilaaja</div>
     <div class="viiva"></div>
-    <div class="n">${esc(d.tilaaja.edustaja)}</div>
-    <div class="k">${esc(d.tilaaja.nimi)}</div>
+    <div class="n">${esc(tilaajanAllekirjoittaja)}</div>
+    ${onErillinenEdustaja ? `<div class="k">${esc(d.tilaaja.nimi)}</div>` : ''}
   </div>
 </div>`}
 
