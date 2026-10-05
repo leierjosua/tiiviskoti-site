@@ -19,7 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const OUT = path.join(__dirname, 'out')
 fs.mkdirSync(OUT, { recursive: true })
 
-const BEATS = ['beat1', 'beat2', 'beat3', 't-hinta', 't-mekanismi', 't-kaynti', 't-saasto']
+const BEATS = ['beat1', 'beat2', 'beat3', 't-hinta', 't-mekanismi', 't-kaynti', 't-saasto', 't-ovi', 't-molemmat']
 const RATIOS = [
   { key: '916', cls: 'r916', w: 1080, h: 1920 },
   { key: '45',  cls: 'r45',  w: 1080, h: 1350 },
