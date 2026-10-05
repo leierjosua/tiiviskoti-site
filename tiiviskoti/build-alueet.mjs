@@ -66,7 +66,7 @@ const YHTEINEN_FAQ = [
   ['Kannattaako tiivistys vai ikkunoiden vaihto?',
    'Jos lasi ja karmi ovat ehjät eikä puussa ole lahoa, tiivistys riittää. Uusi ikkuna asennettuna maksaa noin 1 200 €, kun saman ikkunan tiivistäminen maksaa alkaen 75 € — eli vaihtaminen on kymmeniä kertoja kalliimpaa. Jos tiivistys ei sinun kohteessasi riitä, sanomme sen käynnillä emmekä veloita turhasta.'],
   ['Kuuluuko ikkunan säätö ja öljyäminen hintaan?',
-   'Kyllä. Ikkunan käynnin säätö ja saranoiden öljyäminen sisältyvät ikkunan hintaan, eikä niistä veloiteta erikseen. Ovissa hintaan kuuluu lisäksi kynnyskumi.'],
+   'Kyllä. Ikkunan käynnin säätö ja saranoiden öljyäminen sisältyvät ikkunan hintaan, eikä niistä veloiteta erikseen. Ovissa hintaan kuuluu samoin oven säätö sekä lukkojen ja saranoiden öljyäminen.'],
   ['Saako työstä kotitalousvähennyksen?',
    'Saa. Työ on kotitaloustyötä, ja lasku erittelee työn osuuden valmiiksi vähennystä varten. Vähennys on 40 % työn osuudesta.'],
 ];
@@ -105,7 +105,7 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const nav = (R, calc = '#laskuri') => `<nav class="top" id="nav"><div class="wrap">
   <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
   <div class="nlinks" id="nlinks">
-    <a href="${R}ikkunoiden-tiivistys.html">Ikkunoiden tiivistys</a><a href="${R}ovien-tiivistys.html">Ovien tiivistys</a><a href="${R}taloyhtio.html">Taloyhtiöille</a><a href="${calc}">Hinta</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a>
+    <a href="${R}ikkunoiden-tiivistys.html">Ikkunoiden tiivistys</a><a href="${R}ovien-tiivistys.html">Ovien tiivistys</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}varaa.html">Varaa aika</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a>
   </div>
   <a href="tel:${TELH}" class="ntel">${TEL}</a>
   <a href="${calc}" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
@@ -140,7 +140,7 @@ const footer = (R, paitsi, calc = '#laskuri', kaupungit = false) => `<footer cla
       <p>Ovien ja ikkunoiden tiivistevaihto Uudellamaalla ja Riihimäellä.</p>
       <div class="mf-rate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     </div>
-    <div class="mf-col"><h4>Palvelut</h4><a href="${R}ikkunoiden-tiivistys.html">Ikkunoiden tiivistys</a><a href="${R}ovien-tiivistys.html">Ovien tiivistys</a><a href="${R}taloyhtio.html">Taloyhtiöille</a><a href="${calc}">Hintalaskuri</a></div>
+    <div class="mf-col"><h4>Palvelut</h4><a href="${R}ikkunoiden-tiivistys.html">Ikkunoiden tiivistys</a><a href="${R}ovien-tiivistys.html">Ovien tiivistys</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${calc}">Hintalaskuri</a></div>
     <div class="mf-col"><h4>Yritys</h4><a href="/#miksi">Miksi me</a><a href="${R}hinta.html">Hinta</a><a href="${R}meista.html">Meistä</a><a href="${R}artikkelit.html">Artikkelit</a><a href="/#saasto">Säästöarvio</a><a href="/#ukk">UKK</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a><a href="${R}varaa.html">Varaa aika</a></div>
     <div class="mf-col"><h4>Yhteys</h4><a href="tel:${TELH}">${TEL}</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="${R}toiminta-alueet.html">Toiminta-alueet</a><a href="https://www.facebook.com/profile.php?id=61573878654177" rel="me noopener">Facebook</a><span class="mf-hours"><b>Avoinna</b><span>Ma–Pe 8–20</span> · <span>La–Su 8–18.30</span></span></div>
   </div>
@@ -488,8 +488,8 @@ const PALVELUT = [
     kicker: 'Ovet',
     hinta: TYPES[1].price,
     hintaSelite: 'ulko- ja parvekeovi',
-    desc: `Ulko-oven, parvekeoven ja terassin liukuoven tiivistys kiinteään hintaan alkaen ${TYPES[1].price} €. Sivutiivisteet, kynnyskumi ja oven käynnin säätö samalla käynnillä.`,
-    lead: 'Vaihdamme sivutiivisteet ja kynnyskumin sekä säädämme oven käynnin niin, että ovi painuu tasaisesti tiivistettä vasten. Kaikki samalla käynnillä.',
+    desc: `Ulko-oven, parvekeoven ja terassin liukuoven tiivistys kiinteään hintaan alkaen ${TYPES[1].price} €. Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö samalla käynnillä.`,
+    lead: 'Vaihdamme oven tiivisteet, öljyämme lukot ja saranat sekä säädämme oven käynnin niin, että ovi painuu tasaisesti tiivistettä vasten. Kaikki samalla käynnillä.',
     oireetOtsikko: 'Milloin ovi kannattaa tiivistää',
     oireet: [
       ['Kynnyksestä vetää', 'Kynnyskumi kuluu ensimmäisenä, koska se jää oven ja kynnyksen väliin joka kerta.'],
@@ -499,7 +499,7 @@ const PALVELUT = [
     ],
     faq: [
       ['Paljonko ulko-oven tiivistys maksaa?', `Ulko-ovi ja parvekeovi maksavat ${TYPES[1].price} € ovelta riippumatta siitä, montako ovea kohteessa on. Pelkkä kynnyskumin vaihto on ${TYPES[5].price} € ja väli- tai huoneovi ${TYPES[4].price} €${TYPES[4].combo ? ` — tai ${TYPES[4].combo} €, kun samalla käynnillä on vähintään kaksi kohdetta` : ''}. Pienin veloitus käynniltä on ${MIN_PRICE} €.`],
-      ['Sisältyykö kynnyskumi hintaan?', 'Kyllä. Ulko-oven hintaan kuuluvat sivutiivisteet, kynnyskumi ja oven käynnin säätö — ei erillisiä lisiä.'],
+      ['Sisältyykö kynnyskumi hintaan?', `Ei. Ulko-oven hintaan kuuluvat tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö. Kynnyskumin vaihto on tarvittaessa erillinen lisätyö, ${TYPES[5].price} €.`],
       ['Entä terassin liuku- tai pariovi?', `Iso lasiovi ja liukuovi ovat ${TYPES[3].price} €, koska niissä on enemmän tiivistettävää kehää ja kiskon huolto kuuluu työhön.`],
       ['Kuinka kauan oven tiivistys kestää?', 'Noin 30 minuuttia ovea kohti. Useampi ovi tehdään samalla käynnillä, jolloin hinta ovea kohti on edullisempi.'],
       ['Korjaako tiivistys vinon oven?', 'Säädämme käyntivälyksen ja saranat siltä osin kuin ne ovat säädettävissä. Jos ovilehti on vääntynyt tai karmi liikkunut, kerromme sen paikan päällä ennen työn aloittamista.'],
@@ -1158,7 +1158,7 @@ function hubSivu() {
   const title = 'Toiminta-alueet: tiivistys Uudellamaalla — TiivisKoti';
   /* "Uudellamaalla ja Riihimäellä", ei pelkkä kuntamäärä + Uusimaa: Riihimäki
      on Kanta-Hämettä, joten "N kuntaa Uudellamaalla" olisi suoraan väärin. */
-  const desc = `Tiivistämme ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla ja Riihimäellä. Samat kiinteät hinnat: ikkuna ${WINDOW_TIERS[0].price} €, ovi ${TYPES[1].price} €.`;
+  const desc = `Tiivistämme ovet ja ikkunat ${ALUEET.length} kunnassa Uudellamaalla ja Riihimäellä. Samat kiinteät hinnat: ikkuna ${WINDOW_TIERS[WINDOW_TIERS.length - 1].price}–${WINDOW_TIERS[0].price} €, ovi ${TYPES[1].price} €.`;
 
   const ld = {
     '@context': 'https://schema.org',

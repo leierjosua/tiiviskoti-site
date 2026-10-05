@@ -52,7 +52,7 @@ export const WINDOW_TIERS = [
    `min`     = arvioitu työaika minuutteina per kappale (= kalenterivaraus) */
 export const TYPES = [
   { id: 'ikkuna',  name: 'Ikkuna',                   desc: 'Karmi- ja puitetiivisteet, säätö ja öljyäminen',      tiers: WINDOW_TIERS, price: 90, min: 25 },
-  { id: 'ulko',    name: 'Ulko-ovi',                 desc: 'Sivutiivisteet + kynnyskumi, käynnin säätö', price: 99,  min: 30 },
+  { id: 'ulko',    name: 'Ulko-ovi',                 desc: 'Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen, säätö', price: 99,  min: 30 },
   { id: 'parveke', name: 'Parvekeovi',               desc: 'Puu-/alumiiniparvekeovi, koko kehä',         price: 99,  min: 30 },
   { id: 'terassi', name: 'Liuku- tai pariovi',       desc: 'Iso lasiovi tai liukuovi, kiskon huolto',    price: 149, min: 30 },
   { id: 'vali',    name: 'Väli- / huoneovi',         desc: 'Sisäoven ääni- ja vetotiiviste',             price: 89,  combo: 59, min: 30 },
