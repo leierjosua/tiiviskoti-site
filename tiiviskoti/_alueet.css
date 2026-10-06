@@ -618,3 +618,6 @@ nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .rc-lines,.rc-empty{color:var(--mute)}
 .q-btn{background:var(--green);color:#fff}
 .wtype{padding-top:12px;padding-bottom:12px}
+
+/* Google-arvosanapilleri heroon (sama kuin index.html). */
+.hero .rating-g{text-decoration:none;gap:8px}.hero .rating-g .stars{display:inline-flex;gap:1px}.hero .rating .st{color:#FBBF24}.hero .rating-g b{font-weight:800;color:inherit}.hero .rating-g .r-sep{width:1px;height:14px;background:currentColor;opacity:.3}.hero .rating-g:hover .r-txt{text-decoration:underline}
