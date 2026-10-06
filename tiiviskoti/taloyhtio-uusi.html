@@ -508,33 +508,45 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 .q-btn{background:var(--green);color:#fff}
 .wtype{padding-top:12px;padding-bottom:12px}
 
-/* KARTOITUSKORTTI HEROSSA (esikatselu 6.10.2026). Kortti istuu oman kuvan päällä;
-   kalenterivaiheessa (.wide) hero muuttuu yhdeksi palstaksi, jotta kalenteri mahtuu. */
-.hero-book{position:relative;padding:clamp(18px,2.6vw,30px);border-radius:var(--r-lg);overflow:hidden;min-width:0}
-.hb-photo{position:absolute;inset:0;z-index:0}
-.hb-photo img{width:100%;height:100%;object-fit:cover;display:block}
-.hb-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,58,40,.10),rgba(22,58,40,.35))}
-.hero-book .stepcard{position:relative;z-index:1;margin:0 auto;box-shadow:0 24px 60px -24px rgba(16,42,30,.55)}
+/* KARTOITUSKORTTI HEROSSA — samaa tyyliä kuin etusivun konsepti v12:
+   kuva koko leveydellä, valkoinen teksti vasemmalla, kortti oikealla.
+   Puhelimessa kuva vain heron yläosassa, jotta asentajat näkyvät otsikon ja kortin välissä. */
+.ty-hero{position:relative;overflow:hidden;background:#163A28;padding:clamp(56px,7vw,96px) 0 clamp(64px,7vw,96px)}
+.ty-bg{position:absolute;inset:0;z-index:0}
+.ty-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;display:block}
+.ty-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,42,30,.86) 0%,rgba(16,42,30,.6) 45%,rgba(16,42,30,.35) 100%),linear-gradient(180deg,rgba(16,42,30,0) 60%,rgba(16,42,30,.55))}
+.ty-hero .wrap{position:relative;z-index:1}
+.ty-hero .hero-grid{grid-template-columns:1.05fr .95fr;align-items:center}
+.ty-hero .rating,.ty-hero h1,.ty-hero .hero-sub,.ty-hero .hero-fine{color:#fff}
+.ty-hero .rating svg,.ty-hero .hero-fine svg{color:#8FD3AC}
+.ty-hero h1 .a{color:#8FD3AC}
+.ty-hero .hero-sub{color:rgba(255,255,255,.88)}
+.ty-hero .hero-fine{color:rgba(255,255,255,.78)}
+.ty-hero .hero-cta .btn-p{display:none}
+.ty-hero .hero-cta .btn-alt{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}
+.ty-hero .hero-cta .btn-o{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.35)}
+.ty-hero .hero-book{position:relative;min-width:0}
+.ty-hero .stepcard{margin:0 0 0 auto;max-width:480px;box-shadow:0 30px 70px -28px rgba(0,0,0,.6)}
 .hb-head{text-align:left;margin:4px 0 14px}
 .hb-head .kicker{display:none}
 .hb-head .title{font-size:clamp(20px,2.1vw,25px);margin:0;text-align:left}
 .hb-head .sub{font-size:14.5px;margin:6px 0 0;text-align:left;max-width:none}
-.hero-grid:has(.stepcard.wide){grid-template-columns:1fr}
-.hero-grid:has(.stepcard.wide) .hero-book{order:-1}
-.hero-grid:has(.stepcard.wide)>div:first-child{display:none}
+/* Kalenterivaihe tarvitsee leveyttä: hero yhdeksi palstaksi ja kortti keskelle. */
+.ty-hero .hero-grid:has(.stepcard.wide){grid-template-columns:1fr}
+.ty-hero .hero-grid:has(.stepcard.wide)>div:first-child{display:none}
+.ty-hero .hero-grid:has(.stepcard.wide) .stepcard{margin:0 auto;max-width:760px}
 @media(max-width:960px){
-  .hero-book{padding:0;overflow:visible;border-radius:0}
-  .hb-photo{position:relative;inset:auto;aspect-ratio:16/9;border-radius:var(--r-lg);overflow:hidden}
-  .hero-book .stepcard{margin:-48px 12px 0}
-}
-@media(max-width:620px){.hero-book .stepcard{margin:-40px 0 0}}
-
-/* Kortti korvaa heron oman "Varaa ilmainen kartoituskäynti" -napin. */
-.hero-grid:has(.hero-book) .hero-cta .btn-p{display:none}
-@media(max-width:960px){
-  .hero-grid:has(.hero-book) .hero-fine{display:none}
-  .hero-grid:has(.hero-book) .hero-cta{display:none}
-  .hb-photo{aspect-ratio:16/8}
+  .ty-hero{padding:28px 0 36px}
+  .ty-hero .hero-grid{grid-template-columns:1fr;gap:0}
+  /* Kuva alkaa vasta tekstin alta, jotta kasvot eivät jää otsikon taakse. */
+  .ty-bg{inset:210px 0 auto 0;height:620px}
+  .ty-bg img{object-position:50% 50%}
+  .ty-bg::after{background:linear-gradient(180deg,#163A28 0%,rgba(22,58,40,.35) 16%,rgba(16,42,30,0) 30%,rgba(16,42,30,.08) 72%,#163A28 100%)}
+  .ty-hero .hero-cta,.ty-hero .hero-fine{display:none}
+  .ty-hero h1,.ty-hero .rating,.ty-hero .hero-sub{text-align:center;justify-content:center;margin-left:auto;margin-right:auto}
+  .ty-hero .hero-book{margin-top:330px}
+  .ty-hero .stepcard{margin:0 auto;max-width:520px}
+  .ty-hero .hb-head .sub{display:none}
 }
 </style>
   <link rel="stylesheet" href="/_anim.css">
@@ -551,7 +563,7 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 </div></nav>
 
 <!-- HERO -->
-<header class="hero"><div class="wrap hero-grid">
+<header class="hero ty-hero"><div class="ty-bg" aria-hidden="true"><img src="img/taloyhtio-hero.webp?v=3" alt="TiivisKodin asentajat talon pihassa kartoituskäynnillä" width="1100" height="880" fetchpriority="high"></div><div class="wrap hero-grid">
   <div>
     <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
     <h1>Taloyhtiön ovet ja ikkunat<br>kuntoon <span class="a">kerralla.</span></h1>
@@ -567,7 +579,6 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
     <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä sopimushinta · kartoitus veloituksetta · työ mahdollisimman vähällä häiriöllä</p>
   </div>
   <div class="hero-book rv" id="varaa">
-    <div class="hb-photo" aria-hidden="true"><img src="img/taloyhtio-hero.webp?v=3" alt="TiivisKodin asentajat talon pihassa kartoituskäynnillä" width="1100" height="880" fetchpriority="high"></div>
     <div class="stepcard" id="stepCard">
     <div class="stepcard-head">
       <button type="button" class="stepback" id="stepBack" hidden>
