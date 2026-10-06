@@ -150,8 +150,9 @@ a.btn-alt:hover{color:#fff}
 .on-deep.btn-o{background:transparent;color:#fff;border-color:rgba(246,247,243,.4)}.on-deep.btn-o:hover{border-color:#fff;color:#fff;background:rgba(246,247,243,.08)}
 
 /* nav */
-nav.top{position:sticky;top:0;z-index:60;background:rgba(246,247,243,.9);backdrop-filter:saturate(1.1);border-bottom:1px solid transparent;transition:.25s}
-nav.top.scr{border-color:var(--line);background:var(--bg)}
+/* Navi kelluu heron kuvan päällä kuten etusivulla (ei omaa valkoista yläpalkkia). */
+nav.top{position:fixed;top:0;left:0;right:0;z-index:60;background:transparent;border-bottom:1px solid transparent;transition:.25s}
+nav.top.scr{border-color:transparent;background:transparent}
 nav.top .wrap{display:flex;align-items:center;height:74px;gap:22px}
 .logo{display:inline-flex;align-items:center;gap:11px;font-weight:800;font-size:23px;letter-spacing:-.03em;color:var(--ink)}
 .logo .mark{width:34px;height:34px}
@@ -510,7 +511,7 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 /* KARTOITUSKORTTI HEROSSA — samaa tyyliä kuin etusivun konsepti v12:
    kuva koko leveydellä, valkoinen teksti vasemmalla, kortti oikealla.
    Puhelimessa kuva vain heron yläosassa, jotta asentajat näkyvät otsikon ja kortin välissä. */
-.ty-hero{position:relative;overflow:hidden;background:#163A28;padding:clamp(56px,7vw,96px) 0 clamp(64px,7vw,96px)}
+.ty-hero{position:relative;overflow:hidden;background:#163A28;padding:calc(clamp(56px,7vw,96px) + 88px) 0 clamp(64px,7vw,96px)}
 .ty-bg{position:absolute;inset:0;z-index:0}
 .ty-bg picture{display:contents}
 .ty-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;display:block}
@@ -536,24 +537,20 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 .ty-hero .hero-grid:has(.stepcard.wide)>div:first-child{display:none}
 .ty-hero .hero-grid:has(.stepcard.wide) .stepcard{margin:0 auto;max-width:760px}
 @media(max-width:960px){
-  /* Puhelimessa ja tabletilla kuva on omana kokonaisena lohkonaan tekstin ja kortin välissä:
-     ei häivytyksiä eikä valkoista sumua (Josua 6.10.), kortti nousee hieman kuvan päälle. */
-  .ty-hero{padding:28px 0 36px;background:var(--bg);display:flex;flex-direction:column}
+  /* Puhelin/tabletti: kuva alkaa sivun ylälaidasta navin alta (kuten etusivulla), koko kuva näkyy,
+     otsikko valkoisena kuvan alaosassa ja kortti tummanvihreällä pohjalla sen alla. */
+  .ty-hero{padding:0 0 36px;display:flex;flex-direction:column}
   .ty-hero>.wrap,.ty-hero .hero-grid{display:contents}
-  .ty-hero .hero-grid>div:first-child{order:1;padding-inline:20px}
-  .ty-bg{order:2;position:relative;inset:auto;height:auto;margin-top:24px}
+  .ty-bg{order:1;position:relative;inset:auto;height:auto}
   .ty-bg img{height:auto;object-fit:initial}
-  .ty-bg::after{display:none}
-  .ty-hero .hero-book{order:3;position:relative;z-index:1;margin:-64px 16px 0}
-  .ty-hero h1,.ty-hero .rating{color:var(--ink)}
-  .ty-hero h1 .a{color:var(--green)}
-  .ty-hero .rating svg{color:var(--green)}
-  .ty-hero .hero-sub{color:var(--text)}
-  .ty-hero .stepcard{box-shadow:0 24px 60px -28px rgba(24,58,40,.45)}
+  .ty-bg::after{background:linear-gradient(180deg,rgba(16,42,30,.45) 0%,rgba(16,42,30,0) 16%,rgba(16,42,30,0) 52%,rgba(16,42,30,.78) 80%,#163A28 100%)}
+  .ty-hero .hero-grid>div:first-child{order:2;position:relative;z-index:1;margin-top:-170px;padding-inline:20px}
+  .ty-hero .hero-book{order:3;position:relative;z-index:1;margin:26px 16px 0}
   .ty-hero .hero-cta,.ty-hero .hero-fine{display:none}
   .ty-hero h1,.ty-hero .rating,.ty-hero .hero-sub{text-align:center;justify-content:center;margin-left:auto;margin-right:auto}
   .ty-hero .stepcard{margin:0 auto;max-width:520px}
   .ty-hero .hb-head .sub{display:none}
+  .ty-hero .hero-grid>div:first-child .rating{display:flex;margin:0 auto 10px;width:max-content;max-width:100%}
 }
 /* Tabletilla viisi linkkiä eivät mahdu riville → valikko burgerin taakse (kuten etusivulla). */
 @media(min-width:621px) and (max-width:1100px){
@@ -562,6 +559,22 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
   nav.top .btn-p{margin-left:auto}
   .burger{display:flex;margin-left:6px}
   .nlinks.op{display:flex;position:absolute;top:calc(100% + 8px);left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
+}
+/* Kelluva navi (kopio etusivulta): ≥621 px valkoinen pillerinä kuvan päällä,
+   puhelimessa läpinäkyvä valkoisella logolla kunnes sivua vieritetään. */
+@media(min-width:621px){
+  nav.top .wrap{background:rgba(255,255,255,.94);backdrop-filter:blur(14px);
+    border:1px solid rgba(24,58,40,.07);border-radius:999px;
+    margin-top:14px;height:64px;padding-inline:18px;
+    box-shadow:0 14px 34px -22px rgba(16,42,30,.55);
+    transition:background .25s,box-shadow .25s,margin-top .25s}
+  nav.top.scr .wrap{background:#fff;box-shadow:0 10px 26px -18px rgba(16,42,30,.45);margin-top:10px}
+}
+@media(max-width:620px){
+  nav.top .wrap{height:62px;gap:12px}
+  nav.top:not(.scr) .logo,nav.top:not(.scr) .logo .d,nav.top:not(.scr) .logo .b{color:#fff}
+  nav.top:not(.scr) .burger span{background:#fff}
+  nav.top.scr{background:var(--bg);border-color:var(--line)}
 }
 /* Mittariluvut heron alla: yksi yhtenäinen kortti, ei kolmea irrallista laatikkoa. */
 .ty-metrics{padding-top:clamp(28px,4vw,48px)}
