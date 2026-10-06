@@ -856,6 +856,16 @@ header.hero .wrap.hero-grid{padding-top:clamp(150px,19vh,190px)}
   .nlinks.op{display:flex;position:absolute;top:calc(100% + 8px);left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
 }
 .hero-sub{font-weight:500}
+
+/* Taloyhtiölinkki heron nappien alla. Koko tekstipino nousee hieman, jotta linkki ei osu asentajien kasvoihin. */
+header.hero .wrap.hero-grid{padding-top:clamp(124px,16vh,160px)}
+.hero-ty{margin:18px auto 0;font-size:15px;color:rgba(255,255,255,.88);text-shadow:0 1px 10px rgba(10,30,20,.5)}
+.hero-ty a{color:#fff;font-weight:700;text-decoration:underline;text-decoration-color:rgba(255,255,255,.45);text-underline-offset:4px;padding:10px 2px}
+.hero-ty a:hover{text-decoration-color:#fff}
+@media(max-width:620px){
+  header.hero .wrap.hero-grid{padding-top:120px}
+  .hero-ty{font-size:14px;margin-top:14px}
+}
 </style>
 <script type="application/ld+json">
 {
@@ -1096,6 +1106,9 @@ header.hero .wrap.hero-grid{padding-top:clamp(150px,19vh,190px)}
            nappi avaa sen sen sijaan että vierittäisi vain alaspäin. -->
       <a href="ota-yhteytta.html" class="btn btn-alt btn-lg">Ota yhteyttä</a>
     </div>
+    <!-- Taloyhtiöille oma reitti heti herossa, mutta tekstilinkkinä eikä kolmantena
+         nappina: ei kilpaile Varaa aika -napin kanssa. -->
+    <p class="hero-ty">Taloyhtiö? <a href="taloyhtio.html#varaa">Varaa ilmainen kartoituskäynti <span aria-hidden="true">→</span></a></p>
   </div>
   <div class="hero-card rv">
     <picture><source media="(max-width:620px)" srcset="img/hero-entrance-mob.webp?v=4"><img src="img/hero-entrance-1600.webp?v=4" srcset="img/hero-entrance-1600.webp?v=4 1600w, img/hero-entrance-2400.webp?v=4 2400w" sizes="100vw" alt="TiivisKodin asentajat vaalean puutalon pihassa työvälineineen" width="2400" height="1803" fetchpriority="high"></picture>
