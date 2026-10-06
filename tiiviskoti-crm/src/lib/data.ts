@@ -192,18 +192,68 @@ export function unitLabel(u: JobUnits | undefined): string | null {
   return osat.length ? osat.join(' · ') : null;
 }
 
-export function jobUnitCounts(fromIso: string, toIso: string, staffId?: string | null) {
+/**
+ * `crew: true` (asennusnäkymä): työparin keikalla rivit ovat vain PÄÄRIVILLÄ —
+ * lisätyllä tekijällä on oma 0 €:n varaus ilman rivejä. Ilman tätä työparin
+ * toinen asentaja näkisi keikkansa "0 ikkunaa, 0 ovea". Silloin luvut otetaan
+ * saman crew_group_id:n varaukselta, jolla on rivejä (oma rivi voittaa, jos
+ * sillä on). Toimiston kalenteri EI käytä tätä, koska se laskee koko
+ * yrityksen summia ja sama työ tulisi silloin kahteen kertaan.
+ */
+export function jobUnitCounts(
+  fromIso: string, toIso: string, staffId?: string | null, opts?: { crew?: boolean },
+) {
+  const sums = sql`
+    coalesce(sum(jl.quantity) filter (
+      where jl.name ~* '^ikkuna' and jl.unit_price_cents > 0), 0)::int as ikk_maksettu,
+    coalesce(sum(jl.quantity) filter (
+      where jl.name ~* 'ilmain' and jl.name ~* 'ikkuna'), 0)::int as ikk_ilmainen,
+    coalesce(sum(jl.quantity) filter (
+      where jl.name ~* '(ovi|kynnys)' and jl.unit_price_cents > 0), 0)::int as ovi_maksettu,
+    coalesce(sum(jl.quantity) filter (
+      where jl.name ~* 'ilmain' and jl.name ~* '(ovi|kynnys)'), 0)::int as ovi_ilmainen
+  `;
+  const final = sql`
+    ikk_maksettu + case when ikk_maksettu = 0 then ikk_ilmainen else 0 end as ikkunat,
+    ovi_maksettu + case when ovi_maksettu = 0 then ovi_ilmainen else 0 end as ovet,
+    case when ikk_maksettu = 0 then ikk_ilmainen else 0 end as ilmaiset_ikkunat,
+    case when ovi_maksettu = 0 then ovi_ilmainen else 0 end as ilmaiset_ovet
+  `;
+  if (opts?.crew) {
+    return sql<JobUnits[]>`
+      with kohteet as (
+        select j.id as job_id, j.crew_group_id
+          from tk.jobs j
+          join tk.calendars c on c.id = j.calendar_id
+         where j.starts_at >= ${fromIso} and j.starts_at < ${toIso}
+           ${staffId ? sql`and c.staff_id = ${staffId}` : sql``}
+      ),
+      lahteet as (
+        select k.job_id, src.id as src_id
+          from kohteet k
+          join tk.jobs src
+            on src.id = k.job_id
+            or (k.crew_group_id is not null and src.crew_group_id = k.crew_group_id
+                and src.status <> 'cancelled')
+      ),
+      rivit as (
+        select jl.job_id as src_id, ${sums}
+          from tk.job_lines jl
+         where jl.job_id in (select src_id from lahteet)
+         group by jl.job_id
+      ),
+      laskettu as (
+        select l.job_id, l.src_id, ${final}
+          from lahteet l join rivit r on r.src_id = l.src_id
+      )
+      select distinct on (job_id) job_id, ikkunat, ovet, ilmaiset_ikkunat, ilmaiset_ovet
+        from laskettu
+       order by job_id, (src_id = job_id and ikkunat + ovet > 0) desc, ikkunat + ovet desc
+    `;
+  }
   return sql<JobUnits[]>`
     with rivit as (
-      select jl.job_id,
-             coalesce(sum(jl.quantity) filter (
-               where jl.name ~* '^ikkuna' and jl.unit_price_cents > 0), 0)::int as ikk_maksettu,
-             coalesce(sum(jl.quantity) filter (
-               where jl.name ~* 'ilmain' and jl.name ~* 'ikkuna'), 0)::int as ikk_ilmainen,
-             coalesce(sum(jl.quantity) filter (
-               where jl.name ~* '(ovi|kynnys)' and jl.unit_price_cents > 0), 0)::int as ovi_maksettu,
-             coalesce(sum(jl.quantity) filter (
-               where jl.name ~* 'ilmain' and jl.name ~* '(ovi|kynnys)'), 0)::int as ovi_ilmainen
+      select jl.job_id, ${sums}
         from tk.job_lines jl
         join tk.jobs j on j.id = jl.job_id
         join tk.calendars c on c.id = j.calendar_id
@@ -211,13 +261,46 @@ export function jobUnitCounts(fromIso: string, toIso: string, staffId?: string |
          ${staffId ? sql`and c.staff_id = ${staffId}` : sql``}
        group by jl.job_id
     )
-    select job_id,
-           ikk_maksettu + case when ikk_maksettu = 0 then ikk_ilmainen else 0 end as ikkunat,
-           ovi_maksettu + case when ovi_maksettu = 0 then ovi_ilmainen else 0 end as ovet,
-           case when ikk_maksettu = 0 then ikk_ilmainen else 0 end as ilmaiset_ikkunat,
-           case when ovi_maksettu = 0 then ovi_ilmainen else 0 end as ilmaiset_ovet
+    select job_id, ${final}
       from rivit
   `;
+}
+
+/**
+ * Työparit usealle keikalle kerralla: job_id → muiden tekijöiden nimet.
+ * Asennusnäkymän listat ja kalenteri kertovat näin "kenen kanssa" ilman
+ * kyselyä per rivi. Peruttu varaus ei ole työpari. db/026 ajamatta → tyhjä.
+ */
+export async function jobMateNames(jobIds: string[]): Promise<Map<string, string[]>> {
+  const out = new Map<string, string[]>();
+  if (jobIds.length === 0) return out;
+  try {
+    const rows = await sql<{ job_id: string; name: string }[]>`
+      select j.id as job_id, s.full_name as name
+        from tk.jobs j
+        join tk.jobs m on m.crew_group_id = j.crew_group_id and m.id <> j.id
+                      and m.status <> 'cancelled'
+        join tk.calendars c on c.id = m.calendar_id
+        join tk.staff s on s.id = c.staff_id
+       where j.id = any(${jobIds}::uuid[]) and j.crew_group_id is not null
+       order by s.full_name
+    `;
+    for (const r of rows) {
+      const list = out.get(r.job_id) ?? [];
+      if (!list.includes(r.name)) list.push(r.name);
+      out.set(r.job_id, list);
+    }
+  } catch (e) {
+    if (!undefinedColumn(e)) throw e;
+  }
+  return out;
+}
+
+/** "Nestori" / "Nestori ja Eelis" / "Nestori, Eelis ja Akseli" — etunimet riittävät porukan kesken. */
+export function mateLabel(names: string[] | undefined): string | null {
+  if (!names || names.length === 0) return null;
+  const etu = names.map((n) => n.split(' ')[0]);
+  return etu.length === 1 ? etu[0] : `${etu.slice(0, -1).join(', ')} ja ${etu[etu.length - 1]}`;
 }
 
 export async function getJob(id: string) {

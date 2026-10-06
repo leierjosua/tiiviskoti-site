@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { sql } from '@/lib/db';
-import type { JobRow } from '@/lib/data';
+import { jobLinks, jobUnitCounts, mateLabel, unitLabel, type JobRow } from '@/lib/data';
 import { satisfactionLabel } from '@/lib/completion';
 import { dateKeyOf, formatDateKey, isoWeekday, timeOf, weekdayName } from '@/lib/time';
 import { JobPhotos } from './photos';
@@ -60,7 +60,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
   const minutes = Math.round((job.ends_at.getTime() - job.starts_at.getTime()) / 60_000);
   const address = [job.address, job.postal_code, job.city].filter(Boolean).join(', ');
 
-  const [lines, mails, completion, kuvat] = await Promise.all([
+  const [ownLines, mails, completion, kuvat, links, units] = await Promise.all([
     sql<{ name: string; quantity: number }[]>`
       select name, quantity from tk.job_lines
        where job_id = ${job.id} order by sort_order
@@ -70,7 +70,27 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
     `,
     readCompletion(job.id),
     listJobPhotos(job.id),
+    jobLinks(job.id),
+    /* Saman hetken väli riittää: haetaan vain tämän varauksen luvut. */
+    jobUnitCounts(new Date(job.starts_at.getTime() - 1000).toISOString(),
+                  new Date(job.starts_at.getTime() + 1000).toISOString(), null, { crew: true }),
   ]);
+  const maara = unitLabel(units.find((u) => u.job_id === job.id));
+  const pari = mateLabel(links.mates.map((m) => m.staff_name));
+
+  /* Työparin lisätyllä tekijällä ei ole omia rivejä (päärivi kantaa ne),
+     joten näytetään parin varauksen rivit — muuten asentaja ei näkisi
+     mitä keikalla tehdään. */
+  let lines = ownLines;
+  let linesFromMate = false;
+  if (ownLines.length === 0 && links.mates.length > 0) {
+    lines = await sql<{ name: string; quantity: number }[]>`
+      select name, quantity from tk.job_lines
+       where job_id = any(${links.mates.map((m) => m.id)}::uuid[])
+       order by sort_order
+    `;
+    linesFromMate = lines.length > 0;
+  }
 
   const receiptSent = mails.some((m) => m.kind === 'receipt' && m.sent_at);
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -144,11 +164,14 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
               {weekdayName(isoWeekday(dayKey))} {formatDateKey(dayKey)} klo{' '}
               <span className="tabular">{timeOf(job.starts_at)} – {timeOf(job.ends_at)}</span>
             </Fact>
-            <Fact icon="🧰">{job.title}</Fact>
+            <Fact icon="🧰" sub={maara ?? undefined}>{job.title}</Fact>
             <Fact icon="◎">{address || 'Ei osoitetta'}</Fact>
+            {pari && (
+              <Fact icon="👥" sub="Teette keikan yhdessä">Työpari: {pari}</Fact>
+            )}
           </div>
 
-          <SectionLabel>Tuotteet ja palvelut</SectionLabel>
+          <SectionLabel>Tuotteet ja palvelut{linesFromMate ? ' (työparin varaukselta)' : ''}</SectionLabel>
           {lines.length === 0 ? (
             <p className="text-sm text-faint">
               Ei erittelyä vielä — viimeistely tekee rivit.

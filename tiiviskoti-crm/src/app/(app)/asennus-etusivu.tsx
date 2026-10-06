@@ -5,7 +5,7 @@ import {
   addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, weekdayShort,
 } from '@/lib/time';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
-import { jobUnitCounts, type JobUnits } from '@/lib/data';
+import { jobMateNames, jobUnitCounts, mateLabel, unitLabel, type JobUnits } from '@/lib/data';
 
 /* =========================================================
    Asennusnäkymän etusivu.
@@ -84,10 +84,12 @@ function UnitMetric({ label, ikkunat, ovet, sub, tone = 'plain' }: {
    löytää kellonajan aina samasta kohdasta.
 
    Päivä jätetään pois tämän päivän listalta: "tänään" on jo otsikossa. */
-function JobRow({ job, showDay, children }: {
-  job: Job; showDay?: boolean; children?: React.ReactNode;
+function JobRow({ job, showDay, units, mates, children }: {
+  job: Job; showDay?: boolean; units?: JobUnits; mates?: string[]; children?: React.ReactNode;
 }) {
   const address = addressOf(job);
+  const maara = unitLabel(units);
+  const pari = mateLabel(mates);
   return (
     <li className="px-4 py-3.5 transition-colors hover:bg-ink-700">
       <div className="flex gap-3">
@@ -111,6 +113,22 @@ function JobRow({ job, showDay, children }: {
           <p className="truncate text-sm text-faint">
             {address ? `◎ ${address}` : 'Ei osoitetta'}
           </p>
+          {/* Montako ja kenen kanssa: ne kaksi asiaa jotka asentaja haluaa
+              tietää ennen kuin lähtee — riittääkö päivä, ja kuka tulee mukaan. */}
+          {(maara || pari) && (
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {maara && (
+                <span className="rounded-full border border-accent/35 bg-accent-dim px-2.5 py-0.5 text-xs font-bold text-accent">
+                  {maara}
+                </span>
+              )}
+              {pari && (
+                <span className="rounded-full border border-line bg-ink-700 px-2.5 py-0.5 text-xs font-semibold text-text">
+                  👥 Työpari: {pari}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -186,10 +204,20 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
        kalenterissa (tk.job_lines nimen perusteella, ilmainen kohde vain
        kerran) — jos tämä laskisi toisin, luvut riitelisivät keskenään
        samalla ruudulla. */
-    jobUnitCounts(dayStart.toISOString(), dayEnd.toISOString(), staff.id),
-    jobUnitCounts(weekStart.toISOString(), weekEnd.toISOString(), staff.id),
-    jobUnitCounts(dayStart.toISOString(), horizon.toISOString(), staff.id),
+    jobUnitCounts(dayStart.toISOString(), dayEnd.toISOString(), staff.id, { crew: true }),
+    jobUnitCounts(weekStart.toISOString(), weekEnd.toISOString(), staff.id, { crew: true }),
+    jobUnitCounts(dayStart.toISOString(), horizon.toISOString(), staff.id, { crew: true }),
   ]);
+
+  /* Rivikohtaiset määrät ja työparit. Rästit ovat menneisyydessä, joten
+     niiden luvut haetaan omalta väliltään; edessä olevat tulevat jo yltä. */
+  const [unitsOverdue, matesOf] = await Promise.all([
+    overdue.length
+      ? jobUnitCounts(helsinkiDateTime(addDays(today, -90), '00:00').toISOString(), dayStart.toISOString(), staff.id, { crew: true })
+      : Promise.resolve([] as JobUnits[]),
+    jobMateNames([...upcoming, ...overdue].map((j) => j.id)),
+  ]);
+  const unitsOf = new Map([...unitsAhead, ...unitsOverdue].map((u) => [u.job_id, u]));
 
   /* Summa riveiltä: jobUnitCounts palauttaa työkohtaiset luvut. */
   const summaa = (rows: JobUnits[]) => rows.reduce(
@@ -269,7 +297,7 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
           ) : (
             <ul className="divide-y divide-line-soft">
               {todayJobs.map((job) => (
-                <JobRow key={job.id} job={job}>
+                <JobRow key={job.id} job={job} units={unitsOf.get(job.id)} mates={matesOf.get(job.id)}>
                   {/* Päivän rivillä on napit, tulevien rivillä ei: reitti ja
                       soitto ovat tarpeen vasta kun ollaan matkalla. */}
                   <div className="mt-3 flex flex-wrap items-center gap-2 pl-[116px]">
@@ -316,7 +344,9 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
             </div>
           ) : (
             <ul className="max-h-[720px] divide-y divide-line-soft overflow-y-auto">
-              {laterJobs.map((job) => <JobRow key={job.id} job={job} showDay />)}
+              {laterJobs.map((job) => (
+                <JobRow key={job.id} job={job} showDay units={unitsOf.get(job.id)} mates={matesOf.get(job.id)} />
+              ))}
             </ul>
           )}
         </Card>
@@ -333,7 +363,7 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
           />
           <ul className="divide-y divide-line-soft">
             {overdue.map((job) => (
-              <JobRow key={job.id} job={job} showDay>
+              <JobRow key={job.id} job={job} showDay units={unitsOf.get(job.id)} mates={matesOf.get(job.id)}>
                 <div className="mt-3 flex flex-wrap items-center gap-2 pl-[116px]">
                   <Link href={`/tyot/${job.id}/viimeistely`}
                         className="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-ink

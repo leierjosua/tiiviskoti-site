@@ -5,7 +5,7 @@ import {
   addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, todayKey, weekdayShort,
 } from '@/lib/time';
 import { Card, Empty, StatusBadge } from '@/components/ui';
-import { jobUnitCounts, unitLabel, type JobUnits } from '@/lib/data';
+import { jobMateNames, jobUnitCounts, mateLabel, unitLabel, type JobUnits } from '@/lib/data';
 
 /* =========================================================
    Asennusnäkymän kalenteri.
@@ -71,9 +71,10 @@ function Metric({ label, value, sub, tone = 'plain' }: {
 }
 
 /** Rivi listanäkymään ja puhelimeen. */
-function JobLine({ job, showDay, units }: { job: Job; showDay?: boolean; units?: JobUnits }) {
+function JobLine({ job, showDay, units, mates }: { job: Job; showDay?: boolean; units?: JobUnits; mates?: string[] }) {
   const address = [job.address, job.postal_code, job.city].filter(Boolean).join(', ');
   const maara = unitLabel(units);
+  const pari = mateLabel(mates);
   return (
     <li>
       <Link href={`/tyot/${job.id}`}
@@ -96,6 +97,7 @@ function JobLine({ job, showDay, units }: { job: Job; showDay?: boolean; units?:
           </p>
           <p className="truncate text-sm text-muted">{job.title}</p>
           <p className="truncate text-sm text-faint">{address || 'Ei osoitetta'}</p>
+          {pari && <p className="mt-0.5 truncate text-sm font-semibold text-text">👥 Työpari: {pari}</p>}
         </div>
       </Link>
     </li>
@@ -152,9 +154,10 @@ export default async function AsennusKalenteri({
          and j.starts_at <  ${to.toISOString()}
        order by j.starts_at
     `,
-    jobUnitCounts(from.toISOString(), to.toISOString(), staff.id),
+    jobUnitCounts(from.toISOString(), to.toISOString(), staff.id, { crew: true }),
   ]);
   const unitsOf = new Map(units.map((u) => [u.job_id, u]));
+  const matesOf = await jobMateNames(rows.map((j) => j.id));
 
   const needle = query.toLowerCase();
   const shown = rows
@@ -320,7 +323,7 @@ export default async function AsennusKalenteri({
           <Empty>{searching ? 'Ei osumia.' : 'Ei keikkoja tällä viikolla.'}</Empty>
         ) : (
           <ul className="divide-y divide-line-soft">
-            {shown.map((job) => <JobLine key={job.id} job={job} showDay units={unitsOf.get(job.id)} />)}
+            {shown.map((job) => <JobLine key={job.id} job={job} showDay units={unitsOf.get(job.id)} mates={matesOf.get(job.id)} />)}
           </ul>
         )}
       </Card>
@@ -384,6 +387,9 @@ export default async function AsennusKalenteri({
                           <div className="truncate opacity-80">
                             {unitLabel(unitsOf.get(job.id)) ?? job.title}
                           </div>
+                          {mateLabel(matesOf.get(job.id)) && (
+                            <div className="truncate opacity-80">👥 {mateLabel(matesOf.get(job.id))}</div>
+                          )}
                         </Link>
                       );
                     })}
