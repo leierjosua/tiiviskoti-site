@@ -386,8 +386,8 @@ function typeCard(t){
    ja tuuletusikkuna samassa aukossa = 2; sisä- ja ulkopuite samassa = 1 (Josua 6.10.2026).
    Kiinteistä ikkunoista ei puhuta tarkoituksella. Tyylit tulevat mukana, koska
    _shared.js on käytössä monella sivulla, joilla on omat CSS:nsä.
-   ESIKATSELU: näkyy vain sivulla, jonka <html data-ikkunaohje="1">. */
-const SHOW_WINDOW_GUIDE = document.documentElement.dataset.ikkunaohje === '1';
+   Livenä kaikilla laskurisivuilla 6.10.2026 (Josua hyväksyi esikatselun). */
+const SHOW_WINDOW_GUIDE = true;
 function windowGuide(){
   if(!document.getElementById('wguide-css')){
     const s = document.createElement('style'); s.id = 'wguide-css';
