@@ -536,13 +536,15 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 .ty-hero .hero-grid:has(.stepcard.wide)>div:first-child{display:none}
 .ty-hero .hero-grid:has(.stepcard.wide) .stepcard{margin:0 auto;max-width:760px}
 @media(max-width:960px){
-  /* Puhelimessa vaalea pohja ja tumma teksti kuten muualla sivustolla (tumma vihreä yläkaista näytti oudolta).
-     Kuva alkaa tekstin alta, jotta kasvot eivät jää otsikon taakse, ja häivyttyy reunoista sivun pohjaan. */
-  .ty-hero{padding:28px 0 36px;background:var(--bg)}
-  .ty-hero .hero-grid{grid-template-columns:1fr;gap:0}
-  .ty-bg{inset:250px 0 auto 0;height:600px}
-  .ty-bg img{object-position:50% 50%}
-  .ty-bg::after{background:linear-gradient(180deg,var(--bg) 0%,rgba(246,247,243,0) 12%,rgba(246,247,243,0) 70%,var(--bg) 100%)}
+  /* Puhelimessa ja tabletilla kuva on omana kokonaisena lohkonaan tekstin ja kortin välissä:
+     ei häivytyksiä eikä valkoista sumua (Josua 6.10.), kortti nousee hieman kuvan päälle. */
+  .ty-hero{padding:28px 0 36px;background:var(--bg);display:flex;flex-direction:column}
+  .ty-hero>.wrap,.ty-hero .hero-grid{display:contents}
+  .ty-hero .hero-grid>div:first-child{order:1;padding-inline:20px}
+  .ty-bg{order:2;position:relative;inset:auto;height:auto;margin-top:24px}
+  .ty-bg img{height:auto;object-fit:initial}
+  .ty-bg::after{display:none}
+  .ty-hero .hero-book{order:3;position:relative;z-index:1;margin:-64px 16px 0}
   .ty-hero h1,.ty-hero .rating{color:var(--ink)}
   .ty-hero h1 .a{color:var(--green)}
   .ty-hero .rating svg{color:var(--green)}
@@ -550,14 +552,16 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
   .ty-hero .stepcard{box-shadow:0 24px 60px -28px rgba(24,58,40,.45)}
   .ty-hero .hero-cta,.ty-hero .hero-fine{display:none}
   .ty-hero h1,.ty-hero .rating,.ty-hero .hero-sub{text-align:center;justify-content:center;margin-left:auto;margin-right:auto}
-  .ty-hero .hero-book{margin-top:360px}
   .ty-hero .stepcard{margin:0 auto;max-width:520px}
   .ty-hero .hb-head .sub{display:none}
 }
-@media(max-width:620px){
-  /* Kapeassa ruudussa ingressi on neljällä rivillä, joten kuva alkaa alempaa. */
-  .ty-bg{top:310px}
-  .ty-hero .hero-book{margin-top:410px}
+/* Tabletilla viisi linkkiä eivät mahdu riville → valikko burgerin taakse (kuten etusivulla). */
+@media(min-width:621px) and (max-width:1100px){
+  nav.top .wrap{position:relative}
+  .nlinks{display:none}
+  nav.top .btn-p{margin-left:auto}
+  .burger{display:flex;margin-left:6px}
+  .nlinks.op{display:flex;position:absolute;top:calc(100% + 8px);left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
 }
 /* Mittariluvut heron alla: yksi yhtenäinen kortti, ei kolmea irrallista laatikkoa. */
 .ty-metrics{padding-top:clamp(28px,4vw,48px)}
