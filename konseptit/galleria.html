@@ -1,0 +1,259 @@
+<title>TiivisKodin etusivukonseptit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: one narrow reading column for the verdict, then a two-up board of concept sheets (desktop shot + phone shot side by side), grouped "uusi ilme" vs "nykyinen + yksi muutos". */
+:root{
+  --bg:#F3F5F0; --surface:#FFFFFF; --ink:#183A28; --text:#46524A; --mute:#78847C;
+  --accent:#217A4E; --accent-soft:#E2EFE7; --line:#DFE5DB; --star:#E0A63A; --chip:#EEF2EC;
+  --display:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1712; --surface:#17221B; --ink:#E6F0E9; --text:#C2CEC6; --mute:#8D9B92;
+  --accent:#6CCB98; --accent-soft:#1F3328; --line:#26352C; --star:#F0BE55; --chip:#1D2A22; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1712; --surface:#17221B; --ink:#E6F0E9; --text:#C2CEC6; --mute:#8D9B92;
+  --accent:#6CCB98; --accent-soft:#1F3328; --line:#26352C; --star:#F0BE55; --chip:#1D2A22; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.6;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:48px 80px}
+h1,h2,h3{font-family:var(--display);color:var(--ink);text-wrap:balance;margin:0;letter-spacing:-.02em}
+h1{font-size:clamp(34px,5vw,56px);font-weight:800;line-height:1.05}
+h2{font-size:clamp(24px,3vw,32px);font-weight:800;line-height:1.15}
+h3{font-size:19px;font-weight:800;line-height:1.25}
+.eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:18px;max-width:62ch;margin:14px 0 0}
+.top{display:grid;gap:12px;margin-bottom:40px}
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:28px 0 56px}
+.vbox{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;display:grid;gap:8px;align-content:start;min-width:0}
+.vbox b{color:var(--ink)}
+.vbox .big{font-family:var(--display);font-size:30px;font-weight:800;color:var(--ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.vbox ol{margin:0;padding-left:20px;display:grid;gap:6px}
+section{margin-top:64px}
+.shead{display:grid;gap:8px;margin-bottom:22px;max-width:70ch}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:22px}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-width:0}
+.shots{display:grid;grid-template-columns:1fr 112px;gap:10px;padding:12px;background:var(--chip)}
+.shots img{display:block;width:100%;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.shots .d{aspect-ratio:16/10;object-fit:cover;object-position:top}
+.shots .m{aspect-ratio:390/844;object-fit:cover;object-position:top}
+.info{padding:18px 20px 20px;display:grid;gap:10px;align-content:start}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:700;letter-spacing:.04em;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.tag.alt{background:var(--chip);color:var(--mute)}
+.num{font-family:var(--display);font-weight:800;color:var(--mute);font-size:14px;font-variant-numeric:tabular-nums}
+.info p{margin:0}
+.uses{font-size:14px;color:var(--mute)}
+.open{justify-self:start;display:inline-flex;align-items:center;gap:8px;font-weight:700;color:#fff;background:var(--accent);padding:11px 18px;border-radius:12px;text-decoration:none;min-height:44px}
+:root[data-theme="dark"] .open{color:#0F1712}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .open{color:#0F1712}}
+.open:hover{filter:brightness(1.08)}
+.open:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.pick{border:2px solid var(--accent)}
+.research{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.rcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:6px;min-width:0}
+.rcard b{color:var(--ink)}
+code{font-size:13.5px;background:var(--chip);padding:1px 6px;border-radius:6px;color:var(--ink);overflow-wrap:anywhere}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:520px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--line)}
+th{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:700}
+tr:last-child td{border-bottom:0}
+td b{color:var(--ink)}
+.foot{margin-top:56px;font-size:14px;color:var(--mute)}
+@media (max-width:560px){.shots{grid-template-columns:1fr 84px}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">tiiviskoti.fi · etusivu · lokakuu 2026</div>
+    <h1>15 konseptia etusivulle</h1>
+    <p class="lead">Kymmenen uutta ilmettä ja viisi parannusta nykyiseen sivuun. Kaikki on rakennettu omista kuvista, oikeista hinnoista ja oikeista Google-arvosteluista. Avaa mikä tahansa: ne ovat toimivia sivuja, eivät kuvia.</p>
+  </header>
+
+  <div class="verdict">
+    <div class="vbox">
+      <div class="eyebrow">Testaa ensin</div>
+      <div class="big">v12 Varaus heti</div>
+      <p>Varauskortti nousee heroon. 86 % varauskortin nähneistä ei koske laskuriin, ja kortti on nyt kaukana alhaalla. Tämä on suppilon suurin vuoto.</p>
+    </div>
+    <div class="vbox">
+      <div class="eyebrow">Nykyinen A/B-testi</div>
+      <div class="big">19,4 % vs 19,3 %</div>
+      <p>Postinumero ensin vs laskuri ensin, 25 päivää, noin 445 korttinäyttöä per versio. Ei eroa. Testi kannattaa päättää tasapelinä ja aloittaa v12.</p>
+    </div>
+    <div class="vbox">
+      <div class="eyebrow">Testijärjestys</div>
+      <ol>
+        <li><b>v12</b> varaus heroon</li>
+        <li><b>v13</b> arvostelut ja tiimi näkyviin</li>
+        <li><b>v15</b> hinnallinen alapalkki mobiiliin</li>
+        <li>Uusi ilme voittajan päälle: <b>v01</b> tai <b>v02</b></li>
+      </ol>
+    </div>
+  </div>
+
+  <section>
+    <div class="shead">
+      <div class="eyebrow">Nykyinen sivu + yksi muutos</div>
+      <h2>Turvallisimmat A/B-testit</h2>
+      <p>Jokainen muuttaa vain yhden asian, joten voittajasta tietää mikä sen teki.</p>
+    </div>
+    <div class="board">
+      <article class="sheet pick">
+        <div class="shots"><img class="d" src="shots/v12-desk.jpg" alt="v12 työpöydällä"><img class="m" src="shots/v12-mob.jpg" alt="v12 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v12</span><h3>Varaus heti näkyvissä</h3><span class="tag">Suositus</span></div>
+          <p>Varauskortti heron oikealle puolelle, mobiilissa suoraan otsikon alle. Hinnan laskeminen alkaa ilman vieritystä.</p>
+          <p class="uses">Muutos: kortin paikka. Muu sivu ennallaan.</p>
+          <a class="open" href="v12-varaus-heti.html" target="_blank" rel="noopener">Avaa v12 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v13-desk.jpg" alt="v13 työpöydällä"><img class="m" src="shots/v13-mob.jpg" alt="v13 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v13</span><h3>Luottamus näkyviin</h3></div>
+          <p>Neljä oikeaa Google-arvostelua palveluiden jälkeen ja viiden hengen tiimirivi "Miksi TiivisKoti" -osioon.</p>
+          <p class="uses">Muutos: arvostelut + tiimirivi.</p>
+          <a class="open" href="v13-arvostelut-ja-tiimi.html" target="_blank" rel="noopener">Avaa v13 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v15-desk.jpg" alt="v15 työpöydällä"><img class="m" src="shots/v15-mob-bar.jpg" alt="v15 puhelimessa alapalkki näkyvissä"></div>
+        <div class="info"><div class="row"><span class="num">v15</span><h3>Aina varattavissa mobiilissa</h3></div>
+          <p>Nykyinen puhelin + Varaa aika -alapalkki vaihtuu palkkiin, jossa näkyy hinta: "Ikkuna alk. 75 € · Ulko-ovi 99 €". Kaikki 8 Google-varausta 30 päivässä tulivat puhelimista.</p>
+          <p class="uses">Muutos: alapalkin sisältö + valoviiru headerin napissa.</p>
+          <a class="open" href="v15-mobiili-cta.html" target="_blank" rel="noopener">Avaa v15 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v11-desk.jpg" alt="v11 työpöydällä"><img class="m" src="shots/v11-mob.jpg" alt="v11 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v11</span><h3>Nykyinen, AaltoAir-hionnalla</h3></div>
+          <p>Sama sisältö ja järjestys. Liike, valo ja mittasuhteet AaltoAirin tasolle: radiaaligradientti, lasikortit, aaltojakaja, tiiviimpi rytmi.</p>
+          <p class="uses">Muutos: vain ulkoasu.</p>
+          <a class="open" href="v11-nykyinen-hiottu.html" target="_blank" rel="noopener">Avaa v11 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v14-desk.jpg" alt="v14 työpöydällä"><img class="m" src="shots/v14-mob.jpg" alt="v14 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v14</span><h3>Kevennetty</h3></div>
+          <p>Sama ilme, 35 % vähemmän vieritettävää. Säästöosio pois, hinnasto ja varaus samaan osioon, viisi tärkeintä kysymystä.</p>
+          <p class="uses">Muutos: sivun pituus.</p>
+          <a class="open" href="v14-kevennetty.html" target="_blank" rel="noopener">Avaa v14 →</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead">
+      <div class="eyebrow">Uusi ilme</div>
+      <h2>Kymmenen suuntaa</h2>
+      <p>Isompia muutoksia. Kannattaa valita yksi suunnaksi ja tuoda se sivulle sen jälkeen, kun v12-testi on kertonut mihin varauskortti kuuluu.</p>
+    </div>
+    <div class="board">
+      <article class="sheet pick">
+        <div class="shots"><img class="d" src="shots/v01-desk.jpg" alt="v01 työpöydällä"><img class="m" src="shots/v01-mob.jpg" alt="v01 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v01</span><h3>AaltoAir-clean</h3><span class="tag">Turvallisin uusi ilme</span></div>
+          <p>AaltoAirin rakenne ja liike TiivisKodin väreissä: lasipilleri, porrastettu sisääntulo, lasikortit, aaltojakajat, vedettävä arvostelukaruselli.</p>
+          <p class="uses">Lasipilleri · radiaaligradientti · ar-glint · ar-attention · drag-hint · aaltojakaja</p>
+          <a class="open" href="v01-aalto-clean.html" target="_blank" rel="noopener">Avaa v01 →</a></div>
+      </article>
+      <article class="sheet pick">
+        <div class="shots"><img class="d" src="shots/v02-desk.jpg" alt="v02 työpöydällä"><img class="m" src="shots/v02-mob.jpg" alt="v02 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v02</span><h3>Hintakortti heroon</h3><span class="tag">Myy eniten</span></div>
+          <p>Toimiva minilaskuri heti etusivulla: ikkunoiden ja ovien määrä, oikea porrastus 90/85/80/75 €, 149 € minimi ja vähennysarvio. Sama idea kuin v12, premium-versiona.</p>
+          <p class="uses">Elävä hinta · porrastusvihje · ar-attention · vierityksen täyttämä viiva</p>
+          <a class="open" href="v02-hintalaskuri-hero.html" target="_blank" rel="noopener">Avaa v02 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v03-desk.jpg" alt="v03 työpöydällä"><img class="m" src="shots/v03-mob.jpg" alt="v03 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v03</span><h3>Editorial</h3></div>
+          <p>Arkkitehtuurilehden aukeama: valtava otsikko, ohuet viivat, epäsymmetrinen kuvataitto ja hinnat ruokalistan tapaan pisteviivoin.</p>
+          <p class="uses">Clip-path-paljastus · parallaksi · yksi korostusväri</p>
+          <a class="open" href="v03-editorial.html" target="_blank" rel="noopener">Avaa v03 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v04-desk.jpg" alt="v04 työpöydällä"><img class="m" src="shots/v04-mob.jpg" alt="v04 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v04</span><h3>Lämpökamera</h3><span class="tag alt">Erottuvin</span></div>
+          <p>Vedettävä liukusäädin: tavallinen kuva ↔ lämpökameranäkymä. "Näe mistä lämpö karkaa." Merkitty havainnekuvaksi, ei mittaukseksi.</p>
+          <p class="uses">Drag-hint · pulssirengas kahvassa · aaltojakaja</p>
+          <a class="open" href="v04-lampokamera.html" target="_blank" rel="noopener">Avaa v04 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v05-desk.jpg" alt="v05 työpöydällä"><img class="m" src="shots/v05-mob.jpg" alt="v05 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v05</span><h3>Videohero</h3></div>
+          <p>Oma työvideo koko ruudulla, otsikko nousee sana kerrallaan. Vierittäessä video pienenee pyöreäksi kortiksi.</p>
+          <p class="uses">Sanamaski · vieritykseen sidottu skaalaus · lasipilleri</p>
+          <a class="open" href="v05-video-hero.html" target="_blank" rel="noopener">Avaa v05 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v06-desk.jpg" alt="v06 työpöydällä"><img class="m" src="shots/v06-mob.jpg" alt="v06 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v06</span><h3>Bento</h3></div>
+          <p>Koko arvolupaus yhdessä Apple-tyylisessä laattaruudukossa: 75 €, 99 €, &lt; 1 min, 5,0 ★, oma porukka, lämpökamera, −40 %.</p>
+          <p class="uses">Porrastettu laattapaljastus · hover-nosto</p>
+          <a class="open" href="v06-bento.html" target="_blank" rel="noopener">Avaa v06 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v07-desk.jpg" alt="v07 työpöydällä"><img class="m" src="shots/v07-mob.jpg" alt="v07 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v07</span><h3>Hinta edellä</h3></div>
+          <p>Yksi valtava luku: 75 € rullaa paikalleen. Uusi ikkuna 1 200 € pienempänä vieressä ja vertailupalkki.</p>
+          <p class="uses">Numerorulla · piirtyvät valintamerkit · ar-glint</p>
+          <a class="open" href="v07-hinta-ankkuri.html" target="_blank" rel="noopener">Avaa v07 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v08-desk.jpg" alt="v08 työpöydällä"><img class="m" src="shots/v08-mob.jpg" alt="v08 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v08</span><h3>Oma porukka</h3></div>
+          <p>Tiimikuva heroksi, viisi muotokuvaa nimillä, liukuva arvostelunauha ja vieritykseen sidottu aikajana.</p>
+          <p class="uses">Arvostelumarquee · pyörivä reunus · ar-attention · aaltojakaja</p>
+          <a class="open" href="v08-tiimi-luottamus.html" target="_blank" rel="noopener">Avaa v08 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v09-desk.jpg" alt="v09 työpöydällä"><img class="m" src="shots/v09-mob.jpg" alt="v09 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v09</span><h3>Tumma premium</h3></div>
+          <p>Syvänvihreä, lähes musta, minttu ainoana korostuksena. Valoviiru napissa ja pyörivä reunus hintakortissa.</p>
+          <p class="uses">ar-glint · @property-reunus · filmirae · duotone-kuvat</p>
+          <a class="open" href="v09-dark-premium.html" target="_blank" rel="noopener">Avaa v09 →</a></div>
+      </article>
+      <article class="sheet">
+        <div class="shots"><img class="d" src="shots/v10-desk.jpg" alt="v10 työpöydällä"><img class="m" src="shots/v10-mob.jpg" alt="v10 puhelimessa"></div>
+        <div class="info"><div class="row"><span class="num">v10</span><h3>Mobiili ensin</h3></div>
+          <p>Peukalolle tehty: pikavalinnat Ikkunat · Ulko-ovi · Taloyhtiö, pyyhkäistävät kortit ja varauspalkki, joka nousee alareunaan.</p>
+          <p class="uses">Slide-up-palkki · scroll-snap · drag-hint</p>
+          <a class="open" href="v10-mobiili-varaus.html" target="_blank" rel="noopener">Avaa v10 →</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead">
+      <div class="eyebrow">Tutkimus</div>
+      <h2>Mitä AaltoAir oikeasti käyttää</h2>
+      <p>Luettu aaltoair.fi:n lähdekoodista 6.10.2026.</p>
+    </div>
+    <div class="research">
+      <div class="rcard"><b>Ei animaatiokirjastoja</b><p>Next.js + Tailwind v4, fontti Outfit. Ei Framer Motionia, GSAPia eikä AOS:ää: pelkkiä CSS-siirtymiä ja pieni IntersectionObserver.</p></div>
+      <div class="rcard"><b>Yksi liikekäyrä</b><p><code>cubic-bezier(0.16, 1, 0.3, 1)</code> 46 kertaa, kesto 0,7–0,8 s. Heron osat tulevat 0,2 / 0,35 / 0,55 / 0,75 / 0,9 / 1,05 / 1,2 s viiveillä.</p></div>
+      <div class="rcard"><b>Lasipilleri</b><p>Valkoinen 8 % läpinäkyvyydellä, sumennus, 10 % reunus. Viisi tähteä · 5.0 · ohut viiva · 620+ arvostelua.</p></div>
+      <div class="rcard"><b>Heron valo</b><p>Kuva + tasainen brändisävy noin 28 % + radiaalinen gradientti tekstin taakse + liukuma alareunaan.</p></div>
+      <div class="rcard"><b>Mikroefektit</b><p><code>ar-glint</code> valoviiru napissa, <code>ar-attention</code> pulssirengas, <code>border-rotate</code> pyörivä reunus, <code>drag-hint</code> karusellivihje.</p></div>
+      <div class="rcard"><b>Rakenne</b><p>Hero → palvelukortit hintamerkillä → varaus → miksi me → tumma tilastopalkki → arvostelukaruselli → aaltojakaja → tumma CTA.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead">
+      <div class="eyebrow">Data</div>
+      <h2>Nykyinen A/B-testi, 11.9.–6.10.2026</h2>
+      <p>Etusivu, sivulatauskohtainen arvonta. Päämittari: valitsi ensimmäisen kohteen laskurista / varauskortti näkyi.</p>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Vaihe</th><th>A · postinumero ensin</th><th>B · laskuri ensin</th></tr></thead>
+      <tbody>
+        <tr><td>Varauskortti näkyi</td><td>428</td><td>462</td></tr>
+        <tr><td><b>Valitsi kohteen</b></td><td><b>83 · 19,4 %</b></td><td><b>89 · 19,3 %</b></td></tr>
+        <tr><td>Kalenteri</td><td>42</td><td>36</td></tr>
+        <tr><td>Yhteystiedot</td><td>20</td><td>14</td></tr>
+        <tr><td>Varaus</td><td>2</td><td>4</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <p class="foot">Konseptit eivät ole livenä eivätkä hakukoneissa (noindex). Varausnapit vievät oikealle varaussivulle. Mikään ei muutu tiiviskoti.fi:ssä ennen kuin valitset.</p>
+</div>

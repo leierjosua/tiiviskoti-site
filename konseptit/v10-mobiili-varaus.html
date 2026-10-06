@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F6F7F3">
+<title>TiivisKoti — v10 Mobiili varaus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7F3; --alt:#ECF0E9; --card:#FFFFFF;
+  --ink:#183A28; --text:#4A544D; --mute:#7B857D;
+  --green:#217A4E; --green-d:#1A6340; --green-l:#2E9E63; --green-soft:#E4F0E9; --mint:#8FD3AC;
+  --deep:#163A28; --deep2:#1E4A34; --line:#E4E8E0; --star:#FBBF24;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --r:20px;
+  --shadow:0 1px 2px rgba(24,58,40,.05),0 12px 32px -14px rgba(24,58,40,.18);
+  --safe:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:Manrope,system-ui,sans-serif;font-weight:500;font-size:16px;line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+h1,h2,h3{color:var(--ink);font-weight:700;letter-spacing:-.025em;line-height:1.1}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+:focus-visible{outline:3px solid var(--green-l);outline-offset:3px;border-radius:12px}
+
+/* ---------- yläpalkki ---------- */
+.top{position:sticky;top:0;z-index:30;background:rgba(246,247,243,.82);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid transparent;transition:border-color .4s var(--ease)}
+.top.scrolled{border-bottom-color:var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-weight:700;font-size:20px;color:var(--ink);letter-spacing:-.02em;min-height:48px;display:inline-flex;align-items:center}
+.logo b{color:var(--green);font-weight:700}
+.top-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--ink);transition:transform .4s var(--ease)}
+.icon-btn:active{transform:scale(.94)}
+.icon-btn svg{width:20px;height:20px}
+.top-link{display:none}
+
+/* ---------- napit ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 26px;border-radius:16px;font-weight:700;font-size:17px;transition:transform .4s var(--ease),background-color .3s var(--ease),box-shadow .4s var(--ease);position:relative;overflow:hidden;isolation:isolate}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 10px 24px -10px rgba(33,122,78,.6)}
+.btn-primary:hover{background:var(--green-d)}
+.btn-line{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn svg{width:18px;height:18px}
+.btn-block{width:100%}
+/* ar-glint */
+.glint::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;z-index:-1;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:ar-glint 4.5s var(--ease) 2s infinite}
+@keyframes ar-glint{0%{transform:skewX(-20deg) translateX(0)}28%,100%{transform:skewX(-20deg) translateX(420%)}}
+
+/* ---------- hero ---------- */
+.hero{padding:22px 0 8px}
+.hero-grid{display:grid;gap:22px}
+.hero-grid>*{min-width:0}
+.rating{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:14px;color:var(--ink);box-shadow:0 2px 10px -4px rgba(24,58,40,.12)}
+.stars{display:flex;gap:1px;color:var(--star)}
+.stars svg{width:14px;height:14px}
+.rating .sep{width:1px;height:14px;background:var(--line)}
+.rating .m{color:var(--mute)}
+.hero h1{font-size:40px;margin:16px 0 10px}
+.hero h1 span{color:var(--green)}
+.hero .sub{font-size:16.5px;max-width:460px}
+
+.pick-label{margin:22px 0 10px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.chips{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:20px;margin:0 -20px;padding:2px 20px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{scroll-snap-align:start;flex:none;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 18px 8px 10px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);color:var(--ink);font-weight:700;font-size:16px;transition:border-color .3s var(--ease),background-color .3s var(--ease),transform .4s var(--ease)}
+.chip:active{transform:scale(.97)}
+.chip .ci{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--green-soft);color:var(--green);transition:background-color .3s var(--ease),color .3s var(--ease)}
+.chip .ci svg{width:18px;height:18px}
+.chip small{display:block;font-weight:500;font-size:12.5px;color:var(--mute);line-height:1.2}
+.chip span.t{line-height:1.2;text-align:left}
+.chip[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft)}
+.chip[aria-pressed="true"] .ci{background:var(--green);color:#fff}
+
+.pick-card{margin-top:14px;background:var(--card);border-radius:var(--r);border:1px solid var(--line);box-shadow:var(--shadow);padding:18px}
+.pick-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:4px}
+.pick-name{font-weight:700;color:var(--ink);font-size:17px}
+.pick-price{font-weight:700;color:var(--green);font-size:22px;letter-spacing:-.02em;white-space:nowrap}
+.pick-desc{font-size:14.5px;margin-bottom:16px;min-height:2.9em}
+.pick-swap{transition:opacity .35s var(--ease),transform .5s var(--ease)}
+.pick-swap.out{opacity:0;transform:translateY(6px)}
+.pick-foot{margin-top:12px;font-size:13px;color:var(--mute);text-align:center}
+
+.hero-photo{position:relative;border-radius:24px;overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow)}
+.hero-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 70%}
+.hero-photo .badge{position:absolute;left:12px;bottom:12px;right:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.glass{background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:999px;padding:7px 13px;font-size:13px;color:var(--ink);font-weight:700}
+
+/* ---------- osiot ---------- */
+.sec{padding:64px 0}
+.eyebrow{display:block;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.sec h2{font-size:30px;margin-bottom:10px}
+.sec .intro{max-width:520px}
+.head-row{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:22px}
+.arrows{display:none;gap:8px}
+
+/* ---------- palvelukaruselli ---------- */
+.rail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:4px 20px 18px;scroll-padding:0 20px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.rail::-webkit-scrollbar{display:none}
+.svc{scroll-snap-align:start;flex:0 0 82%;max-width:340px;background:var(--card);border-radius:var(--r);border:1.5px solid var(--line);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:border-color .4s var(--ease),transform .6s var(--ease)}
+.svc.hl{border-color:var(--green)}
+.svc-img{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--alt)}
+.svc-img img{width:100%;height:100%;object-fit:cover}
+.svc-img .glass{position:absolute;top:12px;right:12px}
+.svc-noimg{display:grid;place-items:center;color:var(--green)}
+.svc-noimg svg{width:56px;height:56px;opacity:.85}
+.svc-body{padding:18px 18px 20px;display:flex;flex-direction:column;flex:1}
+.svc h3{font-size:20px;margin-bottom:6px}
+.svc p{font-size:14.5px;flex:1;margin-bottom:16px}
+.svc ul{list-style:none;font-size:14.5px;margin-bottom:16px;flex:1}
+.svc li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+.svc li strong{color:var(--ink)}
+.svc .btn{min-height:48px;font-size:15.5px;border-radius:14px}
+/* drag-hint: kortit nykäisevät kerran vasemmalle kun karuselli tulee näkyviin */
+.rail.hint .svc{animation:drag-hint 1.6s var(--ease) .3s 1}
+@keyframes drag-hint{0%{transform:translateX(0)}35%{transform:translateX(-44px)}100%{transform:translateX(0)}}
+.swipe{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);margin-top:2px;transition:opacity .5s var(--ease)}
+.swipe svg{width:18px;height:18px}
+.swipe.gone{opacity:0}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:6px}
+.dots i{width:6px;height:6px;border-radius:99px;background:#CFD6CC;transition:width .5s var(--ease),background-color .3s var(--ease)}
+.dots i.on{width:20px;background:var(--green)}
+
+/* ---------- luottamus ---------- */
+.trust{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.t-item{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.t-item strong{display:block;color:var(--ink);font-size:22px;letter-spacing:-.02em;line-height:1.15}
+.t-item span{font-size:13.5px;line-height:1.35;display:block;margin-top:4px}
+
+/* ---------- miten ---------- */
+.how{background:var(--deep);color:#C9D9CE;border-radius:28px;margin:0 12px;padding:44px 0}
+.how h2{color:#fff}
+.how .eyebrow{color:var(--mint)}
+.steps{list-style:none;display:grid;gap:12px;margin-top:22px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;padding:16px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.steps li::before{counter-increment:s;content:counter(s);width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--mint);color:var(--deep);font-weight:700;font-size:17px}
+.steps h3{color:#fff;font-size:17px;margin-bottom:2px;letter-spacing:-.01em}
+.steps p{font-size:14.5px}
+.how-video{margin-top:22px;border-radius:20px;overflow:hidden;aspect-ratio:16/9;background:#0E2318}
+.how-video video{width:100%;height:100%;object-fit:cover}
+
+/* ---------- arvostelut ---------- */
+.revs{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:4px 20px 14px;scroll-padding:0 20px;scrollbar-width:none}
+.revs::-webkit-scrollbar{display:none}
+.rev{scroll-snap-align:start;flex:0 0 84%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px}
+.rev blockquote{color:var(--ink);font-size:15.5px;line-height:1.55;flex:1}
+.who{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink)}
+.who small{display:block;color:var(--mute);font-size:12.5px}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--green-soft);color:var(--green);font-weight:700}
+
+/* ---------- UKK ---------- */
+.faq{display:grid;gap:10px;margin-top:20px}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.qa button{width:100%;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;text-align:left;font-weight:700;font-size:16px;color:var(--ink)}
+.qa .pm{flex:none;width:32px;height:32px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;transition:transform .6s var(--ease),background-color .3s var(--ease)}
+.qa .pm svg{width:14px;height:14px}
+.qa button[aria-expanded="true"] .pm{transform:rotate(45deg);background:var(--green);color:#fff}
+.ans{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s var(--ease)}
+.ans > div{overflow:hidden}
+.ans p{padding:0 18px 18px;font-size:15px;opacity:0;transform:translateY(-4px);transition:opacity .5s var(--ease),transform .6s var(--ease)}
+.qa.open .ans{grid-template-rows:1fr}
+.qa.open .ans p{opacity:1;transform:none}
+
+/* ---------- loppu-CTA + footer ---------- */
+.end{padding:0 0 32px}
+.end-box{background:var(--deep);border-radius:28px;padding:40px 22px;text-align:center;color:#C9D9CE;position:relative;overflow:hidden}
+.end-box::before{content:"";position:absolute;width:520px;height:520px;left:50%;top:-300px;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(143,211,172,.28),transparent);pointer-events:none}
+.end-box h2{color:#fff;font-size:30px;margin-bottom:10px;position:relative}
+.end-box p{position:relative;margin-bottom:22px}
+.end-box .btns{position:relative;display:grid;gap:10px;max-width:400px;margin:0 auto}
+.end-box .btn-primary{background:var(--mint);color:var(--deep);box-shadow:none}
+.end-box .btn-primary:hover{background:#A3DDBC}
+.end-box .btn-line{background:transparent;color:#fff;border-color:rgba(255,255,255,.22)}
+footer{padding:12px 0 40px;font-size:14px;color:var(--mute)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:6px 20px;justify-content:space-between;align-items:center}
+footer a{min-height:48px;display:inline-flex;align-items:center;color:var(--text)}
+
+/* ---------- tarttuva varauspalkki ---------- */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 12px calc(10px + var(--safe));
+  transform:translateY(120%);transition:transform .7s var(--ease);pointer-events:none}
+.bar.show{transform:none;pointer-events:auto}
+.bar-in{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.94);-webkit-backdrop-filter:saturate(1.4) blur(16px);backdrop-filter:saturate(1.4) blur(16px);border:1px solid var(--line);border-radius:22px;padding:8px 8px 8px 16px;box-shadow:0 -2px 0 rgba(255,255,255,.5) inset,0 18px 50px -12px rgba(24,58,40,.35)}
+.bar-txt{flex:1;min-width:0;font-size:13.5px;line-height:1.3;color:var(--text)}
+.bar-txt strong{color:var(--ink);font-weight:700;white-space:nowrap}
+.bar-txt .l2{display:block}
+.bar .btn{min-height:52px;padding:0 22px;border-radius:16px;flex:none}
+
+/* ---------- sisääntulo ---------- */
+.in{opacity:0;transform:translateY(22px);animation:in .8s var(--ease) forwards}
+@keyframes in{to{opacity:1;transform:none}}
+.d1{animation-delay:.2s}.d2{animation-delay:.35s}.d3{animation-delay:.55s}.d4{animation-delay:.75s}.d5{animation-delay:.9s}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.on{opacity:1;transform:none}
+
+/* ---------- desktop ---------- */
+@media (min-width:900px){
+  body{font-size:17px}
+  .wrap{padding:0 32px}
+  .top .wrap{height:76px}
+  .top-link{display:inline-flex;align-items:center;min-height:48px;padding:0 14px;color:var(--text);font-size:15px}
+  .top-link:hover{color:var(--ink)}
+  .hero{padding:56px 0 24px}
+  .hero-grid{grid-template-columns:1fr 1.05fr;gap:64px;align-items:center}
+  .hero h1{font-size:64px;margin:20px 0 14px}
+  .hero .sub{font-size:18.5px}
+  .chips{margin:0;padding:2px 0 6px;overflow:visible;flex-wrap:nowrap}
+  .chip{padding-right:16px}
+  .pick-card{max-width:500px;padding:22px}
+  .hero-photo{aspect-ratio:5/5.2;border-radius:32px}
+  .sec{padding:110px 0}
+  .sec h2{font-size:44px}
+  .arrows{display:flex}
+  .rail{margin:0;padding:4px 0 18px;scroll-padding:0}
+  .svc{flex:0 0 calc((100% - 28px)/3);max-width:none}
+  .swipe{display:none}
+  .trust{grid-template-columns:repeat(4,1fr);gap:16px}
+  .t-item{padding:24px}
+  .t-item strong{font-size:28px}
+  .how{max-width:1120px;margin:0 auto;padding:72px 0;border-radius:36px}
+  .how .wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center}
+  .how-video{margin-top:0}
+  .revs{margin:0;padding:4px 0 14px;display:grid;grid-template-columns:repeat(4,1fr);overflow:visible}
+  .rev{max-width:none}
+  .faq-wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start}
+  .faq{margin-top:0}
+  .end-box{padding:80px 40px;border-radius:36px}
+  .end-box h2{font-size:52px}
+  .end-box .btns{grid-template-columns:1fr 1fr;max-width:520px}
+  /* palkki → kelluva pilleri oikeaan alakulmaan */
+  .bar{left:auto;right:28px;bottom:28px;padding:0;transform:translateY(30px) scale(.96);opacity:0;transition:transform .7s var(--ease),opacity .5s var(--ease)}
+  .bar.show{transform:none;opacity:1}
+  .bar-in{border-radius:999px;padding:8px 8px 8px 24px;gap:18px}
+  .bar-txt{font-size:14px}
+  .bar .btn{border-radius:999px}
+}
+@media (max-width:360px){
+  .hero h1{font-size:35px}
+  .bar-txt{font-size:12.5px}
+  .bar .btn{padding:0 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .in,.reveal{opacity:1!important;transform:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="TiivisKoti etusivu">Tiivis<b>Koti</b></a>
+    <div class="top-actions">
+      <a class="top-link" href="#palvelut">Palvelut</a>
+      <a class="top-link" href="#ukk">Kysymykset</a>
+      <a class="icon-btn" href="tel:+358458755996" aria-label="Soita 045 875 5996"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <a class="rating in d1" href="#arvostelut" aria-label="Google-arvio 5,0, 12 arvostelua">
+        <span class="stars" aria-hidden="true"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9z"/></svg><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9z"/></svg><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9z"/></svg><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9z"/></svg><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9z"/></svg></span>
+        5,0 <span class="sep"></span><span class="m">12 Google-arvostelua</span>
+      </a>
+      <h1 class="in d2">Veto kuriin,<br><span>lämpö kotiin.</span></h1>
+      <p class="sub in d3">Ovien ja ikkunoiden tiivisteet kiinteään hintaan. Varaa verkosta alle minuutissa.</p>
+
+      <p class="pick-label in d4" id="pick-label">Mitä tiivistetään?</p>
+      <div class="chips in d4" role="group" aria-labelledby="pick-label">
+        <button class="chip" data-svc="ikkunat" aria-pressed="true"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M12 3v18M4 12h16"/></svg></span><span class="t">Ikkunat<small>alk. 75 €</small></span></button>
+        <button class="chip" data-svc="ovi" aria-pressed="false"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17M3 21h18"/><circle cx="15" cy="12.5" r="1" fill="currentColor"/></svg></span><span class="t">Ulko-ovi<small>99 €</small></span></button>
+        <button class="chip" data-svc="taloyhtio" aria-pressed="false"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V5l8-3 8 3v16M3 21h18M9 9h1M14 9h1M9 13h1M14 13h1M10 21v-4h4v4"/></svg></span><span class="t">Taloyhtiö<small>maksuton kartoitus</small></span></button>
+      </div>
+
+      <div class="pick-card in d5" id="pick" aria-live="polite">
+        <div class="pick-swap" id="pick-swap">
+          <div class="pick-row"><span class="pick-name" id="pick-name">Ikkunan tiivistys</span><span class="pick-price" id="pick-price">75–90 €</span></div>
+          <p class="pick-desc" id="pick-desc">Per ikkuna, määrän mukaan. Säätö ja öljyäminen kuuluvat hintaan.</p>
+        </div>
+        <a class="btn btn-primary btn-block glint" id="pick-cta" href="https://tiiviskoti.fi/varaa.html">Varaa ikkunat <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <p class="pick-foot">Näet tarkan hinnan laskurista ennen varausta.</p>
+      </div>
+    </div>
+    <figure class="hero-photo in d3">
+      <img src="assets/hero-entrance.webp" alt="Kaksi TiivisKodin asentajaa puutalon edessä" width="1100" height="880" fetchpriority="high">
+      <figcaption class="badge"><span class="glass">Oma porukka, ei alihankintaa</span><span class="glass">Uusimaa + Riihimäki</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="sec" id="palvelut">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <div><span class="eyebrow">Palvelut ja hinnat</span><h2>Kiinteä hinta, ei tarjouspyyntöjä.</h2></div>
+      <div class="arrows">
+        <button class="icon-btn" data-dir="-1" aria-label="Edellinen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button class="icon-btn" data-dir="1" aria-label="Seuraava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <div class="rail" id="rail" tabindex="0" aria-label="Palvelut, pyyhkäise sivulle">
+      <article class="svc" data-svc="ikkunat">
+        <div class="svc-img"><img src="assets/ikkunat.webp" alt="Valkoinen ikkuna harmaassa puutalossa" loading="lazy" width="1000" height="625"><span class="glass">alk. 75 €</span></div>
+        <div class="svc-body">
+          <h3>Ikkunat</h3>
+          <ul><li><span>1–4 kpl</span><strong>90 €</strong></li><li><span>5–9 kpl</span><strong>85 €</strong></li><li><span>10–13 kpl</span><strong>80 €</strong></li><li><span>14+ kpl</span><strong>75 €</strong></li></ul>
+          <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Varaa ikkunat</a>
+        </div>
+      </article>
+      <article class="svc" data-svc="ovi">
+        <div class="svc-img"><img src="assets/ulko-ovet.webp" alt="Ulko-ovi" loading="lazy" width="1000" height="625"><span class="glass">99 €</span></div>
+        <div class="svc-body">
+          <h3>Ulko-ovi</h3>
+          <p>Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen sekä oven säätö.</p>
+          <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Varaa ulko-ovi</a>
+        </div>
+      </article>
+      <article class="svc" data-svc="muut">
+        <div class="svc-img svc-noimg" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"><rect x="10" y="10" width="20" height="44" rx="2"/><rect x="34" y="10" width="20" height="44" rx="2"/><circle cx="26" cy="33" r="1.6" fill="currentColor"/><circle cx="38" cy="33" r="1.6" fill="currentColor"/></svg></div>
+        <div class="svc-body">
+          <h3>Muut ovet</h3>
+          <ul><li><span>Väli- tai huoneovi</span><strong>89 €</strong></li><li><span>Liuku- tai pariovi</span><strong>149 €</strong></li></ul>
+          <a class="btn btn-line" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a>
+        </div>
+      </article>
+      <article class="svc" data-svc="taloyhtio">
+        <div class="svc-img"><img src="assets/taloyhtiot.webp" alt="Taloyhtiö" loading="lazy" width="900" height="563"><span class="glass">Maksuton</span></div>
+        <div class="svc-body">
+          <h3>Taloyhtiöt</h3>
+          <p>Maksuton kartoituskäynti ja kirjallinen tarjous hallitukselle.</p>
+          <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Pyydä kartoitus</a>
+        </div>
+      </article>
+    </div>
+    <div class="swipe" id="swipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M15 8l4 4-4 4"/></svg>Pyyhkäise nähdäksesi kaikki</div>
+    <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <div class="trust">
+      <div class="t-item reveal"><strong>5,0 ★</strong><span>Google, 12 arvostelua</span></div>
+      <div class="t-item reveal"><strong>−40 %</strong><span>kotitalous&shy;vähennys</span></div>
+      <div class="t-item reveal"><strong>1 käynti</strong><span>työ valmiiksi kerralla</span></div>
+      <div class="t-item reveal"><strong>0 €</strong><span>lämpökamera&shy;kuvaus ennen työtä</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow reveal">Näin se toimii</span>
+      <h2 class="reveal" style="font-size:clamp(30px,4vw,44px)">Kolme vaihetta, yksi käynti.</h2>
+      <ol class="steps">
+        <li class="reveal"><div><h3>Valitse kohteet</h3><p>Näet hinnan heti laskurista ja varaat ajan verkosta.</p></div></li>
+        <li class="reveal"><div><h3>Lämpökamera näyttää vedon</h3><p>Kuvaamme ennen työtä, veloituksetta.</p></div></li>
+        <li class="reveal"><div><h3>Uudet tiivisteet, sama päivä</h3><p>Oma porukka tekee työn yhdellä käynnillä.</p></div></li>
+      </ol>
+    </div>
+    <div class="how-video reveal">
+      <video muted autoplay loop playsinline preload="metadata" poster="assets/tyo-loop-poster.jpg" aria-label="Työkuvaa: tiivisteen asennus">
+        <source src="assets/tyo-loop-16x9.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="arvostelut">
+  <div class="wrap">
+    <div class="reveal" style="margin-bottom:20px"><span class="eyebrow">Arvostelut</span><h2>5,0 ★ Googlessa.</h2></div>
+    <div class="revs reveal">
+      <figure class="rev"><blockquote>”Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta. Vahva suositus.”</blockquote><figcaption class="who"><span class="av">E</span><div>Edwin T.<small>Google</small></div></figcaption></figure>
+      <figure class="rev"><blockquote>”Lopputulos vaikuttaa hyvältä. Ikkunoita on paljon ja tiivistys vei koko päivän kahdelta tekijältä. Pari juttua oli korjattava ja nekin hoituivat nopeasti ilman viivettä. Reippaita ja aikaansaavia tekijöitä.”</blockquote><figcaption class="who"><span class="av">M</span><div>Marjut S.<small>Google</small></div></figcaption></figure>
+      <figure class="rev"><blockquote>”Thank you for professional and fast service. The reservation was easy to make online!”</blockquote><figcaption class="who"><span class="av">G</span><div>Gunvor v. W.<small>Google</small></div></figcaption></figure>
+      <figure class="rev"><blockquote>”Pojat tekivät työnsä ammattitaidolla 👍”</blockquote><figcaption class="who"><span class="av">L</span><div>Lilja S.<small>Google</small></div></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="ukk" style="padding-top:0">
+  <div class="wrap faq-wrap">
+    <div class="reveal"><span class="eyebrow">Kysymykset</span><h2>Lyhyesti ja selvästi.</h2></div>
+    <div class="faq">
+      <div class="qa reveal"><button aria-expanded="false" aria-controls="a1" id="q1">Mitä ikkunan tiivistys maksaa?<span class="pm"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></button><div class="ans" id="a1" role="region" aria-labelledby="q1"><div><p>75–90 € ikkunalta määrän mukaan: 90 € (1–4 kpl), 85 € (5–9), 80 € (10–13) ja 75 € (14 tai enemmän). Karmi- ja puitetiivisteet, säätö ja öljyäminen kuuluvat hintaan.</p></div></div></div>
+      <div class="qa reveal"><button aria-expanded="false" aria-controls="a2" id="q2">Mitä ulko-oven 99 € sisältää?<span class="pm"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></button><div class="ans" id="a2" role="region" aria-labelledby="q2"><div><p>Tiivisteiden vaihdon, lukkojen ja saranoiden öljyämisen sekä oven säädön. Väli- tai huoneovi on 89 € ja liuku- tai pariovi 149 €.</p></div></div></div>
+      <div class="qa reveal"><button aria-expanded="false" aria-controls="a3" id="q3">Onko käynnillä vähimmäishinta?<span class="pm"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></button><div class="ans" id="a3" role="region" aria-labelledby="q3"><div><p>Pienin käynti on 149 €. Se sisältää käynnin, matkat ja lämpökamerakuvauksen.</p></div></div></div>
+      <div class="qa reveal"><button aria-expanded="false" aria-controls="a4" id="q4">Saanko kotitalousvähennyksen?<span class="pm"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></button><div class="ans" id="a4" role="region" aria-labelledby="q4"><div><p>Kyllä. Kotitalousvähennys on −40 % työn osuudesta.</p></div></div></div>
+      <div class="qa reveal"><button aria-expanded="false" aria-controls="a5" id="q5">Missä toimitte?<span class="pm"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></button><div class="ans" id="a5" role="region" aria-labelledby="q5"><div><p>Koko Uudellamaalla ja Riihimäellä.</p></div></div></div>
+      <div class="qa reveal"><button aria-expanded="false" aria-controls="a6" id="q6">Pitääkö pyytää tarjous?<span class="pm"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></button><div class="ans" id="a6" role="region" aria-labelledby="q6"><div><p>Ei tarvitse. Näet hinnan heti laskurista ja varaat ajan verkosta alle minuutissa. Taloyhtiöille teemme maksuttoman kartoituskäynnin ja kirjallisen tarjouksen hallitukselle.</p></div></div></div>
+      <div class="qa reveal"><button aria-expanded="false" aria-controls="a7" id="q7">Kuka työn tekee?<span class="pm"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></button><div class="ans" id="a7" role="region" aria-labelledby="q7"><div><p>Oma porukka, ei alihankintaa. Työ tehdään yhdellä käynnillä.</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="end" id="loppu">
+  <div class="wrap">
+    <div class="end-box reveal">
+      <h2>Kylmä veto ei kuulu kotiin.</h2>
+      <p>Varaa aika verkosta alle minuutissa.</p>
+      <div class="btns">
+        <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a>
+        <a class="btn btn-line" href="tel:+358458755996">Soita 045 875 5996</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="logo" style="font-size:18px">Tiivis<b>Koti</b></span>
+    <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a>
+    <span>© 2026 TiivisKoti</span>
+  </div>
+</footer>
+
+<div class="bar" id="bar" aria-hidden="true">
+  <div class="bar-in">
+    <div class="bar-txt"><strong>Ikkuna alk. 75 €</strong> · <strong>Ulko-ovi 99 €</strong><span class="l2">Kiinteä hinta, −40 % kotitalousvähennys</span></div>
+    <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html" tabindex="-1">Varaa aika</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasIO = 'IntersectionObserver' in window;
+
+  /* scroll-reveal */
+  var rv = document.querySelectorAll('.reveal');
+  if(hasIO){
+    var io = new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}});},{rootMargin:'0px 0px -6% 0px',threshold:.06});
+    rv.forEach(function(el){io.observe(el)});
+  } else rv.forEach(function(el){el.classList.add('on')});
+
+  /* yläpalkin reuna */
+  var top = document.getElementById('top');
+  window.addEventListener('scroll',function(){top.classList.toggle('scrolled',scrollY>8)},{passive:true});
+
+  /* pikavalinnat */
+  var data = {
+    ikkunat:{n:'Ikkunan tiivistys',p:'75–90 €',d:'Per ikkuna, määrän mukaan. Säätö ja öljyäminen kuuluvat hintaan.',c:'Varaa ikkunat'},
+    ovi:{n:'Ulko-oven tiivistys',p:'99 €',d:'Tiivisteet, lukkojen ja saranoiden öljyäminen sekä oven säätö.',c:'Varaa ulko-ovi'},
+    taloyhtio:{n:'Taloyhtiö',p:'0 €',d:'Maksuton kartoituskäynti ja kirjallinen tarjous hallitukselle.',c:'Pyydä kartoitus'}
+  };
+  var chips = document.querySelectorAll('.chip');
+  var swap = document.getElementById('pick-swap');
+  var cta = document.getElementById('pick-cta');
+  var arrow = cta.querySelector('svg').outerHTML;
+  var rail = document.getElementById('rail');
+  function select(key){
+    chips.forEach(function(c){c.setAttribute('aria-pressed', c.dataset.svc===key ? 'true':'false')});
+    var d = data[key];
+    swap.classList.add('out');
+    setTimeout(function(){
+      document.getElementById('pick-name').textContent=d.n;
+      document.getElementById('pick-price').textContent=d.p;
+      document.getElementById('pick-desc').textContent=d.d;
+      cta.innerHTML=d.c+' '+arrow;
+      swap.classList.remove('out');
+    }, reduce?0:180);
+    rail.querySelectorAll('.svc').forEach(function(s){s.classList.toggle('hl', s.dataset.svc===key)});
+    var card = rail.querySelector('.svc[data-svc="'+key+'"]');
+    if(card) rail.scrollTo({left:card.offsetLeft-rail.offsetLeft-(parseFloat(getComputedStyle(rail).paddingLeft)||0),behavior:reduce?'auto':'smooth'});
+  }
+  chips.forEach(function(c){c.addEventListener('click',function(){select(c.dataset.svc)})});
+  rail.querySelector('.svc[data-svc="ikkunat"]').classList.add('hl');
+
+  /* karuselli: pisteet, nuolet, drag-hint */
+  var cards = rail.querySelectorAll('.svc');
+  var dots = document.querySelectorAll('#dots i');
+  var swipe = document.getElementById('swipe');
+  var touched = false;
+  rail.addEventListener('scroll',function(){
+    var w = cards[0].getBoundingClientRect().width + 14;
+    var i = Math.round(rail.scrollLeft / w);
+    if(rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4) i = cards.length-1;
+    dots.forEach(function(d,k){d.classList.toggle('on',k===i)});
+    if(rail.scrollLeft>10 && !touched){touched=true;swipe.classList.add('gone');}
+  },{passive:true});
+  document.querySelectorAll('.arrows .icon-btn').forEach(function(b){
+    b.addEventListener('click',function(){rail.scrollBy({left:(+b.dataset.dir)*(cards[0].getBoundingClientRect().width+14),behavior:reduce?'auto':'smooth'})});
+  });
+  if(hasIO && !reduce){
+    var hio = new IntersectionObserver(function(es){
+      if(es[0].isIntersecting){
+        hio.disconnect();
+        if(!touched && rail.scrollWidth > rail.clientWidth + 4){ rail.classList.add('hint'); setTimeout(function(){rail.classList.remove('hint')},2200); }
+      }
+    },{threshold:.6});
+    hio.observe(rail);
+  }
+
+  /* tarttuva varauspalkki: näkyy heron jälkeen, piiloutuu kun loppu-CTA näkyy */
+  var bar = document.getElementById('bar');
+  var barBtn = bar.querySelector('a');
+  var pastHero = false, endVisible = false;
+  function upd(){
+    var s = pastHero && !endVisible;
+    bar.classList.toggle('show', s);
+    bar.setAttribute('aria-hidden', s ? 'false':'true');
+    barBtn.tabIndex = s ? 0 : -1;
+  }
+  if(hasIO){
+    new IntersectionObserver(function(es){pastHero = !es[0].isIntersecting && es[0].boundingClientRect.top < 0; upd();},{threshold:0}).observe(document.getElementById('pick'));
+    new IntersectionObserver(function(es){endVisible = es[0].isIntersecting; upd();},{threshold:0}).observe(document.getElementById('loppu'));
+  }
+
+  /* UKK-haitari */
+  document.querySelectorAll('.qa button').forEach(function(b){
+    b.addEventListener('click',function(){
+      var qa = b.parentElement, open = !qa.classList.contains('open');
+      qa.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', open ? 'true':'false');
+    });
+  });
+})();
+</script>
+</body>
+</html>

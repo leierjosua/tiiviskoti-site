@@ -48,3 +48,11 @@ tiiviskoti/mainokset/video/out/
 
 # minterpolate-valituote, syntyy uudelleen build-videot.mjs:lla
 tiiviskoti/mainokset/out/_pohja.mp4
+
+# Asiakkaiden asiakirjat (nimet, osoitteet, sähköpostit) — repo on julkinen. Generaattorit (*.mjs) pysyvät mukana.
+tiiviskoti/asiakirjat/*.pdf
+tiiviskoti/asiakirjat/*.json
+tiiviskoti/asiakirjat/*.txt
+# Raakavideot ja renderöinnit
+tiiviskoti/mainokset/video/remotion/public/ikkuna-ovi/
+tiiviskoti/mainokset/video/remotion/out/

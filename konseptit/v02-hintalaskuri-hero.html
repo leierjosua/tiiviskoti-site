@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/logo-vihrea.svg">
+<title>TiivisKoti — v02 Hintalaskuri-hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7F3; --alt:#ECF0E9; --card:#FFFFFF;
+  --ink:#183A28; --text:#4A544D; --mute:#7B857D;
+  --green:#217A4E; --green-d:#1A6340; --green-l:#2E9E63; --green-soft:#E4F0E9; --mint:#8FD3AC;
+  --deep:#163A28; --deep2:#1E4A34; --line:#E4E8E0; --star:#FBBF24;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --shadow:0 1px 2px rgba(22,58,40,.04),0 12px 32px -12px rgba(22,58,40,.12);
+  --shadow-lg:0 2px 6px rgba(22,58,40,.04),0 40px 80px -24px rgba(22,58,40,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Manrope,system-ui,sans-serif;background:#fff;color:var(--text);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+h1,h2,h3{color:var(--ink);font-weight:800;letter-spacing:-.025em;line-height:1.1}
+h2{font-size:clamp(30px,3.4vw,42px)}
+h3{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.lead{font-size:18px;max-width:540px}
+.stars{display:inline-flex;gap:2px}
+.stars svg{width:15px;height:15px;fill:var(--star)}
+
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;font-weight:700;font-size:16px;transition:transform .5s var(--ease),background .3s,box-shadow .5s var(--ease);overflow:hidden;white-space:nowrap}
+.btn svg{transition:transform .5s var(--ease)}
+.btn:hover svg{transform:translateX(4px)}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 12px 28px -12px rgba(33,122,78,.8)}
+.btn-primary:hover{background:var(--green-d);transform:translateY(-2px)}
+.btn-ghost{border:1.5px solid var(--line);color:var(--ink);background:#fff}
+.btn-ghost:hover{border-color:var(--green)}
+
+/* nav */
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:84px}
+.nav img{height:32px;width:auto}
+.nav-links{display:flex;gap:30px;font-weight:600;font-size:15px;color:var(--text);align-items:center}
+.nav-links a:hover{color:var(--green)}
+.nav-cta{min-height:44px;padding:0 20px;font-size:15px}
+
+/* hero */
+.hero{position:relative;padding:40px 0 120px;background:linear-gradient(180deg,#fff 0%,var(--bg) 100%)}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(44px,5.6vw,76px);letter-spacing:-.04em;line-height:1.02;margin:22px 0 22px}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero .sub{font-size:19px;max-width:500px}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border-radius:999px;background:var(--green-soft);font-size:14px;font-weight:700;color:var(--ink)}
+.trust{display:flex;flex-wrap:wrap;gap:12px 26px;margin-top:36px;font-size:15px;font-weight:600;color:var(--ink)}
+.trust span{display:inline-flex;align-items:center;gap:9px}
+.trust .ck{width:22px;height:22px;border-radius:50%;background:var(--green-soft);display:grid;place-items:center;flex:none}
+.hero-alt{margin-top:28px;font-size:15px;color:var(--mute)}
+.hero-alt a{color:var(--green);font-weight:700;border-bottom:1.5px solid rgba(33,122,78,.25)}
+
+.stage{position:relative;padding:0 0 0 0}
+.photo{position:absolute;top:-10px;right:-40px;width:78%;aspect-ratio:4/5;border-radius:28px;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:0% 70%}
+.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,58,40,0) 50%,rgba(22,58,40,.25))}
+.calc{position:relative;z-index:2;width:400px;max-width:100%;margin:90px 0 0 0;background:#fff;border-radius:24px;box-shadow:var(--shadow-lg);padding:28px 28px 24px;border:1px solid rgba(228,232,224,.8)}
+.calc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.calc-head b{color:var(--ink);font-size:17px}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--green);letter-spacing:.04em;text-transform:uppercase}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--green-l);box-shadow:0 0 0 0 rgba(46,158,99,.5);animation:ar-attention 2.4s var(--ease) infinite}
+@keyframes ar-attention{0%{box-shadow:0 0 0 0 rgba(46,158,99,.45)}70%,100%{box-shadow:0 0 0 8px rgba(46,158,99,0)}}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .lbl b{display:block;color:var(--ink);font-size:16px}
+.row .lbl small{font-size:13.5px;color:var(--mute)}
+.step{display:flex;align-items:center;gap:4px;background:var(--bg);border-radius:999px;padding:4px}
+.step button{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:var(--ink);font-size:22px;font-weight:600;cursor:pointer;box-shadow:0 1px 3px rgba(22,58,40,.12);display:grid;place-items:center;transition:transform .3s var(--ease),background .2s}
+.step button:hover:not(:disabled){background:var(--green-soft)}
+.step button:active:not(:disabled){transform:scale(.92)}
+.step button:disabled{opacity:.35;cursor:default}
+.step output{min-width:34px;text-align:center;font-weight:800;font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
+.total{margin-top:6px;padding:18px 20px;border-radius:16px;background:var(--bg)}
+.total-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.total-top>span{font-size:14.5px;font-weight:600;color:var(--text)}
+.total-top b{font-size:40px;font-weight:800;color:var(--ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.breakdown{margin-top:8px;font-size:13.5px;color:var(--mute);min-height:20px}
+.deduct{margin-top:12px;padding-top:12px;border-top:1px dashed #D3DACF;display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14.5px;transition:opacity .4s var(--ease)}
+.deduct>span{color:var(--text)}
+.deduct small{display:inline-block;margin-left:4px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--green);background:var(--green-soft);padding:2px 7px;border-radius:999px;vertical-align:1px}
+.deduct b{color:var(--green);font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.deduct[hidden]{display:none}
+.nudge{margin-top:12px;font-size:13.5px;color:var(--green-d);font-weight:600;min-height:20px}
+.calc .btn{width:100%;margin-top:16px;min-height:58px;font-size:17px}
+.calc-foot{margin-top:12px;text-align:center;font-size:13px;color:var(--mute)}
+
+/* entrance */
+.in{opacity:0;transform:translateY(24px);animation:slide-up .8s var(--ease) forwards}
+@keyframes slide-up{to{opacity:1;transform:none}}
+.photo.in{transform:translateY(0) scale(.97);animation:photo-in 1.1s var(--ease) .2s forwards}
+@keyframes photo-in{to{opacity:1;transform:none}}
+.d1{animation-delay:.2s}.d2{animation-delay:.35s}.d3{animation-delay:.55s}.d4{animation-delay:.75s}.d5{animation-delay:.9s}.d6{animation-delay:1.05s}
+
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.on{opacity:1;transform:none}
+.rv-d1{transition-delay:.1s}.rv-d2{transition-delay:.2s}.rv-d3{transition-delay:.3s}
+
+section{padding:120px 0}
+.center{text-align:center}
+.center .lead{margin:16px auto 0}
+
+/* how */
+.how-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:72px;align-items:center}
+.steps{position:relative;display:grid;gap:36px;margin-top:40px;counter-reset:s}
+.steps::before{content:"";position:absolute;left:21px;top:22px;bottom:22px;width:2px;background:var(--line)}
+.steps .line-fill{position:absolute;left:21px;top:22px;width:2px;height:0;background:var(--green);transition:height 1.6s var(--ease) .3s}
+.steps.on .line-fill{height:calc(100% - 44px)}
+.s{position:relative;display:flex;gap:22px}
+.s .n{flex:none;width:44px;height:44px;border-radius:50%;background:#fff;border:2px solid var(--line);display:grid;place-items:center;font-weight:800;color:var(--ink);position:relative;z-index:1;transition:border-color .6s var(--ease),background .6s var(--ease),color .6s}
+.steps.on .s .n{border-color:var(--green);background:var(--green);color:#fff}
+.steps.on .s:nth-child(3) .n{transition-delay:.5s}
+.steps.on .s:nth-child(4) .n{transition-delay:1s}
+.s p{margin-top:6px;font-size:16px}
+.video{border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg);aspect-ratio:16/10;background:var(--alt)}
+.video video{width:100%;height:100%;object-fit:cover}
+
+/* services */
+.svcs{background:var(--bg)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.svc{background:#fff;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .6s var(--ease),box-shadow .6s var(--ease);display:flex;flex-direction:column}
+.svc:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.svc-img{aspect-ratio:16/10;overflow:hidden}
+.svc-img img{width:100%;height:100%;object-fit:cover;transition:transform 1s var(--ease)}
+.svc:hover .svc-img img{transform:scale(1.04)}
+.svc-body{padding:24px 26px 26px;display:flex;flex-direction:column;flex:1}
+.svc-price{font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-top:6px}
+.svc-price small{font-size:15px;font-weight:600;color:var(--mute)}
+.svc-body p{margin-top:10px;font-size:15.5px}
+.more-prices{margin-top:32px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:14.5px;font-weight:600;color:var(--ink)}
+.chip span{color:var(--mute);font-weight:500}
+
+/* reviews */
+.rev-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:56px;align-items:start}
+.rev{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
+.rev:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.rev q{quotes:none;display:block;margin:14px 0 18px;font-size:15.5px;color:var(--text)}
+.rev .who{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);font-size:15px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-weight:800;font-size:14px}
+.rev-score{display:inline-flex;align-items:center;gap:10px;margin-top:20px;font-weight:700;color:var(--ink)}
+
+/* CTA */
+.cta{padding:0 0 120px}
+.cta-box{position:relative;overflow:hidden;background:var(--deep);border-radius:32px;padding:80px 40px;text-align:center;color:#fff}
+.cta-box::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 55% 80% at 50% 0%,rgba(143,211,172,.2),transparent 70%)}
+.cta-box>*{position:relative}
+.cta-box h2{color:#fff;font-size:clamp(32px,4.2vw,52px)}
+.cta-box h2 em{font-style:normal;color:var(--mint)}
+.cta-box p{color:rgba(255,255,255,.78);margin:16px auto 32px;max-width:520px;font-size:18px}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-light{background:#fff;color:var(--ink)}
+.btn-light:hover{transform:translateY(-2px)}
+.btn-line{border:1.5px solid rgba(255,255,255,.25);color:#fff}
+.btn-line:hover{background:rgba(255,255,255,.08)}
+footer{border-top:1px solid var(--line);padding:36px 0 44px;font-size:14.5px;color:var(--mute)}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+footer img{height:26px;width:auto}
+footer nav{display:flex;gap:24px;flex-wrap:wrap}
+footer a:hover{color:var(--green)}
+
+@media (max-width:1060px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .stage{max-width:560px}
+  .photo{right:0;width:70%}
+  .nav-links .hide-m{display:none}
+}
+@media (max-width:960px){
+  .how-grid{grid-template-columns:1fr;gap:48px}
+  .svc-grid{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 20px}
+  section{padding:84px 0}
+  .nav .wrap{height:70px}
+  .nav img{height:26px}
+  .nav-links .tel{display:none}
+  .hero{padding:16px 0 84px}
+  .hero h1{margin:18px 0 16px}
+  .hero .sub{font-size:17px}
+  .trust{gap:10px 18px;margin-top:24px;font-size:14px}
+  .hero-alt{margin-top:18px}
+  .hero-grid{gap:28px}
+  .stage{margin:0 -4px}
+  .photo{position:relative;top:0;right:0;width:100%;aspect-ratio:2/1;border-radius:22px}
+  .photo img{object-position:50% 72%}
+  .calc{margin:-64px auto 0;width:calc(100% - 20px);padding:22px 20px 20px}
+  .total-top b{font-size:34px}
+  .svc-grid,.rev-grid{grid-template-columns:1fr}
+  .cta-box{padding:56px 22px;border-radius:24px}
+  .cta-btns{flex-direction:column}
+  footer .wrap{flex-direction:column;align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .in,.rv{opacity:1!important;transform:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="star" viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></symbol>
+  <symbol id="arrow" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ck" viewBox="0 0 20 20"><path d="M6 10.5l2.5 2.5L14 7.5" fill="none" stroke="#217A4E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="nav in d1">
+  <div class="wrap">
+    <a href="#" aria-label="TiivisKoti etusivu"><img src="assets/logo-vihrea.svg" alt="TiivisKoti"></a>
+    <div class="nav-links">
+      <a class="hide-m" href="#miten">Miten toimii</a>
+      <a class="hide-m" href="#palvelut">Hinnat</a>
+      <a class="hide-m" href="#arvostelut">Arvostelut</a>
+      <a class="tel" href="tel:+358458755996">045 875 5996</a>
+      <a class="btn btn-primary nav-cta" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero" style="padding-top:40px">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="pill in d1"><span class="stars" aria-hidden="true"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span>5,0 · 12 Google-arvostelua</span>
+      <h1 class="in d2">Kylmä veto ei kuulu <em>kotiin.</em></h1>
+      <p class="sub in d3">Ovien ja ikkunoiden tiivisteiden vaihto kiinteään hintaan. Laske hinta, valitse aika. Ei tarjouspyyntöjä.</p>
+      <div class="trust in d4">
+        <span><i class="ck"><svg width="14" height="14"><use href="#ck"/></svg></i>Oma porukka, ei alihankintaa</span>
+        <span><i class="ck"><svg width="14" height="14"><use href="#ck"/></svg></i>Valmis yhdellä käynnillä</span>
+        <span><i class="ck"><svg width="14" height="14"><use href="#ck"/></svg></i>Uusimaa ja Riihimäki</span>
+      </div>
+      <p class="hero-alt in d5">Taloyhtiö? <a href="https://tiiviskoti.fi/varaa.html">Varaa maksuton kartoituskäynti</a></p>
+    </div>
+
+    <div class="stage">
+      <div class="photo in"><img src="assets/hero-entrance.webp" alt="TiivisKodin asentajat puutalon edessä" fetchpriority="high"></div>
+      <div class="calc in d4" id="calc" aria-label="Hintalaskuri">
+        <div class="calc-head"><b>Laske hinta</b><span class="live"><i></i>Hinta heti</span></div>
+        <div class="row">
+          <div class="lbl"><b>Ikkunat</b><small id="winRate">85 € / ikkuna</small></div>
+          <div class="step"><button type="button" data-k="w" data-d="-1" aria-label="Vähemmän ikkunoita">−</button><output id="w" aria-live="polite">5</output><button type="button" data-k="w" data-d="1" aria-label="Lisää ikkunoita">+</button></div>
+        </div>
+        <div class="row">
+          <div class="lbl"><b>Ulko-ovet</b><small>99 € / ovi</small></div>
+          <div class="step"><button type="button" data-k="d" data-d="-1" aria-label="Vähemmän ovia">−</button><output id="d" aria-live="polite">1</output><button type="button" data-k="d" data-d="1" aria-label="Lisää ovia">+</button></div>
+        </div>
+        <div class="total">
+          <div class="total-top"><span>Kiinteä hinta</span><b><span id="tot">524</span> €</b></div>
+          <div class="breakdown" id="bd">5 × 85 € + 1 × 99 €</div>
+          <div class="deduct" id="dedRow"><span>Kotitalousvähennyksen jälkeen noin<small>arvio</small></span><b><span id="after">485</span> €</b></div>
+        </div>
+        <div class="nudge" id="nudge"></div>
+        <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Valitse aika <svg width="18" height="18"><use href="#arrow"/></svg></a>
+        <p class="calc-foot">Säätö, öljyäminen ja lämpökamerakuvaus sisältyvät.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="miten">
+  <div class="wrap how-grid">
+    <div>
+      <div class="rv"><span class="eyebrow">Miten toimii</span><h2>Kolme askelta. Ei tarjouspyyntöjä.</h2></div>
+      <div class="steps rv rv-d1" id="steps">
+        <span class="line-fill"></span>
+        <div class="s"><span class="n">1</span><div><h3>Laske hinta</h3><p>Valitse ikkunoiden ja ovien määrä. Näet kiinteän hinnan heti.</p></div></div>
+        <div class="s"><span class="n">2</span><div><h3>Valitse aika</h3><p>Varaus verkosta alle minuutissa. Ei odottelua.</p></div></div>
+        <div class="s"><span class="n">3</span><div><h3>Me hoidamme loput</h3><p>Lämpökamerakuvaus, uudet tiivisteet, säätö ja öljyäminen. Yhdellä käynnillä.</p></div></div>
+      </div>
+    </div>
+    <div class="video rv rv-d2">
+      <video muted autoplay loop playsinline poster="assets/tyo-loop-poster.jpg" aria-label="Työkuvaa: tiivisteen asennus ikkunan uraan">
+        <source src="assets/tyo-loop-16x9.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<section class="svcs" id="palvelut">
+  <div class="wrap">
+    <div class="center rv"><span class="eyebrow">Palvelut ja hinnat</span><h2>Selkeät hinnat. Ei yllätyksiä.</h2><p class="lead">Uusi ikkuna maksaisi noin 1 200 €. Tiivisteiden vaihto maksaa siitä murto-osan.</p></div>
+    <div class="svc-grid">
+      <article class="svc rv rv-d1">
+        <div class="svc-img"><img src="assets/ikkunat.webp" alt="Valkoinen ikkuna harmaassa puutalossa" loading="lazy"></div>
+        <div class="svc-body"><h3>Ikkunoiden tiivistys</h3><div class="svc-price">75–90 € <small>/ ikkuna</small></div><p>Karmi- ja puitetiivisteet. Säätö ja öljyäminen kuuluvat hintaan.</p></div>
+      </article>
+      <article class="svc rv rv-d2">
+        <div class="svc-img"><img src="assets/ulko-ovet.webp" alt="Ulko-ovi" loading="lazy"></div>
+        <div class="svc-body"><h3>Ulko-oven tiivistys</h3><div class="svc-price">99 € <small>/ ovi</small></div><p>Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen, oven säätö.</p></div>
+      </article>
+      <article class="svc rv rv-d3">
+        <div class="svc-img"><img src="assets/taloyhtiot.webp" alt="Kerrostalo" loading="lazy"></div>
+        <div class="svc-body"><h3>Taloyhtiöt</h3><div class="svc-price">Maksuton <small>kartoitus</small></div><p>Kartoituskäynti ja kirjallinen tarjous hallitukselle.</p></div>
+      </article>
+    </div>
+    <div class="more-prices rv">
+      <span class="chip">Liuku- tai pariovi <span>149 €</span></span>
+      <span class="chip">Väli- tai huoneovi <span>89 €</span></span>
+      <span class="chip">Pienin käynti <span>149 €</span></span>
+      <span class="chip">Kotitalousvähennys <span>−40 %</span></span>
+    </div>
+  </div>
+</section>
+
+<section id="arvostelut">
+  <div class="wrap">
+    <div class="center rv"><span class="eyebrow">Arvostelut</span><h2>Asiakkaiden sanoin</h2>
+      <div class="rev-score"><span class="stars" aria-hidden="true"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span>5,0 · 12 Google-arvostelua</div>
+    </div>
+    <div class="rev-grid">
+      <article class="rev rv rv-d1"><span class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><q>Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta. Vahva suositus.</q><div class="who"><span class="avatar">E</span>Edwin T.</div></article>
+      <article class="rev rv rv-d2"><span class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><q>Lopputulos vaikuttaa hyvältä. Ikkunoita on paljon ja tiivistys vei koko päivän kahdelta tekijältä. Pari juttua oli korjattava ja nekin hoituivat nopeasti ilman viivettä. Reippaita ja aikaansaavia tekijöitä.</q><div class="who"><span class="avatar">M</span>Marjut S.</div></article>
+      <article class="rev rv rv-d3"><span class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><q>Thank you for professional and fast service. The reservation was easy to make online!</q><div class="who"><span class="avatar">G</span>Gunvor v. W.</div></article>
+      <article class="rev rv rv-d3"><span class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><q>Pojat tekivät työnsä ammattitaidolla 👍</q><div class="who"><span class="avatar">L</span>Lilja S.</div></article>
+    </div>
+  </div>
+</section>
+
+<div class="cta">
+  <div class="wrap">
+    <div class="cta-box rv">
+      <h2>Veto kuriin, <em>lämpö kotiin.</em></h2>
+      <p>Valitse vapaa aika verkosta. Näet hinnan ennen kuin varaat.</p>
+      <div class="cta-btns">
+        <a class="btn btn-light" href="https://tiiviskoti.fi/varaa.html">Valitse aika <svg width="18" height="18"><use href="#arrow"/></svg></a>
+        <a class="btn btn-line" href="tel:+358458755996">Soita 045 875 5996</a>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="assets/logo-vihrea.svg" alt="TiivisKoti">
+    <nav><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="tel:+358458755996">045 875 5996</a><span>Uusimaa ja Riihimäki</span></nav>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- hintalaskuri ---- */
+  var MAX = {w:40, d:6};
+  var st = {w:5, d:1};
+  function rate(n){ return n<=4?90 : n<=9?85 : n<=13?80 : 75; }
+  function price(w,d){
+    var t = w*rate(w) + d*99;
+    var minApplied = t>0 && t<149;
+    if (minApplied) t = 149;
+    return {total:t, minApplied:minApplied};
+  }
+  // Kotitalousvähennys (arvio): 40 % työn osuudesta (oletus 90 %), omavastuu 150 €, katto 2100 €
+  function deduction(total){ return Math.min(2100, Math.max(0, 0.40*0.90*total - 150)); }
+  function nextTier(w){ if(w<5) return [5,85]; if(w<10) return [10,80]; if(w<14) return [14,75]; return null; }
+  var fmt = new Intl.NumberFormat('fi-FI',{maximumFractionDigits:0});
+  var shown = {tot:0, after:0};
+  function animate(key, el, to){
+    var from = shown[key]; shown[key] = to;
+    if (reduce || from===to){ el.textContent = fmt.format(to); return; }
+    var t0 = performance.now(), dur = 300;
+    (function f(now){
+      var p = Math.min(1,(now-t0)/dur), e = 1-Math.pow(2,-10*p); if(p===1)e=1;
+      el.textContent = fmt.format(Math.round(from + (to-from)*e));
+      if (p<1) requestAnimationFrame(f);
+    })(t0);
+  }
+  var $ = function(id){return document.getElementById(id)};
+  function render(first){
+    var w=st.w, d=st.d, r=rate(w), p=price(w,d);
+    $('w').textContent = w; $('d').textContent = d;
+    $('winRate').textContent = (w>0? r : 90) + ' € / ikkuna';
+    var parts=[];
+    if (w) parts.push(w+' × '+r+' €');
+    if (d) parts.push(d+' × 99 €');
+    $('bd').textContent = p.minApplied ? 'Pienin käynti 149 € (sis. käynnin ja matkat)' : parts.join(' + ');
+    var ded = deduction(p.total);
+    var after = Math.round(p.total - ded);
+    if (first){ shown.tot=p.total; shown.after=after; $('tot').textContent=fmt.format(p.total); $('after').textContent=fmt.format(after); }
+    else { animate('tot',$('tot'),p.total); if(ded>0) animate('after',$('after'),after); else shown.after=after; }
+    $('dedRow').hidden = !(ded>0);
+    var nt = nextTier(w);
+    $('nudge').textContent = (nt && w>0) ? 'Vielä '+(nt[0]-w)+' ikkunaa → '+nt[1]+' € / ikkuna' : '';
+    document.querySelectorAll('.step button').forEach(function(b){
+      var k=b.dataset.k, dd=+b.dataset.d, n=st[k]+dd;
+      var other = k==='w'? st.d : st.w;
+      b.disabled = n<0 || n>MAX[k] || (n===0 && other===0);
+    });
+  }
+  document.querySelectorAll('.step button').forEach(function(b){
+    b.addEventListener('click',function(){ var k=b.dataset.k; st[k]+= +b.dataset.d; render(false); });
+  });
+  render(true);
+  window.__tkPrice = {rate:rate, price:price, deduction:deduction, st:st};
+
+  /* ---- reveal ---- */
+  var els = document.querySelectorAll('.rv');
+  if (reduce || !('IntersectionObserver' in window)) els.forEach(function(e){e.classList.add('on')});
+  else {
+    var io = new IntersectionObserver(function(en){ en.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('on'); io.unobserve(x.target);} }); },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+    els.forEach(function(e){io.observe(e)});
+  }
+})();
+</script>
+</body>
+</html>

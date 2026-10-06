@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>TiivisKoti — v07 Hinta edellä</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7F3; --alt:#ECF0E9; --card:#FFFFFF;
+  --ink:#183A28; --text:#4A544D; --mute:#7B857D;
+  --green:#217A4E; --green-d:#1A6340; --green-l:#2E9E63; --green-soft:#E4F0E9; --mint:#8FD3AC;
+  --deep:#163A28; --deep2:#1E4A34; --line:#E4E8E0; --star:#FBBF24;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --r:20px; --wrap:1200px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:Manrope,system-ui,sans-serif;font-size:17px;line-height:1.6;font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+h1,h2,h3{color:var(--ink);font-weight:800;letter-spacing:-0.025em;line-height:1.1}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+
+/* ---------- buttons ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;font-weight:700;font-size:16px;transition:transform .5s var(--ease),background .3s,box-shadow .5s var(--ease);overflow:hidden;white-space:nowrap}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 8px 24px -10px rgba(33,122,78,.6)}
+.btn-primary:hover{background:var(--green-d);transform:translateY(-2px);box-shadow:0 14px 30px -12px rgba(33,122,78,.7)}
+.btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--ink)}
+.btn-white{background:#fff;color:var(--deep)}
+.btn-white:hover{transform:translateY(-2px)}
+.btn-line-w{color:#fff;border:1.5px solid rgba(255,255,255,.25)}
+.btn-line-w:hover{border-color:#fff}
+/* AaltoAir ar-glint */
+.glint::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);transform:translateX(-120%);animation:ar-glint 5s var(--ease) 2.4s infinite}
+@keyframes ar-glint{0%{transform:translateX(-120%)}30%,100%{transform:translateX(120%)}}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:20;background:rgba(246,247,243,.82);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid transparent;transition:border-color .4s}
+.top.scrolled{border-bottom-color:var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+.top img{height:26px;width:auto}
+.top nav{display:flex;align-items:center;gap:28px;font-size:15px;font-weight:600;color:var(--ink)}
+.top nav a.l{opacity:.75;transition:opacity .3s}
+.top nav a.l:hover{opacity:1}
+.top .btn{min-height:44px;padding:0 20px;font-size:15px}
+
+/* ---------- hero ---------- */
+.hero{padding:56px 0 96px}
+.hero .wrap{display:grid;grid-template-columns:1.25fr .75fr;gap:64px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 14px;border-radius:999px;background:rgba(255,255,255,.7);border:1px solid var(--line);backdrop-filter:blur(10px);font-size:14px;font-weight:600;color:var(--ink);box-shadow:0 4px 18px -10px rgba(24,58,40,.25)}
+.stars{display:inline-flex;gap:2px}
+.stars svg{width:15px;height:15px;fill:var(--star)}
+.pill .sep{width:1px;height:16px;background:var(--line)}
+.pill .m{color:var(--mute);font-weight:500}
+.label{margin-top:40px;font-size:18px;font-weight:600;color:var(--text)}
+.price{display:flex;align-items:flex-start;font-size:clamp(116px,17vw,248px);font-weight:800;color:var(--ink);letter-spacing:-0.055em;line-height:1;font-variant-numeric:tabular-nums;margin:6px 0 0 -0.04em}
+.odo{display:inline-flex}
+.d{display:block;height:1em;overflow:hidden;-webkit-mask-image:linear-gradient(transparent 0,#000 10%,#000 90%,transparent 100%);mask-image:linear-gradient(transparent 0,#000 10%,#000 90%,transparent 100%)}
+.strip{display:flex;flex-direction:column;transform:translateY(0);transition:transform 1.25s var(--ease)}
+.strip span{display:block;height:1em;line-height:1em;text-align:center}
+.d.t .strip{transition-delay:.02s}
+.d.o .strip{transition-duration:1.35s}
+.price .eur{font-size:.42em;letter-spacing:-0.02em;margin:.14em 0 0 .12em;color:var(--green)}
+.per{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:16px;color:var(--text)}
+.per b{color:var(--ink);font-weight:700}
+.anchor{margin-top:30px;font-size:15px;color:var(--mute);font-weight:500}
+.anchor s{text-decoration:none}
+.cmp{margin-top:14px;max-width:460px;display:grid;gap:12px}
+.cmp .row{display:grid;grid-template-columns:112px 1fr 72px;align-items:center;gap:14px;font-size:13px;font-weight:600}
+.cmp .row .n{color:var(--text)}
+.cmp .row .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.cmp .row.b .v,.cmp .row.b .n{color:var(--mute);font-weight:500}
+.bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px;transition:width 1.4s var(--ease)}
+.row.a .bar i{background:var(--green)}
+.row.b .bar{background:transparent}
+.row.b .bar i{background:#C9D0C6}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px}
+.frame{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:3/4.2;box-shadow:0 30px 60px -30px rgba(24,58,40,.35)}
+.frame img{width:100%;height:100%;object-fit:cover;object-position:48% 50%;transform:scale(1.08);transition:transform 1.8s var(--ease)}
+.loaded .frame img{transform:scale(1)}
+.frame .chip{position:absolute;left:16px;right:16px;bottom:16px;padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);font-size:14px;color:var(--ink);font-weight:600;display:flex;gap:12px;align-items:center}
+.chip .dot{flex:0 0 32px;height:32px;border-radius:50%;background:var(--green-soft);display:grid;place-items:center}
+.chip .dot svg{width:16px;height:16px;stroke:var(--green);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.chip small{display:block;color:var(--mute);font-weight:500;font-size:13px}
+
+/* hero stagger (AaltoAir 0.2/0.35/0.55/0.75/0.9/1.05/1.2) */
+.st{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.loaded .st{opacity:1;transform:none}
+.loaded .s1{transition-delay:.2s}.loaded .s2{transition-delay:.35s}.loaded .s3{transition-delay:.55s}
+.loaded .s4{transition-delay:.75s}.loaded .s5{transition-delay:.9s}.loaded .s6{transition-delay:1.05s}.loaded .s7{transition-delay:1.2s}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- sections ---------- */
+section.sec{padding:120px 0}
+.head{max-width:640px;margin-bottom:56px}
+.head h2{font-size:clamp(34px,4.4vw,52px);margin-top:14px}
+.head p{margin-top:16px;font-size:18px}
+
+/* price table */
+.tbl{background:var(--card);border-radius:24px;border:1px solid var(--line);overflow:hidden}
+.tr{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:26px 36px;border-top:1px solid var(--line)}
+.tr:first-child{border-top:0}
+.tr.h{padding:18px 36px;background:#FAFBF8;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.tr .q{font-weight:700;color:var(--ink);font-size:18px}
+.tr .p{font-size:34px;font-weight:800;color:var(--ink);letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
+.tr .p small{font-size:15px;font-weight:600;color:var(--mute);letter-spacing:0;margin-left:4px}
+.tr .x{text-align:right;font-size:15px;color:var(--mute)}
+.tr.best{position:relative;background:linear-gradient(90deg,var(--green-soft),#fff 70%)}
+.tr.best .p{color:var(--green)}
+.tag{display:inline-block;padding:5px 12px;border-radius:999px;background:var(--green);color:#fff;font-size:12px;font-weight:700;letter-spacing:.02em}
+.tnote{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:22px;font-size:15px;color:var(--text)}
+.tnote b{color:var(--ink)}
+.others{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:56px}
+.oc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
+.oc:hover{transform:translateY(-4px);box-shadow:0 20px 40px -24px rgba(24,58,40,.3)}
+.oc .n{font-size:15px;font-weight:600;color:var(--text)}
+.oc .v{margin-top:8px;font-size:30px;font-weight:800;color:var(--ink);letter-spacing:-0.03em}
+.oc .s{margin-top:6px;font-size:14px;color:var(--mute);line-height:1.5}
+
+/* included */
+.inc{background:var(--alt)}
+.inc .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:80px;align-items:start}
+.inc .head{margin:0;position:sticky;top:120px}
+.list{list-style:none;display:grid;gap:4px}
+.list li{display:grid;grid-template-columns:44px 1fr;gap:18px;align-items:start;padding:24px 0;border-top:1px solid #D9DFD5}
+.list li:first-child{border-top:0}
+.list h3{font-size:19px;letter-spacing:-0.01em;line-height:1.3}
+.list p{margin-top:4px;font-size:16px}
+.ck{width:44px;height:44px;border-radius:50%;border:1.5px solid #C9D3C6;display:grid;place-items:center;background:#fff}
+.ck svg{width:20px;height:20px;fill:none;stroke:var(--green);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ck path{stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .9s var(--ease) .25s}
+.ck circle{stroke:var(--green);stroke-width:1.6;stroke-dasharray:126;stroke-dashoffset:126;transition:stroke-dashoffset 1.1s var(--ease)}
+.list li.in .ck path,.list li.in .ck circle{stroke-dashoffset:0}
+
+/* problem strip */
+.problem{padding:96px 0;text-align:center}
+.problem p.big{font-size:clamp(26px,3.4vw,40px);font-weight:700;color:var(--ink);letter-spacing:-0.02em;line-height:1.25;max-width:860px;margin:0 auto}
+.problem p.big em{font-style:normal;color:var(--green)}
+.problem p.sm{margin-top:18px;color:var(--mute);font-size:15px}
+
+/* reviews */
+.rh{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:48px}
+.rh h2{font-size:clamp(34px,4.4vw,52px);margin-top:14px}
+.score{display:flex;align-items:center;gap:14px}
+.score .big{font-size:56px;font-weight:800;color:var(--ink);letter-spacing:-0.04em;line-height:1}
+.score .stars svg{width:18px;height:18px}
+.score small{display:block;font-size:14px;color:var(--mute);margin-top:4px}
+.revs{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.rc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px}
+.rc q{quotes:none;color:var(--ink);font-size:16px;line-height:1.6;font-weight:500;flex:1}
+.rc .who{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:700;color:var(--ink)}
+.av{width:38px;height:38px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-weight:800;font-size:15px}
+.who small{display:block;font-weight:500;color:var(--mute);font-size:13px}
+.rc .stars svg{width:14px;height:14px}
+
+/* housing */
+.ty{margin-top:56px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding:28px 32px;border-radius:20px;border:1px solid var(--line);background:var(--card)}
+.ty b{color:var(--ink)}
+
+/* cta */
+.cta{position:relative;background:var(--deep);color:#C8D6CC;overflow:hidden}
+.cta .wrap{position:relative;padding:120px 24px;display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center}
+.cta::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 80% at 80% 20%,rgba(46,158,99,.28),transparent 70%)}
+.cta h2{color:#fff;font-size:clamp(38px,5.2vw,64px)}
+.cta p{margin-top:18px;font-size:18px;max-width:520px}
+.cta .act{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+.cta .act .btn{width:100%}
+.cta .act small{text-align:center;font-size:14px;color:#9FB5A6}
+.wave{display:block;width:100%;height:56px;margin-bottom:-1px}
+
+footer{background:var(--deep);color:#9FB5A6;font-size:14px;border-top:1px solid rgba(255,255,255,.08)}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding-top:32px;padding-bottom:32px}
+footer img{height:22px;width:auto}
+footer a:hover{color:#fff}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .hero .wrap{grid-template-columns:1fr;gap:48px}
+  .frame{aspect-ratio:4/3.4;max-width:560px}
+  .inc .wrap{grid-template-columns:1fr;gap:32px}
+  .inc .head{position:static}
+  .revs{grid-template-columns:1fr 1fr}
+  .others{grid-template-columns:1fr 1fr}
+  .cta .wrap{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 20px}
+  .top nav a.l{display:none}
+  .top .wrap{height:64px}
+  .top img{height:22px}
+  .hero{padding:32px 0 72px}
+  .label{margin-top:28px;font-size:16px}
+  .price{font-size:clamp(108px,36vw,160px)}
+  .cmp .row{grid-template-columns:92px 1fr 62px;gap:10px}
+  .cta-row .btn{flex:1 1 100%}
+  section.sec{padding:84px 0}
+  .tr{grid-template-columns:1fr auto;padding:20px;row-gap:6px}
+  .tr.h{display:none}
+  .tr .x{grid-column:1/-1;text-align:left;font-size:14px}
+  .tr .p{font-size:28px}
+  .others{grid-template-columns:1fr}
+  .revs{grid-template-columns:1fr}
+  .ty{padding:22px}
+  .ty .btn{width:100%}
+  .cta .wrap{padding:84px 20px}
+  .problem{padding:72px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .st,.rv{opacity:1!important;transform:none!important}
+  .ck path,.ck circle{stroke-dashoffset:0!important}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a href="#" aria-label="TiivisKoti etusivu"><img src="assets/logo-vihrea.svg" alt="TiivisKoti"></a>
+    <nav>
+      <a class="l" href="#hinnat">Hinnat</a>
+      <a class="l" href="#sisaltyy">Mitä sisältyy</a>
+      <a class="l" href="#arvostelut">Arvostelut</a>
+      <a class="l" href="tel:+358458755996">045 875 5996</a>
+      <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <a class="pill st s1" href="#arvostelut">
+        <span class="stars" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg></span>
+        5,0 <span class="sep"></span> <span class="m">12 arvostelua Googlessa</span>
+      </a>
+
+      <h1 class="label st s2">Ikkunan tiivistys, alkaen</h1>
+      <div class="price st s2" role="img" aria-label="75 euroa">
+        <span class="odo" aria-hidden="true">
+          <span class="d t"><span class="strip" data-to="7"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></span></span>
+          <span class="d o"><span class="strip" data-to="15"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></span></span>
+        </span>
+        <span class="eur" aria-hidden="true">€</span>
+      </div>
+      <div class="per st s3"><span><b>/ ikkuna</b>, kiinteä hinta</span><span>Säätö ja öljyäminen sisältyvät</span></div>
+
+      <p class="anchor st s4">Uusi ikkuna maksaisi noin 1&nbsp;200&nbsp;€.</p>
+      <div class="cmp st s4" id="cmp">
+        <div class="row a"><span class="n">Tiivistys</span><span class="bar"><i data-w="6.25"></i></span><span class="v">75 €</span></div>
+        <div class="row b"><span class="n">Uusi ikkuna</span><span class="bar"><i data-w="100"></i></span><span class="v">n. 1&nbsp;200&nbsp;€</span></div>
+      </div>
+
+      <div class="cta-row st s5">
+        <a class="btn btn-primary glint" href="https://tiiviskoti.fi/varaa.html">Katso hinta ja varaa aika</a>
+        <a class="btn btn-ghost" href="tel:+358458755996">045 875 5996</a>
+      </div>
+    </div>
+
+    <figure class="frame st s3">
+      <img src="assets/ikkunat.webp" alt="Valkoinen puuikkuna harmaan puutalon seinässä" width="1000" height="625">
+      <figcaption class="chip">
+        <span class="dot"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        <span>Karmi- ja puitetiivisteet<small>Työ yhdellä käynnillä</small></span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="sec" id="hinnat" style="background:var(--card);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="head rv">
+      <span class="eyebrow">Hinnasto</span>
+      <h2>Mitä enemmän ikkunoita, sitä halvempi kappale.</h2>
+      <p>Kappalehinta määräytyy ikkunoiden kokonaismäärästä. Näet lopullisen hinnan heti laskurista — ei tarjouspyyntöjä.</p>
+    </div>
+
+    <div class="tbl rv">
+      <div class="tr h"><span>Ikkunoita</span><span>Hinta / ikkuna</span><span style="text-align:right">Sisältää</span></div>
+      <div class="tr"><span class="q">1–4 kpl</span><span class="p">90 €</span><span class="x">Tiivisteet, säätö, öljyäminen</span></div>
+      <div class="tr"><span class="q">5–9 kpl</span><span class="p">85 €</span><span class="x">Tiivisteet, säätö, öljyäminen</span></div>
+      <div class="tr"><span class="q">10–13 kpl</span><span class="p">80 €</span><span class="x">Tiivisteet, säätö, öljyäminen</span></div>
+      <div class="tr best"><span class="q">14+ kpl</span><span class="p">75 €</span><span class="x"><span class="tag">Edullisin</span></span></div>
+    </div>
+    <div class="tnote rv">
+      <span><b>Kotitalousvähennys −40 %</b></span>
+      <span>Pienin käynti <b>149 €</b> (sis. käynnin, matkat ja lämpökamerakuvauksen)</span>
+    </div>
+
+    <div class="others">
+      <div class="oc rv"><div class="n">Ulko-ovi</div><div class="v">99 €</div><div class="s">Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen, oven säätö</div></div>
+      <div class="oc rv"><div class="n">Väli- tai huoneovi</div><div class="v">89 €</div><div class="s">Kiinteä hinta ovelta</div></div>
+      <div class="oc rv"><div class="n">Liuku- tai pariovi</div><div class="v">149 €</div><div class="s">Kiinteä hinta ovelta</div></div>
+      <div class="oc rv"><div class="n">Lämpökamerakuvaus</div><div class="v">0 €</div><div class="s">Ennen työtä, veloituksetta</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec inc" id="sisaltyy">
+  <div class="wrap">
+    <div class="head rv">
+      <span class="eyebrow">Hintaan sisältyy</span>
+      <h2>75 € ei ole pelkkä tiiviste.</h2>
+      <p>Yksi hinta, yksi käynti. Ei lisälaskuja jälkikäteen.</p>
+    </div>
+    <ul class="list">
+      <li class="rv"><span class="ck"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20"/><path d="M14 22.5l5.5 5.5L30 17.5"/></svg></span><div><h3>Karmi- ja puitetiivisteiden vaihto</h3><p>Vanhat tiivisteet pois, uudet tilalle.</p></div></li>
+      <li class="rv"><span class="ck"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20"/><path d="M14 22.5l5.5 5.5L30 17.5"/></svg></span><div><h3>Ikkunan säätö</h3><p>Puite painuu tiivistettä vasten ja sulkeutuu kevyesti.</p></div></li>
+      <li class="rv"><span class="ck"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20"/><path d="M14 22.5l5.5 5.5L30 17.5"/></svg></span><div><h3>Öljyäminen</h3><p>Kuuluu hintaan, ei erillistä lisätyötä.</p></div></li>
+      <li class="rv"><span class="ck"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20"/><path d="M14 22.5l5.5 5.5L30 17.5"/></svg></span><div><h3>Lämpökamerakuvaus ennen työtä</h3><p>Näet itse, mistä vetää. Veloituksetta.</p></div></li>
+      <li class="rv"><span class="ck"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20"/><path d="M14 22.5l5.5 5.5L30 17.5"/></svg></span><div><h3>Oma porukka, ei alihankintaa</h3><p>Sama tiimi varauksesta valmiiseen työhön.</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="problem">
+  <div class="wrap rv">
+    <p class="big">Kylmä veto ei kuulu kotiin. Vetävä ovi tai ikkuna nostaa lämmityskuluja <em style="white-space:nowrap">tyypillisesti 10–15&nbsp;%</em>.</p>
+    <p class="sm">Tiivisteiden vaihto on pieni työ verrattuna uuteen ikkunaan.</p>
+  </div>
+</section>
+
+<section class="sec" id="arvostelut" style="background:var(--card);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="rh rv">
+      <div><span class="eyebrow">Arvostelut</span><h2>Mitä asiakkaat sanovat.</h2></div>
+      <div class="score">
+        <span class="big">5,0</span>
+        <span><span class="stars" aria-label="5 tähteä"><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg></span><small>12 arvostelua Googlessa</small></span>
+      </div>
+    </div>
+    <div class="revs">
+      <article class="rc rv"><span class="stars" aria-label="5 tähteä"><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg></span><q>Lopputulos vaikuttaa hyvältä. Ikkunoita on paljon ja tiivistys vei koko päivän kahdelta tekijältä. Pari juttua oli korjattava ja nekin hoituivat nopeasti ilman viivettä. Reippaita ja aikaansaavia tekijöitä.</q><div class="who"><span class="av">M</span><span>Marjut S.<small>Google</small></span></div></article>
+      <article class="rc rv"><span class="stars" aria-label="5 tähteä"><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg></span><q>Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta. Vahva suositus.</q><div class="who"><span class="av">E</span><span>Edwin T.<small>Google</small></span></div></article>
+      <article class="rc rv"><span class="stars" aria-label="5 tähteä"><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg></span><q>Thank you for professional and fast service. The reservation was easy to make online!</q><div class="who"><span class="av">G</span><span>Gunvor v. W.<small>Google</small></span></div></article>
+      <article class="rc rv"><span class="stars" aria-label="5 tähteä"><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg></span><q>Pojat tekivät työnsä ammattitaidolla 👍</q><div class="who"><span class="av">L</span><span>Lilja S.<small>Google</small></span></div></article>
+    </div>
+
+    <div class="ty rv">
+      <span><b>Taloyhtiö?</b> Maksuton kartoituskäynti ja kirjallinen tarjous hallitukselle.</span>
+      <a class="btn btn-ghost" href="tel:+358458755996">Soita 045 875 5996</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="rv">
+      <h2>Veto kuriin,<br>lämpö kotiin.</h2>
+      <p>Varaa aika verkosta alle minuutissa. Näet hinnan heti laskurista. Palvelemme Uusimaalla ja Riihimäellä.</p>
+    </div>
+    <div class="act rv">
+      <a class="btn btn-white glint" href="https://tiiviskoti.fi/varaa.html">Varaa aika — alkaen 75 €</a>
+      <a class="btn btn-line-w" href="tel:+358458755996">Soita 045 875 5996</a>
+      <small>info@tiiviskoti.fi</small>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="assets/logo-valkoinen.svg" alt="TiivisKoti">
+    <span>Ovien ja ikkunoiden tiivistys · Uusimaa ja Riihimäki</span>
+    <span><a href="tel:+358458755996">045 875 5996</a> · <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+
+  // header border on scroll
+  var top = document.getElementById('top');
+  addEventListener('scroll', function(){ top.classList.toggle('scrolled', scrollY > 8); }, {passive:true});
+
+  function start(){
+    document.body.classList.add('loaded');
+    // odometer: roll each digit strip to its target (expo-out via CSS)
+    document.querySelectorAll('.strip').forEach(function(s){
+      s.style.transform = 'translateY(' + (-parseInt(s.dataset.to,10)) + 'em)';
+    });
+    // comparison bar
+    setTimeout(function(){
+      document.querySelectorAll('#cmp .bar i').forEach(function(i){ i.style.width = i.dataset.w + '%'; });
+    }, reduce ? 0 : 900);
+  }
+  // wait for the font so digit metrics are right, but never longer than 600 ms
+  var go = false; function once(){ if(!go){ go = true; requestAnimationFrame(function(){ requestAnimationFrame(start); }); } }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(once);
+  setTimeout(once, 600);
+
+  // scroll reveal (AaltoAir-style IntersectionObserver)
+  var els = document.querySelectorAll('.rv');
+  if (reduce || !('IntersectionObserver' in window)) { els.forEach(function(e){ e.classList.add('in'); }); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var el = en.target;
+      // stagger siblings that enter together
+      var sibs = Array.prototype.filter.call(el.parentNode.children, function(c){ return c.classList.contains('rv'); });
+      var idx = Math.max(0, sibs.indexOf(el));
+      el.style.transitionDelay = Math.min(idx, 5) * 0.1 + 's';
+      el.classList.add('in');
+      io.unobserve(el);
+    });
+  }, {rootMargin:'0px 0px -8% 0px', threshold:0.12});
+  els.forEach(function(e){ io.observe(e); });
+})();
+</script>
+</body>
+</html>

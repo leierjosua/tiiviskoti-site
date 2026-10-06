@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/logo-vihrea.svg">
+<title>TiivisKoti — v01 Aalto clean</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7F3; --alt:#ECF0E9; --card:#FFFFFF;
+  --ink:#183A28; --text:#4A544D; --mute:#7B857D;
+  --green:#217A4E; --green-d:#1A6340; --green-l:#2E9E63; --green-soft:#E4F0E9; --mint:#8FD3AC;
+  --deep:#163A28; --deep2:#1E4A34; --line:#E4E8E0; --star:#FBBF24;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --r:20px;
+  --shadow:0 1px 2px rgba(22,58,40,.04),0 8px 24px -8px rgba(22,58,40,.10);
+  --shadow-h:0 2px 4px rgba(22,58,40,.05),0 20px 40px -12px rgba(22,58,40,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+h1,h2,h3{color:var(--ink);font-weight:800;letter-spacing:-.025em;line-height:1.1}
+h2{font-size:clamp(30px,3.6vw,44px)}
+h3{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.lead{font-size:18px;color:var(--text);max-width:560px}
+.center{text-align:center}
+.center .lead{margin:16px auto 0}
+
+/* ---------- buttons ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 28px;border-radius:999px;font-weight:700;font-size:16px;transition:transform .5s var(--ease),background .3s,box-shadow .5s var(--ease);overflow:hidden;white-space:nowrap}
+.btn svg{transition:transform .5s var(--ease)}
+.btn:hover svg{transform:translateX(4px)}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 10px 30px -10px rgba(33,122,78,.7)}
+.btn-primary:hover{background:var(--green-d);transform:translateY(-2px)}
+.btn-primary::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:ar-glint 5s var(--ease) 2.2s infinite}
+@keyframes ar-glint{0%{left:-60%}22%,100%{left:130%}}
+.btn-glass{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#fff;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.btn-glass:hover{background:rgba(255,255,255,.16);transform:translateY(-2px)}
+.btn-ghost{border:1.5px solid var(--line);color:var(--ink);background:#fff}
+.btn-ghost:hover{border-color:var(--green);transform:translateY(-2px)}
+
+/* ---------- nav ---------- */
+.nav{position:absolute;top:0;left:0;right:0;z-index:20}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:84px}
+.nav img{height:34px;width:auto}
+.nav-links{display:flex;gap:32px;font-weight:600;font-size:15px;color:rgba(255,255,255,.82)}
+.nav-links a:hover{color:#fff}
+.nav-cta{min-height:44px;padding:0 20px;font-size:15px}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:100svh;min-height:760px;display:flex;align-items:center;justify-content:center;color:#fff;overflow:hidden;background:var(--deep)}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 62%;transform:scale(1.06);animation:hero-zoom 2.4s var(--ease) forwards}
+@keyframes hero-zoom{to{transform:scale(1)}}
+.hero-tint{position:absolute;inset:0;background:rgba(22,58,40,.38)}
+.hero-radial{position:absolute;inset:0;background:radial-gradient(ellipse 62% 55% at 50% 47%,rgba(16,44,30,.72) 0%,rgba(16,44,30,.42) 55%,rgba(16,44,30,.12) 100%)}
+.hero-fade{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(to bottom,transparent,rgba(22,58,40,.85))}
+.hero-inner{position:relative;z-index:2;text-align:center;padding:140px 24px 170px;max-width:980px}
+.pill{display:inline-flex;align-items:center;gap:12px;padding:9px 18px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:14px;font-weight:600}
+.stars{display:inline-flex;gap:2px}
+.stars svg{width:15px;height:15px;fill:var(--star)}
+.pill .sep{width:1px;height:16px;background:rgba(255,255,255,.28)}
+.pill .muted{color:rgba(255,255,255,.75);font-weight:500}
+.hero h1{font-size:clamp(46px,7.4vw,96px);color:#fff;margin:28px 0 22px;letter-spacing:-.04em;line-height:1.02}
+.hero h1 span{display:block}
+.hero h1 em{font-style:normal;color:var(--mint)}
+.hero p.sub{font-size:clamp(17px,1.5vw,20px);color:rgba(255,255,255,.86);max-width:600px;margin:0 auto;font-weight:500}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:36px}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:760px;margin:56px auto 0}
+.stat{padding:20px 18px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);text-align:center}
+.stat b{display:block;font-size:clamp(22px,2.4vw,30px);font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.15;white-space:nowrap}
+.stat small{display:block;font-size:13.5px;color:rgba(255,255,255,.72);margin-top:4px;font-weight:500}
+
+/* stagger entrance */
+.in{opacity:0;transform:translateY(26px);animation:slide-up .8s var(--ease) forwards}
+@keyframes slide-up{to{opacity:1;transform:none}}
+.d1{animation-delay:.2s}.d2{animation-delay:.35s}.d3{animation-delay:.55s}.d4{animation-delay:.75s}.d5{animation-delay:.9s}.d6{animation-delay:1.05s}.d7{animation-delay:1.2s}
+.nav.in{transform:translateY(-12px)}
+
+.wave{position:absolute;left:0;right:0;bottom:-1px;z-index:3;line-height:0}
+.wave svg{width:100%;height:90px;display:block}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.on{opacity:1;transform:none}
+.rv-d1{transition-delay:.08s}.rv-d2{transition-delay:.16s}.rv-d3{transition-delay:.24s}
+
+section{padding:112px 0}
+.sec-head{margin-bottom:56px}
+
+/* ---------- services ---------- */
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.svc{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);transition:transform .6s var(--ease),box-shadow .6s var(--ease);display:flex;flex-direction:column}
+.svc:hover{transform:translateY(-6px);box-shadow:var(--shadow-h)}
+.svc-img{position:relative;aspect-ratio:4/3;overflow:hidden}
+.svc-img img{width:100%;height:100%;object-fit:cover;transition:transform 1s var(--ease)}
+.svc:hover .svc-img img{transform:scale(1.05)}
+.badge{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);color:var(--ink);font-weight:800;font-size:15px;padding:8px 14px;border-radius:999px;box-shadow:0 6px 18px -6px rgba(0,0,0,.25)}
+.badge small{font-weight:600;color:var(--mute);font-size:12.5px}
+.svc-body{padding:26px 26px 28px;display:flex;flex-direction:column;flex:1}
+.svc-body p{margin:10px 0 18px;font-size:15.5px}
+.svc-body ul{list-style:none;display:grid;gap:8px;font-size:15px;margin-bottom:22px}
+.svc-body li{display:flex;gap:10px;align-items:flex-start}
+.svc-body li::before{content:"";flex:none;width:18px;height:18px;margin-top:3px;border-radius:50%;background:var(--green-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 10.5l2.5 2.5L14 7.5' fill='none' stroke='%23217A4E' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat}
+.svc-link{margin-top:auto;font-weight:700;color:var(--green);display:inline-flex;gap:8px;align-items:center;min-height:44px}
+.svc-link svg{transition:transform .5s var(--ease)}
+.svc:hover .svc-link svg{transform:translateX(4px)}
+.price-note{margin-top:28px;text-align:center;font-size:15px;color:var(--mute)}
+
+/* ---------- why ---------- */
+.why{background:var(--card)}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.why-img{position:relative;border-radius:24px;overflow:hidden;aspect-ratio:4/5;box-shadow:var(--shadow-h)}
+.why-img img{width:100%;height:100%;object-fit:cover}
+.why-float{position:absolute;left:20px;bottom:20px;right:20px;display:flex;gap:14px;align-items:center;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px)}
+.why-float .ic{flex:none;width:44px;height:44px;border-radius:12px;background:var(--green);display:grid;place-items:center}
+.why-float b{display:block;color:var(--ink);font-size:15.5px}
+.why-float span{font-size:14px;color:var(--mute)}
+.why-list{display:grid;gap:26px;margin-top:36px}
+.why-item{display:flex;gap:18px}
+.why-item .ic{flex:none;width:48px;height:48px;border-radius:14px;background:var(--green-soft);display:grid;place-items:center}
+.why-item p{font-size:15.5px;margin-top:4px}
+
+/* ---------- stats band ---------- */
+.band{background:var(--deep);color:#fff;padding:84px 0;position:relative;overflow:hidden}
+.band::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 120% at 80% 0%,rgba(143,211,172,.12),transparent 60%)}
+.band-grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.band-item{text-align:center;padding:8px 12px;border-left:1px solid rgba(255,255,255,.1)}
+.band-item:first-child{border-left:0}
+.band-item b{display:block;font-size:clamp(34px,3.8vw,50px);font-weight:800;letter-spacing:-.03em;line-height:1.1;color:#fff}
+.band-item b em{font-style:normal;color:var(--mint)}
+.band-item span{display:block;margin-top:8px;font-size:15px;color:rgba(255,255,255,.7)}
+
+/* ---------- reviews ---------- */
+.rev-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:44px;flex-wrap:wrap}
+.g-score{display:flex;align-items:center;gap:14px;padding:14px 20px;background:#fff;border-radius:16px;box-shadow:var(--shadow)}
+.g-score b{font-size:28px;color:var(--ink);font-weight:800}
+.g-score small{display:block;font-size:13px;color:var(--mute)}
+.carousel{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 24px 28px;margin:0 -24px;scrollbar-width:none;cursor:grab;-webkit-overflow-scrolling:touch}
+.carousel::-webkit-scrollbar{display:none}
+.carousel.drag{cursor:grabbing;scroll-snap-type:none}
+.carousel.hint .rev{animation:drag-hint 1.6s var(--ease) .3s 1}
+@keyframes drag-hint{0%,100%{transform:none}40%{transform:translateX(-44px)}}
+.rev{flex:0 0 min(380px,84vw);scroll-snap-align:start;background:#fff;border-radius:var(--r);padding:28px;box-shadow:var(--shadow);display:flex;flex-direction:column;user-select:none}
+.rev .top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;font-size:16px;flex:none}
+.rev .who b{display:block;color:var(--ink);font-size:15.5px}
+.rev .who small{font-size:13px;color:var(--mute)}
+.rev .g{margin-left:auto}
+.rev q{quotes:none;font-size:16px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.rev.open q{-webkit-line-clamp:unset}
+.rev .more{margin-top:auto;padding-top:14px;font-weight:700;font-size:14px;color:var(--green);background:none;border:0;font-family:inherit;cursor:pointer;text-align:left;min-height:44px}
+.rev .stars{margin-bottom:12px}
+.drag-tip{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mute);font-weight:600}
+
+/* ---------- CTA ---------- */
+.cta-wrap{position:relative;background:var(--deep);color:#fff;padding:40px 0 0;margin-top:0}
+.cta-wave{position:relative;line-height:0;background:var(--bg)}
+.cta-wave svg{width:100%;height:90px;display:block}
+.cta{padding:56px 0 96px;text-align:center;position:relative}
+.cta::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 50% 70% at 50% 40%,rgba(46,158,99,.22),transparent 70%);pointer-events:none}
+.cta h2{color:#fff;font-size:clamp(34px,4.6vw,58px);position:relative}
+.cta h2 em{font-style:normal;color:var(--mint)}
+.cta p{color:rgba(255,255,255,.78);max-width:560px;margin:18px auto 0;font-size:18px;position:relative}
+.cta .hero-btns{position:relative}
+.cta-ring{position:relative;display:inline-flex}
+.cta-ring::before{content:"";position:absolute;inset:0;border-radius:999px;box-shadow:0 0 0 0 rgba(143,211,172,.5);animation:ar-attention 2.6s var(--ease) 1.5s infinite}
+@keyframes ar-attention{0%{box-shadow:0 0 0 0 rgba(143,211,172,.45)}70%,100%{box-shadow:0 0 0 16px rgba(143,211,172,0)}}
+.footer{border-top:1px solid rgba(255,255,255,.1);padding:40px 0 48px;font-size:14.5px;color:rgba(255,255,255,.6)}
+.footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.footer img{height:28px;width:auto}
+.footer nav{display:flex;gap:24px;flex-wrap:wrap}
+.footer a:hover{color:#fff}
+
+/* ---------- responsive ---------- */
+@media (max-width:960px){
+  .services{grid-template-columns:1fr 1fr}
+  .services .svc:last-child{grid-column:1/-1}
+  .why-grid{grid-template-columns:1fr;gap:48px}
+  .why-img{aspect-ratio:4/3.4}
+  .band-grid{grid-template-columns:1fr 1fr;row-gap:40px}
+  .band-item:nth-child(3){border-left:0}
+  .nav-links{display:none}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  section{padding:80px 0}
+  .wrap{padding:0 20px}
+  .nav .wrap{height:72px}
+  .nav img{height:28px}
+  .hero{min-height:0}
+  .hero-inner{padding:118px 20px 120px}
+  .hero h1{margin:22px 0 18px}
+  .hero-btns{flex-direction:column;align-items:stretch;max-width:340px;margin-left:auto;margin-right:auto}
+  .hero-stats{grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:40px}
+  .stat{padding:14px 6px;border-radius:14px}
+  .stat b{font-size:18px}
+  .stat small{font-size:11.5px;line-height:1.35}
+  .pill{font-size:13px;gap:9px;padding:8px 14px}
+  .services{grid-template-columns:1fr}
+  .wave svg,.cta-wave svg{height:48px}
+  .sec-head{margin-bottom:40px}
+  .footer .wrap{flex-direction:column;align-items:flex-start}
+  .cta .hero-btns{flex-direction:column;align-items:stretch}
+  .cta-ring .btn{width:100%}
+  .band-item span{font-size:14px}
+  .carousel{margin:0 -20px;padding:8px 20px 28px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .in,.rv{opacity:1!important;transform:none!important}
+  .hero-img{transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="star" viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></symbol>
+  <symbol id="arrow" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="g" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2-1.9 3.2-4.7 3.2-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.8 0-5.2-1.9-6.1-4.5H2.2v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.9 14.2a6.6 6.6 0 0 1 0-4.3V7.1H2.2a11 11 0 0 0 0 9.9z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3 .6 4.1 1.6l3.1-3.1A11 11 0 0 0 2.2 7.1l3.7 2.8C6.8 7.3 9.2 5.4 12 5.4z"/></symbol>
+</svg>
+
+<header class="hero">
+  <img class="hero-img" src="assets/hero-entrance.webp" alt="Kaksi TiivisKodin asentajaa puutalon edessä työkalujen kanssa" fetchpriority="high">
+  <div class="hero-tint"></div>
+  <div class="hero-radial"></div>
+  <div class="hero-fade"></div>
+
+  <nav class="nav in d1">
+    <div class="wrap">
+      <a href="#" aria-label="TiivisKoti etusivu"><img src="assets/logo-valkoinen.svg" alt="TiivisKoti"></a>
+      <div class="nav-links">
+        <a href="#palvelut">Palvelut</a>
+        <a href="#miksi">Miksi me</a>
+        <a href="#arvostelut">Arvostelut</a>
+        <a href="tel:+358458755996">045 875 5996</a>
+      </div>
+      <a class="btn btn-glass nav-cta" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a>
+    </div>
+  </nav>
+
+  <div class="hero-inner">
+    <div class="pill in d1">
+      <span class="stars" aria-hidden="true"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span>
+      <span>5,0</span><span class="sep"></span><span class="muted">12 Google-arvostelua</span>
+    </div>
+    <h1>
+      <span class="in d2">Kylmä veto</span>
+      <span class="in d3">ei kuulu <em>kotiin.</em></span>
+    </h1>
+    <p class="sub in d4">Vaihdamme ovien ja ikkunoiden tiivisteet kiinteään hintaan. Oma porukka, yksi käynti. Uusimaa ja Riihimäki.</p>
+    <div class="hero-btns in d5">
+      <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Varaa aika <svg width="18" height="18"><use href="#arrow"/></svg></a>
+      <a class="btn btn-glass" href="#palvelut">Katso hinnat</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat in d5"><b>75–90 €</b><small>/ ikkuna</small></div>
+      <div class="stat in d6"><b>&lt; 1 min</b><small>ajanvaraus</small></div>
+      <div class="stat in d7"><b>−40 %</b><small>kotitalous&shy;vähennys</small></div>
+    </div>
+  </div>
+
+  <div class="wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 90" preserveAspectRatio="none"><path d="M0 52 C 240 92 480 92 720 58 C 960 24 1200 20 1440 50 L1440 90 L0 90 Z" fill="#F6F7F3"/></svg>
+  </div>
+</header>
+
+<main>
+<section id="palvelut">
+  <div class="wrap">
+    <div class="sec-head center rv">
+      <span class="eyebrow">Palvelut ja hinnat</span>
+      <h2>Kiinteä hinta. Näet sen heti.</h2>
+      <p class="lead">Ei tarjouspyyntöjä eikä odottelua. Lämpökamerakuvaus ennen työtä veloituksetta.</p>
+    </div>
+    <div class="services">
+      <article class="svc rv rv-d1">
+        <div class="svc-img"><img src="assets/ikkunat.webp" alt="Valkoinen ikkuna harmaassa puutalossa" loading="lazy"><span class="badge">75–90 € <small>/ ikkuna</small></span></div>
+        <div class="svc-body">
+          <h3>Ikkunoiden tiivistys</h3>
+          <p>Karmi- ja puitetiivisteet uusiksi. Mitä enemmän ikkunoita, sitä edullisempi kappalehinta.</p>
+          <ul><li>Säätö ja öljyäminen kuuluvat hintaan</li><li>90 € → 75 € / ikkuna määrän mukaan</li></ul>
+          <a class="svc-link" href="https://tiiviskoti.fi/varaa.html">Varaa ikkunat <svg width="18" height="18"><use href="#arrow"/></svg></a>
+        </div>
+      </article>
+      <article class="svc rv rv-d2">
+        <div class="svc-img"><img src="assets/ulko-ovet.webp" alt="Ulko-ovi" loading="lazy"><span class="badge">99 € <small>/ ovi</small></span></div>
+        <div class="svc-body">
+          <h3>Ulko-oven tiivistys</h3>
+          <p>Ovi, joka sulkeutuu kevyesti eikä päästä vetoa sisään.</p>
+          <ul><li>Tiivisteiden vaihto</li><li>Lukkojen ja saranoiden öljyäminen</li><li>Oven säätö</li></ul>
+          <a class="svc-link" href="https://tiiviskoti.fi/varaa.html">Varaa ovi <svg width="18" height="18"><use href="#arrow"/></svg></a>
+        </div>
+      </article>
+      <article class="svc rv rv-d3">
+        <div class="svc-img"><img src="assets/taloyhtiot.webp" alt="Kerrostalo" loading="lazy"><span class="badge">Maksuton <small>kartoitus</small></span></div>
+        <div class="svc-body">
+          <h3>Taloyhtiöille</h3>
+          <p>Tulemme katsomaan kohteen ja teemme kirjallisen tarjouksen hallitukselle.</p>
+          <ul><li>Maksuton kartoituskäynti</li><li>Kirjallinen tarjous hallitukselle</li></ul>
+          <a class="svc-link" href="https://tiiviskoti.fi/varaa.html">Varaa kartoitus <svg width="18" height="18"><use href="#arrow"/></svg></a>
+        </div>
+      </article>
+    </div>
+    <p class="price-note rv">Liuku- ja pariovi 149 € · väli- ja huoneovi 89 € · pienin käynti 149 € sisältää käynnin, matkat ja lämpökamerakuvauksen.</p>
+  </div>
+</section>
+
+<section class="why" id="miksi">
+  <div class="wrap why-grid">
+    <div class="why-img rv">
+      <img src="assets/miksi-tyo.webp" alt="TiivisKodin asentaja kävelee kohteeseen työkalujen kanssa" loading="lazy">
+      <div class="why-float">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
+        <div><b>Oma porukka, ei alihankintaa</b><span>Samat tekijät alusta loppuun</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="rv"><span class="eyebrow">Miksi TiivisKoti</span>
+      <h2>Veto kuriin,<br>lämpö kotiin.</h2>
+      <p class="lead" style="margin-top:18px">Vetävä ovi tai ikkuna nostaa lämmityskuluja tyypillisesti 10–15 %. Uusi ikkuna maksaisi noin 1 200 €. Tiivisteiden vaihto maksaa siitä murto-osan.</p></div>
+      <div class="why-list">
+        <div class="why-item rv rv-d1"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#217A4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><h3>Varaat alle minuutissa</h3><p>Näet hinnan heti laskurista ja valitset vapaan ajan verkosta.</p></div></div>
+        <div class="why-item rv rv-d2"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#217A4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span><div><h3>Lämpökamera ennen työtä</h3><p>Näytämme, mistä veto tulee. Kuvaus veloituksetta.</p></div></div>
+        <div class="why-item rv rv-d3"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#217A4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><div><h3>Valmista yhdellä käynnillä</h3><p>Tiivisteet, säätö ja öljyäminen samalla kertaa.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="band">
+  <div class="wrap band-grid">
+    <div class="band-item rv"><b>5,0<em>★</em></b><span>Google-arvio, 12 arvostelua</span></div>
+    <div class="band-item rv rv-d1"><b>Kiinteä</b><span>hinta ennen työtä</span></div>
+    <div class="band-item rv rv-d2"><b>40 %</b><span>kotitalousvähennys</span></div>
+    <div class="band-item rv rv-d3"><b>1</b><span>käynti, työ valmis</span></div>
+  </div>
+</div>
+
+<section id="arvostelut">
+  <div class="wrap">
+    <div class="rev-head rv">
+      <div><span class="eyebrow">Arvostelut</span><h2>Mitä asiakkaat sanovat</h2></div>
+      <div class="g-score"><svg width="30" height="30"><use href="#g"/></svg><div><b>5,0</b> <span class="stars" aria-label="5 tähteä"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><small>12 arvostelua Googlessa</small></div></div>
+    </div>
+    <div class="carousel rv" id="carousel">
+      <article class="rev"><div class="top"><span class="avatar" style="background:#217A4E">M</span><div class="who"><b>Marjut S.</b><small>Google-arvostelu</small></div><svg class="g" width="20" height="20"><use href="#g"/></svg></div><span class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><q>Lopputulos vaikuttaa hyvältä. Ikkunoita on paljon ja tiivistys vei koko päivän kahdelta tekijältä. Pari juttua oli korjattava ja nekin hoituivat nopeasti ilman viivettä. Reippaita ja aikaansaavia tekijöitä.</q><button class="more" type="button">Lue lisää</button></article>
+      <article class="rev"><div class="top"><span class="avatar" style="background:#1E4A34">E</span><div class="who"><b>Edwin T.</b><small>Google-arvostelu</small></div><svg class="g" width="20" height="20"><use href="#g"/></svg></div><span class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><q>Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta. Vahva suositus.</q></article>
+      <article class="rev"><div class="top"><span class="avatar" style="background:#2E9E63">G</span><div class="who"><b>Gunvor v. W.</b><small>Google-arvostelu</small></div><svg class="g" width="20" height="20"><use href="#g"/></svg></div><span class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><q>Thank you for professional and fast service. The reservation was easy to make online!</q></article>
+      <article class="rev"><div class="top"><span class="avatar" style="background:#1A6340">L</span><div class="who"><b>Lilja S.</b><small>Google-arvostelu</small></div><svg class="g" width="20" height="20"><use href="#g"/></svg></div><span class="stars"><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg><svg><use href="#star"/></svg></span><q>Pojat tekivät työnsä ammattitaidolla 👍</q></article>
+    </div>
+    <div class="drag-tip rv"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 12h12m-4-4 4 4-4 4M4 8v8"/></svg>Vedä nähdäksesi lisää</div>
+  </div>
+</section>
+</main>
+
+<div class="cta-wave" aria-hidden="true">
+  <svg viewBox="0 0 1440 90" preserveAspectRatio="none"><path d="M0 40 C 260 0 520 4 760 36 C 1000 68 1220 76 1440 44 L1440 90 L0 90 Z" fill="#163A28"/></svg>
+</div>
+<footer class="cta-wrap">
+  <div class="cta">
+    <div class="wrap">
+      <h2 class="rv">Varaa aika <em>ennen pakkasia.</em></h2>
+      <p class="rv rv-d1">Valitse vapaa aika verkosta. Näet hinnan ennen kuin varaat.</p>
+      <div class="hero-btns rv rv-d2">
+        <span class="cta-ring"><a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Varaa aika <svg width="18" height="18"><use href="#arrow"/></svg></a></span>
+        <a class="btn btn-glass" href="tel:+358458755996">Soita 045 875 5996</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="wrap">
+      <img src="assets/logo-valkoinen.svg" alt="TiivisKoti">
+      <nav><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><a href="tel:+358458755996">045 875 5996</a><span>Uusimaa ja Riihimäki</span></nav>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els = document.querySelectorAll('.rv');
+  if (reduce || !('IntersectionObserver' in window)) { els.forEach(function(e){e.classList.add('on')}); }
+  else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('on'); io.unobserve(en.target);} });
+    },{threshold:.12, rootMargin:'0px 0px -40px 0px'});
+    els.forEach(function(e){ io.observe(e); });
+  }
+  // carousel: drag + one-time drag-hint
+  var c = document.getElementById('carousel');
+  if (!reduce) {
+    var hio = new IntersectionObserver(function(en){ if(en[0].isIntersecting){ setTimeout(function(){c.classList.add('hint')},500); hio.disconnect(); } },{threshold:.6});
+    hio.observe(c);
+  }
+  var down=false,sx=0,sl=0,moved=false;
+  c.addEventListener('pointerdown',function(e){ if(e.pointerType!=='mouse')return; down=true;moved=false;sx=e.clientX;sl=c.scrollLeft;c.classList.add('drag'); });
+  window.addEventListener('pointermove',function(e){ if(!down)return; var dx=e.clientX-sx; if(Math.abs(dx)>3)moved=true; c.scrollLeft=sl-dx; });
+  window.addEventListener('pointerup',function(){ if(!down)return; down=false;c.classList.remove('drag'); });
+  c.addEventListener('click',function(e){ if(moved){e.preventDefault();e.stopPropagation();} },true);
+  document.querySelectorAll('.rev .more').forEach(function(b){
+    b.addEventListener('click',function(){ var r=b.closest('.rev'); r.classList.toggle('open'); b.textContent=r.classList.contains('open')?'Näytä vähemmän':'Lue lisää'; });
+  });
+})();
+</script>
+</body>
+</html>

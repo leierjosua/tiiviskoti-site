@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>TiivisKoti — v08 Oma porukka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7F3; --alt:#ECF0E9; --card:#FFFFFF;
+  --ink:#183A28; --text:#4A544D; --mute:#7B857D;
+  --green:#217A4E; --green-d:#1A6340; --green-l:#2E9E63; --green-soft:#E4F0E9; --mint:#8FD3AC;
+  --deep:#163A28; --deep2:#1E4A34; --line:#E4E8E0; --star:#FBBF24;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --wrap:1200px;
+}
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:Manrope,system-ui,sans-serif;font-size:17px;line-height:1.6;font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+h1,h2,h3{color:var(--ink);font-weight:800;letter-spacing:-0.025em;line-height:1.08}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;font-weight:700;font-size:16px;transition:transform .5s var(--ease),background .3s,border-color .3s,box-shadow .5s var(--ease);overflow:hidden;white-space:nowrap}
+.btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 10px 28px -12px rgba(33,122,78,.7)}
+.btn-primary:hover{background:var(--green-l);transform:translateY(-2px)}
+.btn-glass{color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.btn-glass:hover{background:rgba(255,255,255,.18)}
+.btn-ghost{color:var(--ink);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--ink)}
+.glint::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.4) 50%,transparent 65%);transform:translateX(-120%);animation:ar-glint 5s var(--ease) 2.2s infinite}
+@keyframes ar-glint{0%{transform:translateX(-120%)}30%,100%{transform:translateX(120%)}}
+
+/* ---------- header ---------- */
+.top{position:fixed;top:0;left:0;right:0;z-index:30;transition:background .5s var(--ease),border-color .5s,backdrop-filter .5s;border-bottom:1px solid transparent}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:76px}
+.top .logo{position:relative;height:26px;width:118px}
+.top .logo img{position:absolute;left:0;top:0;height:26px;width:auto;transition:opacity .4s}
+.top .logo .lg{opacity:0}
+.top nav{display:flex;align-items:center;gap:26px;font-size:15px;font-weight:600;color:#fff;transition:color .4s}
+.top nav .l{opacity:.85}
+.top nav .l:hover{opacity:1}
+.top .btn{min-height:44px;padding:0 20px;font-size:15px}
+.top.solid{background:rgba(246,247,243,.86);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom-color:var(--line)}
+.top.solid nav{color:var(--ink)}
+.top.solid .logo .lw{opacity:0}
+.top.solid .logo .lg{opacity:1}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:flex-end;color:#fff;overflow:hidden;background:var(--deep)}
+.hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%;transform:scale(1.06);transition:transform 2.4s var(--ease)}
+.loaded .hero>img{transform:scale(1)}
+.hero .tint{position:absolute;inset:0;background:rgba(22,58,40,.26)}
+.hero .rad{position:absolute;inset:0;background:radial-gradient(90% 70% at 22% 92%,rgba(14,38,26,.82) 0%,rgba(14,38,26,.45) 45%,transparent 75%),linear-gradient(180deg,rgba(14,38,26,.45) 0%,transparent 18%,transparent 45%,rgba(14,38,26,.75) 100%)}
+.hero .wrap{position:relative;width:100%;padding-top:140px;padding-bottom:116px}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font-size:14px;font-weight:600}
+.stars{display:inline-flex;gap:2px}
+.stars svg{width:15px;height:15px;fill:var(--star)}
+.pill .sep{width:1px;height:16px;background:rgba(255,255,255,.25)}
+.pill .m{opacity:.85;font-weight:500}
+.hero h1{color:#fff;font-size:clamp(40px,5.2vw,72px);max-width:860px;margin-top:26px;letter-spacing:-0.035em;text-wrap:balance}
+.hero h1 span{color:var(--mint)}
+.hero p.sub{margin-top:22px;font-size:19px;max-width:560px;color:rgba(255,255,255,.86)}
+.hero .acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:70px;display:block}
+
+.st{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.loaded .st{opacity:1;transform:none}
+.loaded .s1{transition-delay:.2s}.loaded .s2{transition-delay:.35s}.loaded .s3{transition-delay:.55s}.loaded .s4{transition-delay:.75s}.loaded .s5{transition-delay:.9s}
+
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+
+section.sec{padding:120px 0}
+.head{max-width:660px;margin-bottom:56px}
+.head h2{font-size:clamp(34px,4.4vw,52px);margin-top:14px}
+.head p{margin-top:16px;font-size:18px}
+
+/* ---------- team ---------- */
+.team .head{display:flex;justify-content:space-between;align-items:flex-end;max-width:none;gap:32px;flex-wrap:wrap}
+.team .head>div{max-width:620px}
+.team .head .facts{display:flex;gap:10px;flex-wrap:wrap}
+.fact{padding:8px 14px;border-radius:999px;background:var(--green-soft);color:var(--green-d);font-size:14px;font-weight:700}
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;align-items:start}
+.pc{transition-property:opacity,transform}
+.pc:nth-child(even){margin-top:44px}
+.pc .ph{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:4/5;background:var(--alt);box-shadow:0 24px 40px -28px rgba(24,58,40,.45)}
+.pc .ph img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s var(--ease),filter 1.1s var(--ease);filter:saturate(.92)}
+.pc .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(22,58,40,.35));opacity:0;transition:opacity .8s var(--ease)}
+.pc:hover .ph img{transform:scale(1.05);filter:saturate(1.05)}
+.pc:hover .ph::after{opacity:1}
+.pc .nm{margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:18px;font-weight:700;color:var(--ink)}
+.pc .nm i{width:8px;height:8px;border-radius:50%;background:var(--green-l);transform:scale(0);transition:transform .6s var(--ease)}
+.pc:hover .nm i{transform:scale(1)}
+.team .note{margin-top:56px;display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:stretch}
+.team .note .q{border-radius:24px;overflow:hidden;position:relative;min-height:260px}
+.team .note .q img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.team .note .t{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:36px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.team .note .t h3{font-size:26px}
+
+/* ---------- reviews marquee ---------- */
+.revs{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+.revs .top2{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:48px}
+.revs h2{font-size:clamp(34px,4.4vw,52px);margin-top:14px}
+.score{display:flex;align-items:center;gap:14px}
+.score .big{font-size:56px;font-weight:800;color:var(--ink);letter-spacing:-0.04em;line-height:1}
+.score .stars svg{width:18px;height:18px}
+.score small{display:block;font-size:14px;color:var(--mute);margin-top:4px}
+.marquee{position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.track{display:flex;width:max-content;animation:mq 46s linear infinite}
+.marquee:hover .track,.marquee:focus-within .track{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-50%)}}
+.set{display:flex}
+.rc{width:400px;margin-right:20px;background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:30px;display:flex;flex-direction:column;gap:18px;transition:transform .6s var(--ease),box-shadow .6s var(--ease),background .4s}
+.rc:hover{transform:translateY(-4px);background:#fff;box-shadow:0 22px 44px -26px rgba(24,58,40,.35)}
+.rc q{quotes:none;color:var(--ink);font-size:17px;line-height:1.6;flex:1}
+.rc .stars svg{width:14px;height:14px}
+.who{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:700;color:var(--ink)}
+.av{width:40px;height:40px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800}
+.who small{display:block;font-weight:500;color:var(--mute);font-size:13px}
+.g{margin-left:auto;width:20px;height:20px}
+
+/* ---------- services ---------- */
+.svc .wrap{display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:start}
+.plist{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:8px 32px}
+.pr{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:24px 0;border-top:1px solid var(--line)}
+.pr:first-child{border-top:0}
+.pr h3{font-size:19px;letter-spacing:-0.01em}
+.pr p{font-size:15px;color:var(--mute);margin-top:4px}
+.pr .v{font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-0.03em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pr .v small{font-size:14px;color:var(--mute);font-weight:600;letter-spacing:0}
+.side{display:grid;gap:16px}
+.mini{border-radius:20px;padding:24px;background:var(--alt);font-size:15px}
+.mini b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+/* AaltoAir border-rotate */
+.rot{position:relative;border-radius:22px;padding:2px;background:conic-gradient(from var(--a),var(--line) 0 60%,var(--mint) 75%,var(--green) 85%,var(--line) 100%);animation:border-rotate 6s linear infinite}
+.rot>div{border-radius:20px;background:var(--card);padding:26px}
+.rot b{display:block;color:var(--ink);font-size:19px;margin-bottom:6px}
+.rot p{font-size:15px}
+.rot a{display:inline-block;margin-top:14px;font-weight:700;color:var(--green)}
+@keyframes border-rotate{to{--a:360deg}}
+
+/* ---------- timeline ---------- */
+.steps{background:var(--alt)}
+.tl{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:40px;--p:0}
+.tl .rail{position:absolute;left:24px;right:calc(33.333% - 24px);top:23px;height:2px;background:#D3DBD0;border-radius:2px;overflow:hidden}
+.tl .fill{position:absolute;inset:0;background:var(--green);transform-origin:left center;transform:scaleX(var(--p))}
+.stp{position:relative}
+.stp .n{position:relative;z-index:1;width:48px;height:48px;border-radius:50%;background:var(--alt);border:2px solid #C9D3C6;color:var(--mute);display:grid;place-items:center;font-weight:800;font-size:17px;transition:background .6s var(--ease),border-color .6s var(--ease),color .6s var(--ease),transform .6s var(--ease)}
+.stp.on .n{background:var(--green);border-color:var(--green);color:#fff;transform:scale(1.06)}
+.stp h3{margin-top:28px;font-size:24px}
+.stp p{margin-top:10px;font-size:16px;max-width:320px}
+.stp .k{display:inline-block;margin-top:16px;font-size:13px;font-weight:700;color:var(--green-d);background:var(--green-soft);padding:5px 12px;border-radius:999px}
+
+/* ---------- cta ---------- */
+.cta{position:relative;background:var(--deep);color:#C8D6CC;overflow:hidden}
+.cta::before{content:"";position:absolute;inset:0;background:radial-gradient(55% 90% at 85% 10%,rgba(46,158,99,.3),transparent 70%)}
+.cta .wrap{position:relative;padding:130px 24px 120px;display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+.cta h2{color:#fff;font-size:clamp(38px,5vw,62px)}
+.cta p{margin-top:18px;font-size:18px;max-width:520px}
+.call{display:flex;align-items:center;gap:20px;padding:26px;border-radius:24px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);transition:background .4s}
+.call:hover{background:rgba(255,255,255,.1)}
+.ring{position:relative;flex:0 0 56px;height:56px;border-radius:50%;background:var(--green);display:grid;place-items:center}
+.ring svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ring::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--mint);animation:ar-attention 2.6s var(--ease) infinite}
+@keyframes ar-attention{0%{transform:scale(1);opacity:.8}70%,100%{transform:scale(1.6);opacity:0}}
+.call small{display:block;font-size:14px;color:#9FB5A6}
+.call strong{display:block;color:#fff;font-size:clamp(24px,2.6vw,32px);font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+.cta .acts{display:grid;gap:12px}
+.cta .acts .btn{width:100%}
+.cta .acts .mail{text-align:center;font-size:14px;color:#9FB5A6}
+
+footer{background:var(--deep);color:#9FB5A6;font-size:14px;border-top:1px solid rgba(255,255,255,.08)}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding-top:32px;padding-bottom:32px}
+footer img{height:22px;width:auto}
+footer a:hover{color:#fff}
+
+@media (max-width:980px){
+  .row{grid-template-columns:repeat(5,minmax(220px,1fr));overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -24px;padding:0 24px 12px;scrollbar-width:none}
+  .row::-webkit-scrollbar{display:none}
+  .pc{scroll-snap-align:start}
+  .pc:nth-child(even){margin-top:0}
+  .row.hint .pc:first-child{animation:drag-hint 1.6s var(--ease) .4s 1}
+  .team .note{grid-template-columns:1fr}
+  .svc .wrap{grid-template-columns:1fr}
+  .cta .wrap{grid-template-columns:1fr}
+}
+@keyframes drag-hint{0%,100%{transform:none}35%{transform:translateX(-26px)}}
+@media (max-width:760px){
+  .tl{grid-template-columns:1fr;gap:36px;padding-left:72px}
+  .tl .rail{left:23px;right:auto;top:24px;bottom:24px;width:2px;height:auto}
+  .tl .fill{transform-origin:center top;transform:scaleY(var(--p))}
+  .stp .n{position:absolute;left:-72px;top:0}
+  .stp h3{margin-top:8px}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 20px}
+  .row{margin:0 -20px;padding:0 20px 12px;grid-template-columns:repeat(5,72%)}
+  .top .wrap{height:64px}
+  .top nav .l{display:none}
+  .top .logo,.top .logo img{height:22px}
+  .hero .wrap{padding-top:120px;padding-bottom:110px}
+  .hero h1{font-size:clamp(34px,10vw,44px)}
+  .hero p.sub{font-size:17px}
+  .hero .acts .btn{flex:1 1 100%}
+  .pill{font-size:13px}
+  section.sec{padding:84px 0}
+  .rc{width:300px;padding:24px}
+  .plist{padding:4px 20px}
+  .pr .v{font-size:24px}
+  .team .note .t{padding:26px}
+  .cta .wrap{padding:96px 20px 84px}
+  .call{padding:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .st,.rv{opacity:1!important;transform:none!important}
+  .track{width:auto}
+  .set{flex-wrap:wrap;gap:16px;justify-content:center}
+  .set[aria-hidden]{display:none}
+  .marquee{-webkit-mask-image:none;mask-image:none;padding:0 20px}
+  .rc{margin-right:0;width:min(400px,100%)}
+  .tl{--p:1!important}
+  .stp .n{background:var(--green);border-color:var(--green);color:#fff}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="TiivisKoti etusivu">
+      <img class="lw" src="assets/logo-valkoinen.svg" alt="TiivisKoti">
+      <img class="lg" src="assets/logo-vihrea.svg" alt="" aria-hidden="true">
+    </a>
+    <nav>
+      <a class="l" href="#tiimi">Tiimi</a>
+      <a class="l" href="#hinnat">Hinnat</a>
+      <a class="l" href="#eteneminen">Näin työ etenee</a>
+      <a class="btn btn-primary" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="hero">
+  <img src="assets/tiimi-porukka.webp" alt="TiivisKodin viisi asentajaa työvälineineen omakotitalon pihalla" width="1650" height="928" fetchpriority="high">
+  <div class="tint"></div><div class="rad"></div>
+  <div class="wrap">
+    <a class="pill st s1" href="#arvostelut">
+      <span class="stars" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg></span>
+      5,0 <span class="sep"></span> <span class="m">12 arvostelua Googlessa</span>
+    </a>
+    <h1 class="st s2">Sama porukka vastaa puhelimeen, kartoittaa <span>ja asentaa.</span></h1>
+    <p class="sub st s3">Oma porukka, ei alihankintaa. Ovien ja ikkunoiden tiivisteet kiinteään hintaan Uusimaalla ja Riihimäellä.</p>
+    <div class="acts st s4">
+      <a class="btn btn-primary glint" href="https://tiiviskoti.fi/varaa.html">Varaa aika verkosta</a>
+      <a class="btn btn-glass" href="tel:+358458755996"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>045 875 5996</a>
+    </div>
+  </div>
+  <svg class="wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path fill="#F6F7F3" d="M0 40 C 240 70 480 8 720 30 C 960 52 1200 66 1440 24 L1440 70 L0 70 Z"/></svg>
+</section>
+
+<section class="sec team" id="tiimi">
+  <div class="wrap">
+    <div class="head rv">
+      <div>
+        <span class="eyebrow">Tiimi</span>
+        <h2>Nämä kasvot näet ovellasi.</h2>
+        <p>Emme välitä töitä eteenpäin. Sama tiimi, jonka kanssa sovit ajan, tulee paikalle ja tekee työn yhdellä käynnillä.</p>
+      </div>
+      <div class="facts"><span class="fact">Oma porukka</span><span class="fact">Ei alihankintaa</span><span class="fact">Työ yhdellä käynnillä</span></div>
+    </div>
+    <div class="row" id="row">
+      <figure class="pc rv"><div class="ph"><img src="assets/tiimi-akseli.webp" alt="Akseli" width="800" height="1000"></div><figcaption class="nm">Akseli<i></i></figcaption></figure>
+      <figure class="pc rv"><div class="ph"><img src="assets/tiimi-daniel.webp" alt="Daniel" width="800" height="1000"></div><figcaption class="nm">Daniel<i></i></figcaption></figure>
+      <figure class="pc rv"><div class="ph"><img src="assets/tiimi-eelis.webp" alt="Eelis" width="800" height="1000"></div><figcaption class="nm">Eelis<i></i></figcaption></figure>
+      <figure class="pc rv"><div class="ph"><img src="assets/tiimi-josua.webp" alt="Josua" width="800" height="1000"></div><figcaption class="nm">Josua<i></i></figcaption></figure>
+      <figure class="pc rv"><div class="ph"><img src="assets/tiimi-nestori.webp" alt="Nestori" width="800" height="1000"></div><figcaption class="nm">Nestori<i></i></figcaption></figure>
+    </div>
+    <div class="note">
+      <div class="q rv"><img src="assets/miksi-tyo.webp" alt="TiivisKodin asentaja työssä" loading="lazy"></div>
+      <div class="t rv">
+        <h3>Kylmä veto ei kuulu kotiin.</h3>
+        <p>Ennen työtä kuvaamme kohteen lämpökameralla veloituksetta, jotta näet itse, mistä vetää. Sen jälkeen vaihdamme tiivisteet, säädämme ja öljyämme — samalla käynnillä.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec revs" id="arvostelut">
+  <div class="wrap">
+    <div class="top2 rv">
+      <div><span class="eyebrow">Google-arvostelut</span><h2>Asiakkaiden sanoin.</h2></div>
+      <div class="score">
+        <span class="big">5,0</span>
+        <span><span class="stars" aria-label="5 tähteä"><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg></span><small>12 arvostelua Googlessa</small></span>
+      </div>
+    </div>
+  </div>
+  <div class="marquee rv" aria-label="Asiakasarvostelut">
+    <div class="track" id="track">
+      <div class="set" id="set"></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec svc" id="hinnat">
+  <div class="wrap">
+    <div>
+      <div class="head rv" style="margin-bottom:40px">
+        <span class="eyebrow">Palvelut ja hinnat</span>
+        <h2>Kiinteä hinta. Näet sen heti.</h2>
+        <p>Ei tarjouspyyntöjä. Laskuri näyttää hinnan ennen kuin varaat.</p>
+      </div>
+      <div class="plist rv">
+        <div class="pr"><div><h3>Ikkunan tiivistys</h3><p>Karmi- ja puitetiivisteet, säätö ja öljyäminen</p></div><div class="v">75–90 € <small>/ kpl</small></div></div>
+        <div class="pr"><div><h3>Ulko-ovi</h3><p>Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen, oven säätö</p></div><div class="v">99 €</div></div>
+        <div class="pr"><div><h3>Väli- tai huoneovi</h3><p>Kiinteä hinta ovelta</p></div><div class="v">89 €</div></div>
+        <div class="pr"><div><h3>Liuku- tai pariovi</h3><p>Kiinteä hinta ovelta</p></div><div class="v">149 €</div></div>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="mini rv"><b>Ikkunoissa määräalennus</b>90 € (1–4 kpl) · 85 € (5–9) · 80 € (10–13) · 75 € (14+)</div>
+      <div class="mini rv"><b>Kotitalousvähennys −40 %</b>Pienin käynti 149 € sisältää käynnin, matkat ja lämpökamerakuvauksen.</div>
+      <div class="rot rv"><div><b>Taloyhtiöille</b><p>Maksuton kartoituskäynti ja kirjallinen tarjous hallitukselle.</p><a href="tel:+358458755996">Soita 045 875 5996 →</a></div></div>
+    </aside>
+  </div>
+</section>
+
+<section class="sec steps" id="eteneminen">
+  <div class="wrap">
+    <div class="head rv">
+      <span class="eyebrow">Näin työ etenee</span>
+      <h2>Kolme vaihetta. Yksi porukka.</h2>
+    </div>
+    <div class="tl" id="tl">
+      <div class="rail" aria-hidden="true"><div class="fill"></div></div>
+      <div class="stp rv"><span class="n">1</span><h3>Varaat ajan</h3><p>Verkossa alle minuutissa. Näet hinnan heti laskurista — tai soitat, ja vastaamme itse.</p><span class="k">Ei tarjouspyyntöjä</span></div>
+      <div class="stp rv"><span class="n">2</span><h3>Kartoitamme</h3><p>Kuvaamme ovet ja ikkunat lämpökameralla ennen työtä, jotta veto näkyy.</p><span class="k">Veloituksetta</span></div>
+      <div class="stp rv"><span class="n">3</span><h3>Asennamme</h3><p>Uudet tiivisteet, säätö ja öljyäminen samalla käynnillä. Maksat sovitun kiinteän hinnan.</p><span class="k">Kotitalousvähennys −40 %</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="rv">
+      <h2>Veto kuriin,<br>lämpö kotiin.</h2>
+      <p>Soita, niin vastaamme itse. Tai varaa aika verkosta — se käy alle minuutissa.</p>
+    </div>
+    <div class="acts rv">
+      <a class="call" href="tel:+358458755996">
+        <span class="ring"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+        <span><small>Soita meille</small><strong>045 875 5996</strong></span>
+      </a>
+      <a class="btn btn-primary glint" href="https://tiiviskoti.fi/varaa.html">Varaa aika verkosta</a>
+      <span class="mail"><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a></span>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="assets/logo-valkoinen.svg" alt="TiivisKoti">
+    <span>Ovien ja ikkunoiden tiivistys · Uusimaa ja Riihimäki</span>
+    <span><a href="tel:+358458755996">045 875 5996</a> · <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- reviews (real Google reviews, verbatim) ----
+  var R = [
+    ['Marjut S.','Lopputulos vaikuttaa hyvältä. Ikkunoita on paljon ja tiivistys vei koko päivän kahdelta tekijältä. Pari juttua oli korjattava ja nekin hoituivat nopeasti ilman viivettä. Reippaita ja aikaansaavia tekijöitä.'],
+    ['Edwin T.','Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta. Vahva suositus.'],
+    ['Gunvor v. W.','Thank you for professional and fast service. The reservation was easy to make online!'],
+    ['Lilja S.','Pojat tekivät työnsä ammattitaidolla 👍']
+  ];
+  var star = '<svg viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L10 14.9l-5.2 2.8 1-5.9L1.5 7.7l5.9-.8z"/></svg>';
+  var g = '<svg class="g" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.3H12v4.3h5.9a5 5 0 0 1-2.2 3.3v2.8h3.6c2.1-1.9 3.3-4.8 3.3-8.1z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.8c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.6H2.1v2.9A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14a6.6 6.6 0 0 1 0-4.2V7H2.1a11 11 0 0 0 0 9.9L5.8 14z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7l3.7 2.9C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
+  var html = R.map(function(r){
+    return '<article class="rc"><span class="stars" aria-label="5 tähteä">'+star+star+star+star+star+'</span><q>'+r[1]+'</q><div class="who"><span class="av">'+r[0][0]+'</span><span>'+r[0]+'<small>Google-arvostelu</small></span>'+g+'</div></article>';
+  }).join('');
+  var set = document.getElementById('set');
+  // two copies of the reviews inside one set so a set is always wider than the viewport
+  set.innerHTML = html + html;
+  var dup = set.cloneNode(true);
+  dup.removeAttribute('id'); dup.setAttribute('aria-hidden','true');
+  dup.querySelectorAll('.rc').forEach(function(c){ c.setAttribute('tabindex','-1'); });
+  document.getElementById('track').appendChild(dup);
+  if (reduce) set.innerHTML = html; // static: each review once
+
+  // ---- hero load ----
+  function start(){ document.body.classList.add('loaded'); }
+  requestAnimationFrame(function(){ requestAnimationFrame(start); });
+
+  // ---- header ----
+  var top = document.getElementById('top'), hero = document.getElementById('hero');
+  function hdr(){ top.classList.toggle('solid', hero.getBoundingClientRect().bottom < 80); }
+  addEventListener('scroll', hdr, {passive:true}); hdr();
+
+  // ---- timeline progress ----
+  var tl = document.getElementById('tl'), stps = tl.querySelectorAll('.stp');
+  var ticking = false;
+  function prog(){
+    ticking = false;
+    var r = tl.getBoundingClientRect(), vh = innerHeight;
+    var p = reduce ? 1 : Math.max(0, Math.min(1, (vh * 0.8 - r.top) / (r.height * 0.9 + vh * 0.15)));
+    tl.style.setProperty('--p', p.toFixed(3));
+    stps.forEach(function(s, i){ s.classList.toggle('on', p >= i / (stps.length - 1) - 0.02); });
+  }
+  addEventListener('scroll', function(){ if(!ticking){ ticking = true; requestAnimationFrame(prog); } }, {passive:true});
+  addEventListener('resize', prog); prog();
+
+  // ---- scroll reveal ----
+  var row = document.getElementById('row');
+  var els = document.querySelectorAll('.rv');
+  if (reduce || !('IntersectionObserver' in window)) { els.forEach(function(e){ e.classList.add('in'); }); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var el = en.target;
+      var sibs = Array.prototype.filter.call(el.parentNode.children, function(c){ return c.classList.contains('rv'); });
+      if (el.parentNode === row) {
+        // the portrait row reveals as one staggered group (on mobile most cards sit off-screen to the right)
+        sibs.forEach(function(c, i){ c.style.transitionDelay = i * 0.1 + 's'; c.classList.add('in'); io.unobserve(c); });
+        setTimeout(function(){ row.classList.add('hint'); }, 900);
+        return;
+      }
+      el.style.transitionDelay = Math.min(Math.max(0, sibs.indexOf(el)), 5) * 0.1 + 's';
+      el.classList.add('in');
+      io.unobserve(el);
+    });
+  }, {rootMargin:'0px 0px -8% 0px', threshold:0.12});
+  els.forEach(function(e){ io.observe(e); });
+})();
+</script>
+</body>
+</html>

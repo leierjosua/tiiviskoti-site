@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Säästölaskuri – Yksi kysymys</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* sl05 "Yksi kysymys": yksi €-kenttä + pikavalinnat; kulutuslaskenta piilossa linkin takana. Iso rauhallinen tulos.
+   Tulos aina haarukka 10–15 %. Ei kiiltoanimaatioita. */
+:root{--ink:#183A28;--text:#4A544D;--mute:#5F6A62;--bg:#F6F7F3;--alt:#ECF0E9;--card:#FFF;--green:#217A4E;--green-l:#2E9E63;--green-d:#1B6641;--green-soft:#E4F0E9;--deep:#163A28;--line:#E4E8E0;--line2:#D2D9CE;
+  --ease:cubic-bezier(0.16,1,0.3,1)}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+.sec{padding:clamp(64px,10vw,140px) 16px}
+.wrap{max-width:760px;margin:0 auto;text-align:center}
+.kicker{font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:18px}
+h2{font-size:clamp(30px,4.6vw,50px);font-weight:800;letter-spacing:-.03em;line-height:1.08;color:var(--ink);max-width:16ch;margin:0 auto}
+
+.q{margin-top:clamp(30px,5vw,48px);position:relative}
+.eur{display:inline-flex;align-items:baseline;justify-content:center;gap:12px;border-bottom:2px solid var(--line2);padding:0 6px 8px;transition:border-color .4s var(--ease);max-width:100%}
+.eur:focus-within{border-color:var(--green)}
+.eur input{width:5.2ch;max-width:62vw;min-width:0;border:0;background:none;font:inherit;font-size:clamp(52px,12vw,84px);font-weight:800;letter-spacing:-.04em;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;padding:0;line-height:1.1}
+.eur input:focus{outline:none}
+.measure{position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;white-space:pre;font-size:clamp(52px,12vw,84px);font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.eur span{font-size:clamp(18px,3vw,24px);font-weight:700;color:var(--mute);white-space:nowrap}
+.chips{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:24px}
+.chips button{appearance:none;font:inherit;font-size:15px;font-weight:700;color:var(--ink);background:var(--card);border:1px solid var(--line2);border-radius:999px;min-height:44px;padding:0 18px;cursor:pointer;font-variant-numeric:tabular-nums;transition:border-color .4s var(--ease),background .4s var(--ease),color .4s var(--ease)}
+.chips button.on{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.chips button:focus-visible,.more:focus-visible,.seg button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.more{appearance:none;border:0;background:none;font:inherit;font-size:15px;font-weight:600;color:var(--green);cursor:pointer;min-height:44px;padding:0 8px;margin-top:14px;text-decoration:underline;text-decoration-color:rgba(33,122,78,.35);text-underline-offset:4px}
+
+.exp{display:grid;grid-template-rows:0fr;transition:grid-template-rows .7s var(--ease),opacity .6s var(--ease);opacity:0}
+.exp.open{grid-template-rows:1fr;opacity:1}
+.exp>div{overflow:hidden;min-height:0}
+.panel{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,3vw,26px);text-align:left;display:grid;gap:16px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--alt);border-radius:14px;padding:4px}
+.seg button{appearance:none;border:0;background:none;font:inherit;font-size:14px;font-weight:700;color:var(--mute);min-height:44px;border-radius:10px;cursor:pointer;transition:background .5s var(--ease),color .5s var(--ease)}
+.seg button.on{background:var(--card);color:var(--green);box-shadow:0 1px 2px rgba(24,58,40,.08),0 4px 12px -6px rgba(24,58,40,.25)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.f{display:flex;flex-direction:column;gap:7px;font-size:13.5px;font-weight:600;color:var(--ink);min-width:0}
+.inp{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line2);border-radius:12px;padding:0 14px;min-height:50px;transition:border-color .3s}
+.inp:focus-within{border-color:var(--green)}
+.inp input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:17px;font-weight:700;color:var(--ink);padding:12px 0;font-variant-numeric:tabular-nums}
+.inp input:focus{outline:none}
+.inp em{font-style:normal;font-size:12.5px;color:var(--mute);white-space:nowrap;margin-left:8px}
+.calc-line{font-size:14px;color:var(--mute)}
+.calc-line b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+.res{margin-top:clamp(44px,7vw,72px);padding-top:clamp(36px,6vw,56px);border-top:1px solid var(--line)}
+.res-l{font-size:16px;color:var(--text);max-width:40ch;margin:0 auto}
+.big{font-size:clamp(52px,13vw,104px);font-weight:800;letter-spacing:-.045em;line-height:1;color:var(--green);font-variant-numeric:tabular-nums;margin:18px 0 10px}
+.big .pre{font-size:.3em;font-weight:700;letter-spacing:0;color:var(--mute);margin-right:.3em;vertical-align:.5em}
+.big small{font-size:.45em;font-weight:700;margin-left:.12em;color:var(--ink)}
+.per{font-size:18px;font-weight:700;color:var(--ink)}
+.ten{font-size:15px;color:var(--mute);margin-top:6px}
+.ten b{color:var(--ink);font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;padding:15px 30px;min-height:52px;border-radius:12px;background:var(--green);color:#fff;text-decoration:none;margin-top:32px;transition:background .3s}
+.btn:hover{background:var(--green-d)}
+.note{font-size:14.5px;color:var(--mute);margin:28px auto 0;max-width:56ch}
+.note strong{color:var(--ink)}
+@media(max-width:480px){.chips{display:grid;grid-template-columns:1fr 1fr;max-width:300px;margin-inline:auto}.fields{grid-template-columns:1fr}.seg{grid-template-columns:1fr 1fr}.btn{width:100%}.chips button{padding:0 14px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<section class="sec" id="saasto"><div class="wrap" id="saastolaskuri">
+  <div class="kicker">Paljonko tiivistys säästää</div>
+  <h2><label for="eur">Paljonko maksat lämmityksestä vuodessa?</label></h2>
+
+  <div class="q">
+    <div class="eur"><input id="eur" type="text" inputmode="decimal" autocomplete="off" value="3 600" aria-describedby="eur-u"><span id="eur-u">€ / vuosi</span></div><span class="measure" id="measure" aria-hidden="true"></span>
+    <div class="chips" role="group" aria-label="Pikavalinnat">
+      <button type="button" data-v="1500">1 500 €</button>
+      <button type="button" data-v="2500">2 500 €</button>
+      <button type="button" data-v="3600" class="on">3 600 €</button>
+      <button type="button" data-v="5000">5 000 €</button>
+    </div>
+    <button type="button" class="more" id="more" aria-expanded="false" aria-controls="exp">En tiedä — laske kulutuksesta</button>
+    <div class="exp" id="exp"><div><div class="panel" id="panel" inert>
+      <div class="seg" role="radiogroup" aria-label="Lämmitystapa">
+        <button type="button" role="radio" class="on" aria-checked="true" data-t="sahko">Sähkö</button>
+        <button type="button" role="radio" aria-checked="false" data-t="kauko">Kaukolämpö</button>
+        <button type="button" role="radio" aria-checked="false" data-t="maa">Maalämpö</button>
+        <button type="button" role="radio" aria-checked="false" data-t="oljy">Öljy</button>
+      </div>
+      <div class="fields">
+        <label class="f" for="hinta"><span id="hinta-l">Sähkön hinta (sis. siirto + alv)</span>
+          <span class="inp"><input id="hinta" type="text" inputmode="decimal" autocomplete="off" value="0,20"><em id="hinta-u">€ / kWh</em></span></label>
+        <label class="f" for="kulutus"><span id="kulutus-l">Lämmityksen kulutus vuodessa</span>
+          <span class="inp"><input id="kulutus" type="text" inputmode="numeric" autocomplete="off" value="18 000"><em id="kulutus-u">kWh / vuosi</em></span></label>
+      </div>
+      <p class="calc-line">Hinta × kulutus = <b id="calc-sum">3 600 €</b> vuodessa. Luku siirtyy yllä olevaan kenttään.</p>
+    </div></div></div>
+  </div>
+
+  <div class="res" aria-live="polite">
+    <p class="res-l">Vetävä ovi tai ikkuna nostaa lämmityskuluja tyypillisesti 10–15 %. Sinun kohdallasi se tarkoittaa</p>
+    <div class="big"><span class="pre">noin</span><span data-test="min" id="o-min">360</span>–<span data-test="max" id="o-max">540</span><small>€</small></div>
+    <div class="per">vuodessa — arvio siitä, mitä tiivistys voi säästää</div>
+    <div class="ten">Kymmenessä vuodessa noin <b><span id="o-10">3 600–5 400</span> €</b></div>
+    <a class="btn" href="https://tiiviskoti.fi/#laskuri">Laske tiivistyksen hinta</a>
+    <p class="note"><strong>Osuus on arvio, ei lupaus.</strong> Lopputulos riippuu talosta, lämmitystavasta ja siitä, kuinka moni ovi ja ikkuna oikeasti vuotaa. Lämpökamerakuvauksessa näet sen omasta kodistasi.</p>
+  </div>
+</div></section>
+
+<script>
+(function(){
+  var T={sahko:{h:0.20,k:18000,hl:'Sähkön hinta (sis. siirto + alv)',hu:'€ / kWh',kl:'Lämmityksen kulutus vuodessa',ku:'kWh / vuosi'},
+         kauko:{h:0.12,k:20000,hl:'Kaukolämmön hinta',hu:'€ / kWh',kl:'Kulutus vuodessa',ku:'kWh / vuosi'},
+         maa:{h:0.20,k:7000,hl:'Sähkön hinta (sis. siirto + alv)',hu:'€ / kWh',kl:'Lämpöpumpun sähkönkulutus',ku:'kWh / vuosi'},
+         oljy:{h:1.45,k:2000,hl:'Lämmitysöljyn hinta',hu:'€ / litra',kl:'Öljynkulutus vuodessa',ku:'litraa / vuosi'}};
+  var $=function(id){return document.getElementById(id)};
+  var fmt=function(n){return Math.round(n).toLocaleString('fi-FI')};
+  var round=function(n){return n<1000?Math.round(n/10)*10:Math.round(n/50)*50};
+  var num=function(s){return parseFloat(String(s).replace(/[\s ]/g,'').replace(',','.'))||0};
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var eur=$('eur'), hin=$('hinta'), kul=$('kulutus'), cur={min:0,max:0}, raf=null;
+  function draw(v){ $('o-min').textContent=fmt(v.min); $('o-max').textContent=fmt(v.max); }
+  function chips(total){ document.querySelectorAll('[data-v]').forEach(function(b){ b.classList.toggle('on',+b.dataset.v===Math.round(total)) }) }
+  function fit(){ var m=$('measure'); m.textContent=eur.value||'0'; eur.style.width=(m.offsetWidth+6)+'px' }
+  function calc(instant){
+    fit(); var total=Math.max(0,num(eur.value)), to={min:round(total*0.10),max:round(total*0.15)};
+    $('o-10').textContent=fmt(to.min*10)+'–'+fmt(to.max*10); chips(total);
+    cancelAnimationFrame(raf);
+    if(reduce||instant){cur=to;draw(to);return}
+    var from=cur,t0=null;
+    (function step(ts){ if(ts===undefined){raf=requestAnimationFrame(step);return}
+      if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/750), e=1-Math.pow(1-p,4), v={};
+      for(var k in to) v[k]=from[k]+(to[k]-from[k])*e;
+      cur=v; draw(v); if(p<1) raf=requestAnimationFrame(step); else {cur=to;draw(to)} })();
+  }
+  function fromUsage(){ var t=Math.max(0,num(hin.value)*num(kul.value)); $('calc-sum').textContent=fmt(t)+' €'; eur.value=fmt(t); calc(); }
+  eur.addEventListener('input',function(){calc()});
+  eur.addEventListener('blur',function(){ if(eur.value.trim()) eur.value=fmt(num(eur.value)); fit() });
+  fit(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit);
+  document.querySelectorAll('[data-v]').forEach(function(b){ b.addEventListener('click',function(){ eur.value=fmt(+b.dataset.v); calc() }) });
+  $('more').addEventListener('click',function(){ var ex=$('exp'), open=!ex.classList.contains('open');
+    ex.classList.toggle('open',open); this.setAttribute('aria-expanded',String(open));
+    if(open) $('panel').removeAttribute('inert'); else $('panel').setAttribute('inert','');
+    this.textContent=open?'Piilota kulutuslaskenta':'En tiedä — laske kulutuksesta'; });
+  document.querySelectorAll('[data-t]').forEach(function(b){ b.addEventListener('click',function(){
+    document.querySelectorAll('[data-t]').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-checked','false')});
+    b.classList.add('on'); b.setAttribute('aria-checked','true');
+    var c=T[b.dataset.t]; hin.value=c.h.toFixed(2).replace('.',','); kul.value=c.k.toLocaleString('fi-FI');
+    $('hinta-l').textContent=c.hl; $('hinta-u').textContent=c.hu; $('kulutus-l').textContent=c.kl; $('kulutus-u').textContent=c.ku;
+    fromUsage(); }); });
+  hin.addEventListener('input',fromUsage); kul.addEventListener('input',fromUsage);
+  var res=document.querySelector('.res');
+  if('IntersectionObserver' in window && !reduce){
+    var io=new IntersectionObserver(function(es){ if(es[0].isIntersecting){io.disconnect();calc()} },{threshold:.3}); io.observe(res);
+  } else calc(true);
+})();
+</script>
+</body>
+</html>
