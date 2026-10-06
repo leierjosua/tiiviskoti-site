@@ -8,11 +8,13 @@ import {
 } from '@/lib/completion';
 import { cx, ErrorNote } from '@/components/ui';
 import { completeJob } from './actions';
+import { TyoraporttiStep } from './tyoraportti';
+import { reportProblems, type WorkReport } from '@/lib/work-report';
 
 /* =========================================================
    Viimeistelyvelho.
 
-   Neljä askelta, joista toinen on ehdollinen: useimmat keikat menevät
+   Viisi askelta, joista toinen on ehdollinen: useimmat keikat menevät
    niin kuin ne varattiin, ja niiltä ei pidä kysyä riviään rivi kerrallaan.
    Siksi ensimmäinen kysymys on "muuttuiko mikään" — ei "mitä tehtiin".
 
@@ -35,10 +37,10 @@ type JobInfo = {
   customerPhone: string | null;
 };
 
-type Step = 'polku' | 'muokkaa' | 'maksu' | 'yhteenveto';
+type Step = 'polku' | 'muokkaa' | 'raportti' | 'maksu' | 'yhteenveto';
 
 const STEP_LABELS: Record<Step, string> = {
-  polku: 'Polku', muokkaa: 'Muokkaa', maksu: 'Maksu', yhteenveto: 'Yhteenveto',
+  polku: 'Polku', muokkaa: 'Muokkaa', raportti: 'Työraportti', maksu: 'Maksu', yhteenveto: 'Yhteenveto',
 };
 
 /** '12,50' → 1250 senttiä. Pilkku ja piste kelpaavat kumpikin. */
@@ -78,7 +80,12 @@ function ChoiceCard({ emoji, title, sub, onClick, tone = 'plain' }: {
   );
 }
 
-export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initialLines: Line[] }) {
+export function ViimeistelyWizard({
+  job, initialLines, initialReport, reportTableMissing, scheduled,
+}: {
+  job: JobInfo; initialLines: Line[];
+  initialReport: WorkReport; reportTableMissing: boolean; scheduled: string;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -92,10 +99,14 @@ export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initial
   const [satisfaction, setSatisfaction] = useState<1 | 2 | 3 | null>(null);
   const [sendReceiptMail, setSendReceiptMail] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  /* Työraportti on pakollinen askel ennen maksua (paperilomakkeen
+     "Työraportti A4" vastine). Raportti kuuluu samaan tallennukseen kuin
+     muu viimeistely — ks. completeJob. */
+  const [report, setReport] = useState<WorkReport>(initialReport);
 
   const steps: Step[] = path === 'muokkaa'
-    ? ['polku', 'muokkaa', 'maksu', 'yhteenveto']
-    : ['polku', 'maksu', 'yhteenveto'];
+    ? ['polku', 'muokkaa', 'raportti', 'maksu', 'yhteenveto']
+    : ['polku', 'raportti', 'maksu', 'yhteenveto'];
 
   const discountCents = centsOf(discount);
   const subtotal = linesTotal(lines);
@@ -161,6 +172,13 @@ export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initial
 
   const submit = () => {
     setError(undefined);
+    /* Viimeinen vartija selaimessa ennen palvelinta (joka tarkistaa saman). */
+    const problems = reportProblems(report);
+    if (problems.length > 0) {
+      setError(`Työraportti on kesken. ${problems.join(' ')}`);
+      setStep('raportti');
+      return;
+    }
     startTransition(async () => {
       const res = await completeJob({
         id: job.id,
@@ -173,6 +191,7 @@ export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initial
         paid: paid === true,
         satisfaction,
         sendReceiptMail: sendReceiptMail && Boolean(job.customerEmail),
+        report,
       });
       if (res.error) { setError(res.error); return; }
       router.push(`/tyot/${job.id}`);
@@ -319,7 +338,7 @@ export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initial
           <div className="grid gap-3 sm:grid-cols-2">
             <ChoiceCard
               emoji="✅" title="Vakiokeikka" sub="Ei muutoksia"
-              onClick={() => { setPath('vakio'); setStep('maksu'); }}
+              onClick={() => { setPath('vakio'); setStep('raportti'); }}
             />
             <ChoiceCard
               emoji="✏️" title="Muokkaa" sub="Lisää veloituksia"
@@ -387,12 +406,23 @@ export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initial
                     className="rounded-lg px-4 py-2.5 text-sm font-semibold text-muted hover:text-text">
               Takaisin
             </button>
-            <button type="button" onClick={() => setStep('maksu')}
+            <button type="button" onClick={() => setStep('raportti')}
                     className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink hover:bg-[#1A6340]">
               Seuraava
             </button>
           </div>
         </div>
+      )}
+
+      {step === 'raportti' && (
+        <TyoraporttiStep
+          report={report}
+          onChange={setReport}
+          onBack={() => setStep(path === 'muokkaa' ? 'muokkaa' : 'polku')}
+          onNext={() => { setError(undefined); setStep('maksu'); window.scrollTo({ top: 0 }); }}
+          tableMissing={reportTableMissing}
+          scheduled={scheduled}
+        />
       )}
 
       {step === 'maksu' && (
@@ -412,7 +442,7 @@ export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initial
             />
           </div>
 
-          <button type="button" onClick={() => setStep(path === 'muokkaa' ? 'muokkaa' : 'polku')}
+          <button type="button" onClick={() => setStep('raportti')}
                   className="rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-muted hover:text-text">
             Takaisin
           </button>
@@ -479,6 +509,17 @@ export function ViimeistelyWizard({ job, initialLines }: { job: JobInfo; initial
               </label>
             </div>
           </div>
+
+          <button type="button" onClick={() => setStep('raportti')}
+                  className="flex w-full items-center gap-3 rounded-(--radius-card) border border-line bg-ink-800 px-5 py-4 text-left hover:border-accent">
+            <span className="flex-1">
+              <span className="block font-semibold text-text">Työraportti</span>
+              <span className="block text-sm text-muted tabular">
+                klo {report.startedAt}–{report.finishedAt} · kuitannut {report.customerAckName || '—'}
+              </span>
+            </span>
+            <span className="text-sm font-semibold text-accent">Muokkaa</span>
+          </button>
 
           <div className="flex items-center gap-3 rounded-(--radius-card) border border-line bg-ink-800 px-5 py-4">
             <span className="flex-1 font-semibold text-text">Maksutila</span>

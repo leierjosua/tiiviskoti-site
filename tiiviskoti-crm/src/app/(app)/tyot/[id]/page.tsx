@@ -9,6 +9,8 @@ import { DeleteJob, EditJobForm, InvoiceMark, RescheduleForm, SendConfirmation, 
 import AsennusTyo from './asennus-tyo';
 import { JobPhotos } from './photos';
 import { listJobPhotos } from '@/lib/photos';
+import { fiNumber, getJobReport } from '@/lib/job-report';
+import { WORK_STEPS, missingSteps } from '@/lib/work-report';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +44,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   );
 
   // Rivit, viestiloki ja liitokset ovat toisistaan riippumattomia — rinnakkain.
-  const [lines, mails, links, photos, deliveryRows, calendars] = await Promise.all([
+  const [lines, mails, links, photos, deliveryRows, calendars, reportRes] = await Promise.all([
     sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
       select name, quantity, unit_price_cents from tk.job_lines
        where job_id = ${id} order by sort_order
@@ -61,7 +63,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     /* Siirtolistan vaihtoehdot. Vain käytössä olevat, jottei työtä voi antaa
        lopettaneelle asentajalle. */
     listCalendars(true),
+    /* Asentajan työraportti (db/033). Puuttuva taulu ei kaada sivua. */
+    getJobReport(id),
   ]);
+  const report = reportRes.report;
   const delivery = deliveryRows[0];
   const lineSumCents = lines.reduce((s, l) => s + l.quantity * l.unit_price_cents, 0);
 
@@ -247,6 +252,85 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             </ul>
           )}
         </Card>
+
+        {/* Työraportti vain luettavana: asentaja täyttää sen viimeistelyssä,
+            toimisto katsoo ja lataa PDF:n. Kortti näkyy vasta kun raportti on. */}
+        {report && (
+          <Card className="h-fit">
+            <CardHeader
+              title="Työraportti"
+              action={
+                <a href={`/tyot/${job.id}/raportti/pdf`}
+                   className="rounded-lg border border-accent/50 px-3 py-1.5 text-xs font-bold text-accent
+                              transition-colors hover:bg-accent/10">
+                  Lataa PDF
+                </a>
+              }
+            />
+            <div className="divide-y divide-line-soft">
+              <Row
+                label="Päivä ja aika"
+                value={<span className="tabular">
+                  {formatDateKey(report.work_date)} klo {report.started_at}–{report.finished_at}
+                  {report.travel_hours !== null && ` · matka ${fiNumber(report.travel_hours)} h`}
+                </span>}
+              />
+              <Row label="Asentaja(t)" value={report.installers} />
+              {report.unit && <Row label="Rappu / huoneisto" value={report.unit} />}
+              <Row
+                label="Kohteet"
+                value={<span className="tabular">
+                  {report.windows} ikkunaa · {report.balcony_doors} parvekeovea · {report.other_doors} muuta ovea
+                </span>}
+              />
+              <div className="px-4 py-2 text-sm">
+                <p className="mb-1.5 text-faint">
+                  Työvaiheet{' '}
+                  <span className="tabular">
+                    ({WORK_STEPS.length - missingSteps(report.steps).length}/{WORK_STEPS.length})
+                  </span>
+                </p>
+                <ul className="space-y-1">
+                  {WORK_STEPS.map((s) => {
+                    const v = report.steps[s.key];
+                    return (
+                      <li key={s.key} className="flex items-start gap-2">
+                        <span className={`mt-px w-20 shrink-0 text-xs font-bold ${
+                          v === 'done' ? 'text-accent' : v === 'na' ? 'text-muted' : 'text-danger'
+                        }`}>
+                          {v === 'done' ? '✓ Tehty' : v === 'na' ? 'Ei tarpeen' : 'Puuttuu'}
+                        </span>
+                        <span className="min-w-0 flex-1">{s.label}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+              {(report.sealant_m !== null || report.silicone_pcs !== null || report.acrylic_pcs !== null) && (
+                <Row
+                  label="Materiaalit"
+                  value={<span className="tabular">
+                    {[
+                      report.sealant_m !== null && `tiivistettä ${fiNumber(report.sealant_m)} m`,
+                      report.silicone_pcs !== null && `silikonia ${report.silicone_pcs} kpl`,
+                      report.acrylic_pcs !== null && `akryyliä ${report.acrylic_pcs} kpl`,
+                    ].filter(Boolean).join(' · ')}
+                  </span>}
+                />
+              )}
+              {report.notes && (
+                <Row label="Huomiot" value={<span className="whitespace-pre-line">{report.notes}</span>} />
+              )}
+              <Row label="Asiakkaan kuittaus" value={report.customer_ack_name} />
+              <Row
+                label="Kirjannut"
+                value={<span className="text-muted">
+                  {report.created_by_name ?? '—'} · {formatDateKey(dateKeyOf(report.updated_at))}
+                </span>}
+              />
+            </div>
+          </Card>
+        )}
 
         <Card className="h-fit">
           <CardHeader title="Muokkaa" />

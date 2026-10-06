@@ -1,6 +1,9 @@
 import { notFound, redirect } from 'next/navigation';
 import { sql } from '@/lib/db';
-import { getJob } from '@/lib/data';
+import { getJob, jobLinks } from '@/lib/data';
+import { getJobReport, reportToForm } from '@/lib/job-report';
+import { unitsFromLines, type WorkReport } from '@/lib/work-report';
+import { dateKeyOf, timeOf } from '@/lib/time';
 import { ownsJob, requireStaff } from '@/lib/session';
 import { linesFromDb, linesTotal } from '@/lib/completion';
 import { ViimeistelyWizard } from './ui';
@@ -20,10 +23,45 @@ export default async function ViimeistelyPage({ params }: { params: Promise<{ id
      ohjataan takaisin varaukseen, jossa tilan voi palauttaa. */
   if (job.status === 'cancelled') redirect(`/tyot/${id}`);
 
-  const rows = await sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
-    select name, quantity, unit_price_cents from tk.job_lines
-     where job_id = ${id} order by sort_order
-  `;
+  const [rows, links, saved] = await Promise.all([
+    sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
+      select name, quantity, unit_price_cents from tk.job_lines
+       where job_id = ${id} order by sort_order
+    `,
+    jobLinks(id),
+    getJobReport(id),
+  ]);
+
+  /* Työraportin esitäyttö. Uudelleenviimeistelyssä tallennettu raportti
+     voittaa — muuten asentaja kirjoittaisi kaiken uudestaan. Uudelle
+     raportille työn tiedot: päivä, tekijät (työpari mukaan), asiakas ja
+     kohteiden määrät riveiltä. Ajat jätetään tyhjiksi tarkoituksella:
+     varattu aika esitäytettynä kuittautuisi todelliseksi katsomatta. */
+  const units = unitsFromLines(rows);
+  const initialReport: WorkReport = saved.report
+    ? reportToForm(saved.report)
+    : {
+        workDate: dateKeyOf(job.starts_at),
+        installers: [job.staff_name, ...links.mates.map((m) => m.staff_name)]
+          .filter((n, i, all) => all.indexOf(n) === i).join(', '),
+        customerName: job.customer_name ?? '',
+        customerPhone: job.customer_phone ?? '',
+        address: [job.address, [job.postal_code, job.city].filter(Boolean).join(' ')]
+          .filter(Boolean).join(', '),
+        unit: '',
+        startedAt: '',
+        finishedAt: '',
+        travelHours: '',
+        windows: units.windows,
+        balconyDoors: units.balconyDoors,
+        otherDoors: units.otherDoors,
+        steps: {},
+        sealantM: '',
+        siliconePcs: '',
+        acrylicPcs: '',
+        notes: '',
+        customerAckName: '',
+      };
 
   /* Hallinnasta luodulla työllä ei ole rivejä — hinta on pelkkä summa.
      Tehdään siitä yksi rivi, jotta velho ja kuitti näkevät saman asian
@@ -65,6 +103,9 @@ export default async function ViimeistelyPage({ params }: { params: Promise<{ id
         customerPhone: job.customer_phone,
       }}
       initialLines={lines}
+      initialReport={initialReport}
+      reportTableMissing={saved.tableMissing}
+      scheduled={`${timeOf(job.starts_at)}–${timeOf(job.ends_at)}`}
     />
   );
 }
