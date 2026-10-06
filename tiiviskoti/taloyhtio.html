@@ -536,17 +536,28 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 .ty-hero .hero-grid:has(.stepcard.wide)>div:first-child{display:none}
 .ty-hero .hero-grid:has(.stepcard.wide) .stepcard{margin:0 auto;max-width:760px}
 @media(max-width:960px){
-  .ty-hero{padding:28px 0 36px}
+  /* Puhelimessa vaalea pohja ja tumma teksti kuten muualla sivustolla (tumma vihreä yläkaista näytti oudolta).
+     Kuva alkaa tekstin alta, jotta kasvot eivät jää otsikon taakse, ja häivyttyy reunoista sivun pohjaan. */
+  .ty-hero{padding:28px 0 36px;background:var(--bg)}
   .ty-hero .hero-grid{grid-template-columns:1fr;gap:0}
-  /* Kuva alkaa vasta tekstin alta, jotta kasvot eivät jää otsikon taakse. */
-  .ty-bg{inset:210px 0 auto 0;height:620px}
+  .ty-bg{inset:250px 0 auto 0;height:600px}
   .ty-bg img{object-position:50% 50%}
-  .ty-bg::after{background:linear-gradient(180deg,#163A28 0%,rgba(22,58,40,.35) 16%,rgba(16,42,30,0) 30%,rgba(16,42,30,.08) 72%,#163A28 100%)}
+  .ty-bg::after{background:linear-gradient(180deg,var(--bg) 0%,rgba(246,247,243,0) 12%,rgba(246,247,243,0) 70%,var(--bg) 100%)}
+  .ty-hero h1,.ty-hero .rating{color:var(--ink)}
+  .ty-hero h1 .a{color:var(--green)}
+  .ty-hero .rating svg{color:var(--green)}
+  .ty-hero .hero-sub{color:var(--text)}
+  .ty-hero .stepcard{box-shadow:0 24px 60px -28px rgba(24,58,40,.45)}
   .ty-hero .hero-cta,.ty-hero .hero-fine{display:none}
   .ty-hero h1,.ty-hero .rating,.ty-hero .hero-sub{text-align:center;justify-content:center;margin-left:auto;margin-right:auto}
-  .ty-hero .hero-book{margin-top:330px}
+  .ty-hero .hero-book{margin-top:360px}
   .ty-hero .stepcard{margin:0 auto;max-width:520px}
   .ty-hero .hb-head .sub{display:none}
+}
+@media(max-width:620px){
+  /* Kapeassa ruudussa ingressi on neljällä rivillä, joten kuva alkaa alempaa. */
+  .ty-bg{top:310px}
+  .ty-hero .hero-book{margin-top:410px}
 }
 /* Mittariluvut heron alla: yksi yhtenäinen kortti, ei kolmea irrallista laatikkoa. */
 .ty-metrics{padding-top:clamp(28px,4vw,48px)}
