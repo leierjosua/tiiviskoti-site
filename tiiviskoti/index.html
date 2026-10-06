@@ -819,6 +819,42 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
 @media(max-width:900px){.sv-calc{grid-template-columns:1fr}.sv-how{grid-template-columns:1fr}}
 @media(max-width:480px){.sv-seg{grid-template-columns:1fr 1fr}.sv-facts{grid-template-columns:1fr;gap:12px}.sv-facts>div{flex-direction:row;justify-content:space-between;align-items:baseline;border-left:0;padding:0;gap:12px}.sv-facts>div>span{text-align:right}.sv-cta{align-self:stretch}}
 @media(prefers-reduced-motion:reduce){.sv-bar,.sv-tab,.sv-inp{transition:none}}
+
+/* SIISTITTY ILME 6.10.2026 (AaltoAir-vertailu): kuva pysyy kirkkaana, tummennus vain tekstin takana,
+   mittarit lasikortteina, vähemmän toistoa ja pientekstiä. */
+.hero-card::after{background:radial-gradient(ellipse 62% 52% at 50% 46%,rgba(16,42,30,.62),rgba(16,42,30,.18) 72%,rgba(16,42,30,0) 100%),linear-gradient(180deg,rgba(16,42,30,.22) 0%,rgba(16,42,30,.12) 40%,rgba(16,42,30,.55) 100%)!important}
+.hero h1{text-shadow:0 2px 24px rgba(10,30,20,.35)}
+.hero-sub{text-shadow:0 1px 12px rgba(10,30,20,.45)}
+.metrics .metric{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);box-shadow:none;-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
+.metrics .metric b,.metrics .metric b .a{color:#fff}
+.metrics .metric>span{color:rgba(255,255,255,.82)}
+.price-note{max-width:600px;margin:18px auto 0;text-align:center;font-size:14.5px;color:var(--mute)}
+.why-list{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:12px}
+.why-list li{display:flex;align-items:center;gap:12px;font-weight:600;color:var(--ink);font-size:16px}
+.why-list svg{flex:none;color:var(--green);background:var(--green-soft);border-radius:999px;padding:5px;width:28px;height:28px;box-sizing:border-box}
+/* Teksti heron yläosaan, jotta napit eivät peitä asentajia kuvan alaosassa. */
+header.hero{align-items:flex-start}
+header.hero .wrap.hero-grid{padding-top:clamp(120px,15vh,150px)}
+@media(max-width:620px){
+  header.hero .wrap.hero-grid{padding-top:96px}
+  .hero-sub{margin-top:14px}
+  .hero-cta{flex-direction:row;justify-content:center;gap:10px;margin-top:20px}
+  .hero-cta .btn{flex:1 1 0;width:auto;max-width:170px;padding-inline:12px}
+}
+/* Tummennus seuraa tekstiä, joka on nyt heron yläosassa. */
+.hero-card::after{background:radial-gradient(ellipse 58% 40% at 50% 30%,rgba(16,42,30,.66),rgba(16,42,30,.22) 70%,rgba(16,42,30,0) 100%),linear-gradient(180deg,rgba(16,42,30,.25) 0%,rgba(16,42,30,.08) 50%,rgba(16,42,30,.5) 100%)!important}
+@media(max-width:620px){
+  .hero-card::after{background:radial-gradient(ellipse 95% 34% at 50% 26%,rgba(16,42,30,.7),rgba(16,42,30,.25) 75%,rgba(16,42,30,0) 100%),linear-gradient(180deg,rgba(16,42,30,.35) 0%,rgba(16,42,30,.06) 50%,rgba(16,42,30,.5) 100%)!important}
+}
+/* Tabletilla viisi linkkiä eivät mahdu riville (rivittyivät kahdelle) → valikko burgerin taakse. */
+@media(min-width:621px) and (max-width:1100px){
+  nav.top .wrap{position:relative}
+  .nlinks{display:none}
+  nav.top .btn-p{margin-left:auto}
+  .burger{display:flex;margin-left:6px}
+  .nlinks.op{display:flex;position:absolute;top:calc(100% + 8px);left:0;right:0;flex-direction:column;background:var(--bg);padding:14px 24px;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
+}
+.hero-sub{font-weight:500}
 </style>
 <script type="application/ld+json">
 {
@@ -1059,7 +1095,6 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
            nappi avaa sen sen sijaan että vierittäisi vain alaspäin. -->
       <a href="ota-yhteytta.html" class="btn btn-alt btn-lg">Ota yhteyttä</a>
     </div>
-    <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta · lämpökamerakartoitus veloituksetta · kotitalousvähennys −40 %</p>
   </div>
   <div class="hero-card rv">
     <picture><source media="(max-width:620px)" srcset="img/hero-entrance-mob.webp?v=4"><img src="img/hero-entrance-1600.webp?v=4" srcset="img/hero-entrance-1600.webp?v=4 1600w, img/hero-entrance-2400.webp?v=4 2400w" sizes="100vw" alt="TiivisKodin asentajat vaalean puutalon pihassa työvälineineen" width="2400" height="1803" fetchpriority="high"></picture>
@@ -1078,7 +1113,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
 <!-- PALVELUT -->
 <section class="sec" id="palvelut"><div class="wrap">
   <div class="center rv"><div class="kicker">Palvelut</div><h2 class="title">Kiinteä hinta ovelle ja ikkunalle</h2>
-    <p class="sub">Tiivisteet, kynnykset ja säädöt samalla käynnillä.</p></div>
+    <p class="sub">Tiivisteet, säätö ja öljyäminen samalla käynnillä.</p></div>
   <div class="cards3">
     <div class="card rv">
       <div class="card-fig">
@@ -1092,7 +1127,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
         <img class="pic" src="img/ulko-ovet.webp?v=3" alt="Puutalon valkoinen ulko-ovi ja katettu kuisti" width="1000" height="625" loading="lazy">
         <span class="tag">99 €/ovi · minimi 149 €</span>
       </div>
-      <div class="card-body"><h3>Ovien tiivistys</h3><p>Pää-, taka- ja parvekeovet. Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö.</p><a href="#laskuri" class="lnk">Varaa aika <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      <div class="card-body"><h3>Ovien tiivistys</h3><p>Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö.</p><a href="#laskuri" class="lnk">Varaa aika <svg class="arrow" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
     <div class="card rv">
       <div class="card-fig">
@@ -1110,7 +1145,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
      laskuria lainkaan ellei tiedä että hinta laskee määrän mukaan. -->
 <section class="sec" id="hinnasto"><div class="wrap">
   <div class="center rv"><div class="kicker">Hinnasto</div><h2 class="title">Mitä useampi ikkuna, sitä halvempi</h2>
-    <p class="sub">Alempi kappalehinta koskee kaikkia ikkunoita, ei vain rajan ylittäviä. Hinnat sisältävät ALV 25,5 %, tiivisteet ja työn.</p></div>
+    <p class="sub">Alempi hinta koskee kaikkia ikkunoita. Hinnat sisältävät työn, tiivisteet ja ALV:n.</p></div>
 
   <div class="rv" style="max-width:760px;margin:30px auto 0;overflow-x:auto">
     <table style="width:100%;border-collapse:collapse;font-size:16px">
@@ -1128,9 +1163,8 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
         <tr><td style="padding:12px 10px">14+</td><td style="padding:12px 10px"><b>75 €</b></td><td style="padding:12px 10px;color:var(--mute)">14 ikkunaa = 1 050 €</td></tr>
       </tbody>
     </table>
-    <p class="sub" style="margin-top:18px;font-size:15px">Porras kannattaa huomata: halvempi hinta koskee taannehtivasti kaikkia ikkunoita, joten <b>kymmenes ikkuna maksaa vain 35 €</b> ja neljästoista 10 €. Laskuri kertoo tämän valintojesi mukaan.</p>
-    <p class="sub" style="margin-top:10px;font-size:15px">Ulko- ja parvekeovi 99 €, liuku- tai pariovi 149 €, väli-/huoneovi 89 €, pelkkä kynnyskumi 45 €. Pienin veloitus 149 € / käynti.</p>
-    <div style="margin-top:22px"><a href="#laskuri" class="btn btn-p btn-lg">Laske oma hintasi</a></div>
+    <p class="price-note">Ulko-ovi 99 €, liuku- tai pariovi 149 €, väli-/huoneovi 89 €, pelkkä kynnyskumi 45 €. Pienin veloitus 149 € / käynti.</p>
+    <div style="margin-top:26px;text-align:center"><a href="#laskuri" class="btn btn-p btn-lg">Laske oma hintasi</a></div>
   </div>
 </div></section>
 
@@ -1349,11 +1383,11 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
     <div class="kicker">Miksi TiivisKoti</div>
     <h2>Kiinteä hinta, ei yllätyksiä</h2>
     <p>Hinta on sama kuin laskurissa. Näet sen ennen varausta, eikä siihen tule jälkikäteen lisiä. Asentaja siivoaa jälkensä lähtiessään.</p>
-    <div class="why-stats">
-      <div class="wstat"><b><span class="a">0 €</span></b><span>lämpökamerakartoitus</span></div>
-      <div class="wstat"><b><span class="a">−40 %</span></b><span>kotitalousvähennys</span></div>
-      <div class="wstat"><b><span class="a">10–15 %</span></b><span>arvioitu pudotus lämmityskuluissa</span></div>
-    </div>
+    <ul class="why-list">
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Lämpökamerakartoitus veloituksetta</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kotitalousvähennys −40 %</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Oma porukka, ei alihankintaa</li>
+    </ul>
   </div>
   <div class="why-fig rv">
     <!-- 16.9.2026: paitalogon tilalle koko porukka (Kuva-49). Kuva on vaaka,
@@ -1411,21 +1445,7 @@ html[data-ab="b"][data-ab-path="koti"] .gate-tabs{display:none}
       <a href="#laskuri" class="btn btn-p sv-cta">Laske tiivistyksen hinta</a>
     </div>
   </div>
-  <div class="sv-how">
-    <div class="rev rv">
-      <h3>Mistä säästö syntyy</h3>
-      <p>Rako päästää lämmitettyä ilmaa ulos ja kylmää tilalle, joten lämmitys käy kovemmilla koko talven. Kun rako umpeutuu, sama sisälämpötila vaatii vähemmän energiaa.</p>
-    </div>
-    <div class="rev rv">
-      <h3>Miten laskuri laskee</h3>
-      <p>Hinta × kulutus = lämmityskulut vuodessa. Vetävät ovet ja ikkunat nostavat niitä tyypillisesti 10–15 %, ja se osuus on säästöarvio.</p>
-    </div>
-    <div class="rev rv">
-      <h3>Mikä arvioon vaikuttaa</h3>
-      <p>Talon koko ja ikä, energian hinta ja se, kuinka moni ovi ja ikkuna oikeasti vuotaa. Lämpökamerakuvauksessa näet sen omasta kodistasi.</p>
-    </div>
-  </div>
-  <p class="save-note rv">Osuus on arvio siitä, kuinka paljon vetävät ovet ja ikkunat kasvattavat lämmityskulua. Emme lupaa tiettyä säästöä etukäteen, koska lopputulos riippuu talosta, lämmitystavasta ja siitä kuinka moni kohta vuotaa.</p>
+  <p class="save-note rv" style="text-align:center;margin-inline:auto">Osuus on arvio, ei lupaus. Lopputulos riippuu talosta, lämmitystavasta ja siitä, kuinka moni kohta vuotaa.</p>
 </div></section>
 
 <!-- CTA -->
