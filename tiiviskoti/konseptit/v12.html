@@ -1023,6 +1023,29 @@ header.hero .wrap.hero-grid.v12-split{display:grid;grid-template-columns:1.1fr m
 @media (max-width:620px) and (max-height:740px){.v12-metrics .metrics{margin-top:24px}}
 @media (prefers-reduced-motion: reduce){.hero-book{animation:none!important}}
 
+
+/* PUHELIN 6.10.: kortti pienemmäksi ja alemmas, jotta tiimi näkyy otsikon ja kortin välissä.
+   Kuva peittää vain heron yläosan; alaosa on tasaista syvänvihreää, johon kuva liukuu. */
+@media(max-width:620px){
+  header.hero.v12-hero{background:#163A28}
+  .v12-hero .hero-card{inset:0 0 auto 0;height:760px}
+  .v12-hero .hero-card img{object-position:50% 100%}
+  .v12-hero .hero-card::after{background:linear-gradient(180deg,rgba(16,42,30,.66) 0%,rgba(16,42,30,.5) 30%,rgba(16,42,30,.08) 50%,rgba(16,42,30,.1) 72%,#163A28 100%)!important}
+  .v12-split .hero-sub{margin-bottom:0}
+  .hero-book{margin-top:250px}
+  .hero-book .stepcard{padding:14px 14px 12px;border-radius:18px}
+  .hero-book .stepcard-head,.hero-book .stepdots,.hero-book .hb-s,.hero-book .gate-field label{display:none}
+  .hero-book .hb-t{font-size:17px;margin:0 0 10px}
+  .hero-book .gate-tabs{gap:8px;margin-bottom:10px}
+  .hero-book .gate-tab{padding:8px 10px;min-height:44px}
+  .hero-book .gate-tab span{font-size:11px}
+  .hero-book .gate-field{display:contents}
+  .hero-book .mock-card{display:grid;grid-template-columns:1fr auto;column-gap:8px;align-items:stretch}
+  .hero-book .hb-t,.hero-book .gate-tabs,.hero-book .gate-ticks{grid-column:1 / -1}
+  .hero-book .gate-postal{margin:0;height:48px;font-size:18px;display:flex;align-items:center;justify-content:center;padding:0 10px;background:#fff;border-radius:12px}
+  .hero-book .gate-cta{margin:0;height:48px;padding:0 18px;display:flex;align-items:center;white-space:nowrap}
+  .hero-book .gate-ticks{margin-top:8px;font-size:12.5px}
+}
 </style>
 </head>
 <body>
