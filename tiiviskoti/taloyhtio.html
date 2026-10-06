@@ -552,6 +552,13 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
   .ty-hero .hb-head .sub{display:none}
   .ty-hero .hero-grid>div:first-child .rating{display:flex;margin:0 auto 10px;width:max-content;max-width:100%}
 }
+@media(max-width:620px){
+  /* Varauskortti näkyviin heti ensimmäisellä ruudulla: matalampi kuva ja ingressi pois puhelimessa. */
+  .ty-bg img{height:440px;object-fit:cover;object-position:50% 25%}
+  .ty-hero .hero-grid>div:first-child{margin-top:-150px}
+  .ty-hero .hero-sub{display:none}
+  .ty-hero .hero-book{margin-top:20px}
+}
 /* Tabletilla viisi linkkiä eivät mahdu riville → valikko burgerin taakse (kuten etusivulla). */
 @media(min-width:621px) and (max-width:1100px){
   nav.top .wrap{position:relative}
