@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Säästölaskuri – Liukusäätimet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* sl02 "Liukusäätimet": kaksi isoa liukusäädintä + kirjoitettava arvo. Tulos päivittyy vedettäessä. Ei kiiltoanimaatioita. */
+:root{--ink:#183A28;--text:#4A544D;--mute:#5F6A62;--bg:#F6F7F3;--alt:#ECF0E9;--card:#FFF;--green:#217A4E;--green-l:#2E9E63;--green-d:#1B6641;--green-soft:#E4F0E9;--deep:#163A28;--line:#E4E8E0;--line2:#D2D9CE;
+  --now:#E59A7E;--aft:#4CC085;--ease:cubic-bezier(0.16,1,0.3,1);--r-lg:20px;--sh:0 1px 2px rgba(24,58,40,.04),0 18px 40px -26px rgba(24,58,40,.32);--thumb:32px}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+.sec{padding:clamp(56px,9vw,120px) 16px}
+.wrap{max-width:1120px;margin:0 auto}
+.head{text-align:center;max-width:640px;margin:0 auto}
+.kicker{font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+h2{font-size:clamp(30px,3.8vw,44px);font-weight:800;letter-spacing:-.025em;line-height:1.1;color:var(--ink)}
+.sub{font-size:18px;color:var(--mute);margin-top:16px}
+
+.calc{display:grid;grid-template-columns:1.15fr 1fr;margin-top:clamp(36px,5vw,60px);background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh);overflow:hidden;overflow:clip}
+.in{padding:clamp(22px,3.4vw,44px);display:flex;flex-direction:column;gap:30px;min-width:0}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--alt);border-radius:14px;padding:4px}
+.seg button{appearance:none;border:0;background:none;font:inherit;font-size:14.5px;font-weight:700;color:var(--mute);min-height:46px;border-radius:10px;cursor:pointer;transition:background .5s var(--ease),color .5s var(--ease),box-shadow .5s var(--ease)}
+.seg button.on{background:var(--card);color:var(--green);box-shadow:0 1px 2px rgba(24,58,40,.08),0 4px 12px -6px rgba(24,58,40,.25)}
+.seg button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+.sl-top{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.sl-top label{font-size:15px;font-weight:700;color:var(--ink);line-height:1.3}
+.val{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line2);border-radius:12px;padding:0 12px;min-height:46px;flex:0 0 auto;transition:border-color .3s}
+.val:focus-within{border-color:var(--green)}
+.val input{width:5.6ch;border:0;background:none;font:inherit;font-size:17px;font-weight:800;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;padding:10px 0}
+.val input:focus{outline:none}
+.val em{font-style:normal;font-size:12.5px;color:var(--mute);white-space:nowrap}
+
+.rng{position:relative;padding-top:38px}
+.rng input{-webkit-appearance:none;appearance:none;width:100%;height:48px;background:transparent;margin:0;cursor:pointer;touch-action:pan-y;display:block}
+.rng input:focus{outline:none}
+.rng input::-webkit-slider-runnable-track{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--green) 0,var(--green-l) var(--p,50%),var(--alt) var(--p,50%))}
+.rng input::-moz-range-track{height:10px;border-radius:999px;background:var(--alt)}
+.rng input::-moz-range-progress{height:10px;border-radius:999px;background:var(--green)}
+.rng input::-webkit-slider-thumb{-webkit-appearance:none;width:var(--thumb);height:var(--thumb);margin-top:calc((10px - var(--thumb))/2);border-radius:50%;background:#fff;border:2px solid var(--green);box-shadow:0 2px 6px rgba(24,58,40,.22);transition:transform .4s var(--ease)}
+.rng input::-moz-range-thumb{width:var(--thumb);height:var(--thumb);border-radius:50%;background:#fff;border:2px solid var(--green);box-shadow:0 2px 6px rgba(24,58,40,.22)}
+.rng input:focus-visible::-webkit-slider-thumb{outline:3px solid rgba(33,122,78,.3);outline-offset:2px}
+.rng.drag input::-webkit-slider-thumb{transform:scale(1.08)}
+.bub{position:absolute;top:0;left:calc(var(--pv,.5) * (100% - var(--thumb)) + var(--thumb) / 2);transform:translate(-50%,6px);background:var(--ink);color:#fff;font-size:13.5px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;font-variant-numeric:tabular-nums;opacity:0;pointer-events:none;transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.bub::after{content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;background:inherit;transform:translateX(-50%) rotate(45deg);border-radius:1px}
+.rng.drag .bub{opacity:1;transform:translate(-50%,0)}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-top:2px;font-variant-numeric:tabular-nums}
+.hint{font-size:13.5px;color:var(--mute)}
+/* Puhelimessa tulos on säätimien alla: pieni tarttuva tulosrivi pitää luvun näkyvissä vedon aikana. */
+.mini{display:none}
+@media(max-width:900px){.mini{display:flex;position:sticky;top:8px;z-index:3;justify-content:space-between;align-items:baseline;gap:10px;background:var(--ink);color:#fff;border-radius:12px;padding:10px 14px;font-size:13.5px;margin:-6px 0 -8px;box-shadow:0 8px 20px -12px rgba(24,58,40,.6)}
+  .mini b{font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap}}
+
+.out{background:var(--green-soft);padding:clamp(24px,3.4vw,44px);display:flex;flex-direction:column;gap:22px;justify-content:center;min-width:0}
+.res-l{font-size:14px;font-weight:700;color:var(--green)}
+.big{font-size:clamp(40px,10vw,64px);font-weight:800;letter-spacing:-.04em;line-height:1.02;color:var(--ink);font-variant-numeric:tabular-nums}
+.big small{font-size:.5em;font-weight:700;margin-left:.15em}
+.big .pre{font-size:.36em;font-weight:700;letter-spacing:0;color:var(--mute);margin-right:.25em}
+.res-s{font-size:14px;color:var(--text);margin-top:6px}
+.split{background:var(--card);border-radius:14px;padding:18px}
+.split-t{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px;margin-bottom:12px}
+.split-t b{color:var(--ink);font-variant-numeric:tabular-nums}
+.sbar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--alt)}
+.sbar i{display:block;height:100%}
+.sbar .base{background:#BFD9C8;flex:85}
+.sbar .leak1{background:var(--now);flex:10;opacity:.65}
+.sbar .leak2{background:var(--now);flex:5}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--mute);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend span::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c)}
+.btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;padding:15px 28px;min-height:52px;border-radius:12px;background:var(--green);color:#fff;text-decoration:none;align-self:flex-start;transition:background .3s}
+.btn:hover{background:var(--green-d)}
+.note{max-width:720px;margin:clamp(32px,5vw,52px) auto 0;text-align:center;font-size:15px;color:var(--mute)}
+.note strong{color:var(--ink)}
+@media(max-width:900px){.calc{grid-template-columns:1fr}}
+@media(max-width:480px){.seg{grid-template-columns:1fr 1fr}.btn{align-self:stretch}:root{--thumb:34px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<section class="sec" id="saasto"><div class="wrap">
+  <div class="head">
+    <div class="kicker">Säästö</div>
+    <h2>Paljonko tiivistys säästää</h2>
+    <p class="sub">Vetävä ovi tai ikkuna nostaa lämmityskuluja tyypillisesti 10–15 %. Vedä säätimet omiin lukuihisi.</p>
+  </div>
+
+  <div class="calc" id="saastolaskuri">
+    <div class="in">
+      <div class="seg" role="radiogroup" aria-label="Lämmitystapa">
+        <button type="button" role="radio" class="on" aria-checked="true" data-t="sahko">Sähkö</button>
+        <button type="button" role="radio" aria-checked="false" data-t="kauko">Kaukolämpö</button>
+        <button type="button" role="radio" aria-checked="false" data-t="maa">Maalämpö</button>
+        <button type="button" role="radio" aria-checked="false" data-t="oljy">Öljy</button>
+      </div>
+
+      <div class="mini" aria-hidden="true"><span>Säästöarvio</span><b>noin <span id="m-min">360</span>–<span id="m-max">540</span> € / v</b></div>
+      <div class="sl">
+        <div class="sl-top"><label for="kulutus" id="kulutus-l">Lämmityksen kulutus vuodessa</label>
+          <span class="val"><input id="kulutus" type="text" inputmode="numeric" autocomplete="off" value="18 000"><em id="kulutus-u">kWh</em></span></div>
+        <div class="rng" id="w-kulutus"><output class="bub" id="b-kulutus">18 000 kWh</output>
+          <input type="range" id="r-kulutus" aria-labelledby="kulutus-l" min="3000" max="40000" step="500" value="18000"></div>
+        <div class="ends"><span id="kmin">3 000</span><span id="kmax">40 000</span></div>
+      </div>
+
+      <div class="sl">
+        <div class="sl-top"><label for="hinta" id="hinta-l">Sähkön hinta (sis. siirto + alv)</label>
+          <span class="val"><input id="hinta" type="text" inputmode="decimal" autocomplete="off" value="0,20"><em id="hinta-u">€/kWh</em></span></div>
+        <div class="rng" id="w-hinta"><output class="bub" id="b-hinta">0,20 €/kWh</output>
+          <input type="range" id="r-hinta" aria-labelledby="hinta-l" min="0.05" max="0.5" step="0.01" value="0.2"></div>
+        <div class="ends"><span id="hmin">0,05</span><span id="hmax">0,50</span></div>
+      </div>
+      <p class="hint">Esimerkkiarvot tavalliselle omakotitalolle. Voit myös kirjoittaa luvun suoraan laatikkoon.</p>
+    </div>
+
+    <div class="out" aria-live="polite">
+      <div>
+        <div class="res-l">Arvioitu säästö vuodessa</div>
+        <div class="big"><span class="pre">noin</span><span data-test="min" id="o-min">360</span>–<span data-test="max" id="o-max">540</span><small>€</small></div>
+        <div class="res-s">kun vetävien ovien ja ikkunoiden tiivisteet uusitaan</div>
+      </div>
+      <div class="split">
+        <div class="split-t"><span>Lämmityskulut nyt</span><b><span id="o-nyt">3 600</span> € / vuosi</b></div>
+        <div class="sbar" aria-hidden="true"><i class="base"></i><i class="leak1"></i><i class="leak2"></i></div>
+        <div class="legend"><span style="--c:#BFD9C8">lämmitys</span><span style="--c:var(--now)">vuotojen osuus, arvio 10–15 %</span></div>
+      </div>
+      <a class="btn" href="https://tiiviskoti.fi/#laskuri">Laske tiivistyksen hinta</a>
+    </div>
+  </div>
+  <p class="note"><strong>Osuus on arvio, ei lupaus.</strong> Laskuri laskee hinta × kulutus ja siitä 10–15 %. Lopputulos riippuu talosta, lämmitystavasta ja siitä, kuinka moni ovi ja ikkuna oikeasti vuotaa.</p>
+</div></section>
+
+<script>
+(function(){
+  var T={sahko:{h:0.20,k:18000,hl:'Sähkön hinta (sis. siirto + alv)',hu:'€/kWh',kl:'Lämmityksen kulutus vuodessa',ku:'kWh',h0:0.05,h1:0.50,hs:0.01,k0:3000,k1:40000,ks:500,hd:2},
+         kauko:{h:0.12,k:20000,hl:'Kaukolämmön hinta',hu:'€/kWh',kl:'Kulutus vuodessa',ku:'kWh',h0:0.05,h1:0.30,hs:0.01,k0:5000,k1:40000,ks:500,hd:2},
+         maa:{h:0.20,k:7000,hl:'Sähkön hinta (sis. siirto + alv)',hu:'€/kWh',kl:'Lämpöpumpun sähkönkulutus',ku:'kWh',h0:0.05,h1:0.50,hs:0.01,k0:2000,k1:20000,ks:250,hd:2},
+         oljy:{h:1.45,k:2000,hl:'Lämmitysöljyn hinta',hu:'€/l',kl:'Öljynkulutus vuodessa',ku:'litraa',h0:0.80,h1:2.50,hs:0.05,k0:500,k1:5000,ks:50,hd:2}};
+  var $=function(id){return document.getElementById(id)};
+  var fmt=function(n){return Math.round(n).toLocaleString('fi-FI')};
+  var fdec=function(n,d){return n.toFixed(d).replace('.',',')};
+  var round=function(n){return n<1000?Math.round(n/10)*10:Math.round(n/50)*50};
+  var num=function(s){return parseFloat(String(s).replace(/[\s ]/g,'').replace(',','.'))||0};
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var type='sahko', cur={min:0,max:0,nyt:0}, raf=null;
+  var F={hinta:{txt:$('hinta'),rng:$('r-hinta'),wrap:$('w-hinta'),bub:$('b-hinta')},
+         kulutus:{txt:$('kulutus'),rng:$('r-kulutus'),wrap:$('w-kulutus'),bub:$('b-kulutus')}};
+  function label(key,v){var c=T[type]; return key==='hinta'?fdec(v,c.hd)+' '+c.hu:fmt(v)+' '+c.ku}
+  function syncRange(key,v){ var r=F[key].rng, lo=+r.min, hi=+r.max, cl=Math.min(hi,Math.max(lo,v));
+    r.value=cl; var p=(cl-lo)/(hi-lo)*100; F[key].wrap.style.setProperty('--pv',p/100); r.style.setProperty('--p',p+'%'); F[key].bub.textContent=label(key,v); }
+  function draw(v){ $('m-min').textContent=fmt(v.min); $('m-max').textContent=fmt(v.max); $('o-min').textContent=fmt(v.min); $('o-max').textContent=fmt(v.max); $('o-nyt').textContent=fmt(v.nyt); }
+  function calc(instant){
+    var nyt=Math.max(0,num(F.hinta.txt.value)*num(F.kulutus.txt.value));
+    var to={min:round(nyt*0.10),max:round(nyt*0.15),nyt:round(nyt)};
+    cancelAnimationFrame(raf);
+    if(reduce||instant){cur=to;draw(to);return}
+    var from=cur,t0=null;
+    (function step(ts){ if(ts===undefined){raf=requestAnimationFrame(step);return}
+      if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/650), e=1-Math.pow(1-p,4), v={};
+      for(var k in to) v[k]=from[k]+(to[k]-from[k])*e;
+      cur=v; draw(v); if(p<1) raf=requestAnimationFrame(step); else {cur=to;draw(to)} })();
+  }
+  Object.keys(F).forEach(function(key){
+    var f=F[key];
+    f.rng.addEventListener('input',function(){ var v=+f.rng.value, c=T[type];
+      f.txt.value=key==='hinta'?fdec(v,c.hd):fmt(v); syncRange(key,v); calc(true); });
+    f.txt.addEventListener('input',function(){ syncRange(key,num(f.txt.value)); calc(); });
+    var tm=null, on=function(){clearTimeout(tm);f.wrap.classList.add('drag')}, later=function(){clearTimeout(tm);tm=setTimeout(function(){f.wrap.classList.remove('drag')},900)};
+    f.rng.addEventListener('pointerdown',on);
+    ['pointerup','pointercancel'].forEach(function(ev){window.addEventListener(ev,function(){ if(f.wrap.classList.contains('drag')) later() })});
+    f.rng.addEventListener('keydown',function(){on();later()});
+  });
+  function setType(t){ type=t; var c=T[t];
+    F.hinta.rng.min=c.h0; F.hinta.rng.max=c.h1; F.hinta.rng.step=c.hs;
+    F.kulutus.rng.min=c.k0; F.kulutus.rng.max=c.k1; F.kulutus.rng.step=c.ks;
+    F.hinta.txt.value=fdec(c.h,c.hd); F.kulutus.txt.value=fmt(c.k);
+    $('hinta-l').textContent=c.hl; $('hinta-u').textContent=c.hu; $('kulutus-l').textContent=c.kl; $('kulutus-u').textContent=c.ku;
+    $('hmin').textContent=fdec(c.h0,2); $('hmax').textContent=fdec(c.h1,2); $('kmin').textContent=fmt(c.k0); $('kmax').textContent=fmt(c.k1);
+    syncRange('hinta',c.h); syncRange('kulutus',c.k); }
+  document.querySelectorAll('[data-t]').forEach(function(b){ b.addEventListener('click',function(){
+    document.querySelectorAll('[data-t]').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-checked','false')});
+    b.classList.add('on'); b.setAttribute('aria-checked','true'); setType(b.dataset.t); calc(); }); });
+  setType('sahko');
+  var root=$('saastolaskuri');
+  if('IntersectionObserver' in window && !reduce){
+    var io=new IntersectionObserver(function(es){ if(es[0].isIntersecting){io.disconnect();calc()} },{threshold:.3}); io.observe(root);
+  } else calc(true);
+})();
+</script>
+</body>
+</html>
