@@ -381,6 +381,38 @@ function typeCard(t){
   return c;
 }
 
+/* Ikkunamäärän ohje: asiakkaat laskivat ikkuna-AUKKOJA, jolloin hinta jäi liian
+   pieneksi ja nousi paikan päällä. Yksi avautuva kokonaisuus = 1 ikkuna; iso ikkuna
+   ja tuuletusikkuna samassa aukossa = 2; sisä- ja ulkopuite samassa = 1 (Josua 6.10.2026).
+   Kiinteistä ikkunoista ei puhuta tarkoituksella. Tyylit tulevat mukana, koska
+   _shared.js on käytössä monella sivulla, joilla on omat CSS:nsä.
+   ESIKATSELU: näkyy vain sivulla, jonka <html data-ikkunaohje="1">. */
+const SHOW_WINDOW_GUIDE = document.documentElement.dataset.ikkunaohje === '1';
+function windowGuide(){
+  if(!document.getElementById('wguide-css')){
+    const s = document.createElement('style'); s.id = 'wguide-css';
+    s.textContent = `.wguide{display:flex;align-items:center;gap:14px;padding:12px 22px 13px;background:var(--green-soft,#E4F0E9);border-bottom:1px solid var(--line,#E4E8E0)}
+.wguide svg{flex:none;width:58px;height:58px}
+.wguide b{display:block;font-size:14px;color:var(--ink,#183A28);line-height:1.3}
+.wguide span{display:block;font-size:13px;color:var(--text,#4A544D);line-height:1.45;margin-top:3px}
+@media(max-width:620px){.wguide{padding:11px 14px 12px;gap:12px}.wguide svg{width:52px;height:52px}.wguide b{font-size:13.5px}.wguide span{font-size:12.5px}}`;
+    document.head.appendChild(s);
+  }
+  const g = document.createElement('div');
+  g.className = 'wguide';
+  /* Kuva: yksi ikkuna-aukko, jossa iso ikkuna (1) ja kapea tuuletusikkuna (2). */
+  g.innerHTML =
+    `<svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+       <rect x="3" y="5" width="58" height="54" rx="3" fill="#fff" stroke="#183A28" stroke-width="2.4"/>
+       <rect x="8" y="10" width="29" height="44" rx="1.5" stroke="#217A4E" stroke-width="2.2"/>
+       <rect x="41" y="10" width="15" height="44" rx="1.5" stroke="#217A4E" stroke-width="2.2"/>
+       <circle cx="22.5" cy="32" r="7.5" fill="#217A4E"/><text x="22.5" y="36.2" text-anchor="middle" font-family="Manrope,system-ui,sans-serif" font-size="11.5" font-weight="800" fill="#fff">1</text>
+       <circle cx="48.5" cy="32" r="6.4" fill="#217A4E"/><text x="48.5" y="35.8" text-anchor="middle" font-family="Manrope,system-ui,sans-serif" font-size="10" font-weight="800" fill="#fff">2</text>
+     </svg>
+     <div><b>Laske jokainen avautuva ikkuna erikseen</b><span>Iso ikkuna ja sen vieressä oleva tuuletusikkuna ovat 2 ikkunaa. Sisä- ja ulkopuite samassa ikkunassa on 1.</span></div>`;
+  return g;
+}
+
 /* Määräalennus toimintana: sirun napautus asettaa määrän portaan alkuun. */
 function tierChips(){
   const box = document.createElement('div');
@@ -401,6 +433,7 @@ if(typesEl && extrasEl){
   const secondary = TYPES.filter(t => !PRIMARY_TYPES.includes(t.id));
   primary.forEach(t=>{
     typesEl.appendChild(typeCard(t));
+    if(t.id==='ikkuna' && SHOW_WINDOW_GUIDE) typesEl.appendChild(windowGuide());
     if(t.tiers) typesEl.appendChild(tierChips());
   });
   if(secondary.length){
