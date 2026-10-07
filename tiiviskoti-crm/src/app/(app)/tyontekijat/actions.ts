@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { sql } from '@/lib/db';
 import { requireManager, requireStaff } from '@/lib/session';
 import { adminAuthConfigured, findAuthUserByEmail, supabaseAdmin } from '@/lib/supabase-admin';
+import { googleConfigured } from '@/lib/google';
+import { linkStaffGoogleCalendar } from '@/lib/staff-calendar';
 
 export type ActionState = { error?: string; ok?: string };
 
@@ -156,4 +158,32 @@ export async function setStaffActive(formData: FormData) {
 
   await sql`update tk.staff set active = ${active} where id = ${id}`;
   revalidatePath('/tyontekijat');
+}
+
+/**
+ * Luo työntekijälle oman TiivisKoti-kalenterin Googleen ja jakaa sen hänelle
+ * (ks. lib/staff-calendar.ts). Jo linkitetylle sama kutsu lähettää jakopostin
+ * uudelleen eikä luo toista kalenteria.
+ */
+export async function linkGoogleCalendar(
+  _prev: ActionState, formData: FormData,
+): Promise<ActionState> {
+  await requireManager();
+  if (!googleConfigured()) return { error: 'Google-yhteys ei ole käytössä tässä ympäristössä.' };
+
+  const staffId = String(formData.get('staffId') ?? '');
+  if (!z.string().uuid().safeParse(staffId).success) return { error: 'Valitse työntekijä' };
+
+  try {
+    const r = await linkStaffGoogleCalendar(staffId);
+    revalidatePath('/tyontekijat');
+    const moved = r.moved > 0 ? ` ${r.moved} tulevaa keikkaa siirretty.` : '';
+    const failed = r.failed > 0 ? ` ${r.failed} siirto epäonnistui, katso lokit.` : '';
+    return {
+      ok: (r.created ? 'Kalenteri luotu ja kutsu lähetetty.' : 'Kutsu lähetetty uudelleen.') + moved + failed,
+    };
+  } catch (e) {
+    console.error('linkGoogleCalendar:', staffId, e instanceof Error ? e.message : e);
+    return { error: e instanceof Error ? e.message : 'Linkitys epäonnistui.' };
+  }
 }

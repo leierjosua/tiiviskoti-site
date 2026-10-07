@@ -152,8 +152,10 @@ export async function deliverBooking(input: DeliverInput): Promise<DeliverResult
       calendarId: input.googleCalendarId ?? undefined,
       // Asentaja osallistujaksi, jotta työ näkyy hänen omassa kalenterissaan
       // eikä vain yrityksen. Ei lisätä jos osoite on yrityksen oma — silloin
-      // tapahtuma on jo siinä kalenterissa.
-      attendees: staff.isFallback ? undefined : [{ email: staff.email, displayName: staff.name }],
+      // tapahtuma on jo siinä kalenterissa. Eikä jos asentajalla on oma
+      // jaettu TiivisKoti-kalenteri (ks. staff-calendar.ts): tapahtuma on jo
+      // siinä, ja kutsu toisi saman keikan toiseen kertaan hänen pääkalenteriinsa.
+      attendees: staff.isFallback || input.googleCalendarId ? undefined : [{ email: staff.email, displayName: staff.name }],
     });
     result.calendar = { ok: true, id: ev.id };
   } catch (e) {
@@ -272,7 +274,7 @@ export async function deliverKartoitus(input: DeliverKartoitusInput): Promise<De
       startsAt: input.startsAt,
       endsAt: input.endsAt,
       calendarId: input.googleCalendarId ?? undefined,
-      attendees: staff.isFallback ? undefined : [{ email: staff.email, displayName: staff.name }],
+      attendees: staff.isFallback || input.googleCalendarId ? undefined : [{ email: staff.email, displayName: staff.name }],
     });
     result.calendar = { ok: true, id: ev.id };
   } catch (e) {
@@ -409,10 +411,11 @@ export async function reassignCalendarEventForJob(
 
     /* Tyhjä lista poistaa vanhan tekijän. Fallback-tapauksessa (asentajalla ei
        ole sähköpostia) tapahtuma jää yrityksen kalenteriin ilman osallistujaa
-       — sama tila kuin luonnissa. */
+       — sama tila kuin luonnissa. Samoin jos uudella tekijällä on oma
+       TiivisKoti-kalenteri: siirto vei tapahtuman jo sinne. */
     const { missing } = await updateCalendarEvent(row.google_event_id, {
       calendarId: row.google_calendar_id ?? undefined,
-      attendees: staff.isFallback ? [] : [{ email: staff.email, displayName: staff.name }],
+      attendees: staff.isFallback || row.google_calendar_id ? [] : [{ email: staff.email, displayName: staff.name }],
     });
     if (missing) await forget();
   } catch (e) {

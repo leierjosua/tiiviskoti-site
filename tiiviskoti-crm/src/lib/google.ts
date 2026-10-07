@@ -332,10 +332,9 @@ export async function updateCalendarEvent(
    `google_calendar_id`. Pelkkä PATCH ei riitä: se päivittää tapahtuman siinä
    kalenterissa jossa se jo on, joten työ jäisi vanhan asentajan kalenteriin.
 
-   Sama lähde ja kohde = ei tehtävää. Nykyisillä asetuksilla kaikilla
-   kalentereilla on `google_calendar_id = null`, jolloin molemmat osoittavat
-   samaan oletuskalenteriin eikä siirtoa tarvita — tämä on olemassa siltä
-   varalta että asentajille annetaan omat Google-kalenterit. */
+   Sama lähde ja kohde = ei tehtävää. Kalenteri jolla on `google_calendar_id
+   = null` osoittaa oletuskalenteriin (info@); oma TiivisKoti-kalenteri
+   syntyy työntekijäsivun napista (ks. staff-calendar.ts). */
 export async function moveCalendarEvent(
   eventId: string, from?: string, to?: string,
 ): Promise<{ missing: boolean }> {
@@ -367,5 +366,45 @@ export async function deleteCalendarEvent(eventId: string, calendarId?: string):
   // 404/410 = tapahtuma on jo poissa. Se on haluttu lopputila, ei virhe.
   if (!res.ok && res.status !== 404 && res.status !== 410) {
     throw new Error(`Kalenteritapahtuman poisto epäonnistui: ${res.status}`);
+  }
+}
+
+/* ---------- Asentajan oma Google-kalenteri ---------- */
+
+/* Uusi kalenteri info@:n tilille. Se näkyy asentajalle omana rivinään
+   ("TiivisKoti") hänen Google-kalenterissaan, kun se on jaettu hänelle —
+   erillään hänen omista menoistaan, ja hän voi piilottaa tai värittää sen. */
+export async function createCalendar(summary: string, description: string): Promise<{ id: string }> {
+  const token = await accessToken();
+  const res = await fetch('https://www.googleapis.com/calendar/v3/calendars', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ summary, description, timeZone: 'Europe/Helsinki' }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Kalenterin luonti epäonnistui: ${res.status} ${text.slice(0, 300)}`);
+  return { id: (JSON.parse(text) as { id: string }).id };
+}
+
+/* Jako lukuoikeudella. `reader` eikä `writer`: kanta on totuus, ja asentajan
+   puhelimessa siirretty tapahtuma ei päivittäisi CRM:ää — keikka näyttäisi
+   siirtyneen vaikka asiakas odottaa vanhaan aikaan.
+
+   `sendNotifications=true`: Google lähettää asentajalle postin jossa on
+   "Lisää tämä kalenteri" -linkki. Gmail-tilillä kalenteri ilmestyy listaan
+   vasta kun siihen on klikattu, joten posti on välttämätön. Sama jako
+   uudestaan on sallittu ja lähettää postin uudelleen. */
+export async function shareCalendar(calendarId: string, email: string): Promise<void> {
+  const token = await accessToken();
+  const res = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/acl?sendNotifications=true`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: 'reader', scope: { type: 'user', value: email } }),
+    },
+  );
+  if (!res.ok) {
+    throw new Error(`Kalenterin jako epäonnistui: ${res.status} ${(await res.text()).slice(0, 300)}`);
   }
 }

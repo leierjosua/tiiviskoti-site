@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { addStaff, setStaffActive, setStaffPassword, type ActionState } from './actions';
+import { addStaff, linkGoogleCalendar, setStaffActive, setStaffPassword, type ActionState } from './actions';
 import { Button, ErrorNote, Field, Input, OkNote, Select } from '@/components/ui';
 import { SubmitButton } from '@/components/submit';
 
@@ -150,6 +150,30 @@ export function ToggleActive({ id, active }: { id: string; active: boolean }) {
       <SubmitButton variant="ghost" className="px-2 py-1 text-xs" pendingLabel="…">
         {active ? 'Poista käytöstä' : 'Palauta käyttöön'}
       </SubmitButton>
+    </form>
+  );
+}
+
+/* Linkitetyn kohdalla nappi lähettää jakopostin uudelleen — tavallisin syy
+   sille ettei kalenteri näy on, ettei postin linkkiä ole klikattu. */
+export function GoogleCalendarLink({ staffId, linked, hasCalendar }: {
+  staffId: string; linked: boolean; hasCalendar: boolean;
+}) {
+  const [state, action, pending] = useActionState<ActionState, FormData>(linkGoogleCalendar, {});
+
+  if (!hasCalendar) return <span className="text-xs text-faint">Ei kalenteria</span>;
+
+  return (
+    <form action={action} className="space-y-1">
+      <input type="hidden" name="staffId" value={staffId} />
+      <div className="flex items-center gap-2">
+        {linked && <span className="text-xs text-accent">✓ Linkitetty</span>}
+        <Button type="submit" variant={linked ? 'ghost' : 'outline'} disabled={pending} className="px-2 py-1 text-xs">
+          {pending ? '…' : linked ? 'Lähetä kutsu uudelleen' : 'Linkitä Google-kalenteriin'}
+        </Button>
+      </div>
+      {state.error && <p className="text-xs text-danger">{state.error}</p>}
+      {state.ok && <p className="text-xs text-accent">{state.ok}</p>}
     </form>
   );
 }

@@ -1,8 +1,9 @@
 import { listStaff } from '@/lib/data';
+import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
 import { adminAuthConfigured } from '@/lib/supabase-admin';
 import { Card, CardHeader, Empty, PageHead } from '@/components/ui';
-import { AddStaffForm, SetPasswordForm, ToggleActive } from './ui';
+import { AddStaffForm, GoogleCalendarLink, SetPasswordForm, ToggleActive } from './ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,14 @@ const ROLE_LABELS: Record<string, string> = {
 
 export default async function StaffPage() {
   const me = await requireManager();
-  const staff = await listStaff();
+  const [staff, calendarLinks] = await Promise.all([
+    listStaff(),
+    sql<{ staff_id: string; linked: boolean }[]>`
+      select staff_id, bool_or(google_calendar_id is not null) as linked
+        from tk.calendars group by staff_id
+    `,
+  ]);
+  const linkByStaff = new Map(calendarLinks.map((c) => [c.staff_id, c.linked]));
   /* Salasanan asetus on omistajan oikeus, ei toimiston: sillä ottaa
      kenen tahansa tunnuksen haltuun. Sama tarkistus tehdään uudelleen
      server actionissa — tämä vain piilottaa lomakkeen, ei suojaa mitään. */
@@ -33,13 +41,14 @@ export default async function StaffPage() {
           {staff.length === 0 ? (
             <Empty>Ei työntekijöitä.</Empty>
           ) : (
-            <table className="w-full min-w-[640px] text-sm">
+            <table className="w-full min-w-[820px] text-sm">
               <thead>
                 <tr className="border-b border-line text-left text-xs text-faint">
                   <th className="px-4 py-2 font-medium">Nimi</th>
                   <th className="px-4 py-2 font-medium">Sähköposti</th>
                   <th className="px-4 py-2 font-medium">Puhelin</th>
                   <th className="px-4 py-2 font-medium">Rooli</th>
+                  <th className="px-4 py-2 font-medium">Google-kalenteri</th>
                   <th className="px-4 py-2 font-medium text-right">Tila</th>
                 </tr>
               </thead>
@@ -50,6 +59,13 @@ export default async function StaffPage() {
                     <td className="px-4 py-2.5 text-muted">{person.email}</td>
                     <td className="px-4 py-2.5 text-muted tabular">{person.phone ?? '—'}</td>
                     <td className="px-4 py-2.5 text-muted">{ROLE_LABELS[person.role]}</td>
+                    <td className="px-4 py-2.5">
+                      <GoogleCalendarLink
+                        staffId={person.id}
+                        linked={linkByStaff.get(person.id) ?? false}
+                        hasCalendar={linkByStaff.has(person.id)}
+                      />
+                    </td>
                     <td className="px-4 py-2.5 text-right">
                       <ToggleActive id={person.id} active={person.active} />
                     </td>
