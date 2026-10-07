@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { requireManager, requireStaff } from '@/lib/session';
-import { deliverBooking, ensureCalendarEventForJob, reassignCalendarEventForJob, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
+import { deliverBooking, ensureCalendarEventForJob, reassignCalendarEventForJob, refreshCrewCalendarEvents, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
 import { computePricing } from '@/lib/pricing';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
@@ -322,8 +322,8 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
   /* Kalenteriin myös ilman vahvistusta ja työparille: kumpikin asentaja
      näkee keikan omassa kalenterissaan. Vahvistuksen jälkeen päätyöllä on jo
      tapahtuma, jolloin tämä ei tee sille mitään. */
-  await ensureCalendarEventForJob(jobId);
-  if (mateJobId) await ensureCalendarEventForJob(mateJobId);
+  if (mateJobId) await refreshCrewCalendarEvents(jobId);
+  else await ensureCalendarEventForJob(jobId);
 
   /* Kauppa Metalle vasta kun työ on kannassa. Vain liiditunnisteelliset:
      ilman rajausta Metalle raportoitaisiin myös orgaaniset ja Googlesta
@@ -611,8 +611,7 @@ export async function transferJob(_prev: ActionState, formData: FormData): Promi
   /* Google-kalenteri perässä: päärivin tapahtuma siirtyy uudelle tekijälle,
      lisätyt työparit saavat omansa ja poistetuilta se poistetaan. */
   if (primaryTarget) await reassignCalendarEventForJob(primary.id, prevPrimaryGoogleCal);
-  await ensureCalendarEventForJob(primary.id);
-  for (const a of addedIds) await ensureCalendarEventForJob(a.jobId);
+  await refreshCrewCalendarEvents(primary.id);
   for (const ev of removedEvents) {
     try {
       await deleteCalendarEvent(ev.google_event_id, ev.google_calendar_id ?? undefined);

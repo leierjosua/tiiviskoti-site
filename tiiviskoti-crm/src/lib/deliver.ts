@@ -352,8 +352,11 @@ export async function syncCalendarEventForJob(jobId: string): Promise<void> {
   if (!row?.google_event_id) return;
 
   try {
+    /* Otsikko samasta lähteestä kuin luonnissa, ettei ajan siirto pudota
+       siitä työparin nimeä. */
+    const content = await eventContent(jobId);
     const { missing } = await updateCalendarEvent(row.google_event_id, {
-      summary: `${row.customer_name ?? 'Asiakas'} — ${row.address ?? ''} (${row.job_number})`,
+      summary: content?.summary ?? `${row.customer_name ?? 'Asiakas'} — ${row.address ?? ''} (${row.job_number})`,
       location: [row.address, row.postal_code, row.city].filter(Boolean).join(', '),
       startsAt: row.starts_at,
       endsAt: row.ends_at,
@@ -442,6 +445,78 @@ export async function removeCalendarEventForJob(jobId: string): Promise<void> {
 /** Aikaleima ihmisluettavana lokiin ja panelin näyttöön. */
 export const humanWhen = (d: Date) => `${dateKeyOf(d)} ${timeOf(d)}`;
 
+
+/** Työn kalenteritapahtuman sisältö kannan nykytilasta. Työparin rivillä ei
+ *  ole omia työrivejä eikä hintaa, joten ne luetaan päätyöltä (ryhmän kallein
+ *  rivi). Muut tekijät näkyvät otsikossa ja kuvauksessa, jotta asentaja näkee
+ *  puhelimesta suoraan kenen kanssa on menossa. */
+async function eventContent(jobId: string) {
+  const [row] = await sql<{
+    job_number: string; starts_at: Date; ends_at: Date; status: string;
+    address: string | null; postal_code: string | null; city: string | null;
+    notes: string | null; price_cents: number; google_event_id: string | null;
+    crew_group_id: string | null; google_calendar_id: string | null;
+    customer_name: string | null; customer_phone: string | null; customer_email: string | null;
+  }[]>`
+    select j.job_number, j.starts_at, j.ends_at, j.status::text as status,
+           j.address, j.postal_code, j.city, j.notes, j.price_cents, j.google_event_id,
+           j.crew_group_id, c.google_calendar_id,
+           cu.full_name as customer_name, cu.phone as customer_phone, cu.email as customer_email
+      from tk.jobs j
+      join tk.calendars c on c.id = j.calendar_id
+      left join tk.customers cu on cu.id = j.customer_id
+     where j.id = ${jobId}
+  `;
+  if (!row) return null;
+
+  const crew = row.crew_group_id
+    ? await sql<{ id: string; job_number: string; price_cents: number; full_name: string }[]>`
+        select j.id, j.job_number, j.price_cents, s.full_name
+          from tk.jobs j
+          join tk.calendars c on c.id = j.calendar_id
+          join tk.staff s on s.id = c.staff_id
+         where j.crew_group_id = ${row.crew_group_id} and j.status <> 'cancelled'
+         order by j.price_cents desc, j.created_at
+      `
+    : [];
+  const primary = crew[0] ?? { id: jobId, job_number: row.job_number, price_cents: row.price_cents };
+  const mates = crew.filter((m) => m.id !== jobId).map((m) => m.full_name);
+
+  const lines = await sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
+    select name, quantity, unit_price_cents from tk.job_lines
+     where job_id = ${primary.id} order by sort_order
+  `;
+  const customerName = row.customer_name ?? 'Asiakas';
+  const description = calendarDescription({
+    jobNumber: primary.job_number === row.job_number
+      ? row.job_number : `${row.job_number} (työpari, päätyö ${primary.job_number})`,
+    customerName,
+    startsAt: row.starts_at,
+    endsAt: row.ends_at,
+    address: row.address ?? '',
+    postalCode: row.postal_code ?? '',
+    city: row.city,
+    lines: lines.map((l) => ({
+      name: l.name, qty: l.quantity,
+      unit: l.unit_price_cents / 100,
+      sum: (l.quantity * l.unit_price_cents) / 100,
+    })),
+    totalCents: primary.price_cents,
+    netCents: Math.round(primary.price_cents * (1 - 0.4 * 0.7)),
+    notes: row.notes,
+    phone: row.customer_phone ?? '',
+    email: row.customer_email ?? '',
+  });
+
+  return {
+    row,
+    summary: `${customerName} — ${row.address ?? ''} (${row.job_number})`
+      + (mates.length ? ` · työpari ${mates.join(', ')}` : ''),
+    description: mates.length ? `Työpari: ${mates.join(', ')}\n\n${description}` : description,
+    location: [row.address, row.postal_code, row.city].filter(Boolean).join(', '),
+  };
+}
+
 /**
  * Luo työlle kalenteritapahtuman, jos sillä ei vielä ole sellaista.
  *
@@ -450,78 +525,61 @@ export const humanWhen = (d: Date) => `${dateKeyOf(d)} ${timeOf(d)}`;
  * vahvistusta luotu työ jäivät siksi kokonaan pois asentajan kalenterista —
  * keikka näkyi CRM:ssä mutta ei puhelimessa.
  *
- * Työparin rivillä ei ole omia työrivejä eikä hintaa, joten kuvaus kootaan
- * päätyöltä (ryhmän kallein rivi). Peruttu tai jo mennyt työ ohitetaan.
- * Ei kaada kutsujaa: kanta on totuus, Google-virhe kirjataan lokiin.
+ * Peruttu tai jo mennyt työ ohitetaan. Ei kaada kutsujaa: kanta on totuus,
+ * Google-virhe kirjataan lokiin.
  */
 export async function ensureCalendarEventForJob(jobId: string): Promise<void> {
   if (!googleConfigured()) return;
   try {
-    const [row] = await sql<{
-      job_number: string; starts_at: Date; ends_at: Date; status: string;
-      address: string | null; postal_code: string | null; city: string | null;
-      notes: string | null; price_cents: number; google_event_id: string | null;
-      crew_group_id: string | null; google_calendar_id: string | null;
-      customer_name: string | null; customer_phone: string | null; customer_email: string | null;
-    }[]>`
-      select j.job_number, j.starts_at, j.ends_at, j.status::text as status,
-             j.address, j.postal_code, j.city, j.notes, j.price_cents, j.google_event_id,
-             j.crew_group_id, c.google_calendar_id,
-             cu.full_name as customer_name, cu.phone as customer_phone, cu.email as customer_email
-        from tk.jobs j
-        join tk.calendars c on c.id = j.calendar_id
-        left join tk.customers cu on cu.id = j.customer_id
-       where j.id = ${jobId}
-    `;
-    if (!row || row.google_event_id || row.status === 'cancelled' || row.ends_at.getTime() < Date.now()) return;
+    const c = await eventContent(jobId);
+    if (!c || c.row.google_event_id || c.row.status === 'cancelled' || c.row.ends_at.getTime() < Date.now()) return;
 
-    const [primary] = row.crew_group_id
-      ? await sql<{ id: string; job_number: string; price_cents: number }[]>`
-          select id, job_number, price_cents from tk.jobs
-           where crew_group_id = ${row.crew_group_id} and status <> 'cancelled'
-           order by price_cents desc, created_at limit 1
-        `
-      : [{ id: jobId, job_number: row.job_number, price_cents: row.price_cents }];
-
-    const lines = await sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
-      select name, quantity, unit_price_cents from tk.job_lines
-       where job_id = ${primary.id} order by sort_order
-    `;
     const staff = await assignedStaff(jobId);
-    const customerName = row.customer_name ?? 'Asiakas';
-
     const ev = await createCalendarEvent({
-      summary: `${customerName} — ${row.address ?? ''} (${row.job_number})`,
-      description: calendarDescription({
-        jobNumber: primary.job_number === row.job_number
-          ? row.job_number : `${row.job_number} (työpari, päätyö ${primary.job_number})`,
-        customerName,
-        startsAt: row.starts_at,
-        endsAt: row.ends_at,
-        address: row.address ?? '',
-        postalCode: row.postal_code ?? '',
-        city: row.city,
-        lines: lines.map((l) => ({
-          name: l.name, qty: l.quantity,
-          unit: l.unit_price_cents / 100,
-          sum: (l.quantity * l.unit_price_cents) / 100,
-        })),
-        totalCents: primary.price_cents,
-        netCents: Math.round(primary.price_cents * (1 - 0.4 * 0.7)),
-        notes: row.notes,
-        phone: row.customer_phone ?? '',
-        email: row.customer_email ?? '',
-      }),
-      location: [row.address, row.postal_code, row.city].filter(Boolean).join(', '),
-      startsAt: row.starts_at,
-      endsAt: row.ends_at,
-      calendarId: row.google_calendar_id ?? undefined,
+      summary: c.summary,
+      description: c.description,
+      location: c.location,
+      startsAt: c.row.starts_at,
+      endsAt: c.row.ends_at,
+      calendarId: c.row.google_calendar_id ?? undefined,
       // Sama sääntö kuin deliverBookingissa: osallistuja vain jos asentajalla
       // ei ole omaa TiivisKoti-kalenteria.
-      attendees: staff.isFallback || row.google_calendar_id ? undefined : [{ email: staff.email, displayName: staff.name }],
+      attendees: staff.isFallback || c.row.google_calendar_id ? undefined : [{ email: staff.email, displayName: staff.name }],
     });
     await sql`update tk.jobs set google_event_id = ${ev.id} where id = ${jobId} and google_event_id is null`;
   } catch (e) {
     console.error('ensureCalendarEventForJob:', jobId, msg(e));
+  }
+}
+
+/**
+ * Päivittää keikan kaikkien tekijöiden tapahtumien otsikon ja kuvauksen —
+ * kutsutaan kun tekijöitä lisätään tai poistetaan, jotta "työpari"-tieto
+ * pysyy oikeana jokaisen kalenterissa. Luo puuttuvat tapahtumat samalla.
+ */
+export async function refreshCrewCalendarEvents(jobId: string): Promise<void> {
+  if (!googleConfigured()) return;
+  const ids = await sql<{ id: string }[]>`
+    select m.id from tk.jobs j
+      join tk.jobs m on m.crew_group_id = j.crew_group_id
+     where j.id = ${jobId} and j.crew_group_id is not null and m.status <> 'cancelled'
+  `;
+  for (const { id } of ids.length ? ids : [{ id: jobId }]) {
+    try {
+      const c = await eventContent(id);
+      if (!c) continue;
+      if (!c.row.google_event_id) { await ensureCalendarEventForJob(id); continue; }
+      const { missing } = await updateCalendarEvent(c.row.google_event_id, {
+        summary: c.summary,
+        description: c.description,
+        calendarId: c.row.google_calendar_id ?? undefined,
+      });
+      if (missing) {
+        await sql`update tk.jobs set google_event_id = null where id = ${id}`;
+        await ensureCalendarEventForJob(id);
+      }
+    } catch (e) {
+      console.error('refreshCrewCalendarEvents:', id, msg(e));
+    }
   }
 }

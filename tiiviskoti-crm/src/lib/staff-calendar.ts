@@ -1,7 +1,7 @@
 import 'server-only';
 import { sql } from './db';
 import { createCalendar, moveCalendarEvent, shareCalendar, updateCalendarEvent } from './google';
-import { ensureCalendarEventForJob } from './deliver';
+import { refreshCrewCalendarEvents } from './deliver';
 
 /* =========================================================
    Asentajan oma "TiivisKoti"-kalenteri Googlessa.
@@ -99,11 +99,13 @@ export async function linkStaffGoogleCalendar(staffId: string): Promise<LinkResu
      vahvistusta luodut työt. Ne luodaan suoraan uuteen kalenteriin. */
   const missing = await sql<{ id: string }[]>`
     select j.id from tk.jobs j join tk.calendars c on c.id = j.calendar_id
-     where c.staff_id = ${staffId} and j.google_event_id is null
+     where c.staff_id = ${staffId} and (j.google_event_id is null or j.crew_group_id is not null)
        and j.ends_at > now() and j.status <> 'cancelled'
   `;
+  /* Työparikeikoilla päivitetään samalla parin tapahtuma, jotta molempien
+     kalentereissa lukee kenen kanssa ollaan menossa. */
   for (const job of missing) {
-    await ensureCalendarEventForJob(job.id);
+    await refreshCrewCalendarEvents(job.id);
     moved++;
   }
 
