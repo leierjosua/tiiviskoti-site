@@ -6,12 +6,12 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { requireManager, requireStaff } from '@/lib/session';
-import { deliverBooking, reassignCalendarEventForJob, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
+import { deliverBooking, ensureCalendarEventForJob, reassignCalendarEventForJob, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
 import { computePricing } from '@/lib/pricing';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
 import { generateOfferPdf } from '@/lib/offer-pdf';
-import { sendMail } from '@/lib/google';
+import { deleteCalendarEvent, sendMail } from '@/lib/google';
 import { parseBookingStart } from '@/lib/time';
 import { reportSaleToMeta } from '@/lib/meta-sale';
 import { receiptEmailSubject, receiptEmailHtml, receiptEmailText, offerEmailSubject, offerEmailHtml, offerEmailText, workOrderSubject, workOrderHtml, workOrderText } from '@/lib/mail-templates';
@@ -119,6 +119,7 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
   let jobNumber = '';
   let mailLines: { name: string; qty: number; unit: number; sum: number }[] = [];
   let googleCalendarId: string | null = null;
+  let mateJobId: string | null = null;
   try {
     // Asiakas ja työ syntyvät joko molemmat tai ei kumpikaan: ilman
     // transaktiota päällekkäinen aika jättäisi orvon asiakasrivin.
@@ -247,6 +248,7 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
                   ${source}, ${lead?.campaign ?? null}, null, 0)
           returning id
         `;
+        mateJobId = mate.id;
         const crew = randomUUID();
         await tx`update tk.jobs set crew_group_id = ${crew}::uuid where id = ${job.id}`;
         await tx`update tk.jobs set crew_group_id = ${crew}::uuid where id = ${mate.id}`;
@@ -316,6 +318,12 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
       console.error('createJob: vahvistuksen lähetys epäonnistui', jobNumber, e);
     }
   }
+
+  /* Kalenteriin myös ilman vahvistusta ja työparille: kumpikin asentaja
+     näkee keikan omassa kalenterissaan. Vahvistuksen jälkeen päätyöllä on jo
+     tapahtuma, jolloin tämä ei tee sille mitään. */
+  await ensureCalendarEventForJob(jobId);
+  if (mateJobId) await ensureCalendarEventForJob(mateJobId);
 
   /* Kauppa Metalle vasta kun työ on kannassa. Vain liiditunnisteelliset:
      ilman rajausta Metalle raportoitaisiin myös orgaaniset ja Googlesta
@@ -542,6 +550,16 @@ export async function transferJob(_prev: ActionState, formData: FormData): Promi
   }
 
   const prevPrimaryGoogleCal = primary.google_calendar_id;
+  /* Poistettavien tapahtumat luetaan ENNEN transaktiota: poistetun rivin
+     jälkeen tunnistetta ei enää ole mistä hakea, ja tapahtuma jäisi
+     asentajan kalenteriin orvoksi. */
+  const removedEvents = remove.length > 0
+    ? await sql<{ google_event_id: string; google_calendar_id: string | null }[]>`
+        select j.google_event_id, c.google_calendar_id
+          from tk.jobs j join tk.calendars c on c.id = j.calendar_id
+         where j.id = any(${remove.map((r) => r.id)}::uuid[]) and j.google_event_id is not null
+      `
+    : [];
   const addedIds: { jobId: string; staffName: string; staffEmail: string | null }[] = [];
 
   try {
@@ -590,11 +608,20 @@ export async function transferJob(_prev: ActionState, formData: FormData): Promi
     throw err;
   }
 
-  /* Google-kalenteri perässä vain päärivillä: työpareilla ei ole omaa
-     tapahtumaa (`deliverBooking` ajetaan vain päätyölle). Poistetuilta
-     varmuuden vuoksi silti, jos sellainen on joskus syntynyt. */
+  /* Google-kalenteri perässä: päärivin tapahtuma siirtyy uudelle tekijälle,
+     lisätyt työparit saavat omansa ja poistetuilta se poistetaan. */
   if (primaryTarget) await reassignCalendarEventForJob(primary.id, prevPrimaryGoogleCal);
-  for (const r of remove) if (!heavy.has(r.id)) await removeCalendarEventForJob(r.id);
+  await ensureCalendarEventForJob(primary.id);
+  for (const a of addedIds) await ensureCalendarEventForJob(a.jobId);
+  for (const ev of removedEvents) {
+    try {
+      await deleteCalendarEvent(ev.google_event_id, ev.google_calendar_id ?? undefined);
+    } catch (e) {
+      console.error('transferJob: tapahtuman poisto epäonnistui', ev.google_event_id, e instanceof Error ? e.message : e);
+    }
+  }
+  await sql`update tk.jobs set google_event_id = null
+             where id = any(${remove.filter((r) => heavy.has(r.id)).map((r) => r.id)}::uuid[])`;
 
   let mailNote = '';
   if (lahetaTyomaarain) {

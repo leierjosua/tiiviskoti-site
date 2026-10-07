@@ -1,6 +1,7 @@
 import 'server-only';
 import { sql } from './db';
 import { createCalendar, moveCalendarEvent, shareCalendar, updateCalendarEvent } from './google';
+import { ensureCalendarEventForJob } from './deliver';
 
 /* =========================================================
    Asentajan oma "TiivisKoti"-kalenteri Googlessa.
@@ -92,6 +93,18 @@ export async function linkStaffGoogleCalendar(staffId: string): Promise<LinkResu
       failed++;
       console.error('linkStaffGoogleCalendar: siirto epäonnistui', job.id, e instanceof Error ? e.message : e);
     }
+  }
+
+  /* Keikat joilla ei ole tapahtumaa lainkaan — työparin rivit ja ilman
+     vahvistusta luodut työt. Ne luodaan suoraan uuteen kalenteriin. */
+  const missing = await sql<{ id: string }[]>`
+    select j.id from tk.jobs j join tk.calendars c on c.id = j.calendar_id
+     where c.staff_id = ${staffId} and j.google_event_id is null
+       and j.ends_at > now() and j.status <> 'cancelled'
+  `;
+  for (const job of missing) {
+    await ensureCalendarEventForJob(job.id);
+    moved++;
   }
 
   return { created, calendarId, moved, failed };
