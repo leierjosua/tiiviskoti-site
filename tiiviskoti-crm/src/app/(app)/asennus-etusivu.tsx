@@ -5,6 +5,7 @@ import {
   addDays, dateKeyOf, formatDateKey, helsinkiDateTime, isoWeekday, timeOf, weekdayShort,
 } from '@/lib/time';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
+import { GoogleKalenteriKortti } from './google-kalenteri-kortti';
 import { jobMateNames, jobUnitCounts, mateLabel, unitLabel, type JobUnits } from '@/lib/data';
 
 /* =========================================================
@@ -164,6 +165,11 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
     j.id, j.job_number, j.starts_at, j.ends_at, j.status::text as status, j.title,
     j.address, j.postal_code, j.city, j.notes,
     cu.full_name as customer_name, cu.phone as customer_phone
+  `;
+
+  const [calLink] = await sql<{ linked: boolean }[]>`
+    select bool_or(google_calendar_id is not null) as linked
+      from tk.calendars where staff_id = ${staff.id}
   `;
 
   const [upcoming, overdue, stats, unitsToday, unitsWeek, unitsAhead] = await Promise.all([
@@ -351,6 +357,8 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
           )}
         </Card>
       </div>
+
+      <GoogleKalenteriKortti linked={calLink?.linked ?? false} hasCalendar={calLink?.linked != null} />
 
       {/* Rästit viimeisenä: ne ovat tärkeitä mutta menneitä, eivätkä saa
           työntää päivän listaa alaspäin. */}
