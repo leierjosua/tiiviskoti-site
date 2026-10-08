@@ -8,7 +8,7 @@ const LABELS: Record<string, string> = {
   new: 'Uusi',
   contacted: 'Yhteydessä',
   no_answer: 'Soita uudelleen',
-  converted: 'Muuttui asiakkaaksi',
+  converted: 'Tarjous lähetetty / asiakas',
   rejected: 'Ei jatkoa',
 };
 

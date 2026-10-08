@@ -36,31 +36,35 @@ const PIXEL_ID = process.env.META_PIXEL_ID || '1102837850103694';
 /* Liidin tila → Metan tapahtuma.
 
    `new` puuttuu tarkoituksella: siitä ei ole vielä opittu mitään, eikä
-   "liidi saapui" ole uutta tietoa Metalle — se tietää sen itse. */
+   "liidi saapui" ole uutta tietoa Metalle — se tietää sen itse.
+
+   `converted` → OfferSent EIKÄ LeadConverted: käytännössä tila asetetaan
+   kun tarjous on lähetetty (8.10.2026: 18 converted-liidiä, niistä 1 työ).
+   Oikea kauppa menee Metalle omana Purchase-tapahtumanaan
+   (api/crm-purchase), joten "converted" nimellä Meta luulisi tarjouksen
+   kaupaksi ja optimoisi väärää vaihetta. Nimen vaihto ei hukannut
+   historiaa: aiemmat LeadConverted-tapahtumat menivät ilman crm-merkintää
+   eikä Meta lukenut niitä vaiheiksi lainkaan. */
 const STAGE_EVENT: Record<string, string> = {
   contacted: 'LeadContacted',
-  converted: 'LeadConverted',
+  converted: 'OfferSent',
   rejected: 'LeadDisqualified',
 };
 
-/* VAIN VIIMEKSI MUUTTUNEET.
+/* KERRAN PER VAIHE: `meta_stage_sent` (db/034) kertoo minkä tilan Meta on
+   jo saanut, ja vain eroavat lähetetään.
 
-   Ensimmäinen versio lähetti kaikki 90 vuorokauden liidit joka ajossa ja
-   nojasi siihen että Meta poistaa kaksoiskappaleet `event_id`:n perusteella.
-   Se on väärin: **Metan deduplikointi kattaa noin 48 tuntia**, joten sen
-   jälkeen sama tapahtuma laskettaisiin uudestaan. Päivittäinen ajo olisi
-   kirjannut samat neljä liidiä yhä uudelleen ja paisuttanut laatulukuja.
+   Aiemmin rivit valittiin `updated_at`in perusteella (2 vrk ikkuna), mutta
+   trg_leads_touch nostaa sitä kaikista muokkauksista — viikkoja sitten
+   vaihtunut tila lähti uudestaan kun liidiin lisättiin soittokierros, ja
+   Metan deduplikointi kattaa vain ~48 h. Tulos 8.10.2026: 61
+   LeadConverted-tapahtumaa 28 liidistä.
 
-   Näkyi datassa 2.9.2026: neljä liidiä oli tuottanut yhdeksän tapahtumaa
-   (LeadContacted 6 + LeadDisqualified 3), koska ajo käynnistettiin käsin
-   kolmesti.
-
-   Kahden vuorokauden ikkuna tarkoittaa että tilan muutos ehtii mukaan
-   seuraavaan päivittäiseen ajoon ja lähtee korkeintaan kahdesti — molemmat
-   deduplikointi-ikkunan sisällä. Hinta: jos ajo on rikki kaksi vuorokautta
-   putkeen, yksi tilamuutos jää lähettämättä. Se on halvempi virhe kuin
-   ylilaskenta, ja vaihtoehto olisi oma sarake kannassa. */
-const MAX_AGE_DAYS = 2;
+   Metan rajoitus: event_time saa olla enintään 7 vrk menneisyydessä, ja
+   yksi liian vanha tapahtuma hylkää koko erän. Siksi aika rajataan
+   6 vrk:een — jos ajo on ollut rikki pitkään, vaihe lähtee silti
+   (myöhäisellä aikaleimalla) eikä tukki jonoa ikuisesti. */
+const MAX_EVENT_AGE_MS = 6 * 24 * 3600 * 1000;
 /* CRM:n nimi Metan liidisuppilossa. Sama arvo myös sivuston
    api/crm-purchase.mjs:ssä — muuten Meta näkisi kaksi eri CRM:ää. */
 const LEAD_EVENT_SOURCE = 'TiivisKoti CRM';
@@ -74,6 +78,7 @@ export type StageSyncResult = {
 };
 
 type StageRow = {
+  id: string;
   external_id: string;
   status: string;
   updated_at: Date;
@@ -86,31 +91,30 @@ export async function sendLeadStages(): Promise<StageSyncResult> {
   }
 
   const rows = await sql<StageRow[]>`
-    select external_id, status, updated_at
+    select id, external_id, status, updated_at
       from tk.leads
-     where external_id is not null
-       and status <> 'new'
-       and updated_at >= now() - ${`${MAX_AGE_DAYS} days`}::interval
+     where external_id ~ '^[0-9]+$'
+       and status in ('contacted', 'converted', 'rejected')
+       and status is distinct from meta_stage_sent
      order by updated_at
      limit ${BATCH_SIZE}
   `;
 
-  const data = rows
-    .filter((r) => STAGE_EVENT[r.status] && /^\d+$/.test(r.external_id))
-    .map((r) => ({
-      event_name: STAGE_EVENT[r.status],
-      event_time: Math.floor(r.updated_at.getTime() / 1000),
-      action_source: 'system_generated',
-      /* Kaksoiskappaleiden esto: sama liidi + sama vaihe = sama tapahtuma. */
-      event_id: `${r.external_id}-${r.status}`,
-      user_data: { lead_id: Number(r.external_id) },
-      /* PAKOLLISET liidien CRM-integraatiossa: ilman näitä Meta ottaa
-         tapahtuman vastaan (events_received) mutta ei tunnista sitä liidin
-         vaiheeksi, eikä laatupalaute päädy mainosten optimointiin. */
-      custom_data: { event_source: 'crm', lead_event_source: LEAD_EVENT_SOURCE },
-    }));
+  const oldest = Date.now() - MAX_EVENT_AGE_MS;
+  const data = rows.map((r) => ({
+    event_name: STAGE_EVENT[r.status],
+    event_time: Math.floor(Math.max(r.updated_at.getTime(), oldest) / 1000),
+    action_source: 'system_generated',
+    /* Kaksoiskappaleiden esto: sama liidi + sama vaihe = sama tapahtuma. */
+    event_id: `${r.external_id}-${r.status}`,
+    user_data: { lead_id: Number(r.external_id) },
+    /* PAKOLLISET liidien CRM-integraatiossa: ilman näitä Meta ottaa
+       tapahtuman vastaan (events_received) mutta ei tunnista sitä liidin
+       vaiheeksi, eikä laatupalaute päädy mainosten optimointiin. */
+    custom_data: { event_source: 'crm', lead_event_source: LEAD_EVENT_SOURCE },
+  }));
 
-  const skipped = rows.length - data.length;
+  const skipped = 0;
   if (data.length === 0) return { configured: true, sent: 0, skipped };
 
   let res: Response;
@@ -139,6 +143,16 @@ export async function sendLeadStages(): Promise<StageSyncResult> {
   try {
     received = (JSON.parse(text) as { events_received?: number }).events_received ?? data.length;
   } catch { /* vastaus ilman runkoa on silti hyväksyntä */ }
+
+  /* Kirjataan vasta Metan hyväksynnän jälkeen. Ehto `status = …` estää
+     merkitsemästä lähetetyksi tilaa joka ehti vaihtua kesken ajon — se
+     lähtee seuraavalla kerralla. */
+  for (const r of rows) {
+    await sql`
+      update tk.leads set meta_stage_sent = ${r.status}
+       where id = ${r.id}::uuid and status = ${r.status}
+    `;
+  }
 
   return { configured: true, sent: received, skipped };
 }
