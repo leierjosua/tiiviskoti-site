@@ -266,6 +266,25 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
           update tk.offers set status = 'accepted'
            where id = ${d.offerId}::uuid and status in ('draft', 'sent', 'expired')
         `;
+      } else if (d.email) {
+        /* Työ syntyi liidiltä tai käsin, vaikka asiakkaalle oli lähetetty
+           tarjous. Ilman tätä tarjous jäi "Lähetetty"-tilaan ja tarjousten
+           hyväksymisaste näytti todellista huonommalta (8.10.2026: T-0021,
+           T-0033). Vain SÄHKÖPOSTILLA: puhelinnumero osui toisen asiakkaan
+           tarjoukseen (sama numero, eri henkilö). Uusin avoin tarjous 90 vrk
+           sisältä; vanhentunutkin kelpaa, koska asiakas tarttui siihen. */
+        const [open] = await tx<{ id: string }[]>`
+          select id from tk.offers
+           where lower(email) = lower(${d.email})
+             and status in ('sent', 'expired')
+             and created_at >= now() - interval '90 days'
+           order by created_at desc
+           limit 1
+        `;
+        if (open) {
+          await tx`update tk.jobs set offer_id = ${open.id}::uuid where id = ${job.id} and offer_id is null`;
+          await tx`update tk.offers set status = 'accepted' where id = ${open.id}::uuid`;
+        }
       }
       /* Liidi merkitään asiakkaaksi samassa transaktiossa: muuten se jäisi
          Liidit-sivulle avoimeksi ja joku soittaisi perään turhaan. */

@@ -1,4 +1,5 @@
 import { runGoogleHealthCheck } from '@/lib/health';
+import { sql } from '@/lib/db';
 
 /* =========================================================
    Päivittäinen kuntotarkistus (Vercel Cron, ks. vercel.json).
@@ -27,5 +28,23 @@ export async function GET(request: Request) {
   }
 
   const result = await runGoogleHealthCheck();
-  return Response.json(result, { status: result.ok ? 200 : 500 });
+
+  /* Voimassaolonsa ohittaneet tarjoukset "Vanhentunut"-tilaan samassa
+     päivittäisessä ajossa. Ilman tätä "Lähetetty" sisälsi viikkoja vanhoja
+     tarjouksia (8.10.2026: 10 / 32), eikä avointen tarjousten määrä tai
+     hyväksymisaste kertonut mitään. Vanhentunut ei ole lopullinen: jos
+     asiakas tarttuu siihen myöhemmin, työn luonti merkitsee sen
+     hyväksytyksi. Ei vaikuta paluukoodiin — tämä ei ole kuntotarkistus. */
+  let offersExpired: number | string = 0;
+  try {
+    const r = await sql`
+      update tk.offers set status = 'expired'
+       where status = 'sent' and valid_until < current_date
+    `;
+    offersExpired = r.count;
+  } catch (e) {
+    offersExpired = `virhe: ${String(e).slice(0, 120)}`;
+  }
+
+  return Response.json({ ...result, offersExpired }, { status: result.ok ? 200 : 500 });
 }
