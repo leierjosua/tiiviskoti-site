@@ -67,7 +67,13 @@ export default async function handler(req, res) {
       eventId: body.eventId ? String(body.eventId) : undefined,
       actionSource: 'system_generated',
       userData,
-      customData: { value: Math.round(cents) / 100, currency: 'EUR' },
+      /* event_source + lead_event_source ovat pakollisia jotta Meta lukee
+         kaupan liidin vaiheeksi (Conversion Leads -integraatio). Nimi sama
+         kuin CRM:n meta-lead-stages.ts:ssä. */
+      customData: {
+        value: Math.round(cents) / 100, currency: 'EUR',
+        event_source: 'crm', lead_event_source: 'TiivisKoti CRM',
+      },
     });
 
     return res.status(200).json({ ok: true, sent });

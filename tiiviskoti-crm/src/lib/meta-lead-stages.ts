@@ -61,6 +61,9 @@ const STAGE_EVENT: Record<string, string> = {
    putkeen, yksi tilamuutos jää lähettämättä. Se on halvempi virhe kuin
    ylilaskenta, ja vaihtoehto olisi oma sarake kannassa. */
 const MAX_AGE_DAYS = 2;
+/* CRM:n nimi Metan liidisuppilossa. Sama arvo myös sivuston
+   api/crm-purchase.mjs:ssä — muuten Meta näkisi kaksi eri CRM:ää. */
+const LEAD_EVENT_SOURCE = 'TiivisKoti CRM';
 const BATCH_SIZE = 100;
 
 export type StageSyncResult = {
@@ -101,6 +104,10 @@ export async function sendLeadStages(): Promise<StageSyncResult> {
       /* Kaksoiskappaleiden esto: sama liidi + sama vaihe = sama tapahtuma. */
       event_id: `${r.external_id}-${r.status}`,
       user_data: { lead_id: Number(r.external_id) },
+      /* PAKOLLISET liidien CRM-integraatiossa: ilman näitä Meta ottaa
+         tapahtuman vastaan (events_received) mutta ei tunnista sitä liidin
+         vaiheeksi, eikä laatupalaute päädy mainosten optimointiin. */
+      custom_data: { event_source: 'crm', lead_event_source: LEAD_EVENT_SOURCE },
     }));
 
   const skipped = rows.length - data.length;
