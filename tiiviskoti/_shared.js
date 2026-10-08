@@ -11,6 +11,32 @@
 import { thinSlots } from './_slots.js';
 import { TYPES, EXTRAS, netAfterDeduction, WINDOW_TIERS, computePricing, unitPriceFor, tierPriceFor } from './pricing.mjs';
 
+/* Google-arvosana tuoreena (api/google-rating, Googlelta kerran vrk:ssa).
+   Sivuilla on kovakoodattu arvo, joka näkyy heti ja jää voimaan jos haku
+   epäonnistuu — tämä vain päivittää sen. Kohteet: tähtipilleri `.rating-g`
+   ja arvosteluosion `.g-sum`. Luku ei saa koskaan laskea näkyvästi nollaan:
+   kelvoton vastaus ohitetaan kokonaan. */
+(async () => {
+  try {
+    const els = document.querySelectorAll('.rating-g, .g-sum');
+    if (!els.length) return;
+    const r = await fetch('/api/google-rating');
+    if (!r.ok) return;
+    const { rating, count } = await r.json();
+    if (!(rating > 0 && count > 0)) return;
+    const arvo = rating.toFixed(1).replace('.', ',');
+    const maara = `${count} Google-arvostelu${count === 1 ? '' : 'a'}`;
+    for (const el of els) {
+      const big = el.querySelector('.rating-g > b, .g-big');
+      if (big) big.textContent = arvo;
+      for (const s of el.querySelectorAll('span')) {
+        if (!s.children.length && /\d+ Google-arvostelu/.test(s.textContent)) s.textContent = maara;
+      }
+      if (el.hasAttribute('aria-label')) el.setAttribute('aria-label', `${arvo} tähteä, ${maara}`);
+    }
+  } catch (e) { /* kovakoodattu arvo jää voimaan */ }
+})();
+
 const ico = {
   ulko:'<svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3" width="12" height="18" rx="1.5" stroke="currentColor" stroke-width="1.8"/><circle cx="14.5" cy="12" r="1.2" fill="currentColor"/></svg>',
   parveke:'<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="18" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="18" rx="1" stroke="currentColor" stroke-width="1.8"/></svg>',
