@@ -95,7 +95,7 @@ export async function sendLeadStages(): Promise<StageSyncResult> {
       from tk.leads
      where external_id ~ '^[0-9]+$'
        and status in ('contacted', 'converted', 'rejected')
-       and status is distinct from meta_stage_sent
+       and status::text is distinct from meta_stage_sent
      order by updated_at
      limit ${BATCH_SIZE}
   `;
