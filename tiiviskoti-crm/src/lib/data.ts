@@ -367,22 +367,59 @@ export type CalendarAvailability = {
 };
 
 export type Area = { id: string; name: string; travelFeeCents: number };
+export type AreaMatch = Area & { matchLength: number };
 
 /**
- * Postinumeron palvelualue, tai null jos aluetta ei ole.
+ * KAIKKI postinumeroon osuvat palvelualueet, tarkin ensin.
  *
- * Ratkaisu tehdään kannassa (`tk.area_for_postal`), jotta sama logiikka —
- * pisin osuva etuliite voittaa — pätee sekä saatavuudessa että varauksen
- * validoinnissa. Matkalisä tulee samasta kyselystä, joten hinta ja
- * saatavuus eivät voi perustua eri alueeseen.
+ * Ennen postinumero ratkesi YHTEEN alueeseen (pisin etuliite voitti). Se ei
+ * toimi asentajakohtaisilla etäisyysalueilla: Nestorin "05470 + 23 km" ja
+ * Eeliksen "00100 + 20 km" menevät päällekkäin, ja pisimmän osuman sääntö
+ * antaisi päällekkäiset postinumerot vain toiselle. Nyt saatavuus on kaikkien
+ * osuvien alueiden kalenterien unioni.
+ *
+ * Tarkkuus (osuman pituus) ratkaisee yhä matkalisän kalenterikohtaisesti,
+ * ks. calendarAreaForPostal — joten erillisen kunnan voi edelleen eriyttää
+ * omalla lisällään laajemmasta alueesta.
+ */
+export async function areasForPostal(postal: string): Promise<AreaMatch[]> {
+  if (!/^\d{5}$/.test(postal)) return [];
+  const rows = await sql<{ id: string; name: string; travel_fee_cents: number; match_length: number }[]>`
+    select a.id, a.name, a.travel_fee_cents, max(length(pfx))::int as match_length
+      from tk.areas a, unnest(a.postal_prefixes) pfx
+     where a.active and ${postal} like pfx || '%'
+     group by a.id
+     order by match_length desc, a.travel_fee_cents, a.name
+  `;
+  return rows.map((r) => ({
+    id: r.id, name: r.name, travelFeeCents: r.travel_fee_cents, matchLength: r.match_length,
+  }));
+}
+
+/**
+ * Palvellaanko postinumeroa lainkaan — tarkin osuva alue, tai null.
+ * Kelpaa kysymykseen "onko alue palveltu" ja esikatselun matkalisään. Varaus
+ * laskee matkalisän valitun kalenterin alueesta (calendarAreaForPostal).
  */
 export async function areaForPostal(postal: string): Promise<Area | null> {
-  if (!/^\d{5}$/.test(postal)) return null;
-  const rows = await sql<{ id: string; name: string; travel_fee_cents: number }[]>`
-    select id, name, travel_fee_cents from tk.area_for_postal(${postal})
-  `;
-  const row = rows[0];
-  return row ? { id: row.id, name: row.name, travelFeeCents: row.travel_fee_cents } : null;
+  const [first] = await areasForPostal(postal);
+  return first ? { id: first.id, name: first.name, travelFeeCents: first.travelFeeCents } : null;
+}
+
+/**
+ * Se postinumeroon osuva alue, jonka kautta tämä kalenteri palvelee
+ * postinumeroa — tarkin ensin, tasapelissä halvin. null = kalenteri ei
+ * palvele postinumeroa, eli varausta ei saa ohjata siihen.
+ */
+export async function calendarAreaForPostal(calendarId: string, postal: string): Promise<Area | null> {
+  const areas = await areasForPostal(postal);
+  if (areas.length === 0) return null;
+  const served = new Set((await sql<{ area_id: string }[]>`
+    select area_id from tk.calendar_areas
+     where calendar_id = ${calendarId} and area_id in ${sql(areas.map((a) => a.id))}
+  `).map((r) => r.area_id));
+  const hit = areas.find((a) => served.has(a.id));
+  return hit ? { id: hit.id, name: hit.name, travelFeeCents: hit.travelFeeCents } : null;
 }
 
 /**
@@ -396,9 +433,10 @@ export async function availability(opts: {
   until: Date;
   now?: Date;
   calendarId?: string;
-  /** Rajaa kalenterit tähän alueeseen. Ilman tätä palautetaan kaikki
-   *  kalenterit — käytössä vain hallinnan sisäisissä näkymissä. */
-  areaId?: string;
+  /** Rajaa kalenterit näihin alueisiin (unioni). Ilman tätä palautetaan
+   *  kaikki kalenterit — käytössä vain hallinnan sisäisissä näkymissä.
+   *  Tyhjä lista = ei yhtään kalenteria. */
+  areaIds?: string[];
   /** Ohittaa kalenterin oman aikaruudukon. Työparia haettaessa toisen
    *  asentajan ajat lasketaan tiheällä ruudukolla, jotta kysymykseksi jää
    *  "onko hän vapaa juuri tuolloin" eikä "osuuko hänen ruudukkonsa
@@ -421,9 +459,11 @@ export async function availability(opts: {
       join tk.staff s on s.id = c.staff_id
      where c.active and s.active
        ${opts.calendarId ? sql`and c.id = ${opts.calendarId}` : sql``}
-       ${opts.areaId
-         ? sql`and exists (select 1 from tk.calendar_areas ca
-                            where ca.calendar_id = c.id and ca.area_id = ${opts.areaId})`
+       ${opts.areaIds
+         ? opts.areaIds.length === 0
+           ? sql`and false`
+           : sql`and exists (select 1 from tk.calendar_areas ca
+                              where ca.calendar_id = c.id and ca.area_id in ${sql(opts.areaIds)})`
          : sql``}
      order by s.full_name, c.name
   `;

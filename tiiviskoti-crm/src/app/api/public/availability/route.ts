@@ -1,4 +1,5 @@
-import { areaForPostal, availability, kartoitusCalendarId } from '@/lib/data';
+import { areasForPostal, availability, kartoitusCalendarId } from '@/lib/data';
+import { sql } from '@/lib/db';
 import { KARTOITUS_MINUTES, MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
 import { json, preflight } from '../cors';
 
@@ -61,7 +62,8 @@ export async function GET(request: Request) {
     return json({ error: 'postal_required' }, { status: 400, origin });
   }
 
-  const area = await areaForPostal(postal);
+  const areas = await areasForPostal(postal);
+  const area = areas[0];
   if (!area) {
     // Ei palvelualuetta: sivu näyttää yhteydenottolomakkeen eikä aikoja.
     return json({ served: false, postal, slots: [] }, { origin });
@@ -74,7 +76,7 @@ export async function GET(request: Request) {
      seikka joka pitää sen erossa kuluttajan varauskalenterista. */
   const wantsKartoitus = params.get('kartoitus') === '1';
   let calendarId: string | undefined;
-  let areaId: string | undefined = area.id;
+  let areaIds: string[] | undefined = areas.map((a) => a.id);
   let durationMinutes = minutes;
 
   if (wantsKartoitus) {
@@ -87,7 +89,7 @@ export async function GET(request: Request) {
       return json({ error: 'kartoitus_unavailable' }, { status: 503, origin });
     }
     calendarId = kartoitusId;
-    areaId = undefined;
+    areaIds = undefined;
     // Kesto tulee palvelimelta, jottei tarjottu aika ja varattava lohko voi erota.
     durationMinutes = KARTOITUS_MINUTES;
   }
@@ -95,21 +97,46 @@ export async function GET(request: Request) {
   const groups = await availability({
     durationMinutes,
     until: new Date(Date.now() + days * 86_400_000),
-    areaId,
+    areaIds,
     calendarId,
   });
 
+  /* Matkalisä kalenterikohtaisesti: tarkin postinumeroon osuva alue jota
+     kalenteri palvelee (sama sääntö kuin varauksessa, calendarAreaForPostal).
+     `areas` on jo tarkkuusjärjestyksessä, joten ensimmäinen osuma voittaa. */
+  const feeByCalendar = new Map<string, number>();
+  if (areaIds && groups.length > 0) {
+    const links = await sql<{ calendar_id: string; area_id: string }[]>`
+      select calendar_id, area_id from tk.calendar_areas
+       where area_id in ${sql(areaIds)} and calendar_id in ${sql(groups.map((g) => g.calendarId))}
+    `;
+    for (const a of areas) {
+      for (const l of links) {
+        if (l.area_id === a.id && !feeByCalendar.has(l.calendar_id)) {
+          feeByCalendar.set(l.calendar_id, a.travelFeeCents);
+        }
+      }
+    }
+  }
+  const feeOf = (calendarId: string) => feeByCalendar.get(calendarId) ?? 0;
+
   // Sivu ei tarvitse tietää kuka työn tekee — se valitsee ajan, ja kalenteri
-  // ratkeaa siitä. Päällekkäiset alkuajat eri asentajilta yhdistetään.
-  const byStart = new Map<string, { startsAt: string; endsAt: string; calendarId: string }>();
+  // ratkeaa siitä. Päällekkäiset alkuajat eri asentajilta yhdistetään;
+  // jos matkalisät eroavat, asiakkaalle tarjotaan halvempi.
+  const byStart = new Map<string, {
+    startsAt: string; endsAt: string; calendarId: string; travelFeeCents: number;
+  }>();
   for (const group of groups) {
+    const fee = feeOf(group.calendarId);
     for (const slot of group.slots) {
       const key = slot.start.toISOString();
-      if (!byStart.has(key)) {
+      const prev = byStart.get(key);
+      if (!prev || fee < prev.travelFeeCents) {
         byStart.set(key, {
           startsAt: key,
           endsAt: slot.end.toISOString(),
           calendarId: group.calendarId,
+          travelFeeCents: fee,
         });
       }
     }
@@ -119,7 +146,15 @@ export async function GET(request: Request) {
   return json({
     served: true,
     postal,
-    area: { name: area.name, travelFeeCents: area.travelFeeCents },
+    /* Alueen matkalisä = halvin tarjolla oleva. Sivu näyttää tämän; tarkka
+       lisä on slotin travelFeeCents ja varaus laskee sen joka tapauksessa
+       palvelimella uudelleen. */
+    area: {
+      name: area.name,
+      travelFeeCents: slots.length > 0
+        ? Math.min(...slots.map((s) => s.travelFeeCents))
+        : area.travelFeeCents,
+    },
     durationMinutes,
     slots,
   }, { origin });

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
-import { areaForPostal, purgeExpiredHolds } from '@/lib/data';
+import { areaForPostal, calendarAreaForPostal, purgeExpiredHolds } from '@/lib/data';
 import { deliverBooking, saveJobLines } from '@/lib/deliver';
 import { removeCalendarEventForJob } from '@/lib/deliver';
 import { normalizeCode, resolveDiscount, type DiscountError } from '@/lib/discounts';
@@ -175,16 +175,15 @@ export async function POST(request: Request) {
   // Alue ratkaistaan postinumerosta palvelimella, ja valitun kalenterin on
   // oikeasti palveltava sitä aluetta. Muuten varauksen voisi ohjata väärän
   // asentajan kalenteriin muokkaamalla pyyntöä.
-  const area = await areaForPostal(d.postalCode);
+  /* Postinumeroon voi osua useampi alue (asentajakohtaiset säteet menevät
+     päällekkäin), joten kysytään suoraan: palveleeko TÄMÄ kalenteri tätä
+     postinumeroa, ja minkä alueen kautta. Matkalisä tulee siitä alueesta. */
+  const area = await calendarAreaForPostal(d.calendarId, d.postalCode);
   if (!area) {
-    return Response.json({ error: 'area_not_served', postal: d.postalCode }, { status: 409 });
-  }
-  const [serves] = await sql<{ ok: boolean }[]>`
-    select true as ok from tk.calendar_areas
-     where calendar_id = ${d.calendarId} and area_id = ${area.id}
-  `;
-  if (!serves) {
-    return Response.json({ error: 'calendar_area_mismatch', area: area.name }, { status: 409 });
+    const anyArea = await areaForPostal(d.postalCode);
+    return anyArea
+      ? Response.json({ error: 'calendar_area_mismatch', area: anyArea.name }, { status: 409 })
+      : Response.json({ error: 'area_not_served', postal: d.postalCode }, { status: 409 });
   }
 
   const travelFeeCents = area.travelFeeCents;

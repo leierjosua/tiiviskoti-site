@@ -2,28 +2,30 @@ import { sql } from '@/lib/db';
 import { kartoitusCalendarId } from '@/lib/data';
 import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty } from '@/components/ui';
-import { AreaRow, CreateAreaForm, DeleteArea } from './ui';
+import { AreaCard, NewArea, type AreaData, type CalendarOption } from './ui';
 
 export const dynamic = 'force-dynamic';
-
-type AreaRowData = {
-  id: string; name: string; postal_prefixes: string[];
-  travel_fee_cents: number; active: boolean;
-  calendars: number; jobs: number; prefix_count: number;
-};
 
 export default async function AreasPage() {
   await requireManager();
 
-  const areas = await sql<AreaRowData[]>`
+  const areas = await sql<AreaData[]>`
     select a.id, a.name, a.postal_prefixes, a.travel_fee_cents, a.active,
-           (select count(*)::int from tk.calendar_areas ca where ca.area_id = a.id) as calendars,
+           a.center_postal, a.radius_km::text as radius_km, a.excluded_postals,
+           coalesce(array(select ca.calendar_id::text from tk.calendar_areas ca where ca.area_id = a.id), '{}') as calendar_ids,
            (select count(*)::int from tk.jobs j
               join tk.calendar_areas ca2 on ca2.calendar_id = j.calendar_id
-             where ca2.area_id = a.id) as jobs,
-           coalesce(array_length(a.postal_prefixes, 1), 0) as prefix_count
+             where ca2.area_id = a.id) as jobs
       from tk.areas a
      order by a.active desc, a.name
+  `;
+
+  const calendarRows = await sql<{ id: string; name: string; staff_name: string }[]>`
+    select c.id, c.name, s.full_name as staff_name
+      from tk.calendars c
+      join tk.staff s on s.id = c.staff_id
+     where c.active and s.active
+     order by s.full_name, c.name
   `;
 
   const allOrphans = await sql<{ id: string; name: string; staff_name: string }[]>`
@@ -47,13 +49,29 @@ export default async function AreasPage() {
   const orphanCalendars = allOrphans.filter((c) => c.id.toLowerCase() !== kartoitusId);
   const kartoitusCal = allOrphans.find((c) => c.id.toLowerCase() === kartoitusId);
 
+  /* Kartoituskalenteria ei tarjota valittavaksi lainkaan — ks. yllä miksi
+     sille ei koskaan liitetä aluetta. Saman henkilön useampi kalenteri
+     erotellaan kalenterin nimellä. */
+  const perStaff = new Map<string, number>();
+  for (const c of calendarRows) perStaff.set(c.staff_name, (perStaff.get(c.staff_name) ?? 0) + 1);
+  const calendars: CalendarOption[] = calendarRows
+    .filter((c) => c.id.toLowerCase() !== kartoitusId)
+    .map((c) => ({
+      id: c.id,
+      label: (perStaff.get(c.staff_name) ?? 0) > 1 ? `${c.staff_name} — ${c.name}` : c.staff_name,
+      otherAreas: areas.filter((a) => a.active && a.calendar_ids.includes(c.id))
+        .map((a) => ({ id: a.id, name: a.name })),
+    }));
+
   return (
     <div className="space-y-6">
       <header>
         <h1 className="text-[22px] font-extrabold tracking-tight text-text">Palvelualueet</h1>
         <p className="text-sm text-muted">
-          Asiakas syöttää postinumeron, ja siitä ratkeaa kenen kalenterista ajat näytetään.
-          Postinumero joka ei osu mihinkään alueeseen ei saa varata aikaa — hänestä tulee liidi.
+          Asiakas syöttää postinumeron, ja siitä ratkeaa kenen kalenterista ajat näytetään —
+          kaikkien asentajien, joiden alueeseen postinumero osuu. Alueen voi rajata etuliitteillä
+          tai etäisyytenä postinumerosta (esim. asentajan koti + 25 km). Postinumero joka ei osu
+          mihinkään alueeseen ei saa varata aikaa — hänestä tulee liidi.
         </p>
       </header>
 
@@ -81,36 +99,16 @@ export default async function AreasPage() {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_330px]">
-        <Card>
-          <CardHeader title="Alueet" />
-          {areas.length === 0 ? (
-            <Empty>Ei alueita. Luo ensimmäinen oikealta.</Empty>
-          ) : (
-            <div>
-              {areas.map((area) => (
-                <div key={area.id} className={area.active ? '' : 'opacity-60'}>
-                  <AreaRow area={area} />
-                  <div className="flex items-center justify-between px-4 pb-3 text-xs text-faint">
-                    <span>
-                      {area.prefix_count} etuliite{area.prefix_count === 1 ? '' : 'ttä'}
-                      {area.jobs > 0 && ` · ${area.jobs} työtä`}
-                    </span>
-                    <DeleteArea id={area.id} name={area.name} hasJobs={area.jobs > 0} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-
-        <Card className="h-fit">
-          <CardHeader title="Uusi alue" />
-          <div className="p-4">
-            <CreateAreaForm />
+      <Card>
+        <CardHeader title="Alueet" action={<NewArea calendars={calendars} />} />
+        {areas.length === 0 ? (
+          <Empty>Ei alueita. Luo ensimmäinen yläkulmasta.</Empty>
+        ) : (
+          <div>
+            {areas.map((area) => <AreaCard key={area.id} area={area} calendars={calendars} />)}
           </div>
-        </Card>
-      </div>
+        )}
+      </Card>
     </div>
   );
 }

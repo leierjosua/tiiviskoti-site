@@ -1,9 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import type { ISql } from 'postgres';
 import { z } from 'zod';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
+import { postalsWithin } from '@/lib/postinumerot';
 
 export type ActionState = { error?: string; ok?: string };
 
@@ -20,6 +22,53 @@ const areaSchema = z.object({
   travelFee: z.coerce.number().min(0, 'Matkalisä ei voi olla negatiivinen').max(2000),
 });
 
+type AreaGeometry = {
+  prefixes: string[];
+  centerPostal: string | null;
+  radiusKm: number | null;
+  excluded: string[];
+};
+
+/* Lomakkeen valintatapa → mitä tallennetaan. Etäisyysalueen postinumerot
+   lasketaan AINA tässä uudelleen; lomakkeen kartta on vain esikatselu. */
+function readGeometry(formData: FormData): AreaGeometry | { error: string } {
+  if (formData.get('mode') !== 'distance') {
+    const prefixes = parsePrefixes(String(formData.get('prefixes') ?? ''));
+    if (!prefixes) return { error: 'Anna postinumeron etuliitteet, esim. "00 01 02" tai "33".' };
+    return { prefixes, centerPostal: null, radiusKm: null, excluded: [] };
+  }
+
+  const center = String(formData.get('centerPostal') ?? '').trim();
+  const radius = Number(String(formData.get('radiusKm') ?? '').replace(',', '.'));
+  if (!/^\d{5}$/.test(center)) return { error: 'Keskipostinumero on 5 numeroa.' };
+  if (!(radius > 0 && radius <= 300)) return { error: 'Säde on 1–300 km.' };
+  const excluded = String(formData.get('excluded') ?? '').split(',').filter((c) => /^\d{5}$/.test(c));
+
+  const result = postalsWithin(center, radius, excluded);
+  if (!result) return { error: `Postinumeroa ${center} ei löydy.` };
+  return {
+    prefixes: result.included,
+    centerPostal: center,
+    radiusKm: Math.round(radius * 10) / 10,
+    excluded: result.excluded,
+  };
+}
+
+/** Ketkä palvelevat aluetta. Sama tieto kuin kalenterin sivulla, toisesta päästä. */
+async function setAreaCalendars(tx: ISql, areaId: string, calendarIds: string[]) {
+  await tx`delete from tk.calendar_areas where area_id = ${areaId}`;
+  for (const calendarId of calendarIds) {
+    await tx`
+      insert into tk.calendar_areas (calendar_id, area_id) values (${calendarId}, ${areaId})
+      on conflict do nothing
+    `;
+  }
+}
+
+function readCalendarIds(formData: FormData): string[] {
+  return [...new Set(formData.getAll('calendarIds').map(String).filter(Boolean))];
+}
+
 export async function createArea(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requireManager();
 
@@ -29,17 +78,22 @@ export async function createArea(_prev: ActionState, formData: FormData): Promis
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot' };
 
-  const prefixes = parsePrefixes(String(formData.get('prefixes') ?? ''));
-  if (!prefixes) {
-    return { error: 'Anna postinumeron etuliitteet, esim. "00 01 02" tai "33".' };
-  }
+  const g = readGeometry(formData);
+  if ('error' in g) return g;
 
-  await sql`
-    insert into tk.areas (name, postal_prefixes, travel_fee_cents)
-    values (${parsed.data.name}, ${prefixes}, ${Math.round(parsed.data.travelFee * 100)})
-  `;
+  await sql.begin(async (tx) => {
+    const [row] = await tx<{ id: string }[]>`
+      insert into tk.areas (name, postal_prefixes, travel_fee_cents,
+                            center_postal, radius_km, excluded_postals)
+      values (${parsed.data.name}, ${g.prefixes}, ${Math.round(parsed.data.travelFee * 100)},
+              ${g.centerPostal}, ${g.radiusKm}, ${g.excluded})
+      returning id
+    `;
+    await setAreaCalendars(tx, row!.id, readCalendarIds(formData));
+  });
   revalidatePath('/alueet');
-  return { ok: `Alue ${parsed.data.name} luotu.` };
+  revalidatePath('/kalenterit', 'layout');
+  return { ok: `Alue ${parsed.data.name} luotu — ${g.prefixes.length} postinumero${g.prefixes.length === 1 ? '' : 'a'}.` };
 }
 
 export async function updateArea(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -52,18 +106,25 @@ export async function updateArea(_prev: ActionState, formData: FormData): Promis
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot' };
 
-  const prefixes = parsePrefixes(String(formData.get('prefixes') ?? ''));
-  if (!prefixes) return { error: 'Anna postinumeron etuliitteet, esim. "00 01 02".' };
+  const g = readGeometry(formData);
+  if ('error' in g) return g;
 
-  await sql`
-    update tk.areas
-       set name = ${parsed.data.name},
-           postal_prefixes = ${prefixes},
-           travel_fee_cents = ${Math.round(parsed.data.travelFee * 100)},
-           active = ${formData.get('active') === 'on'}
-     where id = ${id}
-  `;
+  await sql.begin(async (tx) => {
+    await tx`
+      update tk.areas
+         set name = ${parsed.data.name},
+             postal_prefixes = ${g.prefixes},
+             travel_fee_cents = ${Math.round(parsed.data.travelFee * 100)},
+             center_postal = ${g.centerPostal},
+             radius_km = ${g.radiusKm},
+             excluded_postals = ${g.excluded},
+             active = ${formData.get('active') === 'on'}
+       where id = ${id}
+    `;
+    await setAreaCalendars(tx, id, readCalendarIds(formData));
+  });
   revalidatePath('/alueet');
+  revalidatePath('/kalenterit', 'layout');
   return { ok: 'Alue tallennettu.' };
 }
 
