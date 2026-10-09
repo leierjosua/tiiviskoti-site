@@ -19,7 +19,7 @@ import { chromium } from '../node_modules/playwright/index.mjs';
 /* ms-playwrightin chromium ei vastaa asennettua versiota → Chrome käsin. */
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const SITE = 'https://tiiviskoti.fi';
-const POSTI = '00120';
+const POSTI = process.env.POSTI || '00120';
 
 const loki = [];
 const ok = (m, x) => loki.push({ t: 'OK', m, x });
@@ -127,13 +127,27 @@ if (n === 0) {
     await eteen.click();
     await page.waitForTimeout(1500);
     const lomake = await page.locator('input[type="email"], #fEmail, input[name="email"]').count();
-    if (lomake) ok('"Jatka yhteystietoihin" avasi yhteystietolomakkeen');
-    else warn('yhteystietolomaketta ei löytynyt jatkon jälkeen');
+    if (lomake) {
+      ok('"Jatka yhteystietoihin" avasi yhteystietolomakkeen');
+      /* Täytetään ja vahvistetaan. Pyyntö katkaistaan (ks. page.route yllä),
+         joten varausta ei synny — mutta näemme mitä olisi lähtenyt. */
+      await page.fill('#fName', 'Testi Testinen');
+      await page.fill('#fEmail', 'testi@example.com');
+      await page.fill('#fPhone', '0400000000');
+      await page.fill('#fAddr', 'Testikatu 1');
+      await page.click('#bSubmit');
+      await page.waitForTimeout(2500);
+      if (!bookingPayload) fail('"Vahvista varaus" ei lähettänyt create-booking-pyyntöä');
+    } else warn('yhteystietolomaketta ei löytynyt jatkon jälkeen');
   } else warn('#toDetails-nappia ei näkynyt ajan valinnan jälkeen');
 }
 
 /* ---------- 4. Yhteenveto ---------- */
-if (bookingPayload) ok('create-booking olisi lähtenyt (katkaistu, mitään ei syntynyt)', bookingPayload.slice(0, 180));
+if (bookingPayload) {
+  ok('create-booking olisi lähtenyt (katkaistu, mitään ei syntynyt)', bookingPayload.slice(0, 180));
+  // Koneluettava rivi: CRM-puolen tarkistus voi lukea tämän (kalenteri ↔ postinumero).
+  if (process.env.PAYLOAD_OUT) (await import('node:fs')).writeFileSync(process.env.PAYLOAD_OUT, bookingPayload);
+}
 
 const omat = rikki.filter((r) => /tiiviskoti\.fi/.test(r));
 if (omat.length) fail(`${omat.length} omaa pyyntöä epäonnistui`, omat.slice(0, 5).join(' · '));
