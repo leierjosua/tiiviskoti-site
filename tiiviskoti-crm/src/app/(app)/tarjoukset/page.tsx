@@ -147,6 +147,7 @@ export default async function OffersPage() {
         sub="Sähköpostilla lähetetyt tarjoukset. Kuluttajat ja taloyhtiöt omissa listoissaan."
         action={
           <div className="flex flex-wrap gap-2">
+            <Link href="/tarjoukset/soittolista"><Button variant="outline">📞 Soittolista</Button></Link>
             <Link href="/tarjoukset/uusi"><Button>Uusi asiakastarjous</Button></Link>
             <Link href="/tarjoukset/uusi/taloyhtio"><Button variant="outline">Uusi taloyhtiötarjous</Button></Link>
           </div>
