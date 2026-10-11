@@ -2,6 +2,7 @@ import { requireStaff } from '@/lib/session';
 import { omatKalenterit, saatavuus, oletusAjat, type SaatavuusPaiva } from '@/lib/saatavuus';
 import { Card, Empty, PageHead } from '@/components/ui';
 import { addDays, formatDateKey, isoWeekday, todayKey, weekdayName } from '@/lib/time';
+import { OdottavaNappi } from './nappi';
 import { merkitsePoissa, merkitseTyossa, merkitseViikko, poistaMerkinta } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -90,28 +91,28 @@ function PaivaRivi({ p, calendarId, oletus }: {
             <input type="hidden" name="date" value={p.date} />
             <input type="hidden" name="alku" value={oletus.alku} />
             <input type="hidden" name="loppu" value={oletus.loppu} />
-            <button className={`${nappi} border-accent/50 text-accent hover:bg-accent/10`}>
+            <OdottavaNappi className={`${nappi} border-accent/50 text-accent hover:bg-accent/10`}>
               Voin tehdä töitä
-            </button>
+            </OdottavaNappi>
           </form>
         )}
         {p.tila !== 'poissa' && (
           <form action={merkitsePoissa}>
             <input type="hidden" name="calendarId" value={calendarId} />
             <input type="hidden" name="date" value={p.date} />
-            <button className={`${nappi} border-line text-muted hover:border-danger/50 hover:text-danger`}>
+            <OdottavaNappi className={`${nappi} border-line text-muted hover:border-danger/50 hover:text-danger`}>
               En voi
-            </button>
+            </OdottavaNappi>
           </form>
         )}
         {p.poikkeusId && (
           <form action={poistaMerkinta}>
             <input type="hidden" name="calendarId" value={calendarId} />
             <input type="hidden" name="date" value={p.date} />
-            <button title="Poista merkintä"
+            <OdottavaNappi title="Poista merkintä"
                     className="rounded-lg px-2 py-1.5 text-xs text-faint hover:text-text">
               ✕
-            </button>
+            </OdottavaNappi>
           </form>
         )}
       </div>
@@ -129,10 +130,10 @@ function PaivaRivi({ p, calendarId, oletus }: {
           <span>–</span>
           <input type="time" name="loppu" defaultValue={p.loppu ?? oletus.loppu}
                  className="rounded-md border border-line bg-ink-800 px-2 py-1 tabular text-text" />
-          <button className="rounded-md border border-line px-2 py-1 font-semibold
+          <OdottavaNappi className="rounded-md border border-line px-2 py-1 font-semibold
                              text-muted hover:text-text">
             Tallenna
-          </button>
+          </OdottavaNappi>
         </form>
       )}
     </li>
@@ -229,9 +230,9 @@ export default async function OmatAjatPage() {
                       <form action={merkitseViikko}>
                         <input type="hidden" name="calendarId" value={kal.calendarId} />
                         <input type="hidden" name="paivat" value={arki.map((p) => p.date).join(',')} />
-                        <button className={`${nappi} border-accent/40 text-accent hover:bg-accent/10`}>
+                        <OdottavaNappi className={`${nappi} border-accent/40 text-accent hover:bg-accent/10`}>
                           Koko arkiviikko töissä
-                        </button>
+                        </OdottavaNappi>
                       </form>
                     )}
                   </div>

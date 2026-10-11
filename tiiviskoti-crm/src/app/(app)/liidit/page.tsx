@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
@@ -6,7 +5,6 @@ import { Card, CardHeader, Empty, ErrorNote } from '@/components/ui';
 import { LeadStatus } from './ui';
 import { DeleteButton } from '@/components/delete-button';
 import { deleteLead } from '../alueet/actions';
-import { importMetaLeads } from '@/lib/meta-leads';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,11 +42,7 @@ export default async function LeadsPage() {
         </p>
       </header>
 
-      {/* Metan haku EI enää blokkaa sivua. Se striimataan omana palanaan,
-          joten liidilista piirtyy heti ja hakutulos ilmestyy kun se valmistuu. */}
-      <Suspense fallback={null}>
-        <MetanHaku />
-      </Suspense>
+      <TuonninTila />
 
       {demand.length > 0 && (
         <Card className="overflow-x-auto">
@@ -149,47 +143,37 @@ export default async function LeadsPage() {
   );
 }
 
-/* Metan liidien haku — omana striimattuna palanaan.
+/* Metan liidituonnin tila — luetaan kannasta, ei haeta Metasta.
 
-   MIKSI EI ENÄÄ SUORAAN RENDERÖINNISSÄ: `importMetaLeads()` alkaa
-   Graphin `/me/accounts`-kutsulla, joka mitattiin 21.9.2026 **2,1
-   sekunniksi**. Se ajettiin ennen liidilistaa, joten koko sivu odotti
-   Metaa joka avauksella — se oli adminin selvästi hitain yksittäinen
-   kohta.
+   MIKSI SIVU EI ENÄÄ AJA TUONTIA: `importMetaLeads()` kesti mitattuna
+   3,4–4,5 s (3.10.2026), ja Suspensesta huolimatta vastaus valmistui vasta
+   tuonnin jälkeen — /liidit oli adminin hitain sivu. Tuonti ajetaan
+   pg_cronilla 5 min välein, joten sivulla tehty haku ei tuonut uusia
+   liidejä vaan ainoastaan odotusta.
 
-   Alkuperäinen perustelu ("Vercelin Hobby sallii vain päivittäisen
-   ajon") on vanhentunut: haku ajetaan pg_cronilla 5 min välein, mikä
-   näkyy siinä että Meta-liidejä saapuu kantaan ympäri vuorokauden
-   (04:20, 01:10, 21:50) ilman että kukaan avaa tätä sivua.
+   Virheen näkyminen säilyy: tuonti kirjaa jokaisen virheen ja onnistumisen
+   (enintään puolen tunnin välein) tk.health_checks:iin. Ikäraja kertoo
+   myös pysähtyneestä ajastimesta, joka ei kirjoita mitään. */
+const TUONTI_VANHA_MS = 2 * 60 * 60_000;
 
-   Haku tehdään silti sivua avattaessa, koska virheen näkyminen on
-   arvokasta: hiljainen vika jäi kerran huomaamatta kolmeksi päiväksi.
-   Ero on vain se, ettei liidilista enää odota sitä. Tässä haussa
-   löytyneet uudet liidit näkyvät listassa seuraavalla latauksella,
-   joten se sanotaan ääneen. */
-async function MetanHaku() {
-  let virhe: string | null = null;
-  let uusia = 0;
-  try {
-    const tulos = await importMetaLeads();
-    if (tulos.error) virhe = tulos.error;
-    else uusia = tulos.imported;
-  } catch (e) {
-    virhe = e instanceof Error ? e.message : String(e);
-  }
-  if (virhe) {
-    console.error('liidit: Metan liidien haku epäonnistui', virhe);
+async function TuonninTila() {
+  const [viimeisin] = await sql<{ ok: boolean; detail: string | null; checked_at: Date }[]>`
+    select ok, detail, checked_at from tk.health_checks
+     where kind = 'meta_leads' order by checked_at desc limit 1
+  `;
+  if (!viimeisin) return null;
+  if (!viimeisin.ok) {
     return (
       <ErrorNote>
-        Metan liidien haku ei onnistunut: {virhe}. Alla olevat liidit ovat kannasta —
-        Metassa voi olla uudempia, jotka eivät ole tulleet perille.
+        Metan liidien haku epäonnistui viimeksi: {viimeisin.detail ?? 'tuntematon virhe'}. Alla olevat
+        liidit ovat kannasta — Metassa voi olla uudempia, jotka eivät ole tulleet perille.
       </ErrorNote>
     );
   }
-  if (uusia > 0) {
+  if (Date.now() - viimeisin.checked_at.getTime() > TUONTI_VANHA_MS) {
     return (
       <ErrorNote>
-        Metasta haettiin {uusia} uutta liidiä. Päivitä sivu, niin ne tulevat listaan.
+        Metan liidejä ei ole haettu yli kahteen tuntiin — ajastettu haku on ehkä pysähtynyt.
       </ErrorNote>
     );
   }
