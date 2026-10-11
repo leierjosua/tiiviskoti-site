@@ -195,10 +195,16 @@ await check('toiminta', 'tulevat työt', async () => {
 
 await check('toiminta', 'vahvistukset', async () => {
   const rows = await sql`
-    select job_number, starts_at from tk.jobs
-     where status = 'confirmed' and confirmation_sent_at is null
-       and starts_at > now() and starts_at < now() + interval '14 days'
-     order by starts_at`;
+    select j.job_number, j.starts_at from tk.jobs j
+     where j.status = 'confirmed' and j.confirmation_sent_at is null
+       and j.starts_at > now() and j.starts_at < now() + interval '14 days'
+       -- Työparin toinen rivi ei saa omaa vahvistusta: asiakas saa sen
+       -- päärivistä. Hälytetään vain jos koko parilta puuttuu vahvistus.
+       and not exists (
+         select 1 from tk.jobs m
+          where j.crew_group_id is not null and m.crew_group_id = j.crew_group_id
+            and m.id <> j.id and m.confirmation_sent_at is not null)
+     order by j.starts_at`;
   if (rows.length) warn('toiminta', `${rows.length} tulevaa työtä ilman vahvistusta asiakkaalle`,
     rows.map((r) => r.job_number).join(', '));
   else ok('toiminta', 'kaikilla tulevilla töillä vahvistus lähetetty');
