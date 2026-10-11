@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { sql } from '@/lib/db';
 import { ownsJob, requireStaff } from '@/lib/session';
@@ -184,13 +185,17 @@ export async function completeJob(input: CompleteInput): Promise<CompleteState> 
   revalidatePath('/kalenteri');
   revalidatePath('/');
 
+  /* Kuitti lähtee VASTAUKSEN JÄLKEEN (`after`). PDF + Gmail kesti
+     asentajan puhelimessa sekunteja, ja velho ohittaa `ok`-viestin
+     kokonaan (siirtyy suoraan työn sivulle) — eli odotus ei tuonut
+     asentajalle mitään tietoa. Keikka on jo kannassa; kuitin tulos
+     kirjautuu `tk.mail_log`iin ja näkyy työn sivulla, myös epäonnistuminen. */
   if (d.sendReceiptMail) {
-    const r = await deliverReceipt(d.id);
-    /* Keikka on jo viimeistelty kantaan. Kuitin epäonnistuminen ei siis
-       peru mitään — se on tieto, ei virhe joka pitäisi yrittää uudelleen
-       koko lomakkeella. */
-    if (r.error) return { ok: `Keikka viimeistelty. Kuitti ei lähtenyt: ${r.error}` };
-    return { ok: 'Keikka viimeistelty ja kuitti lähetetty.' };
+    after(async () => {
+      const r = await deliverReceipt(d.id);
+      if (r.error) console.error('completeJob: kuitti ei lähtenyt', d.id, r.error);
+    });
+    return { ok: 'Keikka viimeistelty, kuitti lähtee asiakkaalle.' };
   }
 
   return { ok: 'Keikka viimeistelty.' };

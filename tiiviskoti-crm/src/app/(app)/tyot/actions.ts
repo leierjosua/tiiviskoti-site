@@ -1017,7 +1017,15 @@ export async function deliverReceipt(id: string): Promise<ActionState> {
       totalIncVatCents: job.price_cents,
     });
   } catch (e) {
-    return { error: `Kuitin luonti epäonnistui: ${(e as Error).message}` };
+    /* Kirjataan lokiin kuten lähetysvirhe: viimeistelyvelho lähettää
+       kuitin taustalla, joten tämä palautusarvo ei näy kenellekään. */
+    const virhe = `Kuitin luonti epäonnistui: ${(e as Error).message}`;
+    await sql`
+      insert into tk.mail_log (job_id, kind, to_email, subject, error)
+      values (${id}, 'receipt', ${job.customer_email}, ${'Kuitti ' + job.job_number}, ${virhe})
+    `;
+    revalidatePath(`/tyot/${id}`);
+    return { error: virhe };
   }
 
   const mailData = {
