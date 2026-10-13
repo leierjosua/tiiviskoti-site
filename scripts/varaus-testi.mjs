@@ -30,8 +30,11 @@ const browser = await chromium.launch({ executablePath: CHROME, headless: true }
 const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
 
 let bookingPayload = null;
+/* Kävijäseuranta (api/public/track) estetään: ilman tätä jokainen ajo kirjautui kävijätilastoon
+   oikeana kävijänä joka pääsee lomakkeelle asti mutta ei koskaan varaa —
+   13.10.2026 se näytti työpöydän lomake→varaus-suhteen 1/21:ltä. */
 for (const r of ['**/api/create-booking', '**/api/create-lead', '**/api/ask',
-                 '**/api/create-kartoitus', '**/api/track-intent']) {
+                 '**/api/create-kartoitus', '**/api/track-intent', '**/api/public/track']) {
   await page.route(r, (route) => {
     if (route.request().url().includes('create-booking')) bookingPayload = route.request().postData();
     route.abort();
