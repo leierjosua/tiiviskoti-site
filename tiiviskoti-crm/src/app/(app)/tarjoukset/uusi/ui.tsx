@@ -44,8 +44,10 @@ export type DraftState = {
   asiakas?: Record<string, string>;
 };
 
-export function OfferBuilder({ kind = 'asiakas', offerId, draft, asiakas }: {
+export function OfferBuilder({ kind = 'asiakas', offerId, draft, asiakas, editSent = false }: {
   kind?: 'asiakas' | 'taloyhtio';
+  /** Jo lähetetyn tarjouksen muutos: sama numero, lähetetään uudelleen. */
+  editSent?: boolean;
   /** Avatun luonnoksen tunniste — tallennus päivittää sen uuden luomisen sijaan. */
   offerId?: string;
   draft?: DraftState;
@@ -101,6 +103,7 @@ export function OfferBuilder({ kind = 'asiakas', offerId, draft, asiakas }: {
     <form action={action} className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
       <input type="hidden" name="kind" value={kind} />
       {offerId ? <input type="hidden" name="offerId" value={offerId} /> : null}
+      {editSent ? <input type="hidden" name="editSent" value="1" /> : null}
       {/* Laskurin tila kulkee mukana lomakkeella, jotta luonnos aukeaa
           samanlaisena. Lasketut rivit eivät riitä: niistä ei näe mitkä
           kohteet oli valittu. */}
@@ -342,8 +345,14 @@ export function OfferBuilder({ kind = 'asiakas', offerId, draft, asiakas }: {
 
           <SubmitButton className="w-full" pendingLabel="Lähetetään…" disabled={pricing.total <= 0}
             name="mode" value="send">
-            {offerId ? 'Lähetä tämä tarjous sähköpostilla' : 'Lähetä tarjous sähköpostilla'}
+            {editSent ? 'Lähetä muutettu tarjous' : offerId ? 'Lähetä tämä tarjous sähköpostilla' : 'Lähetä tarjous sähköpostilla'}
           </SubmitButton>
+          {editSent ? (
+            <p className="text-xs text-faint">
+              Asiakas saa sähköpostin "Päivitetty tarjous", joka kertoo korvaavansa aiemman version.
+              Muutos ja vanha summa kirjataan sisäiseen muistiinpanoon.
+            </p>
+          ) : (<>
 
           {/* Sama lomake, sama hinnoittelu — vain loppu eroaa. `mode` kulkee
               napin omana arvona, joten kentän arvo ratkeaa siitä kumpaa
@@ -357,6 +366,7 @@ export function OfferBuilder({ kind = 'asiakas', offerId, draft, asiakas }: {
             jatkaa myöhemmin — kaikki valinnat säilyvät. PDF:n voi ladata ja tarjouksen lähettää
             silloin kun se on valmis.
           </p>
+          </>)}
           {state.error && <ErrorNote>{state.error}</ErrorNote>}
           {state.ok && <OkNote>{state.ok}</OkNote>}
         </div>

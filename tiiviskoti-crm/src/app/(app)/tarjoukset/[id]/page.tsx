@@ -182,6 +182,29 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
           </Card>
         )}
 
+        {/* Lähetetyn tarjouksen muutos (13.10.2026). Ennen tätä lähetettyä ei
+            voinut muuttaa lainkaan, joten korjattu summa vaati kokonaan uuden
+            tarjouksen uudella numerolla — ja vanha jäi soittolistalle avoimeksi.
+            Ei hyväksytylle eikä tarjoukselle josta on työ: niistä on sovittu,
+            ja muutos kuuluu työlle (actions.ts tarkistaa saman). */}
+        {['sent', 'expired', 'declined'].includes(offer.status) && !offer.job_id && (
+          <Card>
+            <CardHeader title="Muuta tarjousta" />
+            <div className="space-y-2 p-4">
+              <Link
+                href={`/tarjoukset/uusi?muokkaa=${offer.id}`}
+                className="block w-full rounded-lg border border-accent/40 bg-accent-dim px-4 py-2 text-center text-sm font-semibold text-accent hover:border-accent"
+              >
+                Muuta ja lähetä uudelleen
+              </Link>
+              <p className="text-xs text-faint">
+                Muuta rivejä, hintoja tai tekstejä ja lähetä päivitetty tarjous samalla numerolla.
+                Voimassaolo alkaa alusta{offer.status === 'expired' ? ', joten vanhentunut tarjous herää henkiin' : ''}.
+              </p>
+            </div>
+          </Card>
+        )}
+
         <Card>
           <CardHeader title="Tila" />
           <div className="p-4">

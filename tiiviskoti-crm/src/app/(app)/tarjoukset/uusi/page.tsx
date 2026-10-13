@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { requireManager } from '@/lib/session';
 import { PageHead } from '@/components/ui';
+import { MIN_PRICE_NAME } from '@/lib/pricing';
 import { OfferBuilder, type DraftState } from './ui';
 
 export const dynamic = 'force-dynamic';
@@ -16,9 +17,49 @@ type DraftRow = {
 
 export default async function NewOfferPage({
   searchParams,
-}: { searchParams: Promise<{ luonnos?: string; tyo?: string; liidi?: string }> }) {
+}: { searchParams: Promise<{ luonnos?: string; tyo?: string; liidi?: string; muokkaa?: string }> }) {
   await requireManager();
-  const { luonnos, tyo, liidi } = await searchParams;
+  const { luonnos, tyo, liidi, muokkaa } = await searchParams;
+
+  /* "Muuta tarjousta": lähetetty, vanhentunut tai hylätty tarjous avataan
+     muokattavaksi ja lähetetään uudelleen samalla numerolla (ks. actions.ts).
+
+     LASKURIN TILA: lähetetyillä tarjouksilla draft_state on lähes aina tyhjä
+     (se tallentui vain luonnoksille), joten tila rakennetaan tallennetuista
+     riveistä. Jokainen rivi tuodaan VAPAANA rivinä alkuperäisellä
+     à-hinnalla — ei arvata takaisin hinnaston kohteeksi, koska silloin
+     vanha tarjous laskettaisiin nykyhinnoilla ja summa muuttuisi
+     huomaamatta. Matkalisä ja pienen käynnin lisä jätetään pois: laskuri
+     laskee ne itse postinumerosta ja summasta, muuten ne tulisivat kahdesti. */
+  type EditRow = DraftRow & {
+    status: string; postal_code: string | null; inclusions: string[] | null;
+    lines: { name: string; quantity: number; unit_price_cents: number }[];
+    has_job: boolean;
+  };
+  let edit: EditRow | null = null;
+  let editDraft: DraftState | undefined;
+  if (muokkaa && !luonnos && !tyo && !liidi) {
+    const [rivi] = await sql<EditRow[]>`
+      select o.id, o.offer_number, o.kind, o.customer_name, o.contact_name, o.email, o.phone,
+             o.address, o.postal_code, o.city, o.notes, o.customer_note, o.inclusions,
+             o.draft_state, o.lines, o.status::text as status,
+             exists (select 1 from tk.jobs j where j.offer_id = o.id and j.status <> 'cancelled') as has_job
+        from tk.offers o where o.id = ${muokkaa}
+    `;
+    if (rivi && ['sent', 'expired', 'declined'].includes(rivi.status) && !rivi.has_job) {
+      edit = rivi;
+      editDraft = rivi.draft_state ?? {
+        custom: rivi.lines
+          .filter((l) => l.name !== 'Matkalisä' && l.name !== MIN_PRICE_NAME)
+          .map((l) => ({ name: l.name, qty: l.quantity, unit: l.unit_price_cents / 100 })),
+        postal: rivi.postal_code ?? '',
+        inclusions: rivi.inclusions ?? undefined,
+      };
+      /* Postinumero kulkee aina tarjouksen omalta riviltä: draft_state voi
+         olla vanhempi kuin viimeksi lähetetty versio. */
+      editDraft = { ...editDraft, postal: rivi.postal_code ?? editDraft.postal ?? '' };
+    }
+  }
 
   /* Työstä avattu tarjous: asiakkaan tiedot tulevat valmiiksi, kaikki muu
      on tyhjää ja muokattavissa.
@@ -103,6 +144,52 @@ export default async function NewOfferPage({
         from tk.offers where id = ${luonnos} and status = 'draft'
     `;
     draft = rivi ?? null;
+  }
+
+  if (muokkaa && !edit) {
+    return (
+      <div className="space-y-6">
+        <PageHead title="Muuta tarjousta"
+          sub={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>} />
+        <p className="rounded-lg border border-line bg-ink-800 px-3 py-2 text-sm text-muted">
+          Tarjousta ei voi muuttaa: sitä ei löytynyt, se on hyväksytty tai siitä on jo tehty työ kalenteriin.{' '}
+          <Link href={`/tarjoukset/${muokkaa}`} className="text-accent">Takaisin tarjoukseen</Link>
+        </p>
+      </div>
+    );
+  }
+
+  if (edit) {
+    return (
+      <div className="space-y-6">
+        <PageHead
+          title={`Muuta tarjousta ${edit.offer_number}`}
+          sub={<Link href={`/tarjoukset/${edit.id}`} className="text-sm text-muted hover:text-text">← Tarjous {edit.offer_number}</Link>}
+        />
+        <p className="rounded-lg border border-line bg-ink-800 px-3 py-2 text-sm text-muted">
+          {edit.draft_state
+            ? 'Tarjous aukesi sellaisena kuin se viimeksi lähetettiin.'
+            : 'Lähetetyn tarjouksen rivit on tuotu vapaina riveinä alkuperäisillä hinnoilla. Muuta määrää tai hintaa suoraan, tai poista rivi ja valitse palvelu laskurista.'}
+          {' '}Lähetys korvaa asiakkaan aiemman version: numero pysyy samana ja voimassaolo alkaa alusta.
+        </p>
+        <OfferBuilder
+          kind={edit.kind}
+          offerId={edit.id}
+          editSent
+          draft={editDraft}
+          asiakas={{
+            customerName: edit.customer_name ?? undefined,
+            contactName: edit.contact_name ?? undefined,
+            email: edit.email ?? undefined,
+            phone: edit.phone ?? undefined,
+            address: edit.address ?? undefined,
+            city: edit.city ?? undefined,
+            notes: edit.notes ?? undefined,
+            customerNote: edit.customer_note ?? undefined,
+          }}
+        />
+      </div>
+    );
   }
 
   return (

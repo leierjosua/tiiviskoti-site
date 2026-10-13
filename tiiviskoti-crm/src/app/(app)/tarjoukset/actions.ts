@@ -15,6 +15,9 @@ import { offerEmailSubject, offerEmailHtml, offerEmailText } from '@/lib/mail-te
 export type ActionState = { error?: string; ok?: string };
 
 const OFFER_VALID_DAYS = 14;
+/** Tilat joista lähetetyn tarjouksen voi muuttaa ja lähettää uudelleen.
+    Hyväksyttyä ei: siitä on sovittu, ja muutos kuuluu työlle. */
+const EDITABLE_SENT = ['sent', 'expired', 'declined'] as const;
 const eurToCents = (e: number) => Math.round(e * 100);
 
 /* Vapaita rivejä luetaan kiinteä määrä. Raja on lomakkeen puolella sama;
@@ -125,6 +128,14 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Tarkista tiedot.' };
   const d = parsed.data;
 
+  /* "Muuta tarjousta": jo lähetetty tarjous muokataan ja lähetetään
+     uudelleen SAMALLA numerolla. Numero pysyy, koska asiakas, soittolista
+     ja mahdollinen myöhempi työ viittaavat siihen — uusi numero jättäisi
+     vanhan roikkumaan avoimeksi. Asiakkaan viesti sanoo että tämä korvaa
+     edellisen. Vain sähköpostilähetys: lähetettyä ei palauteta luonnokseksi. */
+  const editSent = String(formData.get('editSent') ?? '') === '1';
+  if (editSent && (!d.offerId || d.mode !== 'send')) return { error: 'Muutettu tarjous lähetetään sähköpostilla.' };
+
   const { counts, extras } = readCounts(formData);
   const area = d.postalCode ? await areaForPostal(d.postalCode) : null;
   const travelFee = (area?.travelFeeCents ?? 0) / 100;
@@ -179,6 +190,30 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
      vain luonnoksia — lähetettyä tarjousta ei kirjoiteta uusiksi, koska
      asiakkaalla on siitä jo kopio. */
   if (d.offerId) {
+    let notes = d.notes ?? null;
+    if (editSent) {
+      const [vanha] = await sql<{ total_cents: number; status: string; has_job: boolean }[]>`
+        select o.total_cents, o.status::text as status,
+               exists (select 1 from tk.jobs j where j.offer_id = o.id and j.status <> 'cancelled') as has_job
+          from tk.offers o where o.id = ${d.offerId}
+      `;
+      if (!vanha) return { error: 'Tarjousta ei löytynyt.' };
+      /* Työn rivit ja summa kopioitiin tarjoukselta työn luonnissa. Jos
+         tarjousta muutettaisiin sen jälkeen, työ ja tarjous näyttäisivät
+         eri summaa samasta keikasta. */
+      if (vanha.has_job) return { error: 'Tarjouksesta on jo tehty työ kalenteriin — muuta rivejä työn sivulla.' };
+      if (!EDITABLE_SENT.includes(vanha.status as (typeof EDITABLE_SENT)[number])) {
+        return { error: 'Tätä tarjousta ei voi muuttaa sen tilassa.' };
+      }
+      /* Jälki sisäiseen muistiinpanoon: asiakkaalla on vanha PDF, joten
+         puhelimessa pitää nähdä mitä hän on aiemmin saanut. */
+      const pvm = new Intl.DateTimeFormat('fi-FI', { timeZone: 'Europe/Helsinki', day: 'numeric', month: 'numeric', year: 'numeric' }).format(new Date());
+      const euro = (c: number) => (c / 100).toLocaleString('fi-FI', { maximumFractionDigits: 2 }) + ' €';
+      notes = [d.notes, `Muutettu ja lähetetty uudelleen ${pvm} (oli ${euro(vanha.total_cents)}, nyt ${euro(totalCents)}).`]
+        .filter(Boolean).join('\n');
+    }
+    /* Vapaa sana ja sisältyy-lista päivitetään myös: PDF:n uudelleenlataus
+       ja "Lähetä"-nappi lukevat ne riviltä, eivät lomakkeelta. */
     const [paivitetty] = await sql<{ id: string; offer_number: string }[]>`
       update tk.offers set
         kind = ${d.kind}, contact_name = ${d.contactName ?? null},
@@ -186,14 +221,18 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
         phone = ${d.phone ?? null}, address = ${d.address ?? null},
         postal_code = ${d.postalCode || null}, city = ${d.city ?? null},
         lines = ${sql.json(lines)}, total_cents = ${totalCents},
-        travel_fee_cents = ${travelCents}, notes = ${d.notes ?? null},
+        travel_fee_cents = ${travelCents}, notes = ${notes},
         valid_until = ${validUntil},
         draft_state = ${d.draftState ? sql.json(JSON.parse(d.draftState)) : null},
+        ${customerNoteColumnExists ? sql`customer_note = ${d.customerNote ?? null},` : sql``}
+        ${inclusionsColumnExists ? sql`inclusions = ${inclusions},` : sql``}
+        ${editSent ? sql`status = 'sent'::tk.offer_status, error = null,` : sql``}
         updated_at = now()
-      where id = ${d.offerId} and status = 'draft'
+      where id = ${d.offerId}
+        and ${editSent ? sql`status in ('sent', 'expired', 'declined')` : sql`status = 'draft'`}
       returning id, offer_number
     `;
-    if (!paivitetty) return { error: 'Luonnosta ei löytynyt tai se on jo lähetetty.' };
+    if (!paivitetty) return { error: editSent ? 'Tarjousta ei voitu muuttaa.' : 'Luonnosta ei löytynyt tai se on jo lähetetty.' };
     offer = paivitetty;
   }
 
@@ -267,6 +306,7 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
     validDays: OFFER_VALID_DAYS,
     customerNote: d.customerNote ?? null,
     inclusions,
+    updated: editSent,
   };
 
   /* Luonnos: rivi on tallessa ja PDF ladattavissa tarjouksen sivulta.
@@ -303,8 +343,15 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
   `;
 
   revalidatePath('/tarjoukset');
-  if (sendErr) return { error: `Tarjous ${offer.offer_number} luotiin, mutta lähetys epäonnistui: ${sendErr}` };
-  return { ok: `Tarjous ${offer.offer_number} lähetetty osoitteeseen ${d.email}.` };
+  revalidatePath(`/tarjoukset/${offer.id}`);
+  if (sendErr) {
+    return { error: editSent
+      ? `Tarjous ${offer.offer_number} muutettiin, mutta lähetys epäonnistui: ${sendErr}. Yritä uudelleen Muuta tarjousta -napista.`
+      : `Tarjous ${offer.offer_number} luotiin, mutta lähetys epäonnistui: ${sendErr}` };
+  }
+  return { ok: editSent
+    ? `Muutettu tarjous ${offer.offer_number} lähetetty osoitteeseen ${d.email}.`
+    : `Tarjous ${offer.offer_number} lähetetty osoitteeseen ${d.email}.` };
 }
 
 const STATUSES = ['sent', 'accepted', 'declined', 'expired'] as const;

@@ -432,10 +432,14 @@ export type OfferEmailData = {
   customerNote?: string | null;
   /** "Työhön sisältyy" -rivit. Sama lista kuin PDF:ssä; tyhjä jättää osion pois. */
   inclusions?: string[] | null;
+  /** Muutettu ja uudelleen lähetetty tarjous (sama numero). Asiakkaalla on
+      jo edellinen versio, joten viestin on sanottava selvästi että tämä
+      korvaa sen — muuten hänellä on kaksi eri summaa samalla numerolla. */
+  updated?: boolean;
 };
 
 export function offerEmailSubject(data: OfferEmailData): string {
-  return `Tarjous ${data.jobNumber} — ${COMPANY}`;
+  return `${data.updated ? 'Päivitetty tarjous' : 'Tarjous'} ${data.jobNumber} — ${COMPANY}`;
 }
 
 export function offerEmailHtml(data: OfferEmailData): string {
@@ -464,10 +468,13 @@ export function offerEmailHtml(data: OfferEmailData): string {
   </td></tr>
 
   <tr><td style="padding:28px 28px 8px">
-    <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Tarjous · Voimassa ${data.validDays} pv</div>
-    <h1 style="margin:8px 0 0;color:${INK};font-size:23px;font-weight:700;line-height:1.3">Kiitos yhteydenotosta, ${esc(firstName(data.customerName))}!</h1>
+    <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">${data.updated ? 'Päivitetty tarjous' : 'Tarjous'} · Voimassa ${data.validDays} pv</div>
+    <h1 style="margin:8px 0 0;color:${INK};font-size:23px;font-weight:700;line-height:1.3">${data.updated ? 'Hei' : 'Kiitos yhteydenotosta'}, ${esc(firstName(data.customerName))}!</h1>
     <p style="margin:12px 0 0;color:${MUTED};font-size:15px;line-height:1.6">
-      Liitteenä tarjous ${esc(data.jobNumber)}. Hyväksy tarjous vastaamalla tähän viestiin
+      ${data.updated
+        ? `Liitteenä päivitetty tarjous ${esc(data.jobNumber)}. Se korvaa aiemmin lähettämämme saman numeron tarjouksen.`
+        : `Liitteenä tarjous ${esc(data.jobNumber)}.`}
+      Hyväksy tarjous vastaamalla tähän viestiin
       tai soittamalla — sovitaan sopiva aika työlle.
     </p>
   </td></tr>
@@ -528,9 +535,11 @@ export function offerEmailHtml(data: OfferEmailData): string {
 export function offerEmailText(data: OfferEmailData): string {
   const inclusions = (data.inclusions ?? []).filter((i) => i.trim());
   return [
-    `Kiitos yhteydenotosta, ${firstName(data.customerName)}!`,
+    `${data.updated ? 'Hei' : 'Kiitos yhteydenotosta'}, ${firstName(data.customerName)}!`,
     '',
-    `Liitteenä tarjous ${data.jobNumber}, yhteensä ${eur(data.totalCents)} (sis. ALV 25,5 %).`,
+    data.updated
+      ? `Liitteenä päivitetty tarjous ${data.jobNumber}, yhteensä ${eur(data.totalCents)} (sis. ALV 25,5 %). Se korvaa aiemmin lähettämämme saman numeron tarjouksen.`
+      : `Liitteenä tarjous ${data.jobNumber}, yhteensä ${eur(data.totalCents)} (sis. ALV 25,5 %).`,
     `Tarjous on voimassa ${data.validDays} päivää. Työn osuus on eritelty kotitalousvähennystä varten.`,
     ...(inclusions.length ? ['', 'Työhön sisältyy:', ...inclusions.map((i) => `- ${i}`)] : []),
     ...(data.customerNote ? ['', data.customerNote] : []),
