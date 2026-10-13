@@ -283,6 +283,23 @@ body #tkChat .tkc-fab svg{width:22px;height:22px}
 .q-meta span{font-size:12px;color:var(--dmute)}
 .q-btn{margin-top:18px;width:100%;background:var(--green-l);border:none;color:#06231a}.q-btn:hover{background:#37b071}
 .q-note{font-size:11.5px;color:var(--dmute);text-align:center;margin-top:11px}
+/* Soittopyyntö hinnan alla. Toissijainen: ei kilpaile varausnapin kanssa,
+   siksi tekstilinkki eikä toinen nappi. */
+.cb{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.cb-open{display:block;width:100%;background:none;border:none;padding:4px 0;font:inherit;font-size:13.5px;color:var(--mute);cursor:pointer;text-align:center}
+.cb-open span{color:var(--green);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.cb-open:focus-visible,.cb-i:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.cb-form{display:grid;gap:6px}
+.cb-lead{font-size:13.5px;line-height:1.45;color:var(--text);margin:0 0 6px}
+.cb-l{font-size:12.5px;font-weight:700;color:var(--ink)}
+.cb-i{width:100%;padding:11px 12px;border:1px solid var(--line2);border-radius:10px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+.cb-send{margin-top:8px;width:100%;background:var(--ink);color:#fff;border:none}
+.cb-send[disabled]{opacity:.6}
+.cb-err{font-size:13px;color:#B3261E;margin-top:4px}
+.cb-ok{font-size:14px;line-height:1.5;color:var(--ink);background:var(--green-soft);border-radius:10px;padding:12px 14px}
+.cb-ok b{color:var(--green)}
+/* Puhelimessa listan alla omana korttinaan (siirto _shared.js:ssä). */
+.order>.cb{margin:0;padding:16px 14px;border-top:1px solid var(--line)}
 /* Näkyy vain puhelimessa, ks. .order-note mediakyselyssä. */
 .order-note{display:none;font-size:12px;line-height:1.5;color:var(--mute);padding:12px 14px;border-top:1px solid var(--line)}
 
@@ -1224,6 +1241,22 @@ header.hero .wrap.hero-grid{padding-top:clamp(124px,16vh,160px)}
         <div class="q-meta"><div><b id="cpCount">0</b><span>kohdetta</span></div><div><b id="cpTime">0 h</b><span>arvioitu kesto</span></div></div>
         <button type="button" class="btn btn-lg q-btn" id="cpBtn" style="pointer-events:none;opacity:.5"><span>Valitse aika<span class="q-btn-long"> kalenterista</span></span></button>
         <div class="q-note">Pienin veloitus 149 € · sis. käynnin, matkat, kartoituksen ja lämpökamerakuvauksen</div>
+        <!-- Soittopyyntö (13.10.2026): hinnan nähneistä vain ~30 % avasi
+             kalenterin, eikä muuta vaihtoehtoa ollut. Puhelimessa _shared.js
+             siirtää tämän listan alle, koska yhteenveto on siellä hintapalkki. -->
+        <div class="cb" id="cbWrap" hidden>
+          <button type="button" class="cb-open" id="cbOpen" aria-expanded="false" aria-controls="cbForm">Ei vielä valmis varaamaan? <span>Soitamme sinulle</span></button>
+          <form class="cb-form" id="cbForm" hidden novalidate>
+            <p class="cb-lead">Jätä numerosi, niin soitamme ja käydään hinta ja kohteet läpi. Ei sido mihinkään.</p>
+            <label class="cb-l" for="cbName">Nimi</label>
+            <input class="cb-i" id="cbName" name="name" autocomplete="name" required>
+            <label class="cb-l" for="cbPhone">Puhelinnumero</label>
+            <input class="cb-i" id="cbPhone" name="tel" type="tel" inputmode="tel" autocomplete="tel" required>
+            <button type="submit" class="btn cb-send" id="cbSend">Pyydä soitto</button>
+            <div class="cb-err" id="cbErr" role="alert" hidden></div>
+          </form>
+          <div class="cb-ok" id="cbOk" role="status" hidden></div>
+        </div>
       </aside>
     </div>
 

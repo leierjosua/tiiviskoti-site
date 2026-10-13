@@ -759,6 +759,10 @@ function render(){
   const btn=document.getElementById('cpBtn'), active = q.total>0;
   btn.style.pointerEvents=active?'auto':'none'; btn.style.opacity=active?'1':'.5';
   if('disabled' in btn) btn.disabled=!active;
+  /* Soittopyyntö näkyy vasta kun hinta on näkyvissä — sen tehtävä on
+     pitää kiinni niistä jotka näkivät hinnan mutta eivät valitse aikaa. */
+  const cb=document.getElementById('cbWrap');
+  if(cb) cb.hidden=!active;
 }
 
 /* ---------- FAQ ----------
@@ -1371,6 +1375,81 @@ if(cpBtnEl && cpBtnEl.tagName==='BUTTON'){
     const alueRatkaistu = avail.state==='ready' || avail.state==='none';
     if(abLaskuriEnsin && !alueRatkaistu && stepIdx('postal')>=0) goStep('postal');
     else goStep('cal');
+  });
+}
+
+/* ---------- soittopyyntö laskurista (13.10.2026) ----------
+   Hinnan nähneistä vain ~30 % avasi kalenterin (30 pv 13.9.–13.10.), eikä
+   kortilla ollut muuta tietä eteenpäin. Metan liidilomake (nimi + puhelin)
+   tuo suurimman osan liideistä, joten sama matala kynnys tarjotaan tässä.
+   Lähtee samaa reittiä kuin Ota yhteyttä -sivun viesti (create-lead,
+   kind 'yksityinen') → CRM:n Liidit-sivu + ilmoitus info@:lle. Valinta ja
+   hinta kulkevat viestissä, jotta soittaja näkee mistä puhutaan.
+   Kalenteri pysyy pääpolkuna: tämä on tekstilinkki, ei toinen nappi. */
+const cbWrap=document.getElementById('cbWrap');
+if(cbWrap){
+  const cbOpen=document.getElementById('cbOpen'), cbForm=document.getElementById('cbForm');
+  const cbErr=document.getElementById('cbErr'), cbOk=document.getElementById('cbOk');
+  const cbSend=document.getElementById('cbSend');
+  const quoteEl=cbWrap.parentElement, orderEl=document.querySelector('.calc-wrap .order');
+
+  /* Puhelimessa yhteenveto on kapea tahmea hintapalkki (index.html, 620 px),
+     johon lomake ei mahdu → siirretään listan alle. Sama solmu, ei kopiota,
+     joten kirjoitettu teksti säilyy kun ikkunaa käännetään. */
+  const mq=window.matchMedia('(max-width:620px)');
+  const place=()=>{ const t=mq.matches&&orderEl?orderEl:quoteEl; if(cbWrap.parentElement!==t) t.appendChild(cbWrap); };
+  place();
+  if(mq.addEventListener) mq.addEventListener('change',place); else if(mq.addListener) mq.addListener(place);
+
+  cbOpen.addEventListener('click',()=>{
+    const auki=cbForm.hidden;
+    cbForm.hidden=!auki; cbOpen.setAttribute('aria-expanded',String(auki));
+    if(auki){
+      if(window.tkTrack) window.tkTrack({type:'cta', cta:'Soittopyyntö: avattu'});
+      document.getElementById('cbName').focus();
+    }
+  });
+
+  const naytaVirhe=(t)=>{ cbErr.textContent=t; cbErr.hidden=false; };
+  cbForm.addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    cbErr.hidden=true;
+    const nimi=document.getElementById('cbName').value.trim();
+    const puh=document.getElementById('cbPhone').value.trim();
+    if(!nimi) return naytaVirhe('Kerro nimesi, niin tiedämme kenelle soitamme.');
+    /* Väljä tarkistus: suomalainen numero voi olla 040…, +358… tai
+       välilyönneillä. Vähintään 7 numeroa riittää karsimaan näppäilyvirheet. */
+    if((puh.match(/\d/g)||[]).length<7) return naytaVirhe('Tarkista puhelinnumero.');
+
+    const pn=((document.getElementById('fPostal')||{}).value||'').trim();
+    const postinumero=/^\d{5}$/.test(pn)?pn:'';
+    const viesti=['Soittopyyntö hintalaskurista.',
+      `Valinta: ${booking.serviceLabel}`,
+      `Laskurin hinta: ${Math.round(booking.total).toLocaleString('fi-FI')} € (sis. ALV)`,
+      discount.state==='ok'?`Alennuskoodi: ${discount.code}`:null,
+    ].filter(Boolean).join('\n');
+
+    cbSend.disabled=true; cbSend.textContent='Lähetetään…';
+    try{
+      const r=await fetch('/api/create-lead',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({kind:'yksityinen', contact:nimi, phone:puh,
+          /* create-lead poimii postinumeron osoitekentästä. */
+          addr:postinumero, message:viesti, pageUrl:location.href,
+          campaign:readCampaign(), gclid:readGclid(), gclidKind:readGclidKind(),
+          fbc:readFbc(), fbp:readFbp(), vid:readVid()})});
+      const j=await r.json().catch(()=>({}));
+      if(!r.ok||!j.ok) throw new Error(j.error||'fail');
+      cbForm.hidden=true; cbOpen.hidden=true;
+      cbOk.textContent='';
+      cbOk.append('Kiitos! Soitamme numeroon ');
+      const b=document.createElement('b'); b.textContent=puh; cbOk.append(b);
+      cbOk.append(' ja käydään hinta läpi. Voit silti varata ajan jo nyt kalenterista.');
+      cbOk.hidden=false;
+      if(window.tkTrack) window.tkTrack({type:'cta', cta:'Soittopyyntö: lähetetty'});
+    }catch(_){
+      naytaVirhe('Lähetys ei onnistunut. Yritä hetken päästä uudelleen tai soita 045 875 5996.');
+      cbSend.disabled=false; cbSend.textContent='Pyydä soitto';
+    }
   });
 }
 
