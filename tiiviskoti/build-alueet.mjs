@@ -482,15 +482,20 @@ const PALVELUT = [
     slug: 'ovien-tiivistys',
     kuva: 'ulko-ovet.webp',
     alt: 'Puutalon valkoinen ulko-ovi ja katettu kuisti',
-    title: `Ovien tiivistys ${TYPES[1].price} € / ovi — TiivisKoti`,
-    h1a: 'Ovien tiivistys',
+    /* 13.10.2026: Adsin ovi-avainsanat (ulko oven tiivistys/-täminen, oven
+       tiivistys) saivat aloitussivukokemukseksi BELOW_AVERAGE (QS 3), kun
+       "ovien tiivistys" sai AVERAGE (QS 7). Sivu sanoi vain "ovien" — nyt
+       otsikko, H1 ja yksi UKK puhuvat hakijan sanoilla. Ei uusia lupauksia:
+       työvaiheet ovat samat kuin leadissä ja SISALTYY-listassa. */
+    title: `Ulko-oven tiivistys ${TYPES[1].price} € — ovien tiivistys kiinteään hintaan | TiivisKoti`,
+    h1a: 'Ulko-oven tiivistys',
     h1b: 'kiinteään hintaan.',
-    kicker: 'Ovet',
+    kicker: 'Ovien tiivistys',
     hinta: TYPES[1].price,
     hintaSelite: 'ulko- ja parvekeovi',
-    desc: `Ulko-oven, parvekeoven ja terassin liukuoven tiivistys kiinteään hintaan alkaen ${TYPES[1].price} €. Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö samalla käynnillä.`,
-    lead: 'Vaihdamme oven tiivisteet, öljyämme lukot ja saranat sekä säädämme oven käynnin niin, että ovi painuu tasaisesti tiivistettä vasten. Kaikki samalla käynnillä.',
-    oireetOtsikko: 'Milloin ovi kannattaa tiivistää',
+    desc: `Ulko-oven tiivistys ${TYPES[1].price} € kiinteään hintaan — myös parvekeoven ja terassin liukuoven tiivistys. Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö samalla käynnillä.`,
+    lead: 'Ulko-oven tiivistyksessä vaihdamme oven tiivisteet, öljyämme lukot ja saranat sekä säädämme oven käynnin niin, että ovi painuu tasaisesti tiivistettä vasten. Kaikki samalla käynnillä.',
+    oireetOtsikko: 'Milloin ulko-ovi kannattaa tiivistää',
     oireet: [
       ['Kynnyksestä vetää', 'Kynnyskumi kuluu ensimmäisenä, koska se jää oven ja kynnyksen väliin joka kerta.'],
       ['Ovi ei sulkeudu tiiviisti', 'Sarana on painunut tai käyntiväli muuttunut. Tiiviste ei auta, jos ovi ei purista sitä koko matkalta.'],
@@ -501,6 +506,7 @@ const PALVELUT = [
       ['Paljonko ulko-oven tiivistys maksaa?', `Ulko-ovi ja parvekeovi maksavat ${TYPES[1].price} € ovelta riippumatta siitä, montako ovea kohteessa on. Pelkkä kynnyskumin vaihto on ${TYPES[5].price} € ja väli- tai huoneovi ${TYPES[4].price} €${TYPES[4].combo ? ` — tai ${TYPES[4].combo} €, kun samalla käynnillä on vähintään kaksi kohdetta` : ''}. Pienin veloitus käynniltä on ${MIN_PRICE} €.`],
       ['Sisältyykö kynnyskumi hintaan?', `Ei. Ulko-oven hintaan kuuluvat tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö. Kynnyskumin vaihto on tarvittaessa erillinen lisätyö, ${TYPES[5].price} €.`],
       ['Entä terassin liuku- tai pariovi?', `Iso lasiovi ja liukuovi ovat ${TYPES[3].price} €, koska niissä on enemmän tiivistettävää kehää ja kiskon huolto kuuluu työhön.`],
+      ['Miten oven tiivistäminen tehdään?', 'Poistamme vanhat tiivisteet ja puhdistamme kiinnityspinnat, asennamme uudet tiivisteet, öljyämme lukot ja saranat ja säädämme oven käynnin. Lopuksi tarkistamme, että ovi sulkeutuu ja painuu tiivistettä vasten koko matkalta. Tiivisteet ja tarvikkeet sisältyvät hintaan.'],
       ['Kuinka kauan oven tiivistys kestää?', 'Noin 30 minuuttia ovea kohti. Useampi ovi tehdään samalla käynnillä, jolloin hinta ovea kohti on edullisempi.'],
       ['Korjaako tiivistys vinon oven?', 'Säädämme käyntivälyksen ja saranat siltä osin kuin ne ovat säädettävissä. Jos ovilehti on vääntynyt tai karmi liikkunut, kerromme sen paikan päällä ennen työn aloittamista.'],
     ],
