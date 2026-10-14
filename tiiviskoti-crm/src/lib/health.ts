@@ -162,11 +162,21 @@ export async function readHealthBanner(): Promise<HealthBanner> {
     /* Vain verkosta tulleet: vain ne kulkevat vahvistuspolun läpi, joten
        vain niiltä puuttuva vahvistus on vika. Adminissa käsin luodulla
        työllä ei ole vahvistusta eikä pidäkään olla. */
+    /* Työparin toinen rivi ei saa omaa vahvistusta — asiakas saa sen
+       päärivistä — mutta se perii päärivin source='web'. Ilman tätä
+       poikkeusta jokainen verkkovaraukseen lisätty asentaja näkyi
+       "varaus ilman vahvistusta" -hälytyksenä (työ 1129, 13.10.2026).
+       Sama sääntö kuin scripts/daily-check.mjs:ssä (d583fa5): hälytetään
+       vain jos koko parilta puuttuu vahvistus. */
     sql<{ n: number }[]>`
-      select count(*)::int as n from tk.jobs
-       where source = 'web' and status <> 'cancelled'
-         and created_at > now() - interval '7 days'
-         and (confirmation_error is not null or confirmation_sent_at is null)
+      select count(*)::int as n from tk.jobs j
+       where j.source = 'web' and j.status <> 'cancelled'
+         and j.created_at > now() - interval '7 days'
+         and (j.confirmation_error is not null or j.confirmation_sent_at is null)
+         and not exists (
+           select 1 from tk.jobs m
+            where j.crew_group_id is not null and m.crew_group_id = j.crew_group_id
+              and m.id <> j.id and m.confirmation_sent_at is not null)
     `,
   ]);
 
