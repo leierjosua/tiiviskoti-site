@@ -209,7 +209,7 @@ export default function Home() {
           <h2 className="h2">Iso kohde, taloyhtiö tai jokin mietityttää?</h2>
           <p className="lead" style={{ marginTop: 16 }}>Jätä viesti, niin vastaamme yleensä tunnissa. Taloyhtiöt, liiketilat ja erikoislasit hinnoittelemme sopimuksella — kerro lyhyesti kohteesta.</p>
           <ul className="cinfo" style={{ marginTop: 26 }}>
-            <li><span className="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="#0968C8" strokeWidth="1.8" strokeLinejoin="round" /></svg></span><div><b>Soita suoraan</b><a href="tel:+358458755996">045 875 5996</a></div></li>
+            <li><span className="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="#0968C8" strokeWidth="1.8" strokeLinejoin="round" /></svg></span><div><b>Soita suoraan</b><a href="tel:+3584578311972">045 7831 1972</a></div></li>
             <li><span className="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 8l9 6 9-6M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" stroke="#0968C8" strokeWidth="1.8" strokeLinejoin="round" /></svg></span><div><b>Sähköposti</b><a href="mailto:info@lasikiilto.fi">info@lasikiilto.fi</a></div></li>
           </ul>
         </div>
@@ -232,7 +232,7 @@ export default function Home() {
       <V4Footer />
 
       <div className="mcta">
-        <a href="tel:+358458755996" className="btn g"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg></a>
+        <a href="tel:+3584578311972" className="btn g"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg></a>
         <a href="#varaa" className="btn btn-p">Laske hinta &amp; varaa</a>
       </div>
 

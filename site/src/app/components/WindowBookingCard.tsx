@@ -96,7 +96,7 @@ export default function WindowBookingCard() {
       setRef(d.reference || null);
       setStep(2);
       topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    } catch { setErr("Yhteysvirhe. Yritä uudelleen tai soita 045 875 5996."); }
+    } catch { setErr("Yhteysvirhe. Yritä uudelleen tai soita 045 7831 1972."); }
     finally { setBusy(false); }
   }
 
@@ -182,7 +182,7 @@ export default function WindowBookingCard() {
           <div className="bk-field"><label>Nimi</label><input className="bk-input" required value={c.name} onChange={(e) => setC({ ...c, name: e.target.value })} placeholder="Matti Meikäläinen" /></div>
           <div className="bk-row">
             <div className="bk-field"><label>Sähköposti</label><input className="bk-input" type="email" required value={c.email} onChange={(e) => setC({ ...c, email: e.target.value })} placeholder="matti@esimerkki.fi" /></div>
-            <div className="bk-field"><label>Puhelin</label><input className="bk-input" required value={c.phone} onChange={(e) => setC({ ...c, phone: e.target.value })} placeholder="045 875 5996" /></div>
+            <div className="bk-field"><label>Puhelin</label><input className="bk-input" required value={c.phone} onChange={(e) => setC({ ...c, phone: e.target.value })} placeholder="045 7831 1972" /></div>
           </div>
           <div className="bk-row">
             <div className="bk-field"><label>Osoite</label><input className="bk-input" required value={c.address} onChange={(e) => setC({ ...c, address: e.target.value })} placeholder="Katuosoite" /></div>

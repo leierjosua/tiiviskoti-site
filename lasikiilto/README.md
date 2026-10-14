@@ -42,7 +42,7 @@ Avaa sitten `http://localhost:8123/`.
 
 ## Vielä tehtävää ennen julkaisua
 
-- [ ] Oikea puhelinnumero (nyt placeholder 045 875 5996, peritty Loppusiivous-brändistä)
+- [ ] Oikea puhelinnumero (nyt placeholder 045 7831 1972, peritty Loppusiivous-brändistä)
 - [ ] Vahvista `info@lasikiilto.fi`, domain, Y-tunnus footeriin
 - [ ] Tarkka toimialue ja lopulliset kpl-hinnat
 - [ ] (Valinnainen) varauslomake / -taustajärjestelmä, kuten Loppusiivous-sivun BookingCard

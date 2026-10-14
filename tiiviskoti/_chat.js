@@ -234,7 +234,7 @@
     } catch (_) {
       send.disabled = false;
       send.textContent = 'Lähetä kysymys';
-      näytä('Viestin lähetys ei onnistunut. Soita 045 875 5996 tai kirjoita info@tiiviskoti.fi.');
+      näytä('Viestin lähetys ei onnistunut. Soita 045 7831 1972 tai kirjoita info@tiiviskoti.fi.');
     }
   }
 

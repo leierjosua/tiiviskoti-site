@@ -53,8 +53,8 @@ const GREEN = '#215A43';
 const CREAM = '#F7F5F0';
 const INK = '#1B2422';
 const MUTED = '#5F6D68';
-const PHONE = '045 875 5996';
-const PHONE_HREF = '+358458755996';
+const PHONE = '045 7831 1972';
+const PHONE_HREF = '+3584578311972';
 
 const sql = postgres(env.DATABASE_URL, {
   prepare: false, ssl: 'require', max: 2, idle_timeout: 5,

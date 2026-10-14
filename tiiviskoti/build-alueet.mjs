@@ -75,8 +75,8 @@ const WINDOW_HIGH = WINDOW_TIERS[0].price;
 const WINDOW_LOW = WINDOW_TIERS[WINDOW_TIERS.length - 1].price;
 const WINDOW_RANGE = `${WINDOW_LOW}\u2013${WINDOW_HIGH}`;
 
-const TEL = '045 875 5996';
-const TELH = '+358458755996';
+const TEL = '045 7831 1972';
+const TELH = '+3584578311972';
 
 /* Kuvat kierrätetään listasta, jotta vierekkäiset aluesivut eivät näytä
    identtisiltä. Sama kuva toistuu vasta viiden kunnan välein. */

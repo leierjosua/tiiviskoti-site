@@ -90,7 +90,7 @@ const body = `
       <p><b>Tiiviskoti Oy</b><br />
       Y-tunnus 3652671-7<br />
       Järvipuistonkatu 5, 04400 Järvenpää<br />
-      <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a> · <a href="tel:+358458755996">045 875 5996</a></p>
+      <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a> · <a href="tel:+3584578311972">045 7831 1972</a></p>
     </div>
 
     <h2>2. Palvelun sisältö</h2>
@@ -142,7 +142,7 @@ ${ikkunaRivit()}
       <p><b>Voit peruuttaa tai siirtää varauksen milloin tahansa maksutta.</b> Emme veloita
         peruutus- tai siirtomaksua.</p>
       <p style="color:var(--mute);font-size:15px">Ilmoita muutoksesta mieluiten mahdollisimman
-        varhain soittamalla <a href="tel:+358458755996">045 875 5996</a> tai sähköpostilla
+        varhain soittamalla <a href="tel:+3584578311972">045 7831 1972</a> tai sähköpostilla
         <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a>, jotta voimme antaa vapautuneen ajan
         toiselle asiakkaalle.</p>
     </div>
@@ -193,7 +193,7 @@ ${ikkunaRivit()}
     <h2>11. Huomautukset ja erimielisyydet</h2>
     <p>Jos työssä on mielestäsi virhe, ilmoita siitä meille mahdollisimman pian osoitteeseen
       <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a> tai numeroon
-      <a href="tel:+358458755996">045 875 5996</a>. Pyrimme aina ensisijaisesti korjaamaan asian.</p>
+      <a href="tel:+3584578311972">045 7831 1972</a>. Pyrimme aina ensisijaisesti korjaamaan asian.</p>
     <p>Jos erimielisyyttä ei saada sovittua, kuluttaja voi saattaa asian
       <b>kuluttajariitalautakunnan</b> käsiteltäväksi (kuluttajariita.fi). Ennen sitä kannattaa olla
       yhteydessä <b>kuluttajaneuvontaan</b> (kkv.fi/kuluttajaneuvonta). Sopimukseen sovelletaan Suomen

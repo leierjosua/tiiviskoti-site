@@ -54,7 +54,7 @@ Fontti **Manrope** (400/500/600/700/800). Logo: `assets/logo-vihrea.svg`, `asset
   - Edwin T.: "Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta. Vahva suositus."
 - Ankkuri: uusi ikkuna maksaisi n. 1 200 €. Vetävä ovi tai ikkuna nostaa lämmityskuluja tyypillisesti 10–15 %
   (**ongelman kuvaus, ei lupaus säästöstä** — älä kirjoita "säästät 15 %").
-- Puhelin 045 875 5996, info@tiiviskoti.fi. Varaus: `https://tiiviskoti.fi/varaa.html`.
+- Puhelin 045 7831 1972, info@tiiviskoti.fi. Varaus: `https://tiiviskoti.fi/varaa.html`.
 - **Kiellettyä:** takuu myyntiargumenttina, keksityt tähtimäärät/asiakasmäärät ("1000+ asiakasta"),
   "säästät X %", parvekeovet erillisenä myyntikärkenä, kynnyskumin sisältyminen oven hintaan.
 

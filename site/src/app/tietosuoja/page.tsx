@@ -23,7 +23,7 @@ export default function Tietosuoja() {
         <p className="upd">Päivitetty 17.6.2026</p>
 
         <h2>1. Rekisterinpitäjä</h2>
-        <p>Lasikiilto Oy · Y-tunnus 0000000-0 · Sähköposti: <a href="mailto:info@lasikiilto.fi">info@lasikiilto.fi</a> · Puhelin: 045 875 5996 · Verkkosivusto: www.lasikiilto.fi</p>
+        <p>Lasikiilto Oy · Y-tunnus 0000000-0 · Sähköposti: <a href="mailto:info@lasikiilto.fi">info@lasikiilto.fi</a> · Puhelin: 045 7831 1972 · Verkkosivusto: www.lasikiilto.fi</p>
         <p>Vastaamme henkilötietojen käsittelystä tämän selosteen mukaisesti. Kaikissa tietosuojaan liittyvissä asioissa voit ottaa yhteyttä osoitteeseen info@lasikiilto.fi.</p>
 
         <h2>2. Kerättävät henkilötiedot ja tietolähteet</h2>

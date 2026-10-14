@@ -70,7 +70,7 @@ const body = `
       Y-tunnus 3652671-7<br />
       Järvipuistonkatu 5, 04400 Järvenpää<br />
       Sähköposti: <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a><br />
-      Puhelin: <a href="tel:+358458755996">045 875 5996</a></p>
+      Puhelin: <a href="tel:+3584578311972">045 7831 1972</a></p>
       <p style="color:var(--mute);font-size:15px">Tietosuoja-asioissa voit olla yhteydessä suoraan yllä oleviin
         yhteystietoihin. Emme ole nimittäneet erillistä tietosuojavastaavaa, sillä toimintamme laajuus ei sitä edellytä.</p>
     </div>

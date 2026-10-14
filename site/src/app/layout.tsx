@@ -72,7 +72,7 @@ const jsonLd = {
     name: "Uusimaa",
   },
   serviceType: "Ikkunanpesu",
-  telephone: "+358458755996",
+  telephone: "+3584578311972",
   email: "info@lasikiilto.fi",
   priceRange: "€€",
 };

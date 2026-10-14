@@ -55,7 +55,7 @@ Selkeä, rehellinen, asiantunteva mutta lähestyttävä. Korostetaan läpinäkyv
 - Ammattilaiset ja välineet mukana
 
 ## Avoimet (täytä ennen julkaisua)
-- [x] Oikea puhelinnumero: `045 875 5996`
+- [x] Oikea puhelinnumero: `045 7831 1972`
 - [ ] Vahvista sähköposti `info@loppusiivous.fi`
 - [ ] Y-tunnus / yritystiedot footeriin
 - [ ] Tarkka toimialue

@@ -13,7 +13,7 @@ export default function V4Footer() {
           </div>
           <div className="mf-cta-btns">
             <Link href="/#varaa" className="btn btn-w btn-lg">Laske hinta</Link>
-            <a href="tel:+358458755996" className="btn btn-ghost btn-lg">045 875 5996</a>
+            <a href="tel:+3584578311972" className="btn btn-ghost btn-lg">045 7831 1972</a>
           </div>
         </div>
 
@@ -26,9 +26,9 @@ export default function V4Footer() {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="5.5" width="18" height="13" rx="2.5" stroke="currentColor" strokeWidth="1.7" /><path d="M4 7l8 6 8-6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 info@lasikiilto.fi
               </a>
-              <a href="tel:+358458755996" className="mf-chip">
+              <a href="tel:+3584578311972" className="mf-chip">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" /></svg>
-                045 875 5996
+                045 7831 1972
               </a>
               <span className="mf-chip">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z" stroke="currentColor" strokeWidth="1.7" /><circle cx="12" cy="10" r="2.3" stroke="currentColor" strokeWidth="1.7" /></svg>

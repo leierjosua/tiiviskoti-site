@@ -70,7 +70,7 @@ const html = `<!doctype html><html lang="fi"><head><meta charset="utf-8">
         <rect x="35" y="20" width="4" height="60" fill="#fff"/></svg>
       <b>TiivisKoti</b>
     </div>
-    <div class="yht">Tiiviskoti Oy · Y-tunnus 3652671-7<br>info@tiiviskoti.fi · 045 875 5996<br>tiiviskoti.fi</div>
+    <div class="yht">Tiiviskoti Oy · Y-tunnus 3652671-7<br>info@tiiviskoti.fi · 045 7831 1972<br>tiiviskoti.fi</div>
   </div>
 
   <h1>Lausunto ikkunoiden tiivisteiden kunnosta</h1>
@@ -104,7 +104,7 @@ const html = `<!doctype html><html lang="fi"><head><meta charset="utf-8">
     <div class="viiva">${esc(d.paikka || '')} ${esc(d.paivays || d.tarkastuspaiva)}</div>
   </div>
 
-  <div class="foot">Tiiviskoti Oy · Y-tunnus 3652671-7 · info@tiiviskoti.fi · 045 875 5996 · tiiviskoti.fi<br>
+  <div class="foot">Tiiviskoti Oy · Y-tunnus 3652671-7 · info@tiiviskoti.fi · 045 7831 1972 · tiiviskoti.fi<br>
   Tiivistystyöt tekee oma asentajamme. Kotitalousvähennys koskee työn osuutta osakkaan itse tilaamasta työstä.</div>
 </body></html>`
 

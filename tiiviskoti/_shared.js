@@ -1012,14 +1012,14 @@ function renderAreaNote(){
     box.innerHTML=
       `<b>Emme vielä palvele postinumerossa ${avail.postal}</b>`+
       '<span>Jätä yhteystietosi, niin otamme yhteyttä kun laajennumme alueellesi — tai soita '+
-      '<a href="tel:+358458755996">045 875 5996</a>.</span>'+
+      '<a href="tel:+3584578311972">045 7831 1972</a>.</span>'+
       '<div id="leadWrap" style="margin-top:12px"></div>';
     renderLeadForm();
     return;
   }
   if(s==='error'){
     box.className='area-note bad';
-    box.innerHTML='<b>Alueen tarkistus ei onnistunut</b><span>Soita <a href="tel:+358458755996">045 875 5996</a>, niin sovitaan aika puhelimessa.</span>';
+    box.innerHTML='<b>Alueen tarkistus ei onnistunut</b><span>Soita <a href="tel:+3584578311972">045 7831 1972</a>, niin sovitaan aika puhelimessa.</span>';
     return;
   }
 
@@ -1065,7 +1065,7 @@ function renderLeadForm(){
       msg.className='lead-msg ok';
       document.querySelector('.lead-f').querySelectorAll('input,button').forEach(el=>el.disabled=true);
     }catch(_){
-      msg.textContent='Lähetys ei onnistunut. Soita 045 875 5996.';
+      msg.textContent='Lähetys ei onnistunut. Soita 045 7831 1972.';
       msg.className='lead-msg bad';
       btn.disabled=false;
     }
@@ -1083,12 +1083,12 @@ function renderSlots(){
   if(avail.state==='loading'){ title.textContent='Haetaan vapaita aikoja…'; return; }
   if(avail.state==='error'){
     title.textContent='Vapaita aikoja ei juuri nyt saada haettua';
-    wrap.innerHTML='<div class="slots-empty">Soita <a href="tel:+358458755996" style="font-weight:700;text-decoration:underline">045 875 5996</a>, niin sovitaan aika puhelimessa.</div>';
+    wrap.innerHTML='<div class="slots-empty">Soita <a href="tel:+3584578311972" style="font-weight:700;text-decoration:underline">045 7831 1972</a>, niin sovitaan aika puhelimessa.</div>';
     return;
   }
   if(avail.state==='none'){
     title.textContent='Ei vapaita aikoja';
-    wrap.innerHTML='<div class="slots-empty">Kalenteri on täynnä. Soita <a href="tel:+358458755996" style="font-weight:700;text-decoration:underline">045 875 5996</a>, niin etsitään aika.</div>';
+    wrap.innerHTML='<div class="slots-empty">Kalenteri on täynnä. Soita <a href="tel:+3584578311972" style="font-weight:700;text-decoration:underline">045 7831 1972</a>, niin etsitään aika.</div>';
     return;
   }
 
@@ -1447,7 +1447,7 @@ if(cbWrap){
       cbOk.hidden=false;
       if(window.tkTrack) window.tkTrack({type:'cta', cta:'Soittopyyntö: lähetetty'});
     }catch(_){
-      naytaVirhe('Lähetys ei onnistunut. Yritä hetken päästä uudelleen tai soita 045 875 5996.');
+      naytaVirhe('Lähetys ei onnistunut. Yritä hetken päästä uudelleen tai soita 045 7831 1972.');
       cbSend.disabled=false; cbSend.textContent='Pyydä soitto';
     }
   });
@@ -1762,7 +1762,7 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
       } else {
         err.textContent = data && data.error==='validation'
           ? 'Tarkista lomakkeen tiedot ja yritä uudelleen.'
-          : 'Varauksen tallennus ei onnistunut. Yritä hetken kuluttua uudelleen tai soita 045 875 5996.';
+          : 'Varauksen tallennus ei onnistunut. Yritä hetken kuluttua uudelleen tai soita 045 7831 1972.';
       }
       err.style.display='block';
       submitBtn.disabled=false; submitBtn.textContent=btnLabel;
@@ -1787,7 +1787,7 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
     selSlot=null; loadAvailability();
     submitBtn.disabled=false; submitBtn.textContent=btnLabel;
   }catch(ex){
-    err.textContent='Yhteysvirhe. Tarkista verkkoyhteys ja yritä uudelleen, tai soita 045 875 5996.';
+    err.textContent='Yhteysvirhe. Tarkista verkkoyhteys ja yritä uudelleen, tai soita 045 7831 1972.';
     err.style.display='block';
     submitBtn.disabled=false; submitBtn.textContent=btnLabel;
   }

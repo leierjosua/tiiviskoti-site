@@ -126,7 +126,7 @@ function buildReceiptHtml(b: Record<string, any>): string {
   <div style="height:2px;background:linear-gradient(to right,${_BRAND},${_ACCENT}) !important;border-radius:0;margin-bottom:10px"></div>
   <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af">
     <div>TiivisKoti.fi</div>
-    <div style="text-align:center">Puh: 045 875 5996<br>www.tiiviskoti.fi<br>info@tiiviskoti.fi</div>
+    <div style="text-align:center">Puh: 045 7831 1972<br>www.tiiviskoti.fi<br>info@tiiviskoti.fi</div>
     <div style="text-align:right"></div>
   </div>
   </div>
@@ -240,7 +240,7 @@ async function fetchCompanySignature(supabase: SupabaseClient): Promise<string> 
 
     // Default company signature
     return generateDefaultSignatureHtml(
-      { first_name: "TiivisKoti", last_name: "", email: COMPANY_EMAIL, phone: "045 875 5996" },
+      { first_name: "TiivisKoti", last_name: "", email: COMPANY_EMAIL, phone: "045 7831 1972" },
       LOGO_EMAIL_URL,
     );
   } catch {

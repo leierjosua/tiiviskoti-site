@@ -218,7 +218,7 @@ export function mountKartoitus(o) {
   function renderNote() {
     if (!noteEl) return;
     const s = st.state;
-    const tel = '<a href="tel:+358458755996">045 875 5996</a>';
+    const tel = '<a href="tel:+3584578311972">045 7831 1972</a>';
     if (s === 'postal') { noteEl.className = 'area-note';
       noteEl.innerHTML = '<b>Syötä postinumero</b><span>Kartoituskäynneillä on oma kalenterinsa — näytämme vapaat ajat heti.</span>'; return; }
     if (s === 'loading') { noteEl.className = 'area-note'; noteEl.innerHTML = '<b>Tarkistetaan aluetta…</b>'; return; }
@@ -370,7 +370,7 @@ export function mountKartoitus(o) {
           err.textContent = 'Valittu aika on jo mennyt. Valitkaa uusi aika kalenterista.';
           selSlot = null; await load();
         } else {
-          err.textContent = 'Ajan varaus ei onnistunut. Yhteydenottonne on silti tallessa ja otamme yhteyttä — tai soittakaa 045 875 5996.';
+          err.textContent = 'Ajan varaus ei onnistunut. Yhteydenottonne on silti tallessa ja otamme yhteyttä — tai soittakaa 045 7831 1972.';
         }
         err.style.display = 'block';
         btn.disabled = false; btn.textContent = label;
@@ -384,7 +384,7 @@ export function mountKartoitus(o) {
         `Varmistattehan, että pääsemme rappukäytäviin ja yhteistiloihin käynnin aikana.`;
       goTo('done');
     } catch (_) {
-      err.textContent = 'Yhteysvirhe. Yhteydenottonne on tallessa ja otamme yhteyttä — tai soittakaa 045 875 5996.';
+      err.textContent = 'Yhteysvirhe. Yhteydenottonne on tallessa ja otamme yhteyttä — tai soittakaa 045 7831 1972.';
       err.style.display = 'block';
       btn.disabled = false; btn.textContent = label;
     }

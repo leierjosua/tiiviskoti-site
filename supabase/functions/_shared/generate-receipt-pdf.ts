@@ -6,7 +6,7 @@ const LOGO_URL = "https://tiiviskoti.fi/img/logo-email.png";
 const COMPANY = {
   name: "TiivisKoti.fi",
   email: "info@tiiviskoti.fi",
-  phone: "045 875 5996",
+  phone: "045 7831 1972",
 };
 
 const VAT_RATE = 0.255; // 25.5%

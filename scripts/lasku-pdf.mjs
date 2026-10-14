@@ -39,7 +39,7 @@ const MYYJA = {
   alvtunnus: 'FI36526717',
   osoite: 'Järvipuistonkatu 5',
   postitoimipaikka: '04400 Järvenpää',
-  puhelin: '045 875 5996',
+  puhelin: '045 7831 1972',
   email: 'info@tiiviskoti.fi',
   iban: 'FI05 7997 7996 5166 00',
   bic: 'HOLVIFIH',

@@ -91,7 +91,7 @@ function buildPreviewHtml(bodyHtml: string, category: string): string {
   if (CATEGORIES_WITH_SELLER_SIG.has(category)) {
     signatureHtml = `<p></p><p>Ystävällisin terveisin,<br><strong>Mikael Björkbacka</strong><br>Lasikiilto Oy<br>0456023730<br>mikael@lasikiilto.fi</p><p><img src="${logoUrl}" alt="Lasikiilto" width="120" style="margin-top:4px;" /></p>`;
   } else if (CATEGORIES_WITH_COMPANY_SIG.has(category)) {
-    signatureHtml = `<p></p><p>Ystävällisin terveisin,<br><strong>Lasikiilto.fi</strong><br>045 875 5996<br>info@lasikiilto.fi</p><p><img src="${logoUrl}" alt="Lasikiilto" width="120" style="margin-top:4px;" /></p>`;
+    signatureHtml = `<p></p><p>Ystävällisin terveisin,<br><strong>Lasikiilto.fi</strong><br>045 7831 1972<br>info@lasikiilto.fi</p><p><img src="${logoUrl}" alt="Lasikiilto" width="120" style="margin-top:4px;" /></p>`;
   }
 
   const contentWithSig = resolved + signatureHtml;
@@ -619,7 +619,7 @@ export default function EmailTemplates() {
 
 function defaultCompanySignatureHtml(): string {
   const logoUrl = "https://agductixsosmzcmzalfy.supabase.co/storage/v1/object/public/public-assets/logo-email.png";
-  return `<p>Ystävällisin terveisin,<br><strong>Lasikiilto.fi</strong><br>045 875 5996<br>info@lasikiilto.fi</p><p><img src="${logoUrl}" alt="Lasikiilto" width="120" style="margin-top:4px;" /></p>`;
+  return `<p>Ystävällisin terveisin,<br><strong>Lasikiilto.fi</strong><br>045 7831 1972<br>info@lasikiilto.fi</p><p><img src="${logoUrl}" alt="Lasikiilto" width="120" style="margin-top:4px;" /></p>`;
 }
 
 function defaultSignatureHtml(emp: { first_name: string; last_name: string; email: string; phone?: string | null }): string {

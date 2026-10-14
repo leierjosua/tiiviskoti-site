@@ -5,7 +5,7 @@ const LOGO_URL = "https://tiiviskoti.fi/img/logo-email.png";
 const COMPANY = {
   name: "TiivisKoti",
   email: "info@tiiviskoti.fi",
-  phone: "045 875 5996",
+  phone: "045 7831 1972",
 };
 
 const BRAND_DARK = rgb(0.086, 0.227, 0.157);

@@ -126,7 +126,7 @@ export function InstallPlanPdf({ installPlan: plan, customerName, customerAddres
         <div style={{ height: "2px", background: `linear-gradient(to right, ${BRAND}, ${ACCENT})`, borderRadius: "1px", marginBottom: "10px" }} />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#9ca3af" }}>
           <div>Lasikiilto.fi</div>
-          <div style={{ textAlign: "center" }}>Puh: 045 875 5996<br />www.lasikiilto.fi<br />info@lasikiilto.fi</div>
+          <div style={{ textAlign: "center" }}>Puh: 045 7831 1972<br />www.lasikiilto.fi<br />info@lasikiilto.fi</div>
           <div style={{ textAlign: "right" }}></div>
         </div>
       </div>

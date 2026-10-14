@@ -256,7 +256,7 @@ export async function generateJobReportPdf(r: JobReportPdfInput): Promise<Uint8A
   /* --- alapalkki ------------------------------------------------------ */
   rect(0, 1250, 924, 58, DARK);
   text('Tiiviskoti Oy · Y-tunnus 3652671-7', 56, 1284, { size: 9, color: WHITE });
-  const phone = '045 875 5996';
+  const phone = '045 7831 1972';
   page.drawText(phone, { x: W / 2 - font.widthOfTextAtSize(phone, 9) / 2, y: Y(1284), size: 9, font, color: WHITE });
   rightText('info@tiiviskoti.fi', 868, 1284, { size: 9, color: WHITE });
 

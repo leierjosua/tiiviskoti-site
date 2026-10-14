@@ -151,7 +151,7 @@ export async function generateReceiptPdf(input: ReceiptInput): Promise<Uint8Arra
   text('TiivisKoti', margin, 48, { font: bold, size: 9, color: BRAND_DARK });
   text('Y-tunnus 3652671-7', width - margin - font.widthOfTextAtSize('Y-tunnus 3652671-7', 9), 48, { size: 9, color: GRAY });
   text('Järvipuistonkatu 5, 04400 Järvenpää', margin, 36, { size: 8, color: GRAY });
-  text('info@tiiviskoti.fi · 045 875 5996 · tiiviskoti.fi', margin, 25, { size: 8, color: GRAY });
+  text('info@tiiviskoti.fi · 045 7831 1972 · tiiviskoti.fi', margin, 25, { size: 8, color: GRAY });
 
   return doc.save();
 }

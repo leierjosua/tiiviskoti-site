@@ -60,7 +60,7 @@ Kotitalousvähennys: −40 % työn osuudesta (netto ≈ 72 % hinnasta), max 2 25
 - `_serve.mjs` — kevyt paikallinen esikatselupalvelin (`node _serve.mjs` → http://localhost:8799).
 
 ## Avoimet (täytä ennen julkaisua)
-- [ ] Vahvista puhelinnumero (nyt sisarbrändin `045 875 5996`)
+- [ ] Vahvista puhelinnumero (nyt sisarbrändin `045 7831 1972`)
 - [ ] Sähköposti `info@tiiviskoti.fi`
 - [ ] Y-tunnus / yritystiedot footeriin
 - [ ] Domain `tiiviskoti.fi` → hosting + DNS
