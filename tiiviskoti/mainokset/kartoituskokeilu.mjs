@@ -59,7 +59,7 @@ Käynti on maksuton eikä sido sinua mihinkään. Näet summan ennen kuin päät
 Ikkunan tiivistys alkaen 75 €, ja mitä useampi ikkuna kerralla, sitä halvempi kappalehinta. Ulko-oven tiivistys 99 €. Työn osuudesta saat kotitalousvähennyksen.
 
 Valitse sopiva aika kalenterista — vahvistus tulee heti sähköpostiin.`;
-const OTSIKKO = 'Ilmainen kartoituskäynti kotiin';
+const OTSIKKO = 'Varaa ilmainen kartoitus';
 const KUVAUS = 'Kiinteä hinta paikan päällä · Uusimaa';
 
 /* Videot: Remotion `video/remotion/src/Kartoitus.tsx` (a = "Ilmainen kartoituskäynti",

@@ -117,9 +117,9 @@ export const Kartoitus: React.FC<{ ratio: '916' | '45'; variant: 'a' | 'b' }> = 
       {/* 3. Loppu: yksi ajatus + CTA. */}
       <Block from={END_AT + 6} to={-1} bottom={bottom}>
         <Img src={staticFile('ikkuna-ovi/logo.png')} style={{ width: 300, marginBottom: 34, opacity: 0.95 }} />
-        <H1 at={END_AT + 8}>Varaa ilmainen</H1>
-        <Mint at={END_AT + 14}>kartoituskäynti.</Mint>
-        <Cta at={END_AT + 30} label="Varaa aika" />
+        <H1 at={END_AT + 8}>Hinta paikan päällä.</H1>
+        <Mint at={END_AT + 14}>Käynti 0&nbsp;€.</Mint>
+        <Cta at={END_AT + 30} label="Varaa ilmainen kartoitus" />
       </Block>
 
       <Audio
