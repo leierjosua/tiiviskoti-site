@@ -23,7 +23,7 @@ export const FPS = 25;
 const X = 20;      // sulautus saman luvun sisällä (0,8 s)
 const XL = 30;     // sulautus ikkunasta oveen (1,2 s)
 
-type Shot = { src: string; len: number; pos45: string; zoomFrom?: number; zoomTo?: number; x?: number };
+export type Shot = { src: string; len: number; pos45: string; zoomFrom?: number; zoomTo?: number; x?: number };
 
 /* len = esihidastetun klipin pituus ruutuina. pos45 = mistä kohtaa 9:16-kuva
    rajataan 4:5:ksi (työ ei saa jäädä rajauksen ulkopuolelle). */
@@ -50,7 +50,7 @@ const END_AT = STARTS[SHOTS.length - 1] + 8;
 
 /* ---------- Kuva ---------- */
 
-const ShotLayer: React.FC<{ s: Shot & { chapterBreak?: boolean }; start: number; isFirst: boolean; r45: boolean }> =
+export const ShotLayer: React.FC<{ s: Shot & { chapterBreak?: boolean }; start: number; isFirst: boolean; r45: boolean }> =
   ({ s, start, isFirst, r45 }) => {
     const frame = useCurrentFrame();
     const local = frame - start;
@@ -93,7 +93,7 @@ const useInOut = (from: number, to: number) => {
   return { visible: frame >= from - 1 && (to < 0 || frame <= to + 20), op: inS * (1 - outS), y: (1 - inS) * 26 - outS * 22 };
 };
 
-const Eyebrow: React.FC<{ at: number; n: string; label: string }> = ({ at, n, label }) => {
+export const Eyebrow: React.FC<{ at: number; n: string; label: string }> = ({ at, n, label }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const s = spring({ frame: frame - at, fps, config: { damping: 200 }, durationInFrames: 24 });
@@ -107,7 +107,7 @@ const Eyebrow: React.FC<{ at: number; n: string; label: string }> = ({ at, n, la
 };
 
 /* Valintamerkki piirtyy viivana (stroke-dashoffset), ei ilmesty. */
-const Check: React.FC<{ at: number; text: string }> = ({ at, text }) => {
+export const Check: React.FC<{ at: number; text: string }> = ({ at, text }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const s = spring({ frame: frame - at, fps, config: { damping: 200 }, durationInFrames: 22 });
@@ -127,7 +127,7 @@ const Check: React.FC<{ at: number; text: string }> = ({ at, text }) => {
   );
 };
 
-const Pill: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => {
+export const Pill: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const s = spring({ frame: frame - at, fps, config: { damping: 200 }, durationInFrames: 22 });
@@ -141,7 +141,7 @@ const Pill: React.FC<{ at: number; children: React.ReactNode }> = ({ at, childre
   );
 };
 
-const Price: React.FC<{ at: number; value: number; prefix?: string }> = ({ at, value, prefix }) => {
+export const Price: React.FC<{ at: number; value: number; prefix?: string; unit?: string }> = ({ at, value, prefix, unit = '€' }) => {
   const frame = useCurrentFrame();
   /* Luku rullaa nollasta hintaan 1,1 s:ssa ja hidastuu loppua kohti. */
   const p = interpolate(frame - at, [0, 28], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic) });
@@ -152,19 +152,19 @@ const Price: React.FC<{ at: number; value: number; prefix?: string }> = ({ at, v
       <span style={{ display: 'inline-flex', alignItems: 'flex-start', gap: 18, color: C.mint }}>
         {prefix && <span style={{ fontSize: 124, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.02 }}>{prefix}</span>}
         <Roll v={v} fs={124} color={C.mint} digits={String(value).length} blur={speed} />
-        <span style={{ fontSize: 124, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.02 }}>€</span>
+        <span style={{ fontSize: 124, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.02 }}>{unit}</span>
       </span>
     </MaskLine>
   );
 };
 
-const H1: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => (
+export const H1: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => (
   <MaskLine at={at} style={{ fontSize: 96, fontWeight: 800, lineHeight: 1.02, letterSpacing: '-0.035em', color: '#fff' }}>
     {children}
   </MaskLine>
 );
 
-const Block: React.FC<{ from: number; to: number; bottom: number; children: React.ReactNode }> = ({ from, to, bottom, children }) => {
+export const Block: React.FC<{ from: number; to: number; bottom: number; children: React.ReactNode }> = ({ from, to, bottom, children }) => {
   const { visible, op, y } = useInOut(from, to);
   if (!visible) return null;
   return (
@@ -175,7 +175,7 @@ const Block: React.FC<{ from: number; to: number; bottom: number; children: Reac
   );
 };
 
-const Cta: React.FC<{ at: number }> = ({ at }) => {
+export const Cta: React.FC<{ at: number }> = ({ at }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const s = spring({ frame: frame - at, fps, config: { damping: 14, stiffness: 120 }, durationInFrames: 30 });

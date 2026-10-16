@@ -152,12 +152,20 @@ if (bookingPayload) {
   if (process.env.PAYLOAD_OUT) (await import('node:fs')).writeFileSync(process.env.PAYLOAD_OUT, bookingPayload);
 }
 
-const omat = rikki.filter((r) => /tiiviskoti\.fi/.test(r));
+/* Google-arvosana palauttaa 503 kun GOOGLE_PLACES_API_KEY puuttuu Vercelistä.
+   Sivu näyttää silloin kovakoodatun luvun eikä mitään hajoa → WARN, ei FAIL,
+   muuten päivittäinen ajo hälyttäisi joka aamu samasta tunnetusta asiasta. */
+const arvosana = rikki.filter((r) => /\/api\/google-rating/.test(r));
+if (arvosana.length) warn('Google-arvosana ei päivity (api/google-rating ' + arvosana[0].split(' ')[0]
+  + ') — sivu näyttää kovakoodatun luvun; lisää GOOGLE_PLACES_API_KEY Verceliin');
+const omat = rikki.filter((r) => /tiiviskoti\.fi/.test(r) && !/\/api\/google-rating/.test(r));
 if (omat.length) fail(`${omat.length} omaa pyyntöä epäonnistui`, omat.slice(0, 5).join(' · '));
 else ok('ei epäonnistuneita pyyntöjä omiin osoitteisiin');
 
 /* Katkaistut rajapinnat tuottavat odotetusti verkkovirheen konsoliin. */
-const oikeat = konsoli.filter((c) => !/ERR_FAILED|ERR_ABORTED|Failed to fetch|NetworkError|Load failed/i.test(c));
+const oikeat = konsoli.filter((c) => !/ERR_FAILED|ERR_ABORTED|Failed to fetch|NetworkError|Load failed/i.test(c))
+  /* Selain ei kerro konsolissa osoitetta → yhtä monta 503-riviä kuin arvosanapyyntöjä pois. */
+  .filter((c, i, a) => !(/status of 503/.test(c) && a.slice(0, i + 1).filter((x) => /status of 503/.test(x)).length <= arvosana.length));
 if (oikeat.length) fail(`${oikeat.length} konsolivirhettä`, oikeat.slice(0, 4).join(' · '));
 else ok('ei konsolivirheitä (katkaisujen aiheuttamat suodatettu)');
 

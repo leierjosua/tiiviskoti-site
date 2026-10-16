@@ -340,6 +340,178 @@ await check('mainokset', 'laskeutumissivut', async () => {
   }
 });
 
+/* ========== 10. SIVUJEN LINKIT JA PUHELINNUMERO ==========
+   Varaustesti (check:varaus) kokeilee etusivun napit selaimessa. Tämä käy
+   läpi KAIKKI yllä listatut sivut: jokainen sisäinen linkki vastaa 200,
+   ankkuri osuu olemassa olevaan osioon, ja tel:-linkit ovat uutta numeroa
+   (vaihdettu 14.10.2026 — vanha 045 875 5996 ei saa palata). */
+const PUHELIN = '+3584578311972';
+await check('linkit', 'sivujen linkit', async () => {
+  const sivut = new Map();   // url ilman hashia -> html
+  const hae = async (u) => {
+    if (!sivut.has(u)) { const r = await get(u); sivut.set(u, r.status === 200 ? r.text : null); if (r.status !== 200) sivut.set(u + '#status', r.status); }
+    return sivut.get(u);
+  };
+  const rikki = [], ankkurit = [], numerot = new Set();
+  let linkkeja = 0;
+  for (const [nimi, url] of SIVUT) {
+    const html = await hae(url);
+    if (!html) continue;
+    for (const [, href] of html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)) {
+      if (href.startsWith('tel:')) { numerot.add(href.slice(4).replace(/[\s-]/g, '')); continue; }
+      if (/^(mailto:|javascript:|https?:\/\/(?!tiiviskoti\.fi))/.test(href)) continue;
+      const abs = new URL(href, url);
+      const kohde = abs.origin + abs.pathname;
+      const hash = abs.hash.slice(1);
+      linkkeja++;
+      const kohdeHtml = await hae(kohde);
+      if (!kohdeHtml) { rikki.push(`${nimi}: ${href} → ${sivut.get(kohde + '#status')}`); continue; }
+      if (hash && !new RegExp(`id=["']${hash.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`).test(kohdeHtml)) ankkurit.push(`${nimi}: ${href}`);
+    }
+  }
+  const uniq = (a) => [...new Set(a)];
+  if (rikki.length) fail('linkit', `${uniq(rikki).length} rikkinäistä linkkiä`, uniq(rikki).slice(0, 6).join(' · '));
+  else ok('linkit', `${linkkeja} sisäistä linkkiä ${SIVUT.length} sivulla, kaikki vastaavat (${sivut.size} eri sivua)`);
+  if (ankkurit.length) warn('linkit', `${uniq(ankkurit).length} ankkuria osoittaa olemattomaan osioon`, uniq(ankkurit).slice(0, 6).join(' · '));
+  const vaarat = [...numerot].filter((n) => n !== PUHELIN);
+  if (vaarat.length) fail('linkit', `väärä puhelinnumero soittonapissa: ${vaarat.join(', ')}`);
+  else if (numerot.size) ok('linkit', `soittonapit oikeaan numeroon (${PUHELIN})`);
+});
+
+/* ========== 11. META-MAINOKSET ==========
+   Token on sivuston .env:ssä (META_CAPI_TOKEN, ads_read). Mainos voi pysähtyä
+   hiljaa: hylätty arvio, maksuvirhe, tai jakelu lakkaa ilman ilmoitusta.
+   Eilinen kulu = 0 vaikka mainoksia on päällä on varmin merkki siitä. */
+const ME = 'act_205952163658187';
+const ME_IG = '17841437143913657';   // @tiiviskoti — ilman tätä IG näyttää flowin
+await check('meta-ads', 'mainostili', async () => {
+  const siteEnv = {};
+  for (const raw of fs.readFileSync(path.join(ROOT, 'tiiviskoti', '.env'), 'utf8').split('\n')) {
+    const m = raw.replace(/\r$/, '').match(/^([A-Z0-9_]+)=(.*)$/);
+    if (m) siteEnv[m[1]] = m[2].replace(/^["']|["']$/g, '');
+  }
+  const T = siteEnv.META_CAPI_TOKEN;
+  if (!T) return warn('meta-ads', 'META_CAPI_TOKEN puuttuu tiiviskoti/.env:sta — Meta-mainoksia ei tarkistettu');
+  const g = async (p, q = {}) => {
+    const u = new URL(`https://graph.facebook.com/v23.0/${p}`);
+    for (const [k, v] of Object.entries(q)) u.searchParams.set(k, typeof v === 'string' ? v : JSON.stringify(v));
+    u.searchParams.set('access_token', T);
+    const j = await (await fetch(u)).json();
+    if (j.error) throw new Error(j.error.message);
+    return j;
+  };
+
+  const acc = await g(ME, { fields: 'account_status,disable_reason' });
+  /* 1 = ACTIVE; 2 = disabled, 3 = unsettled (maksu), 7/9 = arvioinnissa/grace. */
+  if (acc.account_status !== 1) return fail('meta-ads', `mainostili EI aktiivinen (status ${acc.account_status}, syy ${acc.disable_reason}) — tarkista maksutapa`);
+  ok('meta-ads', 'mainostili aktiivinen');
+
+  const sets = (await g(`${ME}/adsets`, { fields: 'name,effective_status,daily_budget', limit: '50' })).data
+    .filter((s) => s.effective_status === 'ACTIVE');
+  if (!sets.length) return fail('meta-ads', 'yksikään mainosjoukko ei ole päällä — Meta ei näytä mitään');
+  for (const s of sets) ok('meta-ads', `${s.name}: ${Number(s.daily_budget) / 100} €/vrk`);
+
+  const ads = (await g(`${ME}/ads`, {
+    fields: 'name,effective_status,created_time,creative{instagram_user_id,object_story_spec}', limit: '100',
+    effective_status: ['ACTIVE', 'PENDING_REVIEW', 'IN_PROCESS', 'WITH_ISSUES', 'DISAPPROVED', 'PENDING_BILLING_INFO'],
+  })).data;
+  const huonot = ads.filter((a) => ['DISAPPROVED', 'WITH_ISSUES', 'PENDING_BILLING_INFO'].includes(a.effective_status));
+  for (const a of huonot) fail('meta-ads', `${a.name}: ${a.effective_status}`);
+  /* Arvio kestää yleensä minuutteja–tunteja; yli vuorokausi on jumissa. */
+  for (const a of ads.filter((x) => ['PENDING_REVIEW', 'IN_PROCESS'].includes(x.effective_status))) {
+    const h = (Date.now() - new Date(a.created_time)) / 3600000;
+    if (h > 24) warn('meta-ads', `${a.name} ollut arvioinnissa ${Math.round(h)} h`);
+  }
+  for (const a of ads) {
+    const ig = a.creative?.instagram_user_id || a.creative?.object_story_spec?.instagram_user_id;
+    if (ig !== ME_IG) fail('meta-ads', `${a.name}: Instagram-identiteetti väärä (${ig ?? 'puuttuu'}) — näkyy flowina`);
+  }
+  const aktiiviset = ads.filter((a) => a.effective_status === 'ACTIVE');
+  if (!aktiiviset.length) fail('meta-ads', 'ei yhtään aktiivista mainosta');
+  else if (aktiiviset.length > 4) warn('meta-ads', `${aktiiviset.length} mainosta päällä — budjetti hajoaa ohueksi (max 4)`);
+  else ok('meta-ads', `${aktiiviset.length} mainosta päällä: ${aktiiviset.map((a) => a.name.split(' - ')[0]).join(', ')}`);
+
+  const lead = (a) => +((a || []).find((x) => x.action_type === 'lead')?.value || 0);
+  const [eilen] = (await g(`${ME}/insights`, { date_preset: 'yesterday', fields: 'spend,inline_link_clicks,actions' })).data;
+  const kulu = +(eilen?.spend || 0);
+  if (aktiiviset.length && kulu === 0) fail('meta-ads', 'eilen 0 € kulua vaikka mainoksia on päällä — jakelu pysähtynyt');
+  else ok('meta-ads', `eilen ${kulu.toFixed(2)} €, ${eilen?.inline_link_clicks || 0} klikkiä, ${lead(eilen?.actions)} liidiä`);
+
+  const [vko] = (await g(`${ME}/insights`, { date_preset: 'last_7d', fields: 'spend,actions' })).data;
+  const l7 = lead(vko?.actions), k7 = +(vko?.spend || 0);
+  /* Nollaraja ~78 €/liidi (ks. muisti); 45 € on aikaisen varoituksen raja. */
+  if (k7 > 60 && l7 === 0) fail('meta-ads', `7 vrk: ${k7.toFixed(0)} € → 0 liidiä`);
+  else if (l7 && k7 / l7 > 45) warn('meta-ads', `7 vrk liidin hinta ${(k7 / l7).toFixed(0)} € (${k7.toFixed(0)} € / ${l7})`);
+  else ok('meta-ads', `7 vrk: ${k7.toFixed(0)} € → ${l7} liidiä${l7 ? ` (${(k7 / l7).toFixed(0)} €/liidi)` : ''}`);
+
+  /* Liidikuivuus: kuinka paljon on kulunut viimeisen CRM:ään tulleen
+     Meta-liidin jälkeen. ~35 €/liidi tasolla 0 liidiä 70 €:lla on ~14 %
+     todennäköisyys pelkkää sattumaa, 105 €:lla ~5 % → silloin jokin on vialla. */
+  const [vika] = await sql`select max(created_at) t from tk.leads where campaign = 'meta-liidilomake'`;
+  if (vika?.t) {
+    /* Seuraavasta päivästä alkaen: liidipäivän kulu syntyi osin ENNEN liidiä
+       ja paisutti summaa (13.→15.10. näytti 100 € kun todellinen oli ~55 €). */
+    const since = new Date(new Date(vika.t).getTime() + 86400000).toISOString().slice(0, 10);
+    const [s] = (await g(`${ME}/insights`, { time_range: { since, until: new Date().toISOString().slice(0, 10) }, fields: 'spend' })).data;
+    const h = Math.round((Date.now() - new Date(vika.t)) / 3600000);
+    const k = +(s?.spend || 0);
+    const msg = `viimeisin Meta-liidi ${h} h sitten, seuraavasta päivästä alkaen kulunut ${k.toFixed(0)} €`;
+    if (k > 105) fail('meta-ads', msg + ' — liidejä ei tule, tarkista lomake ja mainokset');
+    else if (k > 70) warn('meta-ads', msg);
+    else ok('meta-ads', msg);
+  }
+});
+
+/* ========== 12. GOOGLE ADS ==========
+   Kampanja voi pysähtyä hiljaa (maksu, hylätty mainos, budjetti). Eilinen
+   kulu ja mainosten hyväksyntä kertovat sen. */
+await check('google-ads', 'kampanja', async () => {
+  if (!env.GOOGLE_ADS_DEVELOPER_TOKEN || !env.GOOGLE_ADS_OAUTH_REFRESH_TOKEN) return warn('google-ads', 'tunnukset puuttuvat');
+  const tok = await (await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: env.GOOGLE_OAUTH_CLIENT_ID, client_secret: env.GOOGLE_OAUTH_CLIENT_SECRET,
+      refresh_token: env.GOOGLE_ADS_OAUTH_REFRESH_TOKEN, grant_type: 'refresh_token',
+    }),
+  })).json();
+  if (!tok.access_token) return fail('google-ads', 'Ads-tunnus ei uusiutunut — raportointi ja konversioiden vienti poikki');
+  const q = async (query) => {
+    const r = await fetch(`https://googleads.googleapis.com/v25/customers/${env.GOOGLE_ADS_CUSTOMER_ID}/googleAds:searchStream`, {
+      method: 'POST', body: JSON.stringify({ query }),
+      headers: { authorization: `Bearer ${tok.access_token}`, 'developer-token': env.GOOGLE_ADS_DEVELOPER_TOKEN, 'content-type': 'application/json' },
+    });
+    const j = await r.json();
+    if (!Array.isArray(j)) throw new Error(JSON.stringify(j).slice(0, 160));
+    return j.flatMap((b) => b.results ?? []);
+  };
+
+  const kamp = await q(`SELECT campaign.name, campaign.status, campaign.primary_status, campaign_budget.amount_micros
+    FROM campaign WHERE campaign.status = 'ENABLED'`);
+  if (!kamp.length) return fail('google-ads', 'yksikään kampanja ei ole päällä');
+  for (const c of kamp) {
+    const ps = c.campaign.primaryStatus;
+    /* LIMITED (esim. tarjousstrategian oppiminen) on normaali; NOT_ELIGIBLE/PAUSED ei. */
+    const msg = `${c.campaign.name}: ${ps}, ${(c.campaignBudget.amountMicros / 1e6).toFixed(0)} €/vrk`;
+    if (['NOT_ELIGIBLE', 'PAUSED', 'REMOVED', 'ENDED'].includes(ps)) fail('google-ads', msg);
+    else ok('google-ads', msg);
+  }
+
+  const [e] = await q(`SELECT metrics.cost_micros, metrics.clicks, metrics.conversions FROM customer WHERE segments.date DURING YESTERDAY`);
+  const kulu = (e?.metrics?.costMicros ?? 0) / 1e6;
+  if (kulu === 0) fail('google-ads', 'eilen 0 € kulua — mainokset eivät näy (maksu? hylkäys?)');
+  else ok('google-ads', `eilen ${kulu.toFixed(2)} €, ${e.metrics.clicks ?? 0} klikkiä, ${(+(e.metrics.conversions ?? 0)).toFixed(1)} konv.`);
+
+  const hylatyt = await q(`SELECT ad_group.name, ad_group_ad.ad.id, ad_group_ad.policy_summary.approval_status
+    FROM ad_group_ad WHERE ad_group_ad.status = 'ENABLED' AND ad_group.status = 'ENABLED' AND campaign.status = 'ENABLED'
+      AND ad_group_ad.policy_summary.approval_status IN ('DISAPPROVED', 'AREA_OF_INTEREST_ONLY')`);
+  if (hylatyt.length) fail('google-ads', `${hylatyt.length} mainosta hylätty/rajoitettu`, hylatyt.map((h) => `${h.adGroup.name} ${h.adGroupAd.ad.id}`).join(' · '));
+  else ok('google-ads', 'kaikki päällä olevat mainokset hyväksytty');
+
+  /* Offline-konversioiden vienti: virhe tarkoittaa ettei Google opi myynneistä. */
+  const virheet = await sql`select count(*)::int n from tk.jobs where ads_upload_error is not null and updated_at > now() - interval '7 days'`;
+  if (virheet[0].n) warn('google-ads', `${virheet[0].n} työn konversion vienti Adsiin epäonnistui 7 vrk:ssa (tk.jobs.ads_upload_error)`);
+});
+
 /* ========== RAPORTTI ========== */
 await sql.end();
 

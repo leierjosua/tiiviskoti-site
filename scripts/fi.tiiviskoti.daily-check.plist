@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Aamun kuntotarkistus klo 8.00 (scripts/daily-run.sh).
+     Jos kone on silloin unessa, launchd ajaa sen heräämisen jälkeen.
+     Asennus:  cp scripts/fi.tiiviskoti.daily-check.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/fi.tiiviskoti.daily-check.plist
+     Poisto:   launchctl unload ~/Library/LaunchAgents/fi.tiiviskoti.daily-check.plist && rm ~/Library/LaunchAgents/fi.tiiviskoti.daily-check.plist
+     Aja heti: launchctl start fi.tiiviskoti.daily-check -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>fi.tiiviskoti.daily-check</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/josualeier/projects/loppusiivous-main-new/scripts/daily-run.sh</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+  <key>StandardOutPath</key><string>/Users/josualeier/Library/Logs/tiiviskoti-check/launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/josualeier/Library/Logs/tiiviskoti-check/launchd.log</string>
+</dict>
+</plist>
