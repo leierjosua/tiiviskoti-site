@@ -5,15 +5,14 @@
 
    MITÄ TEHDÄÄN
      1. Uusi kampanja "TK67 Kartoituskokeilu" (OUTCOME_TRAFFIC) + mainosjoukko
-        30 e/vrk, sama kohdennus kuin TK29:ssä. Mainosjoukko PÄÄTTYY
+        15 e/vrk, sama kohdennus kuin TK29:ssä. Mainosjoukko PÄÄTTYY
         ITSESTÄÄN 30.10.2026 klo 23.59 — rahaa ei kulu vahingossa yli.
-     2. Neljä mainosta, sama teksti: kuvat TK67 sakset, TK68 uratiiviste;
-        videot TK69 "Ilmainen kartoituskäynti", TK70 "Vetääkö ikkuna tai ovi?".
+     2. Kaksi mainosta (15 e/vrk ei riitä neljälle): kuva TK67 sakset ja
+        video TK69 "Ilmainen kartoituskäynti". TK68/TK70-materiaali on valmiina.
         Linkki https://tiiviskoti.fi/kartoitus.html?src=meta-kartoitus-tk6x,
         jolloin jokainen varaus kantaa CRM:ssä mainoksen tunnuksen.
-     3. TK29 (liidilomake) PAUSED kokeilun ajaksi. Sitä EI palauteta
-        automaattisesti: 30.10. päätetään jatketaanko kartoitusta vai
-        palataanko liidilomakkeeseen.
+     3. TK29 (liidilomake) JATKAA 30 e/vrk rinnalla (Josua 16.10.) — 30.10.
+        verrataan samojen viikkojen tuloksia: € / maksava työ kummastakin.
 
    MIKSI LINK_CLICKS EIKÄ KONVERSIO-OPTIMOINTI: sivustolla ei ole selaimen
    Pixeliä, ja Schedule-tapahtumia tulisi kahdessa viikossa liian vähän
@@ -45,10 +44,10 @@ const TOK = env.META_CAPI_TOKEN;
 if (!TOK) { console.error('META_CAPI_TOKEN puuttuu tiiviskoti/.env:sta'); process.exit(1); }
 
 const ACT = 'act_205952163658187';
-const TK29 = '120247977245210132';         // liidilomakejoukko, pausetetaan
+const TK29 = '120247977245210132';         // liidilomakejoukko, jatkaa rinnalla
 const PAGE = '556560117546812';
 const IG = '17841437143913657';            // @tiiviskoti — ilman tätä IG näyttää flowin
-const BUDJETTI = 3000;                     // senttejä = 30 e/vrk
+const BUDJETTI = 1500;                     // senttejä = 15 e/vrk (TK29 jatkaa 30 e/vrk rinnalla)
 const LOPPU = '2026-10-30T23:59:00+0200';  // mainosjoukko pysähtyy itsestään
 const SIVU = 'https://tiiviskoti.fi/kartoitus.html';
 
@@ -68,9 +67,7 @@ const KUVAUS = 'Kiinteä hinta paikan päällä · Uusimaa';
 const VIDEOT = path.join(process.env.HOME, 'Desktop', 'tiiviskoti-mainosvideot');
 const UUDET = [
   { nimi: 'TK67 - Kartoitus sakset (kuva)', tyyppi: 'kuva', tiedosto: path.join(OUT, 'mainos-k-sakset.png'), src: 'meta-kartoitus-tk67' },
-  { nimi: 'TK68 - Kartoitus uratiiviste (kuva)', tyyppi: 'kuva', tiedosto: path.join(OUT, 'mainos-k-uratiiviste.png'), src: 'meta-kartoitus-tk68' },
   { nimi: 'TK69 - Kartoitus video (ilmainen käynti)', tyyppi: 'video', tiedosto: path.join(VIDEOT, 'tk-kartoitus-a-45.mp4'), src: 'meta-kartoitus-tk69' },
-  { nimi: 'TK70 - Kartoitus video (vetääkö?)', tyyppi: 'video', tiedosto: path.join(VIDEOT, 'tk-kartoitus-b-45.mp4'), src: 'meta-kartoitus-tk70' },
 ];
 
 /* ---------- Graph-apurit (kuten kierros1.mjs) ---------- */
@@ -141,12 +138,12 @@ const jo = kaikki.data.filter((a) => UUDET.some((u) => u.nimi === a.name));
 
 console.log(`Kartoitussivu tuotannossa:  ${sivuOk ? 'OK' : 'EI — deployaa sivusto ensin'}`);
 console.log(`CRM kotikartoitus:          ${crmOk ? `OK (${saat.slots.length} aikaa 14 vrk, 45 min)` : 'EI — deployaa CRM ensin'}`);
-console.log(`\n1. Uusi kampanja + mainosjoukko 30 €/vrk, päättyy ${LOPPU}`);
+console.log(`\n1. Uusi kampanja + mainosjoukko ${BUDJETTI / 100} €/vrk, päättyy ${LOPPU}`);
 console.log(`   kohdennus kopioidaan: ${tk29.name}`);
 console.log('2. Uudet:');
 for (const u of UUDET) console.log(`     ${u.nimi}  ← ${path.basename(u.tiedosto)}  → ${SIVU}?src=${u.src}${existsSync(u.tiedosto) ? '' : '  PUUTTUU'}`);
 console.log(`     otsikko: ${OTSIKKO}\n     kuvaus:  ${KUVAUS}\n     CTA:     Varaa nyt (BOOK_TRAVEL)`);
-console.log(`3. Pausella: ${tk29.name} (nyt ${tk29.effective_status}, ${Number(tk29.daily_budget) / 100} €/vrk)`);
+console.log(`3. Ennallaan rinnalla: ${tk29.name} (${tk29.effective_status}, ${Number(tk29.daily_budget) / 100} €/vrk)`);
 
 if (jo.length) { console.error(`\nMainokset ovat jo olemassa (${jo.map((a) => a.name).join(', ')}) — ei luoda tuplia.`); process.exit(1); }
 if (UUDET.some((u) => !existsSync(u.tiedosto))) { console.error('\nMateriaalia puuttuu.'); process.exit(1); }
@@ -209,8 +206,7 @@ for (const u of UUDET) {
   console.log(`  ✓ ${u.nimi} → mainos ${mainos.id}`);
 }
 
-await post(TK29, { status: 'PAUSED' });
-console.log(`  ✗ pausella: ${tk29.name}`);
+/* TK29 jää päälle rinnalle (Josua 16.10.): vertailu samoilla viikoilla. */
 
 /* ---------- Tarkistus ---------- */
 
