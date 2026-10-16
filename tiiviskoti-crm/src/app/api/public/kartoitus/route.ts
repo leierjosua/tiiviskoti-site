@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
-import { KARTOITUS_MINUTES, KOTI_KARTOITUS_MINUTES } from '@/lib/availability';
+import { KARTOITUS_MINUTES, KOTI_KARTOITUS_BOOKABLE_FROM, KOTI_KARTOITUS_MINUTES } from '@/lib/availability';
 import { areaForPostal, calendarAreaForPostal, kartoitusCalendarId, purgeExpiredHolds } from '@/lib/data';
 import { campaignFromVisitorTrail, fbcFromVisitorTrail } from '@/lib/visitor';
 import { deliverKartoitus, removeCalendarEventForJob } from '@/lib/deliver';
@@ -116,6 +116,10 @@ export async function POST(request: Request) {
 
   if (starts.getTime() < Date.now()) {
     return Response.json({ error: 'in_past' }, { status: 400 });
+  }
+  // Kotikartoituksia vasta alkupäivästä (ks. availability.ts). slot_taken saa sivun hakemaan ajat uudelleen.
+  if (koti && starts < KOTI_KARTOITUS_BOOKABLE_FROM) {
+    return Response.json({ error: 'slot_taken' }, { status: 409 });
   }
 
   await purgeExpiredHolds();

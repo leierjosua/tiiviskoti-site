@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
-import { MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
+import { INSTALL_BOOKABLE_FROM, MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
 import { areaForPostal, calendarAreaForPostal, purgeExpiredHolds } from '@/lib/data';
 import { deliverBooking, saveJobLines } from '@/lib/deliver';
 import { removeCalendarEventForJob } from '@/lib/deliver';
@@ -145,6 +145,12 @@ export async function POST(request: Request) {
 
   const d = parsed.data;
   const starts = new Date(d.startsAt);
+
+  /* Asennuksia saa varata verkosta vasta INSTALL_BOOKABLE_FROM alkaen. Kalenteri
+     ei näytä aikaisempia aikoja, mutta vanha välilehti tai muokattu pyyntö voisi. */
+  if (starts < INSTALL_BOOKABLE_FROM) {
+    return Response.json({ error: 'slot_taken' }, { status: 409 });
+  }
 
   /* Paikanpitäjä: kalenteriin varataan enintään MAX_BOOKING_BLOCK_MINUTES, jotta
      iso keikka mahtuu vapaaseen aikaan eikä varaus kaadu — muuten kauppa

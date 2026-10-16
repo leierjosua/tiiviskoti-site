@@ -70,8 +70,12 @@ for (const [nimi, url] of SIVUT) {
 /* ========== 2. VARAUSPOLKU ==========
    Tämä on se joka tuo rahan. Saatavuus tarkistetaan oikealla postinumerolla;
    itse varausta EI tehdä, koska se loisi työn ja lähettäisi postia. */
+/* Verkkovarauksen alkupäivä: asennukset vasta 9.11.2026 alkaen, kotikartoitukset
+   20.10. alkaen (kartoituskokeilu, CRM:n availability.ts). Ilman tätä tarkistus
+   hälyttäisi "ei yhtään aikaa" koko kokeilun ajan. */
+const ASENNUS_ALKAA = new Date('2026-11-09T00:00:00+02:00');
 await check('varaus', 'saatavuus', async () => {
-  const r = await get('https://admin.tiiviskoti.fi/api/public/availability?postal=00120&days=21',
+  const r = await get('https://admin.tiiviskoti.fi/api/public/availability?postal=00120&days=60',
     { headers: { origin: 'https://tiiviskoti.fi' } });
   if (r.status !== 200) return fail('varaus', `saatavuusrajapinta ${r.status}`);
   const j = JSON.parse(r.text);
@@ -79,15 +83,25 @@ await check('varaus', 'saatavuus', async () => {
   const n = j.slots?.length ?? 0;
   /* Nolla aikaa = kalenteri on käytännössä kiinni eikä kukaan voi varata.
      Näin kävi 25.8.–7.9., jolloin mainokset pyörivät tyhjää vastaan. */
-  if (n === 0) return fail('varaus', 'EI YHTÄÄN vapaata aikaa 21 vrk:lle — kukaan ei voi varata');
-  if (n < 5) return warn('varaus', `vain ${n} vapaata aikaa 21 vrk:lle`);
+  if (n === 0) return fail('varaus', 'EI YHTÄÄN vapaata asennusaikaa 60 vrk:lle — kukaan ei voi varata');
+  if (n < 5) return warn('varaus', `vain ${n} vapaata asennusaikaa 60 vrk:lle`);
   const eka = new Date(j.slots[0].startsAt);
-  const paivia = Math.round((eka - Date.now()) / 86400000);
-  if (paivia > 10) warn('varaus', `ensimmäinen vapaa aika vasta ${paivia} vrk päässä (${eka.toLocaleDateString('fi-FI')})`);
-  else ok('varaus', `${n} vapaata aikaa, ensimmäinen ${eka.toLocaleDateString('fi-FI')} (${paivia} vrk)`);
+  const alku = Math.max(Date.now(), ASENNUS_ALKAA.getTime());
+  const paivia = Math.round((eka - alku) / 86400000);
+  if (paivia > 10) warn('varaus', `ensimmäinen vapaa asennusaika vasta ${eka.toLocaleDateString('fi-FI')}`);
+  else ok('varaus', `${n} vapaata asennusaikaa, ensimmäinen ${eka.toLocaleDateString('fi-FI')}`);
 
   const kalenterit = new Set(j.slots.map((s) => s.calendarId));
-  ok('varaus', `aikoja ${kalenterit.size} eri kalenterista`);
+  ok('varaus', `asennusaikoja ${kalenterit.size} eri kalenterista`);
+});
+
+await check('varaus', 'kotikartoitus', async () => {
+  const r = await get('https://admin.tiiviskoti.fi/api/public/availability?postal=00120&days=21&kartoitus=koti',
+    { headers: { origin: 'https://tiiviskoti.fi' } });
+  if (r.status !== 200) return fail('varaus', `kotikartoituksen saatavuus ${r.status}`);
+  const n = JSON.parse(r.text).slots?.length ?? 0;
+  if (n === 0) fail('varaus', 'kotikartoitukselle EI YHTÄÄN aikaa 21 vrk:lle (kartoitus.html)');
+  else ok('varaus', `kotikartoitus: ${n} aikaa 21 vrk:lle`);
 });
 
 await check('varaus', 'CORS', async () => {

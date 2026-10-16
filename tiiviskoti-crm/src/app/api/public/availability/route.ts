@@ -1,6 +1,9 @@
 import { areasForPostal, availability, kartoitusCalendarId } from '@/lib/data';
 import { sql } from '@/lib/db';
-import { KARTOITUS_MINUTES, KOTI_KARTOITUS_MINUTES, MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
+import {
+  INSTALL_BOOKABLE_FROM, KARTOITUS_MINUTES, KOTI_KARTOITUS_BOOKABLE_FROM, KOTI_KARTOITUS_MINUTES,
+  MAX_BOOKING_BLOCK_MINUTES,
+} from '@/lib/availability';
 import { json, preflight } from '../cors';
 
 /* GET /api/public/availability?postal=04400&days=60&minutes=120
@@ -50,7 +53,8 @@ export async function GET(request: Request) {
     let firstSlot: string | null = null;
     for (const group of groups) {
       if (kartoitusId && group.calendarId.toLowerCase() === kartoitusId) continue;
-      const slot = group.slots[0];
+      // Lupaus koskee asennusta, joten sama alkupäivä kuin varauskalenterissa.
+      const slot = group.slots.find((s) => s.start >= INSTALL_BOOKABLE_FROM);
       if (!slot) continue;
       const iso = slot.start.toISOString();
       if (!firstSlot || iso < firstSlot) firstSlot = iso;
@@ -99,12 +103,20 @@ export async function GET(request: Request) {
     durationMinutes = KARTOITUS_MINUTES;
   }
 
-  const groups = await availability({
+  const rawGroups = await availability({
     durationMinutes,
     until: new Date(Date.now() + days * 86_400_000),
     areaIds,
     calendarId,
   });
+  /* Varattavuuden alkupäivä tyypin mukaan (ks. availability.ts). Taloyhtiön
+     kartoituskalenteria ei rajata. */
+  const bookableFrom = wantsKartoitus ? null
+    : wantsKotiKartoitus ? KOTI_KARTOITUS_BOOKABLE_FROM
+    : INSTALL_BOOKABLE_FROM;
+  const groups = bookableFrom
+    ? rawGroups.map((g) => ({ ...g, slots: g.slots.filter((s) => s.start >= bookableFrom) }))
+    : rawGroups;
 
   /* Matkalisä kalenterikohtaisesti: tarkin postinumeroon osuva alue jota
      kalenteri palvelee (sama sääntö kuin varauksessa, calendarAreaForPostal).

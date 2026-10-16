@@ -78,6 +78,17 @@ export const KARTOITUS_MINUTES = 20;
    luvulla — muuta molempiin. */
 export const KOTI_KARTOITUS_MINUTES = 45;
 
+/* Verkosta varattavuuden alkupäivät (Josua 16.10.2026, kartoituskokeilu).
+   Asentajien loka–marraskuun alun vapaat ajat on varattu kotikartoituksille:
+     - kotikartoituksen voi varata 20.10.2026 alkaen,
+     - ASENNUKSEN (tavallinen verkkovaraus) vasta viikolta 46 eli 9.11.2026 alkaen.
+   Koskee VAIN julkisia reittejä (sivuston kalenteri ja varaus) — adminissa
+   työn voi edelleen laittaa mihin tahansa vapaaseen aikaan. Suomen aikaa,
+   joten offset on kirjoitettu näkyviin (EEST +03 / EET +02). Rajat
+   vanhenevat itsestään: kun päivä on ohi, ne eivät rajaa mitään. */
+export const KOTI_KARTOITUS_BOOKABLE_FROM = new Date('2026-10-20T00:00:00+03:00');
+export const INSTALL_BOOKABLE_FROM = new Date('2026-11-09T00:00:00+02:00');
+
 /* ---------- aikavälialgebra ---------- */
 
 function normalize(intervals: Interval[]): Interval[] {
