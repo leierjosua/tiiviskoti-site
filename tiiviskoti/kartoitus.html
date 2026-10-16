@@ -537,14 +537,21 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
    näyttävä ensimmäisellä ruudulla. Matalampi kuva, pienempi otsikko, ei
    luottamusrivia, ja aluehuomio näkyy vasta kun postinumerolla on tulos. */
 @media(max-width:620px){
-  .ty-bg img{height:250px;object-position:50% 22%}
-  .ty-hero .hero-grid>div:first-child{margin-top:-96px}
+  /* Kuva niin korkea, että kasvot jäävät yläpalkin alapuolelle eikä otsikko
+     peitä niitä; otsikko kahtena selvänä tasona: palvelu pienellä, lupaus isolla. */
+  .ty-bg img{height:330px;object-position:50% 8%}
+  .ty-hero .hero-grid>div:first-child{margin-top:-104px}
   .ty-hero .hero-grid>div:first-child .rating{display:none}
-  .ty-hero h1{font-size:28px;line-height:1.08}
+  .ty-hero h1{font-size:34px;line-height:1.04}
+  .ty-hero h1 .h1-svc{display:block;font-size:17px;font-weight:700;letter-spacing:0;margin-bottom:6px;opacity:.92}
+  .ty-hero h1 .h1-svc+br{display:none}
   .ty-hero .hero-book{margin-top:12px}
   .ty-hero .stepcard{padding-top:14px;padding-bottom:16px}
   .ty-hero .hb-head{margin:0 0 10px}
-  .ty-hero .hb-head .title{font-size:20px}
+  /* Ensimmäisessä vaiheessa kortin otsikko toistaisi heron otsikon sanasta
+     sanaan — puhelimessa pois. Myöhemmissä vaiheissa ("Valitse sopiva aika")
+     se on tarpeen ja näkyy. */
+  .ty-hero .stepcard:has(.vstep[data-step="postal"]:not([hidden])) .hb-head{display:none}
   #kartNote:not(.ok):not(.bad){display:none}
   .gate-ticks{margin-top:10px}
 }
@@ -566,7 +573,7 @@ select.bk-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 <header class="hero ty-hero"><div class="ty-bg" aria-hidden="true"><picture><source media="(max-width:620px)" srcset="img/taloyhtio-hero-mob.webp?v=4"><img src="img/taloyhtio-hero-1600.webp?v=4" srcset="img/taloyhtio-hero-1600.webp?v=4 1600w, img/taloyhtio-hero-2400.webp?v=4 2400w" sizes="100vw" alt="TiivisKodin asentajat talon pihassa kartoituskäynnillä" width="2400" height="1803" fetchpriority="high"></picture></div><div class="wrap hero-grid">
   <div>
     <div class="rating"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.1-7 9-4-.9-7-4.6-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Oma porukka, ei alihankintaa</div>
-    <h1>Ikkunoiden ja ovien tiivistys —<br><span class="a">ilmainen kartoituskäynti.</span></h1>
+    <h1><span class="h1-svc">Ikkunoiden ja ovien tiivistys —</span><br><span class="a">ilmainen kartoituskäynti.</span></h1>
     <p class="hero-sub">Asentaja katsoo ikkunat ja ovet ja kertoo hinnan paikan päällä.</p>
     <!-- Kaksi polkua (Josua 16.10.): kartoitus kortissa oikealla, suora asennusvaraus
          tästä. Linkki kantaa osoiterivin ?src=:n mukanaan (data-keep-query), jotta
