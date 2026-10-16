@@ -465,8 +465,14 @@ await check('meta-ads', 'mainostili', async () => {
   if (vika?.t) {
     /* Seuraavasta päivästä alkaen: liidipäivän kulu syntyi osin ENNEN liidiä
        ja paisutti summaa (13.→15.10. näytti 100 € kun todellinen oli ~55 €). */
-    const since = new Date(new Date(vika.t).getTime() + 86400000).toISOString().slice(0, 10);
-    const [s] = (await g(`${ME}/insights`, { time_range: { since, until: new Date().toISOString().slice(0, 10) }, fields: 'spend' })).data;
+    /* Suomen päivät (Metan tili on Helsingin ajassa). Jos liidi tuli tänään,
+       "seuraava päivä" on huomenna eikä kulua ole vielä — Meta hylkäisi
+       since > until -välin, joten silloin ei kysytä lainkaan. */
+    const fiDay = (d) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Helsinki' }).format(d);
+    const since = fiDay(new Date(new Date(vika.t).getTime() + 86400000));
+    const until = fiDay(new Date());
+    const s = since > until ? null
+      : (await g(`${ME}/insights`, { time_range: { since, until }, fields: 'spend' })).data[0];
     const h = Math.round((Date.now() - new Date(vika.t)) / 3600000);
     const k = +(s?.spend || 0);
     const msg = `viimeisin Meta-liidi ${h} h sitten, seuraavasta päivästä alkaen kulunut ${k.toFixed(0)} €`;
