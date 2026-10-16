@@ -1,6 +1,6 @@
 import { areasForPostal, availability, kartoitusCalendarId } from '@/lib/data';
 import { sql } from '@/lib/db';
-import { KARTOITUS_MINUTES, MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
+import { KARTOITUS_MINUTES, KOTI_KARTOITUS_MINUTES, MAX_BOOKING_BLOCK_MINUTES } from '@/lib/availability';
 import { json, preflight } from '../cors';
 
 /* GET /api/public/availability?postal=04400&days=60&minutes=120
@@ -75,9 +75,14 @@ export async function GET(request: Request) {
      kartoituskalenteri ei ole `tk.calendar_areas`-taulussa, mikä on juuri se
      seikka joka pitää sen erossa kuluttajan varauskalenterista. */
   const wantsKartoitus = params.get('kartoitus') === '1';
+  /* Kotitalouden kartoituskäynti (`?kartoitus=koti`) EI käytä kartoituskalenteria
+     vaan alueen asentajien omia kalentereita, kuten tavallinen varaus — käynnin
+     tekee se asentaja joka myös asentaa. Ero varaukseen on vain kesto ja se,
+     ettei matkalisää ole (käynti on veloitukseton). */
+  const wantsKotiKartoitus = params.get('kartoitus') === 'koti';
   let calendarId: string | undefined;
   let areaIds: string[] | undefined = areas.map((a) => a.id);
-  let durationMinutes = minutes;
+  let durationMinutes = wantsKotiKartoitus ? KOTI_KARTOITUS_MINUTES : minutes;
 
   if (wantsKartoitus) {
     const kartoitusId = kartoitusCalendarId();
@@ -118,7 +123,8 @@ export async function GET(request: Request) {
       }
     }
   }
-  const feeOf = (calendarId: string) => feeByCalendar.get(calendarId) ?? 0;
+  // Veloitukseton kotikartoitus: ei matkalisää, vaikka kalenteri on alueella jolla on lisä.
+  const feeOf = (calendarId: string) => (wantsKotiKartoitus ? 0 : feeByCalendar.get(calendarId) ?? 0);
 
   // Sivu ei tarvitse tietää kuka työn tekee — se valitsee ajan, ja kalenteri
   // ratkeaa siitä. Päällekkäiset alkuajat eri asentajilta yhdistetään;

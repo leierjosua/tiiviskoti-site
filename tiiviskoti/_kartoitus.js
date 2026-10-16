@@ -25,6 +25,31 @@ const CRM_BASE = 'https://tiiviskoti-crm.vercel.app';
    pyynnöstä, vaan käyttää aina omaansa. */
 export const KARTOITUS_MIN = 20;
 
+/* Kotitalouden kartoituskäynti (kokeilu 10/2026, `kartoitus.html`): varataan
+   ALUEEN ASENTAJAN kalenteriin, ja hinta annetaan paikan päällä. PIDÄ SYNKASSA
+   CRM:n `KOTI_KARTOITUS_MINUTES`-vakion kanssa. */
+export const KOTI_MIN = 45;
+
+/* Tekstit, jotka eroavat taloyhtiön (te-muoto) ja kodin (sinä-muoto) välillä. */
+const TXT = {
+  taloyhtio: {
+    pickDay: 'Valitkaa päivä nähdäksenne vapaat ajat', pickFirst: 'Valitkaa ensin aika',
+    otherDay: 'Ei vapaita aikoja tänä päivänä. Valitkaa toinen päivä.',
+    postal: 'Kartoituskäynneillä on oma kalenterinsa — näytämme vapaat ajat heti.',
+    unserved: (tel) => `Otamme mielellämme yhteyttä kun laajennumme alueellenne — soittakaa ${tel}.`,
+    error: (tel) => `Soittakaa ${tel}, niin sovitaan aika puhelimessa.`,
+    full: (tel) => `Soittakaa ${tel}, niin etsimme ajan yhdessä.`,
+  },
+  koti: {
+    pickDay: 'Valitse päivä nähdäksesi vapaat ajat', pickFirst: 'Valitse ensin aika',
+    otherDay: 'Ei vapaita aikoja tänä päivänä. Valitse toinen päivä.',
+    postal: 'Näytämme alueesi asentajan vapaat ajat heti.',
+    unserved: (tel) => `Ilmoitamme kun laajennumme alueellesi — tai soita ${tel}.`,
+    error: (tel) => `Soita ${tel}, niin sovitaan aika puhelimessa.`,
+    full: (tel) => `Soita ${tel}, niin etsitään aika yhdessä.`,
+  },
+};
+
 const MONTHS = ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu','heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu'];
 const WD = ['sunnuntai','maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai'];
 
@@ -60,6 +85,33 @@ const CAL_HTML = `
     <div class="slots" data-k="slots"></div>
   </div>
   <button type="button" class="btn btn-p btn-lg" data-k="todetails" style="width:100%;margin-top:18px" disabled>Valitkaa ensin aika</button>`;
+
+const FORM_HTML_KOTI = `
+  <div class="steprecap">
+    <div>
+      <div class="when" data-k="when">—</div>
+      <div class="svc">Ilmainen kartoituskäynti · noin ${KOTI_MIN} min</div>
+    </div>
+    <button type="button" class="chg" data-k="change">Vaihda aika</button>
+  </div>
+  <div class="bk-field"><label>Nimi</label>
+    <input class="bk-input" data-k="contact" placeholder="Etu- ja sukunimi" autocomplete="name" /></div>
+  <div class="bk-field"><label>Katuosoite</label>
+    <input class="bk-input" data-k="addr" placeholder="Esimerkkikuja 5" autocomplete="street-address" /></div>
+  <div class="bk-row">
+    <div class="bk-field"><label>Puhelin</label>
+      <input class="bk-input" data-k="phone" type="tel" placeholder="045 123 4567" autocomplete="tel" /></div>
+    <div class="bk-field"><label>Sähköposti</label>
+      <input class="bk-input" data-k="email" type="email" placeholder="nimi@esimerkki.fi" autocomplete="email" /></div>
+  </div>
+  <div class="bk-field"><label>Ikkunoiden ja ovien määrä (arvio)</label>
+    <select class="bk-input" data-k="doors"><option>En osaa sanoa</option><option>1–4 kpl</option><option>5–9 kpl</option><option>10–15 kpl</option><option>Yli 15 kpl</option></select></div>
+  <div class="bk-err" data-k="err" style="display:none"></div>
+  <button type="button" class="btn btn-p btn-lg" data-k="book" style="width:100%">Varaa ilmainen kartoituskäynti</button>
+  <div class="bk-trust">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/></svg>
+    Käynti on maksuton eikä sido sinua mihinkään · <a href="tietosuoja.html" data-k="privacy" style="text-decoration:underline;text-underline-offset:2px;color:inherit">Tietosuoja</a>
+  </div>`;
 
 const FORM_HTML = `
   <div class="steprecap">
@@ -113,6 +165,7 @@ const DONE_HTML = `
  * @param {()=>string|undefined} [o.fbc] Meta-klikin tunnisteet CAPIa varten
  * @param {()=>string|undefined} [o.campaign] mainoskampanja (?src=, utm_*, klikkitunniste)
  * @param {()=>string|undefined} [o.gclid] Google Ads -klikin tunniste
+ * @param {'taloyhtio'|'koti'} [o.mode] koti = kotitalouden käynti asentajan kalenteriin
  */
 export function mountKartoitus(o) {
   const { noteEl, calEl, formEl, doneEl, postalEl, continueEl, goTo } = o;
@@ -123,9 +176,14 @@ export function mountKartoitus(o) {
   const campaign = o.campaign || (() => undefined);
   const gclid = o.gclid || (() => undefined);
   const R = o.rootPrefix || '';
+  const koti = o.mode === 'koti';
+  const T = TXT[koti ? 'koti' : 'taloyhtio'];
+  const MIN = koti ? KOTI_MIN : KARTOITUS_MIN;
 
-  calEl.innerHTML = CAL_HTML;
-  formEl.innerHTML = FORM_HTML;
+  calEl.innerHTML = koti
+    ? CAL_HTML.replace('Valitkaa päivä nähdäksenne vapaat ajat', T.pickDay).replace('Valitkaa ensin aika', T.pickFirst)
+    : CAL_HTML;
+  formEl.innerHTML = koti ? FORM_HTML_KOTI : FORM_HTML;
   doneEl.innerHTML = DONE_HTML;
 
   const q = (host, k) => host.querySelector(`[data-k="${k}"]`);
@@ -160,7 +218,7 @@ export function mountKartoitus(o) {
   const freeSlots = (d) => (!d || d < today || d > maxDay) ? [] : (st.slotsByDay.get(keyOf(d)) || []);
   const selected = () => (!selDay || !selSlot) ? null : (freeSlots(selDay).find((s) => s.time === selSlot) || null);
   const fields = () => {
-    const v = (k) => (q(formEl, k).value || '').trim();
+    const v = (k) => ((q(formEl, k) || {}).value || '').trim();
     return { yhtio:v('yhtio'), addr:v('addr'), contact:v('contact'), role:v('role'),
              phone:v('phone'), email:v('email'), doors:v('doors') };
   };
@@ -176,7 +234,7 @@ export function mountKartoitus(o) {
       /* `kartoitus=1` hakee ajat kartoituskäyntien omasta kalenterista, ei
          asennuskalenterista. Ilman sitä sivu tarjoaisi asentajan maksullisia
          työaikoja veloituksettomaan käyntiin. */
-      const r = await fetch(`${CRM_BASE}/api/public/availability?postal=${st.postal}&days=70&minutes=${KARTOITUS_MIN}&kartoitus=1`);
+      const r = await fetch(`${CRM_BASE}/api/public/availability?postal=${st.postal}&days=70&minutes=${MIN}&kartoitus=${koti ? 'koti' : '1'}`);
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const data = await r.json();
       if (data.served === false) {
@@ -220,16 +278,16 @@ export function mountKartoitus(o) {
     const s = st.state;
     const tel = '<a href="tel:+3584578311972">045 7831 1972</a>';
     if (s === 'postal') { noteEl.className = 'area-note';
-      noteEl.innerHTML = '<b>Syötä postinumero</b><span>Kartoituskäynneillä on oma kalenterinsa — näytämme vapaat ajat heti.</span>'; return; }
+      noteEl.innerHTML = `<b>Syötä postinumero</b><span>${T.postal}</span>`; return; }
     if (s === 'loading') { noteEl.className = 'area-note'; noteEl.innerHTML = '<b>Tarkistetaan aluetta…</b>'; return; }
     if (s === 'unserved') { noteEl.className = 'area-note bad';
-      noteEl.innerHTML = `<b>Emme vielä palvele postinumerossa ${st.postal}</b><span>Otamme mielellämme yhteyttä kun laajennumme alueellenne — soittakaa ${tel}.</span>`; return; }
+      noteEl.innerHTML = `<b>Emme vielä palvele postinumerossa ${st.postal}</b><span>${T.unserved(tel)}</span>`; return; }
     if (s === 'error') { noteEl.className = 'area-note bad';
-      noteEl.innerHTML = `<b>Alueen tarkistus ei onnistunut</b><span>Soittakaa ${tel}, niin sovitaan aika puhelimessa.</span>`; return; }
+      noteEl.innerHTML = `<b>Alueen tarkistus ei onnistunut</b><span>${T.error(tel)}</span>`; return; }
     if (s === 'none') { noteEl.className = 'area-note bad';
-      noteEl.innerHTML = `<b>Kalenteri on täynnä seuraavien viikkojen osalta</b><span>Soittakaa ${tel}, niin etsimme ajan yhdessä.</span>`; return; }
+      noteEl.innerHTML = `<b>Kalenteri on täynnä seuraavien viikkojen osalta</b><span>${T.full(tel)}</span>`; return; }
     noteEl.className = 'area-note ok';
-    noteEl.innerHTML = `<b>Palvelemme postinumerossa ${st.postal}${st.area ? ` · ${st.area}` : ''}</b><span>Käynti kestää noin ${KARTOITUS_MIN} minuuttia eikä maksa mitään.</span>`;
+    noteEl.innerHTML = `<b>Palvelemme postinumerossa ${st.postal}${st.area ? ` · ${st.area}` : ''}</b><span>Käynti kestää noin ${MIN} minuuttia eikä maksa mitään.</span>`;
   }
 
   function renderCal() {
@@ -262,10 +320,10 @@ export function mountKartoitus(o) {
   function renderSlots() {
     const wrap = q(calEl, 'slots'), title = q(calEl, 'slotstitle');
     wrap.innerHTML = '';
-    if (!selDay) { title.textContent = 'Valitkaa päivä nähdäksenne vapaat ajat'; return; }
+    if (!selDay) { title.textContent = T.pickDay; return; }
     const free = freeSlots(selDay);
     title.textContent = `Vapaat ajat — ${WD[selDay.getDay()]} ${selDay.getDate()}.${selDay.getMonth()+1}.`;
-    if (free.length === 0) { wrap.innerHTML = '<div class="slots-empty">Ei vapaita aikoja tänä päivänä. Valitkaa toinen päivä.</div>'; return; }
+    if (free.length === 0) { wrap.innerHTML = `<div class="slots-empty">${T.otherDay}</div>`; return; }
     free.forEach((s) => {
       const b = document.createElement('button'); b.type = 'button';
       b.className = 'slot' + (selSlot === s.time ? ' sel' : ''); b.textContent = s.time;
@@ -282,7 +340,7 @@ export function mountKartoitus(o) {
     next.disabled = !sel;
     next.textContent = sel
       ? `Jatka — ${WD[selDay.getDay()].slice(0,2)} ${selDay.getDate()}.${selDay.getMonth()+1}. klo ${sel.time}`
-      : 'Valitkaa ensin aika';
+      : T.pickFirst;
     // Vaiheen 1 jatkonappi aukeaa vasta kun aikoja on oikeasti löytynyt.
     if (continueEl) continueEl.disabled = st.state !== 'ready';
     // Kooste vaiheessa 3: valittu aika on esillä myös kun kalenteri ei näy.
@@ -303,9 +361,10 @@ export function mountKartoitus(o) {
       const r = await fetch('/api/create-lead', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
-          yhtio:f.yhtio, contact:f.contact, role:f.role, phone:f.phone, email:f.email,
+          ...(koti ? { kind:'yksityinen' } : { yhtio:f.yhtio, role:f.role }),
+          contact:f.contact, phone:f.phone, email:f.email,
           addr:`${f.addr}, ${st.postal}`, doors:f.doors,
-          message:'Varasi kartoituskäynnin verkosta.',
+          message: koti ? 'Varasi ilmaisen kotikartoituksen verkosta.' : 'Varasi kartoituskäynnin verkosta.',
           pageUrl: location.href, fbc: fbc(), fbp: fbp(),
           campaign: campaign(), gclid: gclid(),
         }),
@@ -322,15 +381,16 @@ export function mountKartoitus(o) {
     const f = fields();
 
     const missing = [];
-    if (!f.yhtio) missing.push('taloyhtiön nimi');
+    if (!koti && !f.yhtio) missing.push('taloyhtiön nimi');
+    if (koti && !f.contact) missing.push('nimi');
     if (!f.addr) missing.push('katuosoite');
-    if (!f.contact) missing.push('yhteyshenkilö');
+    if (!koti && !f.contact) missing.push('yhteyshenkilö');
     if (!f.phone) missing.push('puhelin');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) missing.push('sähköposti');
     if (missing.length) {
-      err.textContent = `Täyttäkää vielä: ${missing.join(', ')}.`;
+      err.textContent = `${koti ? 'Täytä' : 'Täyttäkää'} vielä: ${missing.join(', ')}.`;
       err.style.display = 'block';
-      q(formEl, missing[0] === 'sähköposti' ? 'email' : 'yhtio').focus();
+      q(formEl, missing[0] === 'sähköposti' ? 'email' : (koti ? 'contact' : 'yhtio')).focus();
       return;
     }
 
@@ -345,8 +405,9 @@ export function mountKartoitus(o) {
       const r = await fetch('/api/create-kartoitus', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
+          kind: koti ? 'koti' : 'taloyhtio',
           calendarId: sel.calendarId, startsAt: sel.startsAt,
-          association: f.yhtio, contactName: f.contact, role: f.role,
+          association: koti ? undefined : f.yhtio, contactName: f.contact, role: koti ? undefined : f.role,
           email: f.email, phone: f.phone,
           address: f.addr, postal: st.postal,
           doors: f.doors, leadRef: st.leadRef,
@@ -359,7 +420,7 @@ export function mountKartoitus(o) {
         /* Aika ehdittiin varata tai alue ei ole meidän — kumpikin vaatii oman
            viestinsä, muuten asiakkaalle valitetaan väärästä asiasta. */
         if (data.error === 'slot_taken') {
-          err.textContent = 'Valitettavasti tuo aika ehdittiin juuri varata. Valitkaa toinen aika kalenterista.';
+          err.textContent = koti ? 'Valitettavasti tuo aika ehdittiin juuri varata. Valitse toinen aika kalenterista.' : 'Valitettavasti tuo aika ehdittiin juuri varata. Valitkaa toinen aika kalenterista.';
           err.style.display = 'block';
           selSlot = null; btn.disabled = false; btn.textContent = label;
           await load(); goTo('cal'); return;
@@ -381,7 +442,8 @@ export function mountKartoitus(o) {
       q(doneEl, 'donetext').textContent =
         `Nähdään ${WD[selDay.getDay()]}na ${selDay.getDate()}.${selDay.getMonth()+1}. klo ${sel.time} osoitteessa ${f.addr}, ${st.postal}. ` +
         `Lähetimme vahvistuksen osoitteeseen ${f.email}. ` +
-        `Varmistattehan, että pääsemme rappukäytäviin ja yhteistiloihin käynnin aikana.`;
+        (koti ? 'Asentaja katsoo ikkunat ja ovet ja kertoo kiinteän hinnan paikan päällä.'
+              : 'Varmistattehan, että pääsemme rappukäytäviin ja yhteistiloihin käynnin aikana.');
       goTo('done');
     } catch (_) {
       err.textContent = 'Yhteysvirhe. Yhteydenottonne on tallessa ja otamme yhteyttä — tai soittakaa 045 7831 1972.';

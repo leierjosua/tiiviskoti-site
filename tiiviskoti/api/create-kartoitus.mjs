@@ -76,6 +76,9 @@ export default async function handler(req, res) {
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
 
+    // 'koti' = kotitalouden veloitukseton käynti alueen asentajan kalenteriin
+    // (kokeilu 10/2026, kartoitus.html). Oletus on taloyhtiö.
+    const kind = body.kind === 'koti' ? 'koti' : 'taloyhtio';
     const association = clean(body.association, 200);
     const contactName = clean(body.contactName, 200);
     const role        = clean(body.role, 100);
@@ -107,7 +110,7 @@ export default async function handler(req, res) {
     const campaign = campaignRaw || (gclid ? 'google-ads' : undefined);
 
     const fields = [];
-    if (!association) fields.push('association');
+    if (kind === 'taloyhtio' && !association) fields.push('association');
     if (!contactName) fields.push('contactName');
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) fields.push('email');
     if (!phone) fields.push('phone');
@@ -124,9 +127,10 @@ export default async function handler(req, res) {
     }
 
     const reservation = await reserveKartoitus({
+      kind,
       calendarId,
       startsAt,
-      association,
+      association: association || undefined,
       contactName,
       role: role || undefined,
       email,
@@ -181,7 +185,7 @@ export default async function handler(req, res) {
     await sendMetaEvent({
       eventName: 'Schedule',
       eventId: reservation.jobId || reservation.jobNumber,
-      eventSourceUrl: req.headers?.referer || 'https://tiiviskoti.fi/taloyhtio.html',
+      eventSourceUrl: req.headers?.referer || (kind === 'koti' ? 'https://tiiviskoti.fi/kartoitus.html' : 'https://tiiviskoti.fi/taloyhtio.html'),
       userData: buildUserData({
         email, phone, name: contactName, postal,
         fbc: (typeof body.fbc === 'string' ? body.fbc : undefined) || reservation.fbc || undefined,
@@ -189,7 +193,7 @@ export default async function handler(req, res) {
         externalId: typeof body.vid === 'string' && body.vid.length <= 64 ? body.vid : undefined,
         req,
       }),
-      customData: { content_category: 'taloyhtio-kartoitus' },
+      customData: { content_category: kind === 'koti' ? 'koti-kartoitus' : 'taloyhtio-kartoitus' },
     });
 
     return res.status(200).json({

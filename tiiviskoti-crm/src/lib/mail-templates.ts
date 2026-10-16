@@ -565,6 +565,9 @@ export function offerEmailText(data: OfferEmailData): string {
    ---------------------------------------------------------------- */
 
 export type KartoitusData = {
+  /** 'koti' = kotitalouden käynti (kokeilu 10/2026): sinä-muoto, ei rappukäytäviä,
+   *  hinta annetaan paikan päällä. Puuttuva = taloyhtiö. */
+  kind?: 'taloyhtio' | 'koti';
   jobNumber: string;
   /** Taloyhtiön nimi, esim. "As Oy Esimerkki". */
   association: string;
@@ -589,6 +592,7 @@ export function kartoitusSubject(data: KartoitusData): string {
 }
 
 export function kartoitusHtml(data: KartoitusData): string {
+  const koti = data.kind === 'koti';
   const when = whenText(data.startsAt, data.endsAt);
   const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')]
     .filter(Boolean).join(', ');
@@ -609,10 +613,12 @@ export function kartoitusHtml(data: KartoitusData): string {
   <tr><td style="padding:28px 28px 8px">
     <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Kartoituskäynti sovittu</div>
     <h1 style="margin:8px 0 0;color:${INK};font-size:23px;font-weight:700;line-height:1.3">Kiitos, ${esc(firstName(data.contactName))} — aika on varattu</h1>
-    <p style="margin:12px 0 0;color:${MUTED};font-size:15px;line-height:1.6">
-      Tulemme katsomaan taloyhtiön <strong style="color:${INK}">${esc(data.association)}</strong> ovet ja ikkunat
+    <p style="margin:12px 0 0;color:${MUTED};font-size:15px;line-height:1.6">${koti
+      ? `Asentajamme tulee katsomaan ikkunasi ja ovesi paikan päälle. Käynti on <strong style="color:${INK}">veloitukseton</strong>
+      eikä sido sinua mihinkään — saat kiinteän hinnan jo käynnin aikana.`
+      : `Tulemme katsomaan taloyhtiön <strong style="color:${INK}">${esc(data.association)}</strong> ovet ja ikkunat
       paikan päälle. Käynti on <strong style="color:${INK}">veloitukseton</strong> eikä sido teitä mihinkään —
-      sen jälkeen saatte kirjallisen sopimushinnan hallituksen käsiteltäväksi.
+      sen jälkeen saatte kirjallisen sopimushinnan hallituksen käsiteltäväksi.`}
     </p>
   </td></tr>
 
@@ -630,7 +636,7 @@ export function kartoitusHtml(data: KartoitusData): string {
     </table>
   </td></tr>
 
-  <tr><td style="padding:18px 28px 0">
+  ${koti ? '' : `<tr><td style="padding:18px 28px 0">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFF8E8;border-radius:10px">
       <tr><td style="padding:14px 18px;color:#6B4F1D;font-size:14px;line-height:1.6">
         <strong>Yksi asia varmistettavaksi:</strong> tarvitsemme pääsyn rappukäytäviin ja yhteistiloihin.
@@ -638,19 +644,22 @@ export function kartoitusHtml(data: KartoitusData): string {
         Jos tämä ei onnistu, siirretään käyntiä mieluummin etukäteen.
       </td></tr>
     </table>
-  </td></tr>
+  </td></tr>`}
 
   <tr><td style="padding:22px 28px 0">
     <div style="color:${INK};font-size:15px;font-weight:700;margin-bottom:8px">Mitä käynnillä tapahtuu</div>
-    <div style="color:${MUTED};font-size:14.5px;line-height:1.75">
-      1. Käymme läpi ulko-ovet, rappukäytävien ovet ja yhteistilojen ikkunat.<br>
+    <div style="color:${MUTED};font-size:14.5px;line-height:1.75">${koti
+      ? `1. Asentaja katsoo ikkunat ja ovet sekä niiden tiivisteet.<br>
+      2. Saat kiinteän hinnan paikan päällä — näet summan ennen kuin päätät.<br>
+      3. Jos haluat tiivistyksen, sovitaan asennusaika saman tien.`
+      : `1. Käymme läpi ulko-ovet, rappukäytävien ovet ja yhteistilojen ikkunat.<br>
       2. Mittaamme vetokohdat ja kirjaamme tiivistettävät kohteet.<br>
-      3. Saatte kirjallisen kiinteän sopimushinnan ja raportin hallitukselle.
+      3. Saatte kirjallisen kiinteän sopimushinnan ja raportin hallitukselle.`}
     </div>
   </td></tr>
 
   ${data.notes ? `<tr><td style="padding:18px 28px 0">
-    <div style="color:${MUTED};font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase">Lisätietonne</div>
+    <div style="color:${MUTED};font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase">${koti ? 'Lisätietosi' : 'Lisätietonne'}</div>
     <div style="color:${INK};font-size:14px;line-height:1.6;margin-top:4px">${esc(data.notes)}</div>
   </td></tr>` : ''}
 
@@ -677,6 +686,30 @@ export function kartoitusText(data: KartoitusData): string {
   const when = whenText(data.startsAt, data.endsAt);
   const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
   const minutes = Math.round((data.endsAt.getTime() - data.startsAt.getTime()) / 60_000);
+
+  if (data.kind === 'koti') {
+    return [
+      'TIIVISKOTI — KARTOITUSKÄYNTI VAHVISTETTU',
+      '',
+      `Kiitos, ${firstName(data.contactName)} — aika on varattu.`,
+      '',
+      `Aika:        ${when} (noin ${minutes} min)`,
+      `Kohde:       ${place}`,
+      `Viitenumero: ${data.jobNumber}`,
+      '',
+      'Käynti on veloitukseton eikä sido sinua mihinkään.',
+      '',
+      'Käynnillä:',
+      '  1. Asentaja katsoo ikkunat ja ovet sekä niiden tiivisteet.',
+      '  2. Saat kiinteän hinnan paikan päällä — näet summan ennen kuin päätät.',
+      '  3. Jos haluat tiivistyksen, sovitaan asennusaika saman tien.',
+      '',
+      data.notes ? `Lisätietosi: ${data.notes}\n` : '',
+      `Muutokset ja peruutukset: ${PHONE} tai info@tiiviskoti.fi`,
+      '',
+      `${COMPANY} · Y-tunnus ${BUSINESS_ID} · Uusimaa`,
+    ].filter((l) => l !== '').join('\n');
+  }
 
   return [
     'TIIVISKOTI — KARTOITUSKÄYNTI VAHVISTETTU',
@@ -709,10 +742,11 @@ export function kartoitusText(data: KartoitusData): string {
 export function kartoitusWorkOrderSubject(data: KartoitusData): string {
   const key = dateKeyOf(data.startsAt);
   const [, m, d] = key.split('-').map(Number);
-  return `KARTOITUS ${data.jobNumber} — ${d}.${m}. klo ${timeOf(data.startsAt)} ${data.address}`;
+  return `${data.kind === 'koti' ? 'KOTIKARTOITUS' : 'KARTOITUS'} ${data.jobNumber} — ${d}.${m}. klo ${timeOf(data.startsAt)} ${data.address}`;
 }
 
 export function kartoitusWorkOrderHtml(data: KartoitusData): string {
+  const koti = data.kind === 'koti';
   const when = whenText(data.startsAt, data.endsAt);
   const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')]
     .filter(Boolean).join(', ');
@@ -727,14 +761,14 @@ export function kartoitusWorkOrderHtml(data: KartoitusData): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:14px;overflow:hidden">
 
   <tr><td style="background:${GREEN_DARK};padding:20px 24px">
-    <div style="color:#BFD8CC;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Kartoituskäynti &middot; ei veloitusta</div>
+    <div style="color:#BFD8CC;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">${koti ? 'Kotikartoitus' : 'Kartoituskäynti'} &middot; ei veloitusta</div>
     <div style="color:#FFFFFF;font-size:20px;font-weight:700;margin-top:4px">${esc(data.jobNumber)}</div>
     <div style="color:#BFD8CC;font-size:14px;margin-top:2px">${esc(when)} &middot; ${minutes} min</div>
   </td></tr>
 
   <tr><td style="padding:22px 24px 0">
-    <div style="color:${MUTED};font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Taloyhtiö</div>
-    <div style="color:${INK};font-size:19px;font-weight:700;margin-top:4px;line-height:1.35">${esc(data.association)}</div>
+    <div style="color:${MUTED};font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">${koti ? 'Asiakas' : 'Taloyhtiö'}</div>
+    <div style="color:${INK};font-size:19px;font-weight:700;margin-top:4px;line-height:1.35">${esc(koti ? data.contactName : data.association)}</div>
     <div style="color:${MUTED};font-size:15px;margin-top:6px">${esc(place)}</div>
     <div style="margin-top:10px">
       <a href="${mapUrl}" style="display:inline-block;background:${GREEN};color:#FFFFFF;font-size:15px;font-weight:700;text-decoration:none;padding:11px 18px;border-radius:8px">Avaa kartalla</a>
@@ -767,9 +801,13 @@ export function kartoitusWorkOrderHtml(data: KartoitusData): string {
 
   <tr><td style="padding:22px 24px 24px">
     <div style="border-top:1px solid #E6E2DA;padding-top:16px;color:${MUTED};font-size:13px;line-height:1.7">
-      Tämä on <strong>veloitukseton kartoitus</strong> — paikan päällä ei laskuteta mitään.
+      ${koti
+        ? `Tämä on <strong>veloitukseton kotikartoitus</strong> — itse käynnistä ei laskuteta.
+      Katso ikkunat ja ovet ja anna kiinteä hinta paikan päällä hintalaskurilla (admin &rarr; Työt &rarr; Uusi).
+      Jos asiakas haluaa tiivistyksen, sovi asennusaika saman tien ja kirjaa työ CRM:ään.`
+        : `Tämä on <strong>veloitukseton kartoitus</strong> — paikan päällä ei laskuteta mitään.
       Kirjaa tiivistettävät kohteet ja määrät, niin hinta lasketaan tarjoukseen jälkikäteen.
-      Soita yhteyshenkilölle ennen lähtöä, jos rappukäytävien oviin tarvitaan avausta.
+      Soita yhteyshenkilölle ennen lähtöä, jos rappukäytävien oviin tarvitaan avausta.`}
     </div>
   </td></tr>
 
@@ -783,11 +821,12 @@ export function kartoitusWorkOrderText(data: KartoitusData): string {
   const place = [data.address, [data.postalCode, data.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
   const minutes = Math.round((data.endsAt.getTime() - data.startsAt.getTime()) / 60_000);
 
+  const koti = data.kind === 'koti';
   return [
-    `KARTOITUSKÄYNTI ${data.jobNumber} — EI VELOITUSTA`,
+    `${koti ? 'KOTIKARTOITUS' : 'KARTOITUSKÄYNTI'} ${data.jobNumber} — EI VELOITUSTA`,
     '',
     `Aika:        ${when} (${minutes} min)`,
-    `Taloyhtiö:   ${data.association}`,
+    koti ? '' : `Taloyhtiö:   ${data.association}`,
     `Kohde:       ${place}`,
     `Yhteyshlö:   ${data.contactName}${data.role ? ` (${data.role})` : ''}`,
     `Puhelin:     ${data.phone}`,
@@ -795,18 +834,25 @@ export function kartoitusWorkOrderText(data: KartoitusData): string {
     data.doors ? `Ovia/ikkunoita (arvio): ${data.doors}` : '',
     '',
     data.notes ? `Asiakkaan lisätiedot: ${data.notes}\n` : '',
-    'Veloitukseton kartoitus — paikan päällä ei laskuteta mitään.',
-    'Kirjaa tiivistettävät kohteet ja määrät, hinta lasketaan tarjoukseen jälkikäteen.',
-    'Soita yhteyshenkilölle ennen lähtöä, jos rappukäytäviin tarvitaan avausta.',
+    ...(koti ? [
+      'Veloitukseton kotikartoitus — itse käynnistä ei laskuteta.',
+      'Anna kiinteä hinta paikan päällä hintalaskurilla (admin → Työt → Uusi).',
+      'Jos asiakas haluaa tiivistyksen, sovi asennusaika ja kirjaa työ CRM:ään.',
+    ] : [
+      'Veloitukseton kartoitus — paikan päällä ei laskuteta mitään.',
+      'Kirjaa tiivistettävät kohteet ja määrät, hinta lasketaan tarjoukseen jälkikäteen.',
+      'Soita yhteyshenkilölle ennen lähtöä, jos rappukäytäviin tarvitaan avausta.',
+    ]),
   ].filter((l) => l !== '').join('\n');
 }
 
 /** Kalenteritapahtuman kuvaus kartoituskäynnistä. */
 export function kartoitusCalendarDescription(data: KartoitusData): string {
   return [
-    `Kartoituskäynti ${data.jobNumber} — VELOITUKSETON`,
+    `${data.kind === 'koti' ? 'Kotikartoitus' : 'Kartoituskäynti'} ${data.jobNumber} — VELOITUKSETON`,
+    data.kind === 'koti' ? 'Anna kiinteä hinta paikan päällä.' : '',
     '',
-    `Taloyhtiö:  ${data.association}`,
+    data.kind === 'koti' ? '' : `Taloyhtiö:  ${data.association}`,
     `Yhteyshlö:  ${data.contactName}${data.role ? ` (${data.role})` : ''}`,
     `Puhelin:    ${data.phone}`,
     `Sähköposti: ${data.email}`,

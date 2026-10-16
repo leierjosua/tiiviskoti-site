@@ -268,7 +268,9 @@ export async function deliverKartoitus(input: DeliverKartoitusInput): Promise<De
     const ev = await createCalendarEvent({
       // "Kartoitus" alkuun, jotta veloituksettoman käynnin erottaa
       // kalenterinäkymässä maksavasta työstä ilman että sitä tarvitsee avata.
-      summary: `Kartoitus: ${input.association} — ${input.address} (${input.jobNumber})`,
+      summary: input.kind === 'koti'
+        ? `Kotikartoitus: ${input.contactName} — ${input.address} (${input.jobNumber})`
+        : `Kartoitus: ${input.association} — ${input.address} (${input.jobNumber})`,
       description: kartoitusCalendarDescription(input),
       location: [input.address, input.postalCode, input.city].filter(Boolean).join(', '),
       startsAt: input.startsAt,

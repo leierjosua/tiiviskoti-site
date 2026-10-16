@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
-import { KARTOITUS_MINUTES } from '@/lib/availability';
-import { areaForPostal, kartoitusCalendarId, purgeExpiredHolds } from '@/lib/data';
+import { KARTOITUS_MINUTES, KOTI_KARTOITUS_MINUTES } from '@/lib/availability';
+import { areaForPostal, calendarAreaForPostal, kartoitusCalendarId, purgeExpiredHolds } from '@/lib/data';
 import { campaignFromVisitorTrail, fbcFromVisitorTrail } from '@/lib/visitor';
 import { deliverKartoitus, removeCalendarEventForJob } from '@/lib/deliver';
 
@@ -36,9 +36,12 @@ export const runtime = 'nodejs';
 const KARTOITUS_SOURCE = 'web-kartoitus';
 
 const schema = z.object({
+  /* 'koti' = kotitalouden veloitukseton käynti alueen asentajan kalenteriin
+     (kokeilu 10/2026). Oletus 'taloyhtio' pitää vanhat kutsujat ennallaan. */
+  kind: z.enum(['taloyhtio', 'koti']).default('taloyhtio'),
   calendarId: z.string().uuid(),
   startsAt: z.string().datetime(),
-  association: z.string().min(1).max(200),
+  association: z.string().max(200).optional(),
   contactName: z.string().min(1).max(200),
   role: z.string().max(100).optional(),
   email: z.string().email(),
@@ -100,11 +103,16 @@ export async function POST(request: Request) {
   }
 
   const d = parsed.data;
+  const koti = d.kind === 'koti';
+  if (!koti && !d.association?.trim()) {
+    return Response.json({ error: 'validation', fields: ['association'] }, { status: 400 });
+  }
+  const minutes = koti ? KOTI_KARTOITUS_MINUTES : KARTOITUS_MINUTES;
   const starts = new Date(d.startsAt);
   /* Kesto tulee palvelimelta eikä pyynnöstä: kutsuja ei saa päättää kuinka
      paljon kalenterista varataan. Sama sääntö kuin matkalisällä ja
      alennuksella varausreitillä — asiakkaan syöte ei ohjaa resurssia. */
-  const ends = new Date(starts.getTime() + KARTOITUS_MINUTES * 60_000);
+  const ends = new Date(starts.getTime() + minutes * 60_000);
 
   if (starts.getTime() < Date.now()) {
     return Response.json({ error: 'in_past' }, { status: 400 });
@@ -118,13 +126,21 @@ export async function POST(request: Request) {
      saatavuushaussa. Tarkistus on siis kalenterin tunnusta vasten, ja se on
      yhtä tärkeä: ilman sitä pyyntöä muokkaamalla voisi ujuttaa maksuttoman
      käynnin keskelle asentajan maksullista työpäivää. */
-  const expectedCalendarId = kartoitusCalendarId();
-  if (!expectedCalendarId) {
-    console.error('public/kartoitus: KARTOITUS_CALENDAR_ID puuttuu');
-    return Response.json({ error: 'kartoitus_unavailable' }, { status: 503 });
-  }
-  if (d.calendarId.toLowerCase() !== expectedCalendarId.toLowerCase()) {
-    return Response.json({ error: 'calendar_not_kartoitus' }, { status: 409 });
+  /* Kotikartoitus menee asentajan kalenteriin, joten tarkistus on sama kuin
+     varausreitillä: kalenterin on palveltava postinumeroa. */
+  if (koti) {
+    if (!(await calendarAreaForPostal(d.calendarId, d.postalCode))) {
+      return Response.json({ error: 'area_not_served', postal: d.postalCode }, { status: 409 });
+    }
+  } else {
+    const expectedCalendarId = kartoitusCalendarId();
+    if (!expectedCalendarId) {
+      console.error('public/kartoitus: KARTOITUS_CALENDAR_ID puuttuu');
+      return Response.json({ error: 'kartoitus_unavailable' }, { status: 503 });
+    }
+    if (d.calendarId.toLowerCase() !== expectedCalendarId.toLowerCase()) {
+      return Response.json({ error: 'calendar_not_kartoitus' }, { status: 409 });
+    }
   }
 
   const [calendar] = await sql<{ id: string; google_calendar_id: string | null }[]>`
@@ -142,9 +158,9 @@ export async function POST(request: Request) {
   }
 
   const notes = [
-    'Veloitukseton kartoituskäynti (taloyhtiö).',
-    `Taloyhtiö: ${d.association}`,
-    `Yhteyshenkilö: ${d.contactName}${d.role ? ` (${d.role})` : ''}`,
+    koti ? 'Veloitukseton kartoituskäynti (koti) — anna kiinteä hinta paikan päällä.' : 'Veloitukseton kartoituskäynti (taloyhtiö).',
+    koti ? null : `Taloyhtiö: ${d.association}`,
+    koti ? null : `Yhteyshenkilö: ${d.contactName}${d.role ? ` (${d.role})` : ''}`,
     d.doors ? `Ovien ja ikkunoiden määrä (asiakkaan arvio): ${d.doors}` : null,
     d.leadRef ? `Tarjouspyynnön viite: ${d.leadRef}` : null,
     d.notes ? `\nAsiakkaan lisätiedot:\n${d.notes}` : null,
@@ -178,7 +194,7 @@ export async function POST(request: Request) {
       } else {
         const [row] = await tx<{ id: string }[]>`
           insert into tk.customers (full_name, email, phone, address, postal_code, city)
-          values (${`${d.association} — ${d.contactName}`}, ${d.email}, ${d.phone},
+          values (${koti ? d.contactName : `${d.association} — ${d.contactName}`}, ${d.email}, ${d.phone},
                   ${d.address}, ${d.postalCode}, ${d.city ?? null})
           returning id
         `;
@@ -190,7 +206,7 @@ export async function POST(request: Request) {
                              address, postal_code, city, price_cents, notes, source,
                              campaign, gclid)
         values (${customerId}, ${d.calendarId}, ${starts}, ${ends}, 'confirmed',
-                ${`Kartoituskäynti: ${d.association}`},
+                ${koti ? `Kotikartoitus: ${d.contactName}` : `Kartoituskäynti: ${d.association}`},
                 ${d.address}, ${d.postalCode}, ${d.city ?? null},
                 0, ${notes}, ${KARTOITUS_SOURCE},
                 ${campaign}, ${d.gclid ?? null})
@@ -206,7 +222,8 @@ export async function POST(request: Request) {
       jobId: created.id,
       jobNumber: created.job_number,
       googleCalendarId: calendar.google_calendar_id,
-      association: d.association,
+      kind: d.kind,
+      association: d.association ?? '',
       contactName: d.contactName,
       role: d.role ?? null,
       phone: d.phone,
@@ -226,7 +243,7 @@ export async function POST(request: Request) {
       jobNumber: created.job_number,
       startsAt: starts.toISOString(),
       endsAt: ends.toISOString(),
-      durationMinutes: KARTOITUS_MINUTES,
+      durationMinutes: minutes,
       area: area.name,
       /* Metan CAPIa varten, jos selaimen oma fbc puuttui. Ks. booking-reitti. */
       fbc: trailFbc,

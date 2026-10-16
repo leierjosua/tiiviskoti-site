@@ -69,6 +69,15 @@ export const MAX_BOOKING_BLOCK_MINUTES = 300;
    tarjoaa eri mittaisia aikoja kuin kalenteriin varataan. */
 export const KARTOITUS_MINUTES = 20;
 
+/* Kotitalouden veloituksettoman kartoituskäynnin kesto (kokeilu 10/2026).
+   Toisin kuin taloyhtiön käynti, tämä varataan ALUEEN ASENTAJAN kalenteriin:
+   asentaja katsoo ikkunat ja ovet ja antaa kiinteän hinnan paikan päällä.
+   Pidempi kuin taloyhtiökäynti, koska hinta sovitaan heti eikä jälkikäteen.
+
+   HUOM: tiiviskoti.fi:n `_kartoitus.js` (`KOTI_MIN`) kysyy ajat tällä samalla
+   luvulla — muuta molempiin. */
+export const KOTI_KARTOITUS_MINUTES = 45;
+
 /* ---------- aikavälialgebra ---------- */
 
 function normalize(intervals: Interval[]): Interval[] {
