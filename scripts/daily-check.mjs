@@ -426,7 +426,7 @@ await check('meta-ads', 'mainostili', async () => {
   for (const s of sets) ok('meta-ads', `${s.name}: ${Number(s.daily_budget) / 100} €/vrk`);
 
   const ads = (await g(`${ME}/ads`, {
-    fields: 'name,effective_status,created_time,creative{instagram_user_id,object_story_spec}', limit: '100',
+    fields: 'name,effective_status,created_time,adset_id,creative{instagram_user_id,object_story_spec}', limit: '100',
     effective_status: ['ACTIVE', 'PENDING_REVIEW', 'IN_PROCESS', 'WITH_ISSUES', 'DISAPPROVED', 'PENDING_BILLING_INFO'],
   })).data;
   const huonot = ads.filter((a) => ['DISAPPROVED', 'WITH_ISSUES', 'PENDING_BILLING_INFO'].includes(a.effective_status));
@@ -442,8 +442,14 @@ await check('meta-ads', 'mainostili', async () => {
   }
   const aktiiviset = ads.filter((a) => a.effective_status === 'ACTIVE');
   if (!aktiiviset.length) fail('meta-ads', 'ei yhtään aktiivista mainosta');
-  else if (aktiiviset.length > 4) warn('meta-ads', `${aktiiviset.length} mainosta päällä — budjetti hajoaa ohueksi (max 4)`);
-  else ok('meta-ads', `${aktiiviset.length} mainosta päällä: ${aktiiviset.map((a) => a.name.split(' - ')[0]).join(', ')}`);
+  else {
+    /* Raja on mainosjoukkoa kohden: budjetti jaetaan joukon sisällä. */
+    const perJoukko = {};
+    for (const a of aktiiviset) (perJoukko[a.adset_id] ??= []).push(a.name.split(' - ')[0]);
+    const liikaa = Object.values(perJoukko).filter((l) => l.length > 4);
+    if (liikaa.length) warn('meta-ads', `yli 4 mainosta samassa mainosjoukossa — budjetti hajoaa ohueksi`, liikaa.map((l) => l.join(', ')).join(' · '));
+    else ok('meta-ads', `${aktiiviset.length} mainosta päällä: ${Object.values(perJoukko).map((l) => l.join(', ')).join(' | ')}`);
+  }
 
   const lead = (a) => +((a || []).find((x) => x.action_type === 'lead')?.value || 0);
   const [eilen] = (await g(`${ME}/insights`, { date_preset: 'yesterday', fields: 'spend,inline_link_clicks,actions' })).data;
