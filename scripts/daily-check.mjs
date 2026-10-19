@@ -128,6 +128,66 @@ await check('crm', 'tietokanta', async () => {
   ok('crm', `tietokanta vastaa (${r.kayttaja})`);
 });
 
+/* ========== 3b. KOHDETIEDOT, KARTOITUS, HYVÄKSYNTÄ (19.10.2026) ==========
+   Kysely varauksen jälkeen (tiiviskoti.fi/kohdetiedot.html → CRM:n
+   /api/public/kohdetiedot), kartoitus CRM:ssä ja tarjouksen hyväksyntä
+   (/hyvaksy/<token>) + sähköpostivahvistus. */
+await check('kysely', 'sivu', async () => {
+  const r = await get('https://tiiviskoti.fi/kohdetiedot.html');
+  if (r.status !== 200) return fail('kysely', `kohdetiedot.html ${r.status}`);
+  if (!r.text.includes('/api/public/kohdetiedot')) return fail('kysely', 'kohdetiedot.html ei viittaa CRM:n rajapintaan');
+  ok('kysely', `kohdetiedot.html 200 (${r.ms} ms)`);
+});
+await check('kysely', 'rajapinta + CORS', async () => {
+  const r = await fetch('https://tiiviskoti-crm.vercel.app/api/public/kohdetiedot?t=' + 'X'.repeat(32), { headers: { origin: 'https://tiiviskoti.fi' } });
+  /* Tuntematon linkki = 404 on oikea vastaus; 500 tarkoittaa että kanta tai koodi on rikki. */
+  if (r.status !== 404) return fail('kysely', `rajapinta vastasi ${r.status} (odotettu 404 tuntemattomalle linkille)`);
+  if (!r.headers.get('access-control-allow-origin')) return fail('kysely', 'rajapinnasta puuttuu CORS → selain estää kyselyn');
+  ok('kysely', 'rajapinta vastaa, CORS kunnossa');
+});
+await check('kysely', 'kattavuus', async () => {
+  /* Jokaisella vahvistetulla työllä pitäisi olla kysely (deliverBooking luo).
+     Lasketaan 19.10.2026 klo 12 jälkeen lähteneistä — sitä ennen kyselyä ei ollut.
+     Puuttuva = ensureSurvey kaatuu tai db/037 on kadonnut. */
+  const [r] = await sql`
+    select count(*)::int as tyot, count(s.job_id)::int as kyselyt
+      from tk.jobs j left join tk.job_surveys s on s.job_id = j.id
+     where j.status = 'confirmed'
+       and j.confirmation_sent_at > greatest(now() - interval '7 days', '2026-10-19T12:00:00+03'::timestamptz)`;
+  if (r.tyot > 0 && r.kyselyt < r.tyot) warn('kysely', `${r.tyot - r.kyselyt}/${r.tyot} vahvistetulta työltä puuttuu kysely (7 vrk)`);
+  else ok('kysely', `kysely ${r.kyselyt}/${r.tyot} vahvistetulla työllä (7 vrk)`);
+});
+await check('kysely', 'täyttämättä ennen keikkaa', async () => {
+  /* Liiketoimintasignaali: keikka 0–2 pv päässä eikä kohdetietoja. Soita. */
+  const rows = await sql`
+    select j.job_number, j.starts_at, cu.full_name, cu.phone
+      from tk.jobs j join tk.job_surveys s on s.job_id = j.id
+      left join tk.customers cu on cu.id = j.customer_id
+     where j.status = 'confirmed' and s.submitted_at is null
+       and j.starts_at between now() and now() + interval '2 days'
+     order by j.starts_at`;
+  if (rows.length) warn('kysely', `${rows.length} keikkaa 2 pv sisällä ilman kohdetietoja — soita`,
+    rows.map((x) => `${x.job_number} ${x.starts_at.toLocaleString('fi-FI')} ${x.full_name ?? ''} ${x.phone ?? ''}`).join('\n'));
+  else ok('kysely', 'kaikki lähipäivien keikat ovat täyttäneet kohdetiedot (tai ei keikkoja)');
+});
+await check('kartoitus', 'hyväksyntäsivu', async () => {
+  const r = await get('https://admin.tiiviskoti.fi/hyvaksy/' + 'X'.repeat(32));
+  if (r.status !== 200 || !r.text.includes('Tarjousta ei löytynyt')) return fail('kartoitus', `hyväksyntäsivu ${r.status} — tarjouslinkit eivät toimi`);
+  ok('kartoitus', 'hyväksyntäsivu vastaa');
+});
+await check('kartoitus', 'vahvistamatta', async () => {
+  /* Asiakas hyväksyi sivulla mutta ei ole vastannut sähköpostiin 2 pv. */
+  const rows = await sql`
+    select offer_number, customer_name, phone, accepted_at
+      from tk.offers
+     where accepted_at is not null and accepted_at < now() - interval '2 days'
+       and (accepted_meta->'confirm'->>'confirmedAt') is null
+       and (accepted_meta->'confirm') is not null`;
+  if (rows.length) warn('kartoitus', `${rows.length} hyväksyttyä tarjousta odottaa sähköpostivahvistusta yli 2 pv`,
+    rows.map((x) => `${x.offer_number} ${x.customer_name} ${x.phone ?? ''}`).join('\n'));
+  else ok('kartoitus', 'ei roikkuvia vahvistuksia');
+});
+
 /* ========== 4. TIETOKANNAN EHEYS ========== */
 await check('eheys', 'päällekkäiset varaukset', async () => {
   const rows = await sql`

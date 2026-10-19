@@ -36,10 +36,21 @@ let bookingPayload = null;
 for (const r of ['**/api/create-booking', '**/api/create-lead', '**/api/ask',
                  '**/api/create-kartoitus', '**/api/track-intent', '**/api/public/track']) {
   await page.route(r, (route) => {
-    if (route.request().url().includes('create-booking')) bookingPayload = route.request().postData();
+    if (route.request().url().includes('create-booking')) {
+      bookingPayload = route.request().postData();
+      /* Onnistunut vastaus keksityllä kyselytunnisteella (19.10.2026): sivun
+         pitää siirtyä kohdetietokyselyyn. Mitään ei synny kantaan. */
+      return route.fulfill({ status: 200, contentType: 'application/json',
+        body: JSON.stringify({ ok: true, ref: 'TK-TESTI', total_cents: 42500, discount_cents: 0, survey_token: 'T'.repeat(32) }) });
+    }
     route.abort();
   });
 }
+/* Kyselyn rajapinta keksityllä datalla, ettei testi osu oikeaan kantaan. */
+await page.route('**/api/public/kohdetiedot*', (route) => route.fulfill({ status: 200, contentType: 'application/json',
+  headers: { 'access-control-allow-origin': '*' },
+  body: JSON.stringify({ ok: true, survey: { jobNumber: 'TK-TESTI', startsAt: new Date(Date.now() + 7 * 864e5).toISOString(),
+    address: 'Testikatu 1', firstName: 'Testi', windows: 5, doors: 0, answers: {}, photos: {}, submittedAt: null, editable: true } }) }));
 
 const konsoli = [];
 page.on('console', (m) => { if (m.type() === 'error') konsoli.push(m.text().slice(0, 160)); });
@@ -141,6 +152,15 @@ if (n === 0) {
       await page.click('#bSubmit');
       await page.waitForTimeout(2500);
       if (!bookingPayload) fail('"Vahvista varaus" ei lähettänyt create-booking-pyyntöä');
+      else {
+        await page.waitForURL(/kohdetiedot\.html\?t=T{32}&uusi=1/, { timeout: 10000 }).catch(() => {});
+        if (!page.url().includes('kohdetiedot.html')) fail('varauksen jälkeen EI siirrytty kohdetietokyselyyn', page.url());
+        else {
+          const auki = await page.waitForSelector('#ktForm:not([hidden])', { timeout: 10000 }).then(() => true).catch(() => false);
+          if (auki) ok('varauksen jälkeen avautui kohdetietokysely (vahvistusbanneri + kysymykset)');
+          else fail('kohdetietokysely ei auennut varauksen jälkeen', page.url());
+        }
+      }
     } else warn('yhteystietolomaketta ei löytynyt jatkon jälkeen');
   } else warn('#toDetails-nappia ei näkynyt ajan valinnan jälkeen');
 }
