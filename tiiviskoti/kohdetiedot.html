@@ -102,17 +102,6 @@ textarea.kt-ta{width:100%;margin-top:10px;font:inherit;font-size:16px;color:var(
   border:1.5px solid var(--line2);border-radius:12px;padding:12px 14px;resize:vertical;min-height:84px}
 textarea.kt-ta:focus{outline:none;border-color:var(--green);background:#fff}
 
-/* ---------- puitekaavio ---------- */
-.kt-diagram{margin-top:14px;background:var(--bg);border-radius:14px;padding:14px 12px 10px}
-.kt-diagram svg{width:100%;height:auto;max-width:420px;margin-inline:auto}
-.kt-diagram .sash{fill:#fff;stroke:#9DB2A5;stroke-width:2;transition:all .2s var(--ease)}
-.kt-diagram .sash.on{fill:var(--green-soft);stroke:var(--green);stroke-width:3}
-.kt-diagram .glass{stroke:#B9D4E6;stroke-width:3}
-.kt-diagram .seal{fill:var(--green-l);opacity:0;transition:opacity .2s var(--ease)}
-.kt-diagram .seal.on{opacity:1}
-.kt-diagram text{font-family:Manrope,sans-serif;font-weight:800;font-size:13px;fill:var(--ink)}
-.kt-diagram text.side{font-size:10.5px;letter-spacing:.12em;fill:var(--mute)}
-.kt-diagram .hide{display:none}
 .kt-note{display:flex;gap:10px;font-size:13.5px;color:var(--text);background:var(--green-soft);
   border-radius:12px;padding:11px 13px;margin-top:12px;line-height:1.5}
 .kt-note svg{flex:none;width:18px;height:18px;color:var(--green);margin-top:1px}
@@ -224,30 +213,20 @@ dialog.kt-later .row .btn{flex:1}
       </div>
 
       <div class="kt-q">
-        <span class="ql">Mitkä puitteet tiivistetään?</span>
-        <p class="qh">Puitteet numeroidaan sisältä ulospäin. Hintaan sisältyy kahden puitteen tiivistys;
-          kolmas puite on lisätyö, 20 € ikkunaa kohti.</p>
-        <div class="kt-diagram" aria-hidden="true">
-          <svg viewBox="0 0 400 150" id="diagram">
-            <text class="side" x="8" y="18">SISÄLLÄ</text>
-            <text class="side" x="392" y="18" text-anchor="end">ULKONA</text>
-            <!-- seinä -->
-            <rect x="40" y="28" width="320" height="10" rx="2" fill="#E4E8E0"/>
-            <rect x="40" y="120" width="320" height="10" rx="2" fill="#E4E8E0"/>
-            <g data-s="1"><rect class="sash" x="78" y="42" width="34" height="74" rx="4"/><line class="glass" x1="95" y1="50" x2="95" y2="108"/><rect class="seal" x="72" y="44" width="5" height="70" rx="2"/><text x="95" y="146" text-anchor="middle">1</text></g>
-            <g data-s="2"><rect class="sash" x="150" y="42" width="34" height="74" rx="4"/><line class="glass" x1="167" y1="50" x2="167" y2="108"/><rect class="seal" x="144" y="44" width="5" height="70" rx="2"/><text x="167" y="146" text-anchor="middle">2</text></g>
-            <g data-s="3"><rect class="sash" x="268" y="42" width="34" height="74" rx="4"/><line class="glass" x1="285" y1="50" x2="285" y2="108"/><rect class="seal" x="262" y="44" width="5" height="70" rx="2"/><text x="285" y="146" text-anchor="middle">3</text></g>
-          </svg>
-        </div>
+        <span class="ql">Missä kohdissa ikkunassa on tiivisteitä?</span>
+        <p class="qh">Valitse kaikki, jotka löydät. Lähikuva tiivisteestä auttaa, jos et ole varma.</p>
         <div class="kt-chips stack">
-          <label class="kt-chip"><input type="radio" name="ikkuna_tiivistetaan" value="1-2"><span>Sisäpuitteet 1 ja 2 <small>· sisältyy hintaan</small></span></label>
-          <label class="kt-chip"><input type="radio" name="ikkuna_tiivistetaan" value="1-2-3"><span>Kaikki kolme: 1, 2 ja ulkopuite 3 <small>· +20 € / ikkuna</small></span></label>
-          <label class="kt-chip"><input type="radio" name="ikkuna_tiivistetaan" value="1"><span>Vain sisin puite 1</span></label>
-          <label class="kt-chip"><input type="radio" name="ikkuna_tiivistetaan" value="en_tieda"><span>En tiedä, katsotaan yhdessä paikan päällä</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ikkuna_tiivisteet" value="sisapuite"><span>1. Sisäpuitteessa</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ikkuna_tiivisteet" value="sisakarmi"><span>2. Sisäkarmissa</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ikkuna_tiivisteet" value="ulkopuite"><span>3. Ulkopuitteessa</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ikkuna_tiivisteet" value="muu"><span>Jossain muualla</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ikkuna_tiivisteet" value="en_tieda"><span>En tiedä</span></label>
         </div>
+        <textarea class="kt-ta" id="ikkuna_tiivisteet_muu" name="ikkuna_tiivisteet_muu" maxlength="200" rows="2"
+          placeholder="Missä? Esim. ulkokarmissa" hidden></textarea>
         <div class="kt-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-          <span>Sisäpuolen tiiviys ratkaisee vedon ja lämmön. Jos ulkopuite tiivistetään, siihen jätetään aina
-            noin 5 cm:n tuuletusrako, jotta lasien väliin ei kerry kosteutta.</span></div>
+          <span>Hintaan sisältyy kahden puitteen tiivistys; kolmas puite on lisätyö, 20 € ikkunaa kohti. Jos ulkopuite
+            tiivistetään, siihen jätetään aina noin 5 cm:n tuuletusrako, jotta lasien väliin ei kerry kosteutta.</span></div>
       </div>
 
       <div class="kt-q">
@@ -474,7 +453,7 @@ function render() {
       else if ($(k) && $(k).tagName === 'TEXTAREA') $(k).value = v;
     }
   }
-  syncDiagram(); progress();
+  syncSeals(); progress();
 }
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -491,41 +470,21 @@ function paintPhoto(slot, url) {
   el.insertAdjacentHTML('beforeend', `<span class="badge">${CHECK}Vaihda</span>`);
 }
 
-/* ---------- puitekaavio ---------- */
-function syncDiagram() {
-  const n = document.querySelector('[name="ikkuna_puitteet"]:checked')?.value;
-  /* Kahden puitteen ikkunassa molemmat sisältyvät hintaan (perushinta =
-     kaksi puitetta), joten "kaikki kolme" piilotetaan ja "1 ja 2"
-     tarkoittaa sisä- ja ulkopuitetta. Kolmen puitteen ikkunassa kolmas
-     on lisätyö 20 € / ikkuna. */
-  const two = n === '2';
-  const radio = (v) => document.querySelector(`[name="ikkuna_tiivistetaan"][value="${v}"]`);
-  if (two && radio('1-2-3').checked) radio('1-2').checked = true;
-  const lbl = (v) => radio(v).nextElementSibling;
-  lbl('1-2').innerHTML = two
-    ? 'Molemmat: sisäpuite 1 ja ulkopuite 2 <small>· sisältyy hintaan</small>'
-    : 'Sisäpuitteet 1 ja 2 <small>· sisältyy hintaan</small>';
-  radio('1-2-3').closest('.kt-chip').hidden = two;
-  lbl('1').textContent = two ? 'Vain sisäpuite 1' : 'Vain sisin puite 1';
-
-  const which = document.querySelector('[name="ikkuna_tiivistetaan"]:checked')?.value || '';
-  let on = which === 'en_tieda' ? [] : which.split('-');
-  /* Kaaviossa ulkopuite on aina kolmas ruutu; kahden puitteen ikkunassa
-     se on numero 2 ja keskimmäinen ruutu piilotetaan. */
-  if (two) on = on.map((x) => (x === '2' ? '3' : x));
-  document.querySelectorAll('#diagram g[data-s]').forEach((g) => {
-    const s = g.dataset.s;
-    g.classList.toggle('hide', two && s === '2');
-    g.querySelector('.sash').classList.toggle('on', on.includes(s));
-    g.querySelector('.seal').classList.toggle('on', on.includes(s));
-    if (s === '3') g.querySelector('text').textContent = two ? '2' : '3';
-  });
+/* ---------- tiivisteiden sijainti ---------- */
+/* "En tiedä" sulkee muut pois ja päinvastoin; "Jossain muualla" avaa kentän. */
+function syncSeals(changed) {
+  const boxes = [...document.querySelectorAll('[name="ikkuna_tiivisteet"]')];
+  if (changed?.name === 'ikkuna_tiivisteet' && changed.checked) {
+    if (changed.value === 'en_tieda') boxes.forEach((b) => { if (b !== changed) b.checked = false; });
+    else boxes.find((b) => b.value === 'en_tieda').checked = false;
+  }
+  $('ikkuna_tiivisteet_muu').hidden = !boxes.find((b) => b.value === 'muu').checked;
 }
 
 /* ---------- edistyminen ---------- */
 function visibleKeys() {
   const keys = [];
-  if (!$('secWin').hidden) keys.push('ikkuna_sisa','ikkuna_tiiviste','ikkuna_ulko','ikkuna_puitteet','ikkuna_tiivistetaan','ikkuna_ura');
+  if (!$('secWin').hidden) keys.push('ikkuna_sisa','ikkuna_tiiviste','ikkuna_ulko','ikkuna_puitteet','ikkuna_tiivisteet','ikkuna_ura');
   if (!$('secDoor').hidden) keys.push('ovi_sisa','ovi_tiiviste','ovi_ulko','ovi_puitteet','ovi_ura');
   return keys;
 }
@@ -544,7 +503,8 @@ function collect() {
     if (!el.name) continue;
     if (el.type === 'radio' && el.checked) a[el.name] = el.value;
     else if (el.type === 'checkbox' && el.checked) (a[el.name] ||= []).push(el.value);
-    else if (el.tagName === 'TEXTAREA' && el.value.trim()) a[el.name] = el.value.trim();
+    /* Piilotettu kenttä ("Jossain muualla" ei valittuna) ei tallennu. */
+    else if (el.tagName === 'TEXTAREA' && !el.hidden && el.value.trim()) a[el.name] = el.value.trim();
   }
   return a;
 }
@@ -569,7 +529,7 @@ async function save(submit = false) {
 }
 $('ktForm').addEventListener('change', (e) => {
   if (e.target.type === 'file') return;
-  if (e.target.name?.startsWith('ikkuna_')) syncDiagram();
+  if (e.target.name === 'ikkuna_tiivisteet') syncSeals(e.target);
   progress();
   clearTimeout(saveTimer); saveTimer = setTimeout(() => save(false), 700);
 });

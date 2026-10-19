@@ -28,6 +28,13 @@ describe('kohdetietokyselyn vastaukset', () => {
     expect(parseAnswers({ lisatiedot: 'a'.repeat(5000), saleet: 'ei' })).toEqual({ saleet: 'ei' });
   });
 
+  it('tallentaa tiivisteiden sijainnit monivalintana', () => {
+    expect(parseAnswers({ ikkuna_tiivisteet: ['sisapuite', 'ulkopuite', 'roska'], ikkuna_tiivisteet_muu: 'ulkokarmi' }))
+      .toEqual({ ikkuna_tiivisteet: ['sisapuite', 'ulkopuite'], ikkuna_tiivisteet_muu: 'ulkokarmi' });
+    expect(answerRows({ ikkuna_tiivisteet: ['sisakarmi', 'muu'], ikkuna_tiivisteet_muu: 'ulkokarmi' }))
+      .toEqual([{ label: 'Tiivisteet ikkunassa', value: 'Sisäkarmissa, Jossain muualla (ulkokarmi)' }]);
+  });
+
   it('näyttää vastaukset luettavina', () => {
     expect(answerRows({ ikkuna_tiivistetaan: '1-2-3', ongelmat: ['veto'] })).toEqual([
       { label: 'Tiivistettävät puitteet', value: 'Kaikki kolme (1, 2 ja ulko 3) — LISÄTYÖ +20 €/ikkuna' },

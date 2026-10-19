@@ -41,6 +41,14 @@ export const CHOICES = {
   ovi_ura: ['Ura oven karmissa', { kylla: 'Kyllä', ei: 'Ei', en_tieda: 'Ei tiedä' }],
 } as const satisfies Record<string, readonly [string, Record<string, string>]>;
 
+/** Missä tiivisteet ovat (19.10.2026, korvasi kysymyksen "mitkä puitteet
+ *  tiivistetään"). Monivalinta. Vanhat ikkuna_tiivistetaan-vastaukset
+ *  näkyvät yhä CRM:ssä CHOICES-kautta. */
+export const SEAL_SPOTS = {
+  sisapuite: 'Sisäpuitteessa', sisakarmi: 'Sisäkarmissa', ulkopuite: 'Ulkopuitteessa',
+  muu: 'Jossain muualla', en_tieda: 'Ei tiedä',
+} as const;
+
 export const PROBLEMS = {
   veto: 'Vetoa', huurtuminen: 'Huurtuu', vihellys: 'Viheltää / humisee',
   melu: 'Melu kuuluu sisään', jaykka: 'Jäykkä tai ei sulkeudu kunnolla', muu: 'Muu',
@@ -60,6 +68,9 @@ const schema = z.object({
   ),
   ongelmat: z.array(z.string()).max(10).optional().catch(undefined)
     .transform((a) => a?.filter((v): v is keyof typeof PROBLEMS => v in PROBLEMS)),
+  ikkuna_tiivisteet: z.array(z.string()).max(10).optional().catch(undefined)
+    .transform((a) => a?.filter((v): v is keyof typeof SEAL_SPOTS => v in SEAL_SPOTS)),
+  ikkuna_tiivisteet_muu: z.string().max(200).optional().catch(undefined),
   saapuminen: z.string().max(500).optional().catch(undefined),
   lisatiedot: z.string().max(2000).optional().catch(undefined),
 }).strip();
@@ -68,6 +79,8 @@ export type SurveyAnswers = {
   [K in keyof typeof CHOICES]?: keyof (typeof CHOICES)[K][1];
 } & {
   ongelmat?: (keyof typeof PROBLEMS)[];
+  ikkuna_tiivisteet?: (keyof typeof SEAL_SPOTS)[];
+  ikkuna_tiivisteet_muu?: string;
   saapuminen?: string;
   lisatiedot?: string;
   /** Kuvapaikka → polku ämpärissä. Palvelin kirjoittaa, ei selain. */
@@ -100,6 +113,10 @@ export function answerRows(a: SurveyAnswers): { label: string; value: string }[]
   for (const [k, [label, opts]] of Object.entries(CHOICES)) {
     const v = (a as Record<string, string | undefined>)[k];
     if (v) rows.push({ label, value: (opts as Record<string, string>)[v] ?? v });
+  }
+  if (a.ikkuna_tiivisteet?.length) {
+    const muu = a.ikkuna_tiivisteet_muu ? ` (${a.ikkuna_tiivisteet_muu})` : '';
+    rows.push({ label: 'Tiivisteet ikkunassa', value: a.ikkuna_tiivisteet.map((k) => SEAL_SPOTS[k]).join(', ') + muu });
   }
   if (a.ongelmat?.length) rows.push({ label: 'Ongelmat', value: a.ongelmat.map((p) => PROBLEMS[p]).join(', ') });
   for (const [k, label] of Object.entries(TEXTS)) {
