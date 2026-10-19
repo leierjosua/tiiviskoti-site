@@ -107,22 +107,12 @@ textarea.kt-ta:focus{outline:none;border-color:var(--green);background:#fff}
 .kt-seals-img img{display:block;width:100%;height:100%;object-fit:cover}
 .kt-seals-img::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,rgba(10,30,20,.18),rgba(10,30,20,0) 22%,rgba(10,30,20,0) 70%,rgba(10,30,20,.22))}
-.kt-seals-hint{position:absolute;left:12px;top:12px;z-index:2;font-size:12.5px;font-weight:800;color:#fff;
-  background:rgba(22,58,40,.72);backdrop-filter:blur(6px);padding:6px 11px;border-radius:999px}
 .kt-pin{position:absolute;left:var(--x);top:var(--y);z-index:3;display:flex;align-items:center;gap:6px;
-  transform:translate(-18px,-50%);border:0;background:none;padding:0;cursor:pointer;font:inherit;-webkit-tap-highlight-color:transparent}
-.kt-pin.left{flex-direction:row-reverse;transform:translate(calc(-100% + 18px),-50%)}
-.kt-pin .n{position:relative;width:36px;height:36px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:800;
-  color:var(--ink);background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(10,30,20,.35);transition:background .2s var(--ease),color .2s var(--ease),transform .2s var(--ease)}
-.kt-pin .n::before{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(255,255,255,.85);animation:ktPulse 2.2s ease-out infinite}
-.kt-pin .l{font-size:13px;font-weight:800;color:var(--ink);background:rgba(255,255,255,.94);padding:5px 9px;border-radius:999px;
-  box-shadow:0 4px 12px rgba(10,30,20,.25);white-space:nowrap;transition:background .2s var(--ease),color .2s var(--ease)}
+  transform:translate(-50%,-50%);border:0;background:none;padding:0;cursor:pointer;font:inherit;-webkit-tap-highlight-color:transparent}
+.kt-pin .n{position:relative;width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:800;
+  color:var(--ink);background:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.9),0 4px 12px rgba(10,30,20,.35);transition:background .2s var(--ease),color .2s var(--ease),transform .2s var(--ease)}
 .kt-pin[aria-pressed="true"] .n{background:var(--green);color:#fff;transform:scale(1.06)}
-.kt-pin[aria-pressed="true"] .n::before{animation:none;border-color:var(--green)}
-.kt-pin[aria-pressed="true"] .l{background:var(--green);color:#fff}
 .kt-pin:focus-visible .n{outline:3px solid var(--ink);outline-offset:3px}
-@keyframes ktPulse{0%{transform:scale(.85);opacity:.9}70%{transform:scale(1.25);opacity:0}100%{opacity:0}}
-@media (prefers-reduced-motion:reduce){.kt-pin .n::before{animation:none;opacity:.6}}
 .kt-seals figcaption{font-size:12.5px;color:var(--mute);margin-top:8px;line-height:1.45}
 .kt-note{display:flex;gap:10px;font-size:13.5px;color:var(--text);background:var(--green-soft);
   border-radius:12px;padding:11px 13px;margin-top:12px;line-height:1.5}
@@ -236,8 +226,7 @@ dialog.kt-later .row .btn{flex:1}
 
       <div class="kt-q">
         <span class="ql">Missä kohdissa ikkunassa on tiivisteitä?</span>
-        <p class="qh">Avaa ikkuna ja katso, missä kohdissa on kumi- tai harjatiiviste. Valitse kaikki, jotka löydät.
-          Voit myös napauttaa numeroa kuvassa.</p>
+        <p class="qh">Avaa ikkuna ja katso, missä kohdissa on kumi- tai harjatiiviste. Katso numerot kuvasta ja valitse alta kaikki, jotka löydät omasta ikkunastasi.</p>
         <!-- Oikea kuva (16.9.2026 kuvaus, Kuva-28) ja numerot sen päällä. Numeroiden
              paikat prosentteina kuvasta; Josua hyväksyi sijainnit 19.10.2026. -->
         <figure class="kt-seals" id="sealsFig">
@@ -247,15 +236,14 @@ dialog.kt-later .row .btn{flex:1}
               <img src="img/tiivisteet-ikkuna.jpg" width="1200" height="1411" loading="lazy"
                    alt="Avattu ikkuna: sisäpuite vasemmalla, ulkopuite oikealla ja niiden välissä karmi">
             </picture>
-            <span class="kt-seals-hint" aria-hidden="true">Napauta numeroa</span>
-            <button type="button" class="kt-pin" data-v="sisapuite" style="--x:30%;--y:81.4%" aria-pressed="false">
-              <span class="n">1</span><span class="l">Sisäpuite</span></button>
-            <button type="button" class="kt-pin left" data-v="sisakarmi" style="--x:62.7%;--y:45%" aria-pressed="false">
-              <span class="n">2</span><span class="l">Sisäkarmi</span></button>
-            <button type="button" class="kt-pin left" data-v="ulkopuite" style="--x:70.5%;--y:31.1%" aria-pressed="false">
-              <span class="n">3</span><span class="l">Ulkopuite</span></button>
+            <button type="button" class="kt-pin" data-v="sisapuite" aria-label="1 Sisäpuitteessa" style="--x:30%;--y:81.4%" aria-pressed="false">
+              <span class="n">1</span></button>
+            <button type="button" class="kt-pin" data-v="sisakarmi" aria-label="2 Sisäkarmissa" style="--x:62.7%;--y:45%" aria-pressed="false">
+              <span class="n">2</span></button>
+            <button type="button" class="kt-pin" data-v="ulkopuite" aria-label="3 Ulkopuitteessa" style="--x:70.5%;--y:31.1%" aria-pressed="false">
+              <span class="n">3</span></button>
           </div>
-          <figcaption>Esimerkkikuva meidän keikalta. Oma ikkunasi voi näyttää erilaiselta, mutta tiivisteet ovat yleensä näissä kohdissa.</figcaption>
+          <figcaption>1 Sisäpuite · 2 Sisäkarmi · 3 Ulkopuite. Esimerkkikuva meidän keikalta; oma ikkunasi voi näyttää erilaiselta.</figcaption>
         </figure>
         <div class="kt-chips stack">
           <label class="kt-chip"><input type="checkbox" name="ikkuna_tiivisteet" value="sisapuite"><span>1. Sisäpuitteessa</span></label>
@@ -525,7 +513,6 @@ function syncSeals(changed) {
   for (const pin of document.querySelectorAll('#sealsFig .kt-pin')) {
     pin.setAttribute('aria-pressed', String(!!boxes.find((b) => b.value === pin.dataset.v)?.checked));
   }
-  if (boxes.some((b) => b.checked)) $('sealsFig').querySelector('.kt-seals-hint')?.remove();
 }
 /* Numeron napautus kuvassa = sama kuin vaihtoehdon napautus. */
 for (const pin of document.querySelectorAll('#sealsFig .kt-pin')) {
