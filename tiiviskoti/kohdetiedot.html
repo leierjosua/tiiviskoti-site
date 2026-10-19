@@ -102,6 +102,25 @@ textarea.kt-ta{width:100%;margin-top:10px;font:inherit;font-size:16px;color:var(
   border:1.5px solid var(--line2);border-radius:12px;padding:12px 14px;resize:vertical;min-height:84px}
 textarea.kt-ta:focus{outline:none;border-color:var(--green);background:#fff}
 
+.kt-seals{margin:14px 0 0;background:var(--bg);border-radius:14px;padding:12px 10px 8px}
+.kt-seals svg{display:block;width:100%;height:auto;max-width:440px;margin-inline:auto}
+.kt-seals .side{font:800 10.5px Manrope,sans-serif;letter-spacing:.12em;fill:var(--mute)}
+.kt-seals .part{font:700 11.5px Manrope,sans-serif;fill:var(--mute)}
+.kt-seals .wood{fill:#E2CDA8;stroke:#B08D5B;stroke-width:1.5}
+.kt-seals .sash{fill:#fff;stroke:#8FA396;stroke-width:2}
+.kt-seals .glass{stroke:#9CC3DD;stroke-width:3;stroke-linecap:round}
+.kt-seals .seal{fill:#AEB8B1;transition:fill .2s var(--ease)}
+.kt-seals .seal.on{fill:var(--green)}
+.kt-seals .pin{cursor:pointer;outline:none}
+.kt-seals .pin line{stroke:#AEB8B1;stroke-width:1.5}
+.kt-seals .pin circle{fill:#fff;stroke:#AEB8B1;stroke-width:2;transition:all .2s var(--ease)}
+.kt-seals .pin text{font:800 14px Manrope,sans-serif;fill:var(--ink)}
+.kt-seals .pin .lbl{font:700 12.5px Manrope,sans-serif;fill:var(--text)}
+.kt-seals .pin.on circle{fill:var(--green);stroke:var(--green)}
+.kt-seals .pin.on line{stroke:var(--green)}
+.kt-seals .pin.on text:not(.lbl){fill:#fff}
+.kt-seals .pin.on .lbl{fill:var(--green);font-weight:800}
+.kt-seals .pin:focus-visible circle{stroke:var(--ink);stroke-width:3}
 .kt-note{display:flex;gap:10px;font-size:13.5px;color:var(--text);background:var(--green-soft);
   border-radius:12px;padding:11px 13px;margin-top:12px;line-height:1.5}
 .kt-note svg{flex:none;width:18px;height:18px;color:var(--green);margin-top:1px}
@@ -214,7 +233,39 @@ dialog.kt-later .row .btn{flex:1}
 
       <div class="kt-q">
         <span class="ql">Missä kohdissa ikkunassa on tiivisteitä?</span>
-        <p class="qh">Valitse kaikki, jotka löydät. Lähikuva tiivisteestä auttaa, jos et ole varma.</p>
+        <p class="qh">Avaa ikkuna ja katso, missä kohdissa on kumi- tai harjatiiviste. Valitse kaikki, jotka löydät.
+          Voit myös napauttaa numeroa kuvassa.</p>
+        <figure class="kt-seals" aria-label="Kuva ikkunan poikkileikkauksesta: tiivisteiden kohdat 1 sisäpuite, 2 sisäkarmi, 3 ulkopuite">
+          <svg viewBox="0 0 360 214" id="sealsSvg" role="img">
+            <text class="side" x="14" y="20">SISÄLLÄ</text>
+            <text class="side" x="346" y="20" text-anchor="end">ULKONA</text>
+            <!-- karmi (puu) ja sisäkarmin vaste -->
+            <path class="wood" d="M30 150V122H166V96H192V122H330V150Z" />
+            <text class="part" x="42" y="141">karmi</text>
+            <!-- sisäpuite -->
+            <rect class="sash" x="66" y="46" width="68" height="72" rx="5" />
+            <line class="glass" x1="100" y1="56" x2="100" y2="108" />
+            <text class="part" x="100" y="40" text-anchor="middle">sisäpuite</text>
+            <!-- ulkopuite -->
+            <rect class="sash" x="236" y="46" width="68" height="72" rx="5" />
+            <line class="glass" x1="270" y1="56" x2="270" y2="108" />
+            <text class="part" x="270" y="40" text-anchor="middle">ulkopuite</text>
+            <!-- tiivisteet -->
+            <rect class="seal" data-v="sisapuite" x="74" y="114" width="52" height="7" rx="3.5" />
+            <rect class="seal" data-v="sisakarmi" x="159" y="98" width="7" height="24" rx="3.5" />
+            <rect class="seal" data-v="ulkopuite" x="244" y="114" width="52" height="7" rx="3.5" />
+            <!-- numerot -->
+            <g class="pin" data-v="sisapuite" tabindex="0" role="button" aria-label="1 Sisäpuitteessa">
+              <line x1="100" y1="124" x2="100" y2="166" /><circle cx="100" cy="178" r="13" /><text x="100" y="183" text-anchor="middle">1</text>
+              <text class="lbl" x="100" y="207" text-anchor="middle">Sisäpuite</text></g>
+            <g class="pin" data-v="sisakarmi" tabindex="0" role="button" aria-label="2 Sisäkarmissa">
+              <line x1="162" y1="124" x2="184" y2="166" /><circle cx="184" cy="178" r="13" /><text x="184" y="183" text-anchor="middle">2</text>
+              <text class="lbl" x="184" y="207" text-anchor="middle">Sisäkarmi</text></g>
+            <g class="pin" data-v="ulkopuite" tabindex="0" role="button" aria-label="3 Ulkopuitteessa">
+              <line x1="270" y1="124" x2="270" y2="166" /><circle cx="270" cy="178" r="13" /><text x="270" y="183" text-anchor="middle">3</text>
+              <text class="lbl" x="270" y="207" text-anchor="middle">Ulkopuite</text></g>
+          </svg>
+        </figure>
         <div class="kt-chips stack">
           <label class="kt-chip"><input type="checkbox" name="ikkuna_tiivisteet" value="sisapuite"><span>1. Sisäpuitteessa</span></label>
           <label class="kt-chip"><input type="checkbox" name="ikkuna_tiivisteet" value="sisakarmi"><span>2. Sisäkarmissa</span></label>
@@ -479,6 +530,16 @@ function syncSeals(changed) {
     else boxes.find((b) => b.value === 'en_tieda').checked = false;
   }
   $('ikkuna_tiivisteet_muu').hidden = !boxes.find((b) => b.value === 'muu').checked;
+  /* Kuva seuraa valintoja: valitut kohdat vihreällä. */
+  for (const el of document.querySelectorAll('#sealsSvg [data-v]')) {
+    el.classList.toggle('on', !!boxes.find((b) => b.value === el.dataset.v)?.checked);
+  }
+}
+/* Numeron napautus kuvassa = sama kuin vaihtoehdon napautus. */
+for (const pin of document.querySelectorAll('#sealsSvg .pin')) {
+  const toggle = () => document.querySelector(`[name="ikkuna_tiivisteet"][value="${pin.dataset.v}"]`).click();
+  pin.addEventListener('click', toggle);
+  pin.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
 }
 
 /* ---------- edistyminen ---------- */
