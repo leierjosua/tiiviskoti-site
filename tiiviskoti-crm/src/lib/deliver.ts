@@ -11,6 +11,7 @@ import {
 } from './mail-templates';
 import { SENDER_EMAIL } from './google';
 import { dateKeyOf, timeOf } from './time';
+import { ensureSurvey, surveyUrl } from './survey';
 
 /* =========================================================
    Varauksen jälkitoimet: vahvistusposti ja kalenteritapahtuma.
@@ -45,6 +46,8 @@ export type DeliverResult = {
   mail: { ok: boolean; id?: string; error?: string };
   workOrder: { ok: boolean; id?: string; error?: string; to?: string };
   calendar: { ok: boolean; id?: string; error?: string };
+  /** Kohdetietokyselyn token, null jos db/037 ajamatta. */
+  surveyToken: string | null;
 };
 
 /** Työn tekijä: kalenterin kautta löytyvä asentaja. Jos sähköpostia ei ole,
@@ -80,7 +83,12 @@ export async function saveJobLines(jobId: string, lines: MailLine[]): Promise<vo
 }
 
 export async function deliverBooking(input: DeliverInput): Promise<DeliverResult> {
-  const result: DeliverResult = { mail: { ok: false }, workOrder: { ok: false }, calendar: { ok: false } };
+  /* Kysely luodaan ennen postia, jotta linkki on vahvistuksessa. Sama työ
+     saa aina saman linkin, myös uudelleenlähetetyssä vahvistuksessa. */
+  const surveyToken = await ensureSurvey(input.jobId);
+  const result: DeliverResult = {
+    mail: { ok: false }, workOrder: { ok: false }, calendar: { ok: false }, surveyToken,
+  };
 
   const data: ConfirmationData = {
     jobNumber: input.jobNumber,
@@ -94,6 +102,7 @@ export async function deliverBooking(input: DeliverInput): Promise<DeliverResult
     totalCents: input.totalCents,
     netCents: input.netCents,
     notes: input.notes,
+    surveyUrl: surveyToken ? surveyUrl(surveyToken) : null,
   };
 
   if (!googleConfigured()) {
@@ -222,7 +231,7 @@ export type DeliverKartoitusInput = KartoitusData & {
 };
 
 export async function deliverKartoitus(input: DeliverKartoitusInput): Promise<DeliverResult> {
-  const result: DeliverResult = { mail: { ok: false }, workOrder: { ok: false }, calendar: { ok: false } };
+  const result: DeliverResult = { mail: { ok: false }, workOrder: { ok: false }, calendar: { ok: false }, surveyToken: null };
 
   if (!googleConfigured()) {
     const error = 'Google-tunnuksia ei ole asetettu';

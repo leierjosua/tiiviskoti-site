@@ -1,5 +1,5 @@
 import 'server-only';
-import { dateKeyOf, isoWeekday, timeOf, weekdayName } from './time';
+import { addDays, dateKeyOf, isoWeekday, timeOf, weekdayName, weekdayShort } from './time';
 
 /* =========================================================
    Sähköpostipohjat.
@@ -38,6 +38,8 @@ export type ConfirmationData = {
   totalCents: number;
   netCents: number;
   notes?: string | null;
+  /** Kohdetietokyselyn linkki (lib/survey.ts). Puuttuu jos db/037 ajamatta. */
+  surveyUrl?: string | null;
 };
 
 const eur = (cents: number) =>
@@ -47,6 +49,58 @@ function whenText(startsAt: Date, endsAt: Date): string {
   const key = dateKeyOf(startsAt);
   const [, m, d] = key.split('-').map(Number);
   return `${weekdayName(isoWeekday(key))} ${d}.${m}.${key.slice(0, 4)} klo ${timeOf(startsAt)}–${timeOf(endsAt)}`;
+}
+
+/* Kohdetiedot pyydetään viimeistään kaksi päivää ennen käyntiä, jotta
+   asentaja ehtii hankkia oikean profiilin. Jos käynti on jo sitä
+   lähempänä, pyydetään "mahdollisimman pian" eikä mennyttä päivää. */
+function surveyDeadline(startsAt: Date): string {
+  const key = addDays(dateKeyOf(startsAt), -2);
+  if (key <= dateKeyOf(new Date())) return 'mahdollisimman pian';
+  const [, m, d] = key.split('-').map(Number);
+  return `viimeistään ${weekdayShort(isoWeekday(key))} ${d}.${m}.`;
+}
+
+/* Kuvaohje on sama postissa ja kyselysivulla (tiiviskoti/kohdetiedot.html). */
+const SURVEY_STEPS = [
+  ['Ikkuna sisältä', 'avaa ikkuna niin, että puitteet ja karmi näkyvät'],
+  ['Lähikuva tiivisteestä', 'nykyinen tiiviste karmin tai puitteen reunassa'],
+  ['Ikkuna ulkoa', 'koko ikkuna talon ulkopuolelta'],
+] as const;
+
+function surveyHtml(data: ConfirmationData): string {
+  if (!data.surveyUrl) return '';
+  const steps = SURVEY_STEPS.map(([h, t], i) => `
+        <tr>
+          <td valign="top" style="padding:6px 10px 6px 0;width:26px">
+            <div style="width:24px;height:24px;border-radius:12px;background:${GREEN};color:#FFFFFF;font-size:13px;font-weight:700;line-height:24px;text-align:center">${i + 1}</div>
+          </td>
+          <td style="padding:6px 0;color:${INK};font-size:14px;line-height:1.5"><strong>${h}</strong> &ndash; <span style="color:${MUTED}">${t}</span></td>
+        </tr>`).join('');
+  return `
+  <tr><td style="padding:22px 28px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:2px solid ${GREEN};border-radius:12px">
+      <tr><td style="padding:20px 20px 18px">
+        <div style="color:${GREEN};font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Tärkeää ennen käyntiä</div>
+        <div style="color:${INK};font-size:18px;font-weight:700;margin-top:4px;line-height:1.35">Täytä kohdetiedot ja lähetä kolme kuvaa</div>
+        <p style="margin:8px 0 12px;color:${MUTED};font-size:14px;line-height:1.6">
+          Näin tiedämme etukäteen, mitä tiivisteprofiilia tarvitaan, ja sovimme kirjallisesti,
+          mitkä puitteet tiivistetään. Täyttö vie noin kaksi minuuttia puhelimella.
+          Ota kuvat yhdestä ikkunasta ja jos varaukseen kuuluu ovi, samat kuvat ovesta.
+        </p>
+        <table role="presentation" cellpadding="0" cellspacing="0">${steps}</table>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:16px"><tr><td style="background:${GREEN};border-radius:10px">
+          <a href="${esc(data.surveyUrl)}" style="display:inline-block;padding:13px 24px;color:#FFFFFF;font-size:15px;font-weight:700;text-decoration:none">Täytä kohdetiedot &rarr;</a>
+        </td></tr></table>
+        <p style="margin:12px 0 0;color:${MUTED};font-size:13px;line-height:1.6">
+          Täytäthän tiedot <strong style="color:${INK}">${surveyDeadline(data.startsAt).replace(/\.$/, '')}</strong>.
+          Tarvitsetko apua kuvien ottamisessa? Soita
+          <a href="tel:${PHONE_HREF}" style="color:${GREEN};font-weight:700;text-decoration:none">${PHONE}</a>.
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+`;
 }
 
 export function confirmationSubject(data: ConfirmationData): string {
@@ -112,6 +166,7 @@ export function confirmationHtml(data: ConfirmationData): string {
     </table>
   </td></tr>
 
+${surveyHtml(data)}
   <tr><td style="padding:24px 28px 0">
     <div style="color:${INK};font-size:15px;font-weight:700;margin-bottom:6px">Tilatut työt</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}
@@ -174,6 +229,15 @@ export function confirmationText(data: ConfirmationData): string {
     '',
     `Yhteensä: ${eur(data.totalCents)} (sis. ALV 25,5 %)`,
     `Kotitalousvähennyksen jälkeen arviolta ${eur(data.netCents)}.`,
+    '',
+    ...(data.surveyUrl ? [
+      '',
+      'TÄRKEÄÄ ENNEN KÄYNTIÄ: täytä kohdetiedot ja lähetä kolme kuvaa',
+      `(${surveyDeadline(data.startsAt)}):`,
+      ...SURVEY_STEPS.map(([h, t], i) => `  ${i + 1}. ${h} – ${t}`),
+      `Kohdetiedot: ${data.surveyUrl}`,
+      `Apua kuvien ottamiseen: ${PHONE}`,
+    ] : []),
     '',
     `Muutokset ja peruutukset: ${PHONE} tai info@tiiviskoti.fi`,
     '',

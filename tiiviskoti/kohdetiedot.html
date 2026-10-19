@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Kohdetiedot — TiivisKoti</title>
+<meta name="description" content="Kerro ikkunoistasi ja ovistasi ennen käyntiä." />
+<!-- Henkilökohtainen linkki, ei hakukoneisiin. -->
+<meta name="robots" content="noindex,nofollow" />
+<meta name="referrer" content="no-referrer" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="_alueet.css" />
+<style>
+/* =========================================================
+   Kohdetietokysely. Asiakas tulee tänne heti varauksen jälkeen
+   (_shared.js ohjaa) tai vahvistuspostin linkistä.
+
+   Vastaukset tallentuvat CRM:ään (tiiviskoti-crm, /api/public/kohdetiedot)
+   ja näkyvät työn sivulla. Kysymysten avaimet ja arvot:
+   PIDÄ SYNKASSA tiiviskoti-crm/src/lib/survey-schema.ts:n kanssa —
+   tuntematon arvo pudotetaan tallennuksessa hiljaa.
+
+   Puhelin ensin: lähes kaikki täyttävät tämän puhelimella, kamera kädessä.
+   ========================================================= */
+button{font-family:inherit}
+body{background:var(--bg);padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+.kt-top{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  max-width:720px;margin-inline:auto;padding:18px 16px}
+.kt-top .logo{font-size:20px}.kt-top .logo .mark{width:30px;height:30px}
+.kt-phone{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:14.5px;color:var(--green);
+  padding:8px 12px;border-radius:999px;background:var(--green-soft)}
+.kt-phone svg{width:16px;height:16px}
+main{max-width:720px;margin-inline:auto;padding-inline:16px}
+
+/* ---------- vahvistusbanneri ---------- */
+.kt-ok{display:flex;gap:14px;align-items:flex-start;background:var(--deep);color:var(--dtext);
+  border-radius:var(--r-lg);padding:18px 18px;margin-top:4px}
+.kt-ok .ic{flex:none;width:38px;height:38px;border-radius:50%;background:var(--green-l);display:grid;place-items:center}
+.kt-ok .ic svg{width:20px;height:20px;color:#06231a}
+.kt-ok b{color:#fff;font-size:17px;display:block}
+.kt-ok p{font-size:14.5px;margin-top:2px;line-height:1.5}
+.kt-ok .ref{font-variant-numeric:tabular-nums;color:var(--dmute)}
+
+/* ---------- otsikko ---------- */
+.kt-head{padding:28px 0 8px}
+.kt-head h1{font-size:clamp(27px,6vw,38px);letter-spacing:-.03em;line-height:1.1}
+.kt-head p{color:var(--text);font-size:16.5px;margin-top:10px;max-width:56ch}
+.kt-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.kt-meta span{font-size:13px;font-weight:700;color:var(--green);background:var(--green-soft);
+  padding:5px 11px;border-radius:999px}
+
+/* ---------- osio ---------- */
+.kt-sec{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:22px 18px;margin-top:16px;box-shadow:var(--sh)}
+.kt-sec>h2{font-size:21px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.kt-sec>h2 .n{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;
+  font-size:14px;display:grid;place-items:center;flex:none}
+.kt-sec>.lead{font-size:14.5px;color:var(--mute);margin-top:6px}
+
+/* ---------- kuvaruudut ---------- */
+.kt-photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.kt-ph{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:6px;aspect-ratio:4/5;border:1.5px dashed var(--line2);border-radius:14px;
+  background:var(--bg);cursor:pointer;padding:10px 8px;overflow:hidden;
+  transition:border-color .18s var(--ease),background .18s var(--ease)}
+.kt-ph:hover,.kt-ph:focus-within{border-color:var(--green);background:var(--green-soft)}
+.kt-ph input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.kt-ph .ill{width:44px;height:44px;color:var(--green)}
+.kt-ph .t{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.2}
+.kt-ph .h{font-size:11.5px;color:var(--mute);line-height:1.3}
+.kt-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.kt-ph .badge{position:absolute;left:8px;right:8px;bottom:8px;display:flex;align-items:center;gap:6px;
+  justify-content:center;font-size:12px;font-weight:800;color:#fff;background:rgba(22,58,40,.82);
+  border-radius:999px;padding:5px 8px;backdrop-filter:blur(4px)}
+.kt-ph .badge svg{width:14px;height:14px}
+.kt-ph.has{border-style:solid;border-color:var(--green)}
+.kt-ph.busy::after{content:"";position:absolute;inset:0;background:rgba(246,247,243,.7)
+  center/28px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='20' fill='none' stroke='%23217A4E' stroke-width='5' stroke-dasharray='90 40'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='.8s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/svg%3E")}
+.kt-ph.err{border-color:#C2410C}
+.kt-tip{font-size:13px;color:var(--mute);margin-top:10px}
+
+/* ---------- kysymykset ---------- */
+.kt-q{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.kt-q>label,.kt-q>.ql{display:block;font-weight:800;color:var(--ink);font-size:16px;line-height:1.35}
+.kt-q .qh{font-size:13.5px;color:var(--mute);margin-top:4px}
+.kt-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.kt-chip{position:relative}
+.kt-chip input{position:absolute;opacity:0;pointer-events:none}
+.kt-chip span{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:10px 16px;border-radius:12px;
+  border:1.5px solid var(--line2);background:var(--card);font-weight:700;font-size:15px;color:var(--ink);
+  cursor:pointer;transition:all .15s var(--ease)}
+.kt-chip input:focus-visible+span{outline:2px solid var(--green);outline-offset:2px}
+.kt-chip input:checked+span{border-color:var(--green);background:var(--green);color:#fff}
+.kt-chips.stack{flex-direction:column}
+.kt-chips.stack .kt-chip span{width:100%;display:block;line-height:1.35}
+.kt-chip small{font-weight:600;opacity:.75}
+textarea.kt-ta{width:100%;margin-top:10px;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);
+  border:1.5px solid var(--line2);border-radius:12px;padding:12px 14px;resize:vertical;min-height:84px}
+textarea.kt-ta:focus{outline:none;border-color:var(--green);background:#fff}
+
+/* ---------- puitekaavio ---------- */
+.kt-diagram{margin-top:14px;background:var(--bg);border-radius:14px;padding:14px 12px 10px}
+.kt-diagram svg{width:100%;height:auto;max-width:420px;margin-inline:auto}
+.kt-diagram .sash{fill:#fff;stroke:#9DB2A5;stroke-width:2;transition:all .2s var(--ease)}
+.kt-diagram .sash.on{fill:var(--green-soft);stroke:var(--green);stroke-width:3}
+.kt-diagram .glass{stroke:#B9D4E6;stroke-width:3}
+.kt-diagram .seal{fill:var(--green-l);opacity:0;transition:opacity .2s var(--ease)}
+.kt-diagram .seal.on{opacity:1}
+.kt-diagram text{font-family:Manrope,sans-serif;font-weight:800;font-size:13px;fill:var(--ink)}
+.kt-diagram text.side{font-size:10.5px;letter-spacing:.12em;fill:var(--mute)}
+.kt-diagram .hide{display:none}
+.kt-note{display:flex;gap:10px;font-size:13.5px;color:var(--text);background:var(--green-soft);
+  border-radius:12px;padding:11px 13px;margin-top:12px;line-height:1.5}
+.kt-note svg{flex:none;width:18px;height:18px;color:var(--green);margin-top:1px}
+
+/* ---------- apu ---------- */
+.kt-help{display:flex;gap:14px;align-items:center;margin-top:16px;padding:18px;border-radius:var(--r-lg);
+  background:var(--alt)}
+.kt-help .ic{flex:none;width:44px;height:44px;border-radius:50%;background:var(--card);display:grid;place-items:center;color:var(--green)}
+.kt-help .ic svg{width:22px;height:22px}
+.kt-help b{display:block;color:var(--ink);font-size:15.5px}
+.kt-help p{font-size:14px;color:var(--text)}
+.kt-help a{color:var(--green);font-weight:800;white-space:nowrap}
+
+/* ---------- alapalkki ---------- */
+.kt-bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.kt-bar .in{max-width:720px;margin-inline:auto;display:flex;align-items:center;gap:10px}
+.kt-bar .btn{padding:13px 18px;font-size:15.5px}
+.kt-bar .btn-p{flex:1}
+.kt-prog{flex:none;font-size:12.5px;color:var(--mute);font-weight:700;line-height:1.25;min-width:70px}
+.kt-prog .bar{display:block;height:5px;border-radius:5px;background:var(--line);margin-top:5px;overflow:hidden}
+.kt-prog .bar i{display:block;height:100%;width:0;background:var(--green);transition:width .3s var(--ease)}
+
+/* ---------- tilaviestit ---------- */
+.kt-state{text-align:center;padding:70px 10px}
+.kt-state h1{font-size:28px}
+.kt-state p{color:var(--text);margin:10px auto 0;max-width:46ch}
+.kt-state .btn{margin-top:20px}
+.kt-saved{font-size:12px;color:var(--mute);text-align:center;margin-top:14px;min-height:18px}
+.kt-done .ic{width:64px;height:64px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;margin:0 auto 18px}
+.kt-done .ic svg{width:32px;height:32px}
+[hidden]{display:none!important}
+
+/* ---------- myöhemmin-ikkuna ---------- */
+dialog.kt-later{border:none;border-radius:var(--r-lg);padding:26px 22px 20px;max-width:420px;width:calc(100% - 32px);
+  box-shadow:0 30px 80px -20px rgba(24,58,40,.45);color:var(--text)}
+dialog.kt-later::backdrop{background:rgba(22,58,40,.45)}
+dialog.kt-later h2{font-size:22px}
+dialog.kt-later p{margin-top:10px;font-size:15px}
+dialog.kt-later .row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+dialog.kt-later .row .btn{flex:1}
+
+@media (max-width:420px){
+  .kt-photos{gap:8px}
+  .kt-ph .h{display:none}
+  .kt-ph .t{font-size:12.5px}
+  .kt-bar .btn-o{padding-inline:12px}
+}
+</style>
+</head>
+<body>
+
+<header class="kt-top">
+  <a href="/" class="logo" aria-label="TiivisKoti etusivu"><svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
+  <a class="kt-phone" href="tel:+3584578311972"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>045 7831 1972</a>
+</header>
+
+<main>
+  <!-- Lataus / virhe / valmis -->
+  <section class="kt-state" id="stLoading"><p>Ladataan…</p></section>
+  <section class="kt-state" id="stMissing" hidden>
+    <h1>Linkkiä ei löytynyt</h1>
+    <p>Tarkista, että avasit koko linkin varausvahvistuksesta. Voit myös lähettää tiedot ja kuvat
+      vastaamalla vahvistusviestiin tai soittaa meille.</p>
+    <a class="btn btn-p" href="tel:+3584578311972">Soita 045 7831 1972</a>
+  </section>
+  <section class="kt-state" id="stLocked" hidden>
+    <h1>Kysely on suljettu</h1>
+    <p>Käynti on jo tehty tai peruttu, joten tietoja ei voi enää muuttaa. Jos jokin on kesken, soita meille.</p>
+    <a class="btn btn-p" href="tel:+3584578311972">Soita 045 7831 1972</a>
+  </section>
+  <section class="kt-state kt-done" id="stDone" hidden>
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h1>Kiitos, tiedot on lähetetty!</h1>
+    <p id="doneText">Asentaja käy tiedot ja kuvat läpi ennen käyntiä ja ottaa oikeat tiivisteet mukaan.
+      Jos jotain on epäselvää, soitamme sinulle.</p>
+    <button class="btn btn-o" id="btnEdit" type="button">Muokkaa vastauksia</button>
+  </section>
+
+  <form id="ktForm" hidden novalidate>
+    <div class="kt-ok" id="okBanner" hidden>
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><b>Varaus vahvistettu</b><p><span id="okWhen"></span> · <span class="ref" id="okRef"></span><br>Vahvistus on matkalla sähköpostiisi.</p></div>
+    </div>
+
+    <div class="kt-head">
+      <span class="kicker">Viimeinen vaihe · noin 2 min</span>
+      <h1 id="hTitle">Näytä meille ikkunasi</h1>
+      <p>Kolme kuvaa ja muutama napautus. Näin tiedämme etukäteen, mitä tiivisteprofiilia tarvitaan,
+        ja sovimme jo nyt, mitkä puitteet tiivistetään. Silloin käynnillä ei tule yllätyksiä kummallekaan.</p>
+      <div class="kt-meta" id="meta"></div>
+    </div>
+
+    <!-- ===================== IKKUNAT ===================== -->
+    <section class="kt-sec" id="secWin" data-kind="ikkuna">
+      <h2><span class="n">1</span>Ikkunat</h2>
+      <p class="lead">Valitse yksi tyypillinen ikkuna ja kuvaa se. Jos ikkunat ovat erilaisia, kerro siitä lopussa.</p>
+      <div class="kt-photos" data-photos="ikkuna"></div>
+      <p class="kt-tip">Vinkki: avaa ikkuna kokonaan ja kuvaa niin, että sekä puitteen reuna että karmi näkyvät.</p>
+
+      <div class="kt-q">
+        <span class="ql">Montako puitetta ikkunassa on?</span>
+        <p class="qh">Puite = lasia kehystävä avautuva osa. Vanhoissa ikkunoissa on usein kolme peräkkäin.</p>
+        <div class="kt-chips">
+          <label class="kt-chip"><input type="radio" name="ikkuna_puitteet" value="2"><span>2 puitetta</span></label>
+          <label class="kt-chip"><input type="radio" name="ikkuna_puitteet" value="3"><span>3 puitetta</span></label>
+          <label class="kt-chip"><input type="radio" name="ikkuna_puitteet" value="en_tieda"><span>En osaa sanoa</span></label>
+        </div>
+      </div>
+
+      <div class="kt-q">
+        <span class="ql">Mitkä puitteet tiivistetään?</span>
+        <p class="qh">Puitteet numeroidaan sisältä ulospäin. Hintaan sisältyy kahden puitteen tiivistys;
+          kolmas puite on lisätyö, 20 € ikkunaa kohti.</p>
+        <div class="kt-diagram" aria-hidden="true">
+          <svg viewBox="0 0 400 150" id="diagram">
+            <text class="side" x="8" y="18">SISÄLLÄ</text>
+            <text class="side" x="392" y="18" text-anchor="end">ULKONA</text>
+            <!-- seinä -->
+            <rect x="40" y="28" width="320" height="10" rx="2" fill="#E4E8E0"/>
+            <rect x="40" y="120" width="320" height="10" rx="2" fill="#E4E8E0"/>
+            <g data-s="1"><rect class="sash" x="78" y="42" width="34" height="74" rx="4"/><line class="glass" x1="95" y1="50" x2="95" y2="108"/><rect class="seal" x="72" y="44" width="5" height="70" rx="2"/><text x="95" y="146" text-anchor="middle">1</text></g>
+            <g data-s="2"><rect class="sash" x="150" y="42" width="34" height="74" rx="4"/><line class="glass" x1="167" y1="50" x2="167" y2="108"/><rect class="seal" x="144" y="44" width="5" height="70" rx="2"/><text x="167" y="146" text-anchor="middle">2</text></g>
+            <g data-s="3"><rect class="sash" x="268" y="42" width="34" height="74" rx="4"/><line class="glass" x1="285" y1="50" x2="285" y2="108"/><rect class="seal" x="262" y="44" width="5" height="70" rx="2"/><text x="285" y="146" text-anchor="middle">3</text></g>
+          </svg>
+        </div>
+        <div class="kt-chips stack">
+          <label class="kt-chip"><input type="radio" name="ikkuna_tiivistetaan" value="1-2"><span>Sisäpuitteet 1 ja 2 <small>· sisältyy hintaan</small></span></label>
+          <label class="kt-chip"><input type="radio" name="ikkuna_tiivistetaan" value="1-2-3"><span>Kaikki kolme: 1, 2 ja ulkopuite 3 <small>· +20 € / ikkuna</small></span></label>
+          <label class="kt-chip"><input type="radio" name="ikkuna_tiivistetaan" value="1"><span>Vain sisin puite 1</span></label>
+          <label class="kt-chip"><input type="radio" name="ikkuna_tiivistetaan" value="en_tieda"><span>En tiedä, katsotaan yhdessä paikan päällä</span></label>
+        </div>
+        <div class="kt-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          <span>Sisäpuolen tiiviys ratkaisee vedon ja lämmön. Jos ulkopuite tiivistetään, siihen jätetään aina
+            noin 5 cm:n tuuletusrako, jotta lasien väliin ei kerry kosteutta.</span></div>
+      </div>
+
+      <div class="kt-q">
+        <span class="ql">Onko ikkunan karmissa tai puitteessa ura tiivisteelle?</span>
+        <p class="qh">Ura on kapea kolo reunassa, johon tiiviste painetaan. Näkyy yleensä lähikuvassa. Jos et ole varma, kuva riittää.</p>
+        <div class="kt-chips">
+          <label class="kt-chip"><input type="radio" name="ikkuna_ura" value="kylla"><span>Kyllä</span></label>
+          <label class="kt-chip"><input type="radio" name="ikkuna_ura" value="ei"><span>Ei</span></label>
+          <label class="kt-chip"><input type="radio" name="ikkuna_ura" value="en_tieda"><span>En tiedä</span></label>
+        </div>
+      </div>
+
+      <div class="kt-q">
+        <span class="ql">Aukeavatko kaikki ikkunat?</span>
+        <div class="kt-chips">
+          <label class="kt-chip"><input type="radio" name="aukeavat" value="kaikki"><span>Kaikki aukeavat</span></label>
+          <label class="kt-chip"><input type="radio" name="aukeavat" value="osa_jumissa"><span>Osa jumissa tai maalattu kiinni</span></label>
+          <label class="kt-chip"><input type="radio" name="aukeavat" value="en_tieda"><span>En tiedä</span></label>
+        </div>
+      </div>
+
+      <div class="kt-q">
+        <span class="ql">Onko lasien välissä sälekaihtimia?</span>
+        <div class="kt-chips">
+          <label class="kt-chip"><input type="radio" name="saleet" value="kylla"><span>Kyllä</span></label>
+          <label class="kt-chip"><input type="radio" name="saleet" value="ei"><span>Ei</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== OVET ===================== -->
+    <section class="kt-sec" id="secDoor" data-kind="ovi">
+      <h2><span class="n">2</span>Ovet</h2>
+      <p class="lead">Samat kuvat yhdestä ovesta, jonka tiivisteet vaihdetaan.</p>
+      <div class="kt-photos" data-photos="ovi"></div>
+
+      <div class="kt-q">
+        <span class="ql">Montako puitetta ovessa on?</span>
+        <p class="qh">Esimerkiksi vanhassa parvekeovessa voi olla erikseen sisä- ja ulkopuite.</p>
+        <div class="kt-chips">
+          <label class="kt-chip"><input type="radio" name="ovi_puitteet" value="1"><span>1 puite</span></label>
+          <label class="kt-chip"><input type="radio" name="ovi_puitteet" value="2"><span>2 puitetta</span></label>
+          <label class="kt-chip"><input type="radio" name="ovi_puitteet" value="en_tieda"><span>En osaa sanoa</span></label>
+        </div>
+      </div>
+
+      <div class="kt-q">
+        <span class="ql">Onko oven karmissa ura tiivisteelle?</span>
+        <div class="kt-chips">
+          <label class="kt-chip"><input type="radio" name="ovi_ura" value="kylla"><span>Kyllä</span></label>
+          <label class="kt-chip"><input type="radio" name="ovi_ura" value="ei"><span>Ei</span></label>
+          <label class="kt-chip"><input type="radio" name="ovi_ura" value="en_tieda"><span>En tiedä</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== YLEISTÄ ===================== -->
+    <section class="kt-sec" id="secGen">
+      <h2><span class="n" id="nGen">3</span>Vielä muutama asia</h2>
+
+      <div class="kt-q" style="border:0;padding-top:0;margin-top:16px">
+        <span class="ql">Mikä haittaa eniten?</span>
+        <p class="qh">Voit valita useamman.</p>
+        <div class="kt-chips">
+          <label class="kt-chip"><input type="checkbox" name="ongelmat" value="veto"><span>Vetoa</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ongelmat" value="huurtuminen"><span>Huurtuu</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ongelmat" value="vihellys"><span>Viheltää / humisee</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ongelmat" value="melu"><span>Melu kuuluu sisään</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ongelmat" value="jaykka"><span>Jäykkä tai ei sulkeudu kunnolla</span></label>
+          <label class="kt-chip"><input type="checkbox" name="ongelmat" value="muu"><span>Muu</span></label>
+        </div>
+      </div>
+
+      <div class="kt-q">
+        <label for="saapuminen">Paikalle tulo</label>
+        <p class="qh">Ovikoodi, pysäköinti, lemmikit tai muu mitä asentajan on hyvä tietää.</p>
+        <textarea class="kt-ta" id="saapuminen" name="saapuminen" maxlength="500" rows="2"></textarea>
+      </div>
+
+      <div class="kt-q">
+        <label for="lisatiedot">Muuta kerrottavaa</label>
+        <p class="qh">Esimerkiksi jos ikkunat ovat keskenään erilaisia tai jokin kohde on erityisen huono.</p>
+        <textarea class="kt-ta" id="lisatiedot" name="lisatiedot" maxlength="2000" rows="3"></textarea>
+      </div>
+    </section>
+
+    <div class="kt-help">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+      <div><b>Tarvitsetko apua kuvien kanssa?</b>
+        <p>Soita <a href="tel:+3584578311972">045 7831 1972</a>, niin neuvomme puhelimessa. Voit myös vastata
+          vahvistusviestiin ja liittää kuvat sinne.</p></div>
+    </div>
+    <p class="kt-saved" id="saved" aria-live="polite"></p>
+  </form>
+</main>
+
+<div class="kt-bar" id="bar" hidden>
+  <div class="in">
+    <div class="kt-prog"><span id="progTxt">0 / 0 valmis</span><span class="bar"><i id="progBar"></i></span></div>
+    <button class="btn btn-o" type="button" id="btnLater">Myöhemmin</button>
+    <button class="btn btn-p" type="button" id="btnSend">Lähetä tiedot</button>
+  </div>
+</div>
+
+<dialog class="kt-later" id="dlgLater">
+  <h2>Selvä, jatka myöhemmin</h2>
+  <p>Vastauksesi on tallennettu. Linkki kyselyyn on varausvahvistuksessa sähköpostissasi, ja voit jatkaa
+    siitä mihin jäit.</p>
+  <p>Täytäthän tiedot <b id="laterDl">viimeistään kaksi päivää ennen käyntiä</b>, jotta ehdimme hankkia oikeat tiivisteet.</p>
+  <div class="row">
+    <button class="btn btn-o" type="button" id="laterBack">Jatkan nyt</button>
+    <a class="btn btn-p" href="/">Selvä</a>
+  </div>
+</dialog>
+
+<script type="module">
+const CRM_BASE = 'https://tiiviskoti-crm.vercel.app';
+const API = `${CRM_BASE}/api/public/kohdetiedot`;
+const params = new URLSearchParams(location.search);
+const token = params.get('t') || '';
+const $ = (id) => document.getElementById(id);
+
+/* Kuvapaikat. Avaimet = survey-schema.ts:n PHOTO_SLOTS. */
+const ILL = {
+  sisa: '<svg class="ill" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="8" y="6" width="32" height="36" rx="2"/><path d="M8 6l14 6v36L8 42"/><path d="M24 14v22"/></svg>',
+  tiiviste: '<svg class="ill" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="21" cy="21" r="12"/><path d="M30 30l10 10"/><path d="M15 15v12M21 15v12" stroke-dasharray="2 3"/></svg>',
+  ulko: '<svg class="ill" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 22L24 8l18 14"/><rect x="11" y="20" width="26" height="22"/><rect x="18" y="26" width="12" height="10"/><path d="M24 26v10M18 31h12"/></svg>',
+};
+const SLOTS = {
+  ikkuna: [
+    ['ikkuna_sisa', 'sisa', 'Sisältä', 'Ikkuna auki, puitteet näkyvissä'],
+    ['ikkuna_tiiviste', 'tiiviste', 'Tiiviste', 'Lähikuva nykyisestä'],
+    ['ikkuna_ulko', 'ulko', 'Ulkoa', 'Koko ikkuna ulkopuolelta'],
+  ],
+  ovi: [
+    ['ovi_sisa', 'sisa', 'Sisältä', 'Ovi auki, karmi näkyvissä'],
+    ['ovi_tiiviste', 'tiiviste', 'Tiiviste', 'Lähikuva nykyisestä'],
+    ['ovi_ulko', 'ulko', 'Ulkoa', 'Koko ovi ulkopuolelta'],
+  ],
+};
+const CHECK = '<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+let survey = null;
+const photos = {};          // slot → esikatseluosoite
+const show = (id) => {
+  for (const s of ['stLoading','stMissing','stLocked','stDone','ktForm']) $(s).hidden = s !== id;
+  $('bar').hidden = id !== 'ktForm';
+};
+
+/* ---------- lataus ---------- */
+async function load() {
+  if (!/^[A-Za-z0-9_-]{32}$/.test(token)) return show('stMissing');
+  try {
+    const r = await fetch(`${API}?t=${encodeURIComponent(token)}`);
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.survey) return show('stMissing');
+    survey = d.survey;
+  } catch { return show('stMissing'); }
+
+  if (!survey.editable) return show('stLocked');
+  render();
+  show(survey.submittedAt && !params.has('uusi') ? 'stDone' : 'ktForm');
+}
+
+function whenText(iso) {
+  const d = new Date(iso);
+  const wd = d.toLocaleDateString('fi-FI', { weekday: 'short', timeZone: 'Europe/Helsinki' });
+  const day = d.toLocaleDateString('fi-FI', { day: 'numeric', month: 'numeric', timeZone: 'Europe/Helsinki' });
+  const t = d.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Helsinki' });
+  return `${wd} ${day} klo ${t}`;
+}
+function deadlineText(iso) {
+  const d = new Date(iso); d.setDate(d.getDate() - 2);
+  if (d <= new Date()) return 'mahdollisimman pian';
+  const wd = d.toLocaleDateString('fi-FI', { weekday: 'short', timeZone: 'Europe/Helsinki' });
+  const day = d.toLocaleDateString('fi-FI', { day: 'numeric', month: 'numeric', timeZone: 'Europe/Helsinki' });
+  return `viimeistään ${wd} ${day}`;
+}
+
+/* ---------- piirto ---------- */
+function render() {
+  const s = survey;
+  /* Näytetään vain varaukseen kuuluvat osiot. 0/0 = rivejä ei tiedetä
+     (esim. hallinnasta luotu työ ilman rivejä) → molemmat. */
+  const unknown = !s.windows && !s.doors;
+  const hasWin = unknown || s.windows > 0, hasDoor = unknown || s.doors > 0;
+  $('secWin').hidden = !hasWin;
+  $('secDoor').hidden = !hasDoor;
+  $('secDoor').querySelector('.n').textContent = hasWin ? '2' : '1';
+  $('nGen').textContent = String((hasWin ? 1 : 0) + (hasDoor ? 1 : 0) + 1);
+  $('hTitle').textContent = hasWin && hasDoor ? 'Näytä meille ikkunasi ja ovesi' : hasWin ? 'Näytä meille ikkunasi' : 'Näytä meille ovesi';
+
+  if (params.has('uusi')) {
+    $('okBanner').hidden = false;
+    $('okWhen').textContent = whenText(s.startsAt);
+    $('okRef').textContent = s.jobNumber;
+  }
+  const meta = [whenText(s.startsAt), s.address, s.jobNumber].filter(Boolean);
+  if (params.has('uusi')) meta.length = 0;
+  $('meta').innerHTML = meta.map((m) => `<span>${esc(m)}</span>`).join('');
+  $('laterDl').textContent = deadlineText(s.startsAt) === 'mahdollisimman pian'
+    ? 'mahdollisimman pian' : `${deadlineText(s.startsAt)} (kaksi päivää ennen käyntiä)`;
+
+  for (const [kind, list] of Object.entries(SLOTS)) {
+    const host = document.querySelector(`[data-photos="${kind}"]`);
+    host.innerHTML = list.map(([slot, ill, t, h]) => `
+      <label class="kt-ph" data-slot="${slot}">
+        ${ILL[ill]}<span class="t">${t}</span><span class="h">${h}</span>
+        <input type="file" accept="image/*" aria-label="${t}: ${h}">
+      </label>`).join('');
+  }
+  Object.assign(photos, s.photos || {});
+  for (const [slot, url] of Object.entries(photos)) paintPhoto(slot, url);
+  document.querySelectorAll('.kt-ph input').forEach((inp) =>
+    inp.addEventListener('change', () => inp.files[0] && upload(inp.closest('.kt-ph').dataset.slot, inp.files[0], inp)));
+
+  // aiemmat vastaukset lomakkeelle
+  const a = s.answers || {};
+  for (const [k, v] of Object.entries(a)) {
+    if (Array.isArray(v)) v.forEach((x) => { const el = document.querySelector(`[name="${k}"][value="${x}"]`); if (el) el.checked = true; });
+    else {
+      const el = document.querySelector(`[name="${k}"][value="${CSS.escape(v)}"]`);
+      if (el) el.checked = true;
+      else if ($(k) && $(k).tagName === 'TEXTAREA') $(k).value = v;
+    }
+  }
+  syncDiagram(); progress();
+}
+
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function paintPhoto(slot, url) {
+  const el = document.querySelector(`.kt-ph[data-slot="${slot}"]`);
+  if (!el) return;
+  el.classList.add('has'); el.classList.remove('err');
+  el.querySelector('img')?.remove(); el.querySelector('.badge')?.remove();
+  const img = new Image(); img.alt = ''; img.src = url;
+  /* HEIC ei näy kaikissa selaimissa — silloin pelkkä merkki riittää. */
+  img.onerror = () => img.remove();
+  el.prepend(img);
+  el.insertAdjacentHTML('beforeend', `<span class="badge">${CHECK}Vaihda</span>`);
+}
+
+/* ---------- puitekaavio ---------- */
+function syncDiagram() {
+  const n = document.querySelector('[name="ikkuna_puitteet"]:checked')?.value;
+  /* Kahden puitteen ikkunassa molemmat sisältyvät hintaan (perushinta =
+     kaksi puitetta), joten "kaikki kolme" piilotetaan ja "1 ja 2"
+     tarkoittaa sisä- ja ulkopuitetta. Kolmen puitteen ikkunassa kolmas
+     on lisätyö 20 € / ikkuna. */
+  const two = n === '2';
+  const radio = (v) => document.querySelector(`[name="ikkuna_tiivistetaan"][value="${v}"]`);
+  if (two && radio('1-2-3').checked) radio('1-2').checked = true;
+  const lbl = (v) => radio(v).nextElementSibling;
+  lbl('1-2').innerHTML = two
+    ? 'Molemmat: sisäpuite 1 ja ulkopuite 2 <small>· sisältyy hintaan</small>'
+    : 'Sisäpuitteet 1 ja 2 <small>· sisältyy hintaan</small>';
+  radio('1-2-3').closest('.kt-chip').hidden = two;
+  lbl('1').textContent = two ? 'Vain sisäpuite 1' : 'Vain sisin puite 1';
+
+  const which = document.querySelector('[name="ikkuna_tiivistetaan"]:checked')?.value || '';
+  let on = which === 'en_tieda' ? [] : which.split('-');
+  /* Kaaviossa ulkopuite on aina kolmas ruutu; kahden puitteen ikkunassa
+     se on numero 2 ja keskimmäinen ruutu piilotetaan. */
+  if (two) on = on.map((x) => (x === '2' ? '3' : x));
+  document.querySelectorAll('#diagram g[data-s]').forEach((g) => {
+    const s = g.dataset.s;
+    g.classList.toggle('hide', two && s === '2');
+    g.querySelector('.sash').classList.toggle('on', on.includes(s));
+    g.querySelector('.seal').classList.toggle('on', on.includes(s));
+    if (s === '3') g.querySelector('text').textContent = two ? '2' : '3';
+  });
+}
+
+/* ---------- edistyminen ---------- */
+function visibleKeys() {
+  const keys = [];
+  if (!$('secWin').hidden) keys.push('ikkuna_sisa','ikkuna_tiiviste','ikkuna_ulko','ikkuna_puitteet','ikkuna_tiivistetaan','ikkuna_ura');
+  if (!$('secDoor').hidden) keys.push('ovi_sisa','ovi_tiiviste','ovi_ulko','ovi_puitteet','ovi_ura');
+  return keys;
+}
+function progress() {
+  const keys = visibleKeys();
+  const done = keys.filter((k) => photos[k] || document.querySelector(`[name="${k}"]:checked`)).length;
+  $('progTxt').textContent = `${done} / ${keys.length} valmis`;
+  $('progBar').style.width = `${keys.length ? (done / keys.length) * 100 : 0}%`;
+  return { done, total: keys.length };
+}
+
+/* ---------- tallennus ---------- */
+function collect() {
+  const a = {};
+  for (const el of $('ktForm').elements) {
+    if (!el.name) continue;
+    if (el.type === 'radio' && el.checked) a[el.name] = el.value;
+    else if (el.type === 'checkbox' && el.checked) (a[el.name] ||= []).push(el.value);
+    else if (el.tagName === 'TEXTAREA' && el.value.trim()) a[el.name] = el.value.trim();
+  }
+  return a;
+}
+let saveTimer = null, saving = Promise.resolve();
+async function save(submit = false) {
+  clearTimeout(saveTimer);
+  saving = saving.then(async () => {
+    $('saved').textContent = 'Tallennetaan…';
+    try {
+      const r = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ t: token, action: 'save', answers: collect(), submit }) });
+      if (r.status === 409) { show('stLocked'); return false; }
+      if (!r.ok) throw new Error(String(r.status));
+      $('saved').textContent = 'Vastaukset tallennettu';
+      return true;
+    } catch {
+      $('saved').textContent = 'Tallennus ei onnistunut. Tarkista verkkoyhteys.';
+      return false;
+    }
+  });
+  return saving;
+}
+$('ktForm').addEventListener('change', (e) => {
+  if (e.target.type === 'file') return;
+  if (e.target.name?.startsWith('ikkuna_')) syncDiagram();
+  progress();
+  clearTimeout(saveTimer); saveTimer = setTimeout(() => save(false), 700);
+});
+$('ktForm').addEventListener('input', (e) => {
+  if (e.target.tagName !== 'TEXTAREA') return;
+  clearTimeout(saveTimer); saveTimer = setTimeout(() => save(false), 1200);
+});
+
+/* ---------- kuvat ---------- */
+/* Pienennetään ennen latausta: puhelimen 4–8 MB kuva on 4G:llä hidas,
+   ja 2000 px riittää tiivisteen tunnistamiseen. Safari muuntaa samalla
+   HEIC:n JPEG:ksi. Jos selain ei osaa purkaa kuvaa, ladataan alkuperäinen. */
+async function shrink(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, 2000 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.85));
+    return blob && blob.size < file.size ? blob : file;
+  } catch { return file; }
+}
+async function upload(slot, file, input) {
+  const el = input.closest('.kt-ph');
+  el.classList.add('busy'); el.classList.remove('err');
+  try {
+    if (file.size > 15 * 1024 * 1024) throw new Error('liian suuri');
+    const body = await shrink(file);
+    const type = body.type || 'image/jpeg';
+    const p = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ t: token, action: 'photo', slot, contentType: type }) }).then((r) => r.json());
+    if (!p.ok) throw new Error(p.error || 'lupa');
+    const up = await fetch(p.uploadUrl, { method: 'PUT', headers: { 'content-type': type }, body });
+    if (!up.ok) throw new Error('lataus ' + up.status);
+    const c = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ t: token, action: 'photo-done', slot, path: p.path }) }).then((r) => r.json());
+    if (!c.ok) throw new Error(c.error || 'kirjaus');
+    const url = URL.createObjectURL(body);
+    photos[slot] = url;
+    paintPhoto(slot, url);
+    $('saved').textContent = 'Kuva tallennettu';
+  } catch (e) {
+    el.classList.add('err');
+    $('saved').textContent = 'Kuvan lataus ei onnistunut. Yritä uudelleen tai lähetä kuva vastaamalla vahvistusviestiin.';
+  } finally {
+    el.classList.remove('busy'); input.value = ''; progress();
+  }
+}
+
+/* ---------- napit ---------- */
+$('btnSend').addEventListener('click', async () => {
+  const { done, total } = progress();
+  /* Puutteellinenkin lähetys hyväksytään: kuva tai vastaus voi oikeasti
+     puuttua, eikä asiakasta saa jumittaa. Kysytään kuitenkin kerran. */
+  if (done < total && !$('btnSend').dataset.confirm) {
+    $('btnSend').dataset.confirm = '1';
+    $('btnSend').textContent = 'Lähetä silti';
+    $('saved').textContent = `${total - done} kohtaa on vielä tyhjänä. Voit lähettää silti tai täydentää ensin.`;
+    return;
+  }
+  $('btnSend').disabled = true;
+  const ok = await save(true);
+  $('btnSend').disabled = false;
+  if (ok) { show('stDone'); window.scrollTo({ top: 0 }); }
+});
+$('btnLater').addEventListener('click', async () => {
+  save(false);
+  $('dlgLater').showModal();
+});
+$('laterBack').addEventListener('click', () => $('dlgLater').close());
+$('btnEdit').addEventListener('click', () => { show('ktForm'); window.scrollTo({ top: 0 }); });
+
+load();
+</script>
+</body>
+</html>

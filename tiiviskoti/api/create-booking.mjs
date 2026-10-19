@@ -279,6 +279,9 @@ export default async function handler(req, res) {
       // nimellisarvonsa (esim. tilaus pienempi kuin alennus).
       discount_cents: reservation.discountCents ?? 0,
       discount_code: reservation.discountCode ?? null,
+      // Kohdetietokyselyn tunniste: sivu siirtyy kyselyyn heti varauksen
+      // jälkeen. Puuttuu jos CRM:n db/037 on ajamatta → tavallinen kiitos.
+      survey_token: typeof reservation.surveyToken === 'string' ? reservation.surveyToken : null,
     });
   } catch (e) {
     console.error('create-booking error:', e);

@@ -381,6 +381,8 @@ export async function POST(request: Request) {
       /* Sivuston funktio käyttää tätä Metan CAPI-tapahtumassa jos selaimen
          oma `fbc` puuttui. Ei henkilötietoa: Metan oma klikkitunniste. */
       fbc: trailFbc,
+      /* Kohdetietokysely: sivusto avaa sen heti kiitosnäkymän sijaan. */
+      surveyToken: delivery.surveyToken,
       mailSent: delivery.mail.ok,
       workOrderSent: delivery.workOrder.ok,
       calendarCreated: delivery.calendar.ok,

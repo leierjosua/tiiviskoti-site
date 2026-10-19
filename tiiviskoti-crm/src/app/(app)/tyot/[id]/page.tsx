@@ -8,6 +8,7 @@ import { sql } from '@/lib/db';
 import { DeleteJob, EditJobForm, InvoiceMark, RescheduleForm, SendConfirmation, SendOffer, SendReceipt, StatusButtons, TransferJobForm } from './ui';
 import AsennusTyo from './asennus-tyo';
 import { JobPhotos } from './photos';
+import { SurveyCard } from './survey-card';
 import { listJobPhotos } from '@/lib/photos';
 import { fiNumber, getJobReport } from '@/lib/job-report';
 import { WORK_STEPS, missingSteps } from '@/lib/work-report';
@@ -252,6 +253,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             </ul>
           )}
         </Card>
+
+        <SurveyCard jobId={job.id} />
 
         {/* Työraportti vain luettavana: asentaja täyttää sen viimeistelyssä,
             toimisto katsoo ja lataa PDF:n. Kortti näkyy vasta kun raportti on. */}

@@ -4,6 +4,7 @@ import { jobLinks, jobUnitCounts, mateLabel, unitLabel, type JobRow } from '@/li
 import { satisfactionLabel } from '@/lib/completion';
 import { dateKeyOf, formatDateKey, isoWeekday, timeOf, weekdayName } from '@/lib/time';
 import { JobPhotos } from './photos';
+import { SurveyCard } from './survey-card';
 import { listJobPhotos } from '@/lib/photos';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { NoteForm } from './ui';
@@ -226,6 +227,9 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
           </div>
         </Card>
       </div>
+
+      {/* Asiakkaan esitiedot: puitteet, ura, mitkä puitteet tiivistetään. */}
+      <SurveyCard jobId={job.id} />
 
       {/* Kuvat myös asentajalle: hän on se joka seisoo paikan päällä ja
           näkee mitä kannattaa muistaa. */}

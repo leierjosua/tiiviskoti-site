@@ -1782,6 +1782,14 @@ if(bFormEl) bFormEl.addEventListener('submit',async e=>{
       + (aleEur>0 ? ` (koodi ${data.discount_code} −${aleEur.toLocaleString('fi-FI')} €)` : '') + '.';
     document.getElementById('bDoneText').textContent = `Kiitos, ${name}! Olemme sinuun yhteydessä ja vahvistamme ajan osoitteeseen ${payload.email}. Aika: ${when}.${priceTxt}`;
     try{ sessionStorage.removeItem('tk_booking'); }catch(_){}
+    /* Kohdetietokysely heti varauksen perään: kuvat ja puitteet ovat
+       tuoreimmillaan nyt, kun asiakas on vielä puhelimen ääressä. Kysely-
+       sivu näyttää ylhäällä saman vahvistuksen kuin kiitosnäkymä. Ilman
+       tunnistetta (CRM:n db/037 ajamatta) jäädään tavalliseen kiitokseen. */
+    if(data.survey_token){
+      location.href='/kohdetiedot.html?t='+encodeURIComponent(data.survey_token)+'&uusi=1';
+      return;
+    }
     /* Varattu aika katoaa vapaista vasta kun se haetaan uudelleen — nyt
        kalenteri kertoo totuuden eikä sitä voi merkitä paikallisesti. */
     selSlot=null; loadAvailability();
