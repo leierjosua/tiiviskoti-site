@@ -957,7 +957,7 @@ const fiDateTime = (d: Date) =>
   new Intl.DateTimeFormat('fi-FI', { timeZone: 'Europe/Helsinki', day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d);
 
 export function acceptedCustomerSubject(d: AcceptedData): string {
-  return `Tarjous ${d.offerNumber} hyväksytty — ${COMPANY}`;
+  return `Vahvista tarjous ${d.offerNumber} vastaamalla tähän viestiin — ${COMPANY}`;
 }
 
 export function acceptedCustomerHtml(d: AcceptedData): string {
@@ -976,12 +976,20 @@ export function acceptedCustomerHtml(d: AcceptedData): string {
     <div style="color:#BFD8CC;font-size:14px;margin-top:3px">Ovien ja ikkunoiden tiivistys</div>
   </td></tr>
   <tr><td style="padding:28px 28px 8px">
-    <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Tarjous hyväksytty</div>
-    <h1 style="margin:8px 0 0;color:${INK};font-size:23px;line-height:1.3">Kiitos, ${esc(firstName(d.customerName))}!</h1>
+    <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Viimeinen vaihe</div>
+    <h1 style="margin:8px 0 0;color:${INK};font-size:23px;line-height:1.3">Vahvista tarjous vastaamalla tähän viestiin</h1>
     <p style="margin:12px 0 0;color:${MUTED};font-size:15px;line-height:1.6">
-      Hyväksyit tarjouksen <strong style="color:${INK}">${esc(d.offerNumber)}</strong> ${esc(fiDateTime(d.acceptedAt))}
-      nimellä <strong style="color:${INK}">${esc(d.acceptedName)}</strong>. Otamme yhteyttä ja sovimme asennusajan.
+      Kiitos, ${esc(firstName(d.customerName))}! Hyväksyit tarjouksen <strong style="color:${INK}">${esc(d.offerNumber)}</strong>
+      ${esc(fiDateTime(d.acceptedAt))} nimellä <strong style="color:${INK}">${esc(d.acceptedName)}</strong>.
     </p>
+  </td></tr>
+  <tr><td style="padding:16px 28px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:2px solid ${GREEN};border-radius:12px">
+      <tr><td style="padding:16px 18px;color:${INK};font-size:15px;line-height:1.6">
+        <strong>Vastaa tähän sähköpostiin esimerkiksi sanalla &rdquo;Vahvistan&rdquo;.</strong><br>
+        <span style="color:${MUTED}">Tarjous on sitova vasta vahvistuksesi jälkeen. Sen jälkeen sovimme asennusajan kanssasi.</span>
+      </td></tr>
+    </table>
   </td></tr>
   <tr><td style="padding:20px 28px 0">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}
@@ -1007,7 +1015,9 @@ export function acceptedCustomerText(d: AcceptedData): string {
     `Kiitos, ${firstName(d.customerName)}!`,
     '',
     `Hyväksyit tarjouksen ${d.offerNumber} ${fiDateTime(d.acceptedAt)} nimellä ${d.acceptedName}.`,
-    'Otamme yhteyttä ja sovimme asennusajan.',
+    '',
+    'VIIMEINEN VAIHE: vahvista tarjous vastaamalla tähän sähköpostiin, esimerkiksi sanalla "Vahvistan".',
+    'Tarjous on sitova vasta vahvistuksesi jälkeen. Sen jälkeen sovimme asennusajan.',
     '',
     ...d.lines.map((l) => `  ${l.qty > 1 ? `${l.qty}× ` : ''}${l.name}  ${eur(l.sum * 100)}`),
     `Yhteensä ${eur(d.totalCents)} (sis. ALV 25,5 %)`,
@@ -1017,7 +1027,7 @@ export function acceptedCustomerText(d: AcceptedData): string {
 }
 
 export function acceptedOfficeSubject(d: AcceptedData): string {
-  return `✅ Tarjous ${d.offerNumber} hyväksytty — ${d.customerName} ${eur(d.totalCents)}`;
+  return `Tarjous ${d.offerNumber} hyväksytty sivulla, odottaa sähköpostivahvistusta — ${d.customerName} ${eur(d.totalCents)}`;
 }
 
 export function acceptedOfficeText(d: AcceptedData): string {
@@ -1031,6 +1041,6 @@ export function acceptedOfficeText(d: AcceptedData): string {
     d.email ? `Sähköposti: ${d.email}` : '',
     `Summa: ${eur(d.totalCents)}`,
     '',
-    'Seuraava askel: sovi asennusaika ja tee työ tarjoukselta CRM:ssä (Laita aika).',
+    'Asiakkaalle lähti pyyntö vahvistaa tarjous vastaamalla sähköpostiin. Saat erillisen ilmoituksen kun vahvistus tulee.',
   ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
 }

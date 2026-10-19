@@ -22,8 +22,11 @@ export function AcceptForm({ token, offerNumber, totalText, via }: {
         <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full bg-[#2E9E63]">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#06231a" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </div>
-        <p className="text-xl font-extrabold text-white">Tarjous hyväksytty</p>
-        <p className="mt-2 text-sm leading-relaxed">Kiitos! Kuittaus on matkalla sähköpostiisi, ja otamme yhteyttä asennusajan sopimiseksi.</p>
+        <p className="text-xl font-extrabold text-white">Kiitos! Vielä yksi vaihe</p>
+        <p className="mt-2 text-[15px] leading-relaxed">
+          Lähetimme sähköpostin. <b className="text-white">Vahvista tarjous vastaamalla siihen</b>, esimerkiksi sanalla
+          &rdquo;Vahvistan&rdquo;. Tarjous on sitova vasta vahvistuksesi jälkeen.
+        </p>
       </div>
     );
   }

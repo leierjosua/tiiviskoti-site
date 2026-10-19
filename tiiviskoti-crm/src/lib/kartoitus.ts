@@ -85,14 +85,15 @@ export type KartoitusRow = {
   staff_name: string | null;
   offer_number: string | null; offer_status: string | null; offer_total_cents: number | null;
   accept_token: string | null; accepted_at: Date | null; accepted_name: string | null;
-  sent_at: Date | null;
+  sent_at: Date | null; confirmed_at: string | null;
 };
 
 const kartoitusSelect = sql`
   select k.id, k.job_id, k.offer_id, k.staff_id, k.data, k.created_at, k.updated_at,
          s.full_name as staff_name,
          o.offer_number, o.status::text as offer_status, o.total_cents as offer_total_cents,
-         o.accept_token, o.accepted_at, o.accepted_name, o.sent_at
+         o.accept_token, o.accepted_at, o.accepted_name, o.sent_at,
+         o.accepted_meta->'confirm'->>'confirmedAt' as confirmed_at
     from tk.kartoitukset k
     left join tk.staff s on s.id = k.staff_id
     left join tk.offers o on o.id = k.offer_id
@@ -137,6 +138,8 @@ export type PublicOffer = {
   total_cents: number; customer_note: string | null; inclusions: string[] | null;
   status: string; valid_until: Date | null; created_at: Date;
   accepted_at: Date | null; accepted_name: string | null;
+  /** Sähköpostivahvistuksen aika (accepted_meta.confirm.confirmedAt). */
+  confirmed_at: string | null;
 };
 
 export async function offerByToken(token: string): Promise<PublicOffer | null> {
@@ -145,7 +148,8 @@ export async function offerByToken(token: string): Promise<PublicOffer | null> {
     const [row] = await sql<PublicOffer[]>`
       select id, offer_number, kind, customer_name, contact_name, email, address, postal_code, city,
              lines, total_cents, customer_note, inclusions, status::text as status, valid_until,
-             created_at, accepted_at, accepted_name
+             created_at, accepted_at, accepted_name,
+             accepted_meta->'confirm'->>'confirmedAt' as confirmed_at
         from tk.offers where accept_token = ${token}
     `;
     return row ?? null;
@@ -181,4 +185,102 @@ export async function acceptOffer(
     returning id
   `;
   return rows.length ? 'ok' : 'closed';
+}
+
+/* ---------- sähköpostivahvistus ----------
+   Josua 19.10.2026: sivulla hyväksymisen jälkeen asiakkaan on vielä
+   VAHVISTETTAVA tarjous vastaamalla sähköpostiin. Hyväksyntä kartoittajan
+   puhelimella ei yksin todista, että asiakas itse on samaa mieltä — vastaus
+   omasta postista todistaa.
+
+   Tila tallentuu `accepted_meta.confirm`-kenttään (ei uutta migraatiota):
+     { threadId, sentAt, confirmedAt?, from?, snippet?, manualBy? }
+   Vastaus tunnistetaan lukemalla Gmail-ketju (gmail.readonly): ketjussa on
+   viesti jonka lähettäjä ei ole oma osoite ja joka tuli vahvistuspyynnön
+   jälkeen. Jos lukeminen ei onnistu (oikeus puuttuu, asiakas vastasi uutena
+   viestinä), toimisto merkitsee vahvistuksen käsin. */
+
+export type ConfirmState = {
+  threadId?: string | null; sentAt?: string; confirmedAt?: string;
+  from?: string; snippet?: string; manualBy?: string;
+};
+
+export async function setConfirmSent(offerId: string, threadId: string | null): Promise<void> {
+  await sql`
+    update tk.offers
+       set accepted_meta = coalesce(accepted_meta, '{}'::jsonb)
+           || jsonb_build_object('confirm', jsonb_build_object('threadId', ${threadId}::text, 'sentAt', now()))
+     where id = ${offerId}::uuid
+  `;
+}
+
+export async function getConfirm(offerId: string): Promise<ConfirmState | null> {
+  try {
+    const [r] = await sql<{ c: ConfirmState | null }[]>`select accepted_meta->'confirm' as c from tk.offers where id = ${offerId}::uuid`;
+    return r?.c ?? null;
+  } catch (e) {
+    if (migrationMissing(e)) return null;
+    throw e;
+  }
+}
+
+async function markConfirmed(offerId: string, patch: Partial<ConfirmState>): Promise<boolean> {
+  const rows = await sql`
+    update tk.offers
+       set accepted_meta = jsonb_set(coalesce(accepted_meta, '{}'::jsonb), '{confirm}',
+             coalesce(accepted_meta->'confirm', '{}'::jsonb) || ${sql.json({ ...patch, confirmedAt: new Date().toISOString() } as never)})
+     where id = ${offerId}::uuid and accepted_at is not null
+       and (accepted_meta->'confirm'->>'confirmedAt') is null
+    returning id
+  `;
+  return rows.length > 0;
+}
+
+/** Toimisto merkitsee vahvistuksen käsin (esim. asiakas vastasi uutena viestinä tai soitti). */
+export async function confirmManually(offerId: string, staffName: string): Promise<boolean> {
+  return markConfirmed(offerId, { manualBy: staffName });
+}
+
+/**
+ * Tarkistaa onko asiakas vastannut vahvistuspyyntöön. Kutsutaan sivujen
+ * latauksessa — yksi Gmail-pyyntö odottavaa tarjousta kohti.
+ * Palauttaa tilan; `error` kun ketjua ei voitu lukea.
+ */
+export async function checkConfirmation(offerId: string): Promise<ConfirmState & { error?: string }> {
+  const c = await getConfirm(offerId);
+  if (!c || c.confirmedAt || !c.threadId) return c ?? {};
+  const { getThreadMessages, SENDER_EMAIL } = await import('./google');
+  try {
+    const sentAt = c.sentAt ? new Date(c.sentAt).getTime() : 0;
+    const reply = (await getThreadMessages(c.threadId)).find((m) =>
+      m.at.getTime() > sentAt && !m.from.toLowerCase().includes(SENDER_EMAIL.toLowerCase()));
+    if (!reply) return c;
+    if (await markConfirmed(offerId, { from: reply.from.slice(0, 200), snippet: reply.snippet })) {
+      await notifyConfirmed(offerId, reply.from, reply.snippet).catch((e) => console.error('vahvistusilmoitus:', e));
+    }
+    return { ...c, confirmedAt: reply.at.toISOString(), from: reply.from, snippet: reply.snippet };
+  } catch (e) {
+    return { ...c, error: (e as Error).message };
+  }
+}
+
+async function notifyConfirmed(offerId: string, from: string, snippet: string) {
+  const [o] = await sql<{ offer_number: string; customer_name: string; total_cents: number }[]>`
+    select offer_number, customer_name, total_cents from tk.offers where id = ${offerId}::uuid`;
+  if (!o) return;
+  const { sendMail, SENDER_EMAIL } = await import('./google');
+  const to = (process.env.LEAD_NOTIFY_TO ?? SENDER_EMAIL).split(',')[0].trim();
+  const eur = (o.total_cents / 100).toLocaleString('fi-FI', { maximumFractionDigits: 2 }) + ' €';
+  const text = [
+    `Asiakas vahvisti tarjouksen ${o.offer_number} sähköpostilla.`,
+    `Asiakas: ${o.customer_name} · ${eur}`,
+    `Vastaus: ${from}`,
+    snippet ? `"${snippet}"` : '',
+    '',
+    'Seuraava askel: sovi asennusaika ja tee työ tarjoukselta CRM:ssä (Laita aika).',
+  ].filter(Boolean).join('\n');
+  await sendMail({
+    to, subject: `✅ Tarjous ${o.offer_number} vahvistettu — ${o.customer_name} ${eur}`,
+    html: `<pre style="font-family:inherit;white-space:pre-wrap">${text.replace(/</g, '&lt;')}</pre>`, text,
+  });
 }

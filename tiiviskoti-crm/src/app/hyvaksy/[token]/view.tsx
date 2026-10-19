@@ -39,7 +39,7 @@ export function OfferView({ o, token, paikalla }: { o: PublicOffer; token: strin
     <Shell>
       <p className="text-[13px] font-bold tracking-[.12em] text-[#217A4E] uppercase">Tarjous {o.offer_number}</p>
       <h1 className="mt-2 text-[30px] leading-tight font-extrabold tracking-tight text-[#183A28]">
-        {o.accepted_at ? 'Tarjous on hyväksytty' : 'Tarkista ja hyväksy tarjous'}
+        {o.accepted_at ? (o.confirmed_at ? 'Tarjous on vahvistettu' : 'Tarjous on hyväksytty') : 'Tarkista ja hyväksy tarjous'}
       </h1>
       <p className="mt-2 text-[15.5px]">
         {o.contact_name ? `${o.customer_name} — ${o.contact_name}` : o.customer_name}
@@ -91,7 +91,15 @@ export function OfferView({ o, token, paikalla }: { o: PublicOffer; token: strin
         {o.accepted_at ? (
           <div className="rounded-2xl bg-[#163A28] p-6 text-[#EAF2EC]">
             <p className="text-lg font-extrabold text-white">Hyväksytty {fiDateTime(o.accepted_at)}</p>
-            <p className="mt-1 text-sm">Hyväksyjä: {o.accepted_name}. Otamme yhteyttä asennusajan sopimiseksi.</p>
+            <p className="mt-1 text-sm">Hyväksyjä: {o.accepted_name}.</p>
+            {o.confirmed_at ? (
+              <p className="mt-2 text-sm">Vahvistettu sähköpostilla. Otamme yhteyttä asennusajan sopimiseksi.</p>
+            ) : (
+              <p className="mt-2 text-[15px]">
+                <b className="text-white">Vielä yksi vaihe:</b> vahvista tarjous vastaamalla sähköpostiin, jonka lähetimme
+                osoitteeseen {o.email}.
+              </p>
+            )}
           </div>
         ) : open ? (
           <AcceptForm token={token} offerNumber={o.offer_number} totalText={eur(o.total_cents)} via={paikalla ? 'paikan-paalla' : 'linkki'} />

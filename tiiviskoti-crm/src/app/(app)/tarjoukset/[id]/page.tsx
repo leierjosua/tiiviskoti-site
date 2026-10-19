@@ -5,6 +5,7 @@ import { getOffer } from '@/lib/data';
 import { sql } from '@/lib/db';
 import { acceptUrl, migrationMissing } from '@/lib/kartoitus';
 import { formatInstant } from '@/lib/time';
+import { ConfirmBox } from '../../kartoitus/confirm-box';
 import { Card, CardHeader, PageHead } from '@/components/ui';
 import { OFFER_STATUS } from '@/lib/offer-status';
 import { OfferStatusButtons, OfferStatusChip, SendDraftButton } from '../ui';
@@ -46,6 +47,7 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
             {formatInstant(acc.accepted_at)} · nimellä <b className="text-white">{acc.accepted_name}</b>
             {acc.accepted_meta?.via === 'paikan-paalla' ? ' · paikan päällä kartoittajan laitteella' : ' · sähköpostin linkistä'}
           </p>
+          <ConfirmBox offerId={id} back={`/tarjoukset/${id}`} />
         </div>
       ) : acc?.accept_token && offer.status === 'sent' ? (
         <p className="rounded-xl bg-accent-dim px-4 py-3 text-sm text-accent">

@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { acceptOffer, offerByToken } from '@/lib/kartoitus';
+import { acceptOffer, offerByToken, setConfirmSent } from '@/lib/kartoitus';
 import { sendMail, SENDER_EMAIL } from '@/lib/google';
 import {
   acceptedCustomerHtml, acceptedCustomerSubject, acceptedCustomerText,
@@ -54,8 +54,15 @@ export async function acceptAction(_prev: AcceptState, formData: FormData): Prom
       email: o.email,
     };
     const office = (process.env.LEAD_NOTIFY_TO ?? SENDER_EMAIL).split(',')[0].trim();
+    /* Vahvistuspyyntö asiakkaalle: hänen vastauksensa samaan ketjuun
+       vahvistaa tarjouksen (lib/kartoitus.ts checkConfirmation). */
+    try {
+      const sent = await sendMail({ to: o.email, subject: acceptedCustomerSubject(d), html: acceptedCustomerHtml(d), text: acceptedCustomerText(d) });
+      await setConfirmSent(o.id, sent.threadId ?? null);
+    } catch (e) {
+      console.error('vahvistuspyyntö:', e);
+    }
     await Promise.allSettled([
-      sendMail({ to: o.email, subject: acceptedCustomerSubject(d), html: acceptedCustomerHtml(d), text: acceptedCustomerText(d) }),
       sendMail({ to: office, subject: acceptedOfficeSubject(d), html: `<pre style="font-family:inherit">${acceptedOfficeText(d).replace(/</g, '&lt;')}</pre>`, text: acceptedOfficeText(d) }),
     ]).then((r) => r.forEach((x) => x.status === 'rejected' && console.error('hyväksyntäposti:', x.reason)));
   }

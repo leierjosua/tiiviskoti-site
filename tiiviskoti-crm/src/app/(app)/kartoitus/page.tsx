@@ -16,8 +16,9 @@ export const dynamic = 'force-dynamic';
 
 const eur = (c: number) => (c / 100).toLocaleString('fi-FI', { maximumFractionDigits: 0 }) + ' €';
 
-function Tila({ status, accepted }: { status: string | null; accepted: boolean }) {
-  const [txt, cls] = accepted ? ['Hyväksytty', 'bg-accent text-white']
+function Tila({ status, accepted, confirmed }: { status: string | null; accepted: boolean; confirmed: boolean }) {
+  const [txt, cls] = confirmed ? ['Vahvistettu', 'bg-accent text-white']
+    : accepted ? ['Odottaa vahvistusta', 'bg-[#FFF4E0] text-warn']
     : status === 'sent' ? ['Lähetetty', 'bg-accent-dim text-accent']
     : status ? [status, 'bg-ink-700 text-muted']
     : ['Ei lähetetty', 'bg-ink-700 text-muted'];
@@ -32,7 +33,7 @@ export default async function KartoitusPage() {
     <div className="space-y-6">
       <PageHead
         title="Kartoitus"
-        sub="Täytä kartoitus paikan päällä, lähetä tarjous ja anna asiakkaan hyväksyä se heti."
+        sub="Täytä kartoitus paikan päällä, lähetä tarjous ja anna asiakkaan hyväksyä se heti. Asiakas vahvistaa vielä vastaamalla sähköpostiin."
         action={<Link href="/kartoitus/uusi" className="rounded-xl bg-accent px-4 py-3 text-sm font-extrabold text-white">+ Uusi kartoitus</Link>}
       />
 
@@ -81,7 +82,7 @@ export default async function KartoitusPage() {
                         {k.offer_total_cents ? ` · ${eur(k.offer_total_cents)}` : ''}
                       </div>
                     </div>
-                    <Tila status={k.offer_status} accepted={!!k.accepted_at} />
+                    <Tila status={k.offer_status} accepted={!!k.accepted_at} confirmed={!!k.confirmed_at} />
                   </Link>
                 </li>
               ))}

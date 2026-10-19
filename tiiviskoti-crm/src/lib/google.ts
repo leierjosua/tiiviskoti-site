@@ -225,7 +225,7 @@ function buildMime(opts: { to: string; subject: string; html: string; text: stri
 
 export async function sendMail(opts: {
   to: string; subject: string; html: string; text: string; attachment?: MailAttachment;
-}): Promise<{ id: string }> {
+}): Promise<{ id: string; threadId?: string }> {
   const token = await accessToken();
   const res = await fetch(
     `https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(SENDER_EMAIL)}/messages/send`,
@@ -237,7 +237,30 @@ export async function sendMail(opts: {
   );
   const text = await res.text();
   if (!res.ok) throw new Error(`Gmail-lähetys epäonnistui: ${res.status} ${text.slice(0, 300)}`);
-  return { id: (JSON.parse(text) as { id: string }).id };
+  const sent = JSON.parse(text) as { id: string; threadId?: string };
+  return { id: sent.id, threadId: sent.threadId };
+}
+
+/**
+ * Viestiketjun viestit (lähettäjä, aika, alku). Käytetään tarjouksen
+ * sähköpostivahvistuksen tunnistamiseen: asiakas vastaa samaan ketjuun.
+ * Vaatii gmail.readonly-oikeuden; ilman sitä heittää virheen.
+ */
+export async function getThreadMessages(threadId: string): Promise<{ id: string; from: string; at: Date; snippet: string }[]> {
+  const token = await accessToken();
+  const res = await fetch(
+    `https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(SENDER_EMAIL)}/threads/${encodeURIComponent(threadId)}?format=metadata&metadataHeaders=From`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Gmail-ketjun luku epäonnistui: ${res.status} ${text.slice(0, 200)}`);
+  const data = JSON.parse(text) as { messages?: { id: string; internalDate: string; snippet?: string; payload?: { headers?: { name: string; value: string }[] } }[] };
+  return (data.messages ?? []).map((m) => ({
+    id: m.id,
+    from: m.payload?.headers?.find((h) => h.name.toLowerCase() === 'from')?.value ?? '',
+    at: new Date(Number(m.internalDate)),
+    snippet: (m.snippet ?? '').slice(0, 200),
+  }));
 }
 
 /* ---------- Calendar ---------- */

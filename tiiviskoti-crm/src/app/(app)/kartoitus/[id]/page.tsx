@@ -5,6 +5,7 @@ import { PageHead } from '@/components/ui';
 import { acceptUrl, getKartoitus } from '@/lib/kartoitus';
 import { formatInstant } from '@/lib/time';
 import { KartoitusForm } from '../form';
+import { ConfirmBox } from '../confirm-box';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +43,7 @@ export default async function KartoitusDetail({ params, searchParams }: {
         <div className="rounded-2xl bg-[#163A28] p-5 text-[#EAF2EC]">
           <p className="text-lg font-extrabold text-white">✓ Asiakas hyväksyi tarjouksen</p>
           <p className="mt-1 text-sm">{formatInstant(k.accepted_at!)} · {k.accepted_name} · {k.offer_total_cents ? eur(k.offer_total_cents) : ''}</p>
+          {k.offer_id && <ConfirmBox offerId={k.offer_id} back={`/kartoitus/${k.id}`} />}
           <p className="mt-2 text-sm">Seuraavaksi: sovi asennusaika ja tee työ tarjoukselta (Tarjous CRM:ssä → Laita aika).</p>
         </div>
       ) : link ? (
