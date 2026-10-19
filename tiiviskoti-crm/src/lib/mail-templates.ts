@@ -500,6 +500,8 @@ export type OfferEmailData = {
       jo edellinen versio, joten viestin on sanottava selvästi että tämä
       korvaa sen — muuten hänellä on kaksi eri summaa samalla numerolla. */
   updated?: boolean;
+  /** Sähköisen hyväksynnän linkki (db/038). Ilman sitä hyväksytään vastaamalla. */
+  acceptUrl?: string | null;
 };
 
 export function offerEmailSubject(data: OfferEmailData): string {
@@ -576,6 +578,13 @@ export function offerEmailHtml(data: OfferEmailData): string {
     <div style="background:${CREAM};border-radius:10px;padding:16px 18px;color:${INK};font-size:15px;line-height:1.7;white-space:pre-line">${esc(data.customerNote)}</div>
   </td></tr>` : ''}
 
+  ${data.acceptUrl ? `<tr><td style="padding:24px 28px 0" align="center">
+    <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="background:${GREEN};border-radius:10px">
+      <a href="${esc(data.acceptUrl)}" style="display:inline-block;padding:15px 30px;color:#FFFFFF;font-size:16px;font-weight:700;text-decoration:none">Hyväksy tarjous &rarr;</a>
+    </td></tr></table>
+    <div style="color:${MUTED};font-size:13px;margin-top:10px">Hyväksyntä vie minuutin. Sovimme sen jälkeen asennusajan kanssasi.</div>
+  </td></tr>` : ''}
+
   <tr><td style="padding:24px 28px 28px">
     <div style="border-top:1px solid #E6E2DA;padding-top:18px;color:${MUTED};font-size:14px;line-height:1.7">
       Kysyttävää tarjouksesta? Soita
@@ -607,7 +616,9 @@ export function offerEmailText(data: OfferEmailData): string {
     `Tarjous on voimassa ${data.validDays} päivää. Työn osuus on eritelty kotitalousvähennystä varten.`,
     ...(inclusions.length ? ['', 'Työhön sisältyy:', ...inclusions.map((i) => `- ${i}`)] : []),
     ...(data.customerNote ? ['', data.customerNote] : []),
-    'Hyväksy tarjous vastaamalla tähän viestiin tai soittamalla.',
+    data.acceptUrl
+      ? `Hyväksy tarjous: ${data.acceptUrl}`
+      : 'Hyväksy tarjous vastaamalla tähän viestiin tai soittamalla.',
     '',
     `${COMPANY} · Y-tunnus ${BUSINESS_ID}`,
     COMPANY_ADDRESS,
@@ -924,4 +935,102 @@ export function kartoitusCalendarDescription(data: KartoitusData): string {
     data.doors ? `Ovia/ikkunoita (arvio): ${data.doors}` : '',
     data.notes ? `\nLisätiedot: ${data.notes}` : '',
   ].filter((l) => l !== '').join('\n');
+}
+
+/* ---------- tarjouksen hyväksyntä ----------
+   Kuittaus asiakkaalle sähköisestä hyväksynnästä ja ilmoitus toimistolle.
+   Kuittaus on asiakkaan kopio siitä mitä hän hyväksyi: summa ja rivit. */
+
+export type AcceptedData = {
+  offerNumber: string;
+  customerName: string;
+  acceptedName: string;
+  acceptedAt: Date;
+  lines: MailLine[];
+  totalCents: number;
+  address?: string | null;
+  phone?: string | null;
+  email?: string | null;
+};
+
+const fiDateTime = (d: Date) =>
+  new Intl.DateTimeFormat('fi-FI', { timeZone: 'Europe/Helsinki', day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d);
+
+export function acceptedCustomerSubject(d: AcceptedData): string {
+  return `Tarjous ${d.offerNumber} hyväksytty — ${COMPANY}`;
+}
+
+export function acceptedCustomerHtml(d: AcceptedData): string {
+  const rows = d.lines.map((l) => `
+    <tr>
+      <td style="padding:8px 0;border-bottom:1px solid #E6E2DA;color:${INK};font-size:14px">${l.qty > 1 ? `<strong>${l.qty}×</strong> ` : ''}${esc(l.name)}</td>
+      <td style="padding:8px 0;border-bottom:1px solid #E6E2DA;text-align:right;color:${INK};font-size:14px;font-weight:600;white-space:nowrap">${eur(l.sum * 100)}</td>
+    </tr>`).join('');
+  return `<!DOCTYPE html>
+<html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:${CREAM};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CREAM};padding:24px 12px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:14px;overflow:hidden">
+  <tr><td style="background:${GREEN};padding:26px 28px">
+    <div style="color:#FFFFFF;font-size:21px;font-weight:700">TiivisKoti</div>
+    <div style="color:#BFD8CC;font-size:14px;margin-top:3px">Ovien ja ikkunoiden tiivistys</div>
+  </td></tr>
+  <tr><td style="padding:28px 28px 8px">
+    <div style="color:${MUTED};font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Tarjous hyväksytty</div>
+    <h1 style="margin:8px 0 0;color:${INK};font-size:23px;line-height:1.3">Kiitos, ${esc(firstName(d.customerName))}!</h1>
+    <p style="margin:12px 0 0;color:${MUTED};font-size:15px;line-height:1.6">
+      Hyväksyit tarjouksen <strong style="color:${INK}">${esc(d.offerNumber)}</strong> ${esc(fiDateTime(d.acceptedAt))}
+      nimellä <strong style="color:${INK}">${esc(d.acceptedName)}</strong>. Otamme yhteyttä ja sovimme asennusajan.
+    </p>
+  </td></tr>
+  <tr><td style="padding:20px 28px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}
+      <tr><td style="padding:12px 0 0;color:${INK};font-size:16px;font-weight:700">Yhteensä</td>
+          <td style="padding:12px 0 0;text-align:right;color:${GREEN};font-size:18px;font-weight:700">${eur(d.totalCents)}</td></tr>
+      <tr><td colspan="2" style="padding:4px 0 0;color:${MUTED};font-size:13px">Sisältää ALV 25,5 %</td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:24px 28px 28px">
+    <div style="border-top:1px solid #E6E2DA;padding-top:18px;color:${MUTED};font-size:14px;line-height:1.7">
+      Kysyttävää? Soita <a href="tel:${PHONE_HREF}" style="color:${GREEN};font-weight:700;text-decoration:none">${PHONE}</a> tai vastaa tähän viestiin.
+    </div>
+  </td></tr>
+  <tr><td style="background:${CREAM};padding:18px 28px;text-align:center;color:${MUTED};font-size:12px;line-height:1.6">
+    <strong>${COMPANY}</strong> &middot; Y-tunnus ${BUSINESS_ID}<br>${COMPANY_ADDRESS}
+  </td></tr>
+</table></td></tr></table>
+</body></html>`;
+}
+
+export function acceptedCustomerText(d: AcceptedData): string {
+  return [
+    `Kiitos, ${firstName(d.customerName)}!`,
+    '',
+    `Hyväksyit tarjouksen ${d.offerNumber} ${fiDateTime(d.acceptedAt)} nimellä ${d.acceptedName}.`,
+    'Otamme yhteyttä ja sovimme asennusajan.',
+    '',
+    ...d.lines.map((l) => `  ${l.qty > 1 ? `${l.qty}× ` : ''}${l.name}  ${eur(l.sum * 100)}`),
+    `Yhteensä ${eur(d.totalCents)} (sis. ALV 25,5 %)`,
+    '',
+    `${COMPANY} · ${PHONE} · info@tiiviskoti.fi`,
+  ].join('\n');
+}
+
+export function acceptedOfficeSubject(d: AcceptedData): string {
+  return `✅ Tarjous ${d.offerNumber} hyväksytty — ${d.customerName} ${eur(d.totalCents)}`;
+}
+
+export function acceptedOfficeText(d: AcceptedData): string {
+  return [
+    `Asiakas hyväksyi tarjouksen ${d.offerNumber} sähköisesti ${fiDateTime(d.acceptedAt)}.`,
+    `Hyväksyjän nimi: ${d.acceptedName}`,
+    '',
+    `Asiakas: ${d.customerName}`,
+    d.address ? `Osoite: ${d.address}` : '',
+    d.phone ? `Puhelin: ${d.phone}` : '',
+    d.email ? `Sähköposti: ${d.email}` : '',
+    `Summa: ${eur(d.totalCents)}`,
+    '',
+    'Seuraava askel: sovi asennusaika ja tee työ tarjoukselta CRM:ssä (Laita aika).',
+  ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
 }

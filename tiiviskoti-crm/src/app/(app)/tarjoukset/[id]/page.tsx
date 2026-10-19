@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireManager } from '@/lib/session';
 import { getOffer } from '@/lib/data';
+import { sql } from '@/lib/db';
+import { acceptUrl, migrationMissing } from '@/lib/kartoitus';
+import { formatInstant } from '@/lib/time';
 import { Card, CardHeader, PageHead } from '@/components/ui';
 import { OFFER_STATUS } from '@/lib/offer-status';
 import { OfferStatusButtons, OfferStatusChip, SendDraftButton } from '../ui';
@@ -25,8 +28,30 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
   if (!offer) notFound();
   const talo = offer.kind === 'taloyhtio';
 
+  /* Sähköinen hyväksyntä (db/038). Erillinen kysely, jottei getOffer kaadu
+     ennen migraatiota. */
+  let acc: { accept_token: string | null; accepted_at: Date | null; accepted_name: string | null; accepted_meta: { via?: string; ip?: string } | null } | undefined;
+  try {
+    [acc] = await sql`select accept_token, accepted_at, accepted_name, accepted_meta from tk.offers where id = ${id}::uuid`;
+  } catch (e) {
+    if (!migrationMissing(e)) throw e;
+  }
+
   return (
     <div className="space-y-6">
+      {acc?.accepted_at ? (
+        <div className="rounded-2xl bg-[#163A28] p-5 text-[#EAF2EC]">
+          <p className="text-lg font-extrabold text-white">✓ Asiakas hyväksyi tarjouksen sähköisesti</p>
+          <p className="mt-1 text-sm">
+            {formatInstant(acc.accepted_at)} · nimellä <b className="text-white">{acc.accepted_name}</b>
+            {acc.accepted_meta?.via === 'paikan-paalla' ? ' · paikan päällä kartoittajan laitteella' : ' · sähköpostin linkistä'}
+          </p>
+        </div>
+      ) : acc?.accept_token && offer.status === 'sent' ? (
+        <p className="rounded-xl bg-accent-dim px-4 py-3 text-sm text-accent">
+          Hyväksyntälinkki: <a href={acceptUrl(acc.accept_token)} target="_blank" rel="noreferrer" className="font-bold underline break-all">{acceptUrl(acc.accept_token)}</a>
+        </p>
+      ) : null}
       <PageHead
         title={`Tarjous ${offer.offer_number}`}
         sub={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}

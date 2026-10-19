@@ -11,6 +11,7 @@ import { generateOfferPdf } from '@/lib/offer-pdf';
 import { MAX_INCLUSIONS, cleanInclusions } from '@/lib/inclusions';
 import { sendMail } from '@/lib/google';
 import { offerEmailSubject, offerEmailHtml, offerEmailText } from '@/lib/mail-templates';
+import { acceptUrl, ensureAcceptToken } from '@/lib/kartoitus';
 
 export type ActionState = { error?: string; ok?: string };
 
@@ -293,7 +294,10 @@ export async function sendProspectOffer(_prev: ActionState, formData: FormData):
     return { error: `Tarjouksen luonti epäonnistui: ${(e as Error).message}` };
   }
 
+  /* Sähköinen hyväksyntä (db/038). Luonnokselle ei: se ei lähde kenellekään. */
+  const acceptToken = d.mode === 'draft' ? null : await ensureAcceptToken(offer.id);
   const mailData = {
+    acceptUrl: acceptToken ? acceptUrl(acceptToken) : null,
     jobNumber: offer.offer_number,
     customerName: d.contactName || d.customerName,
     lines: lines.map((l) => ({
@@ -423,7 +427,9 @@ export async function sendSavedOffer(_prev: ActionState, formData: FormData): Pr
     return { error: `PDF:n luonti epäonnistui: ${(e as Error).message}` };
   }
 
+  const acceptToken = await ensureAcceptToken(offer.id);
   const mailData = {
+    acceptUrl: acceptToken ? acceptUrl(acceptToken) : null,
     jobNumber: offer.offer_number,
     customerName: offer.contact_name || offer.customer_name,
     lines: offer.lines.map((l) => ({

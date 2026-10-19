@@ -25,6 +25,7 @@ const NAV = [
      jälkeen — ei asetusten seassa. Toimistokin näkee sen: myös heillä on
      kalenteri, ja saman sivun käyttäminen pitää ilmoitustavan yhtenä. */
   { href: '/omat-ajat', label: 'Omat ajat', asennus: true },
+  { href: '/kartoitus', label: 'Kartoitus', asennus: true },
   { href: '/tarjoukset', label: 'Tarjoukset', managerOnly: true },
   { href: '/asiakkaat', label: 'Asiakkaat', managerOnly: true, asennus: true },
   { href: '/saatavuus', label: 'Saatavuus', managerOnly: true },
