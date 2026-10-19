@@ -86,6 +86,31 @@ async function accessToken(): Promise<string> {
   return data.access_token;
 }
 
+/* Lukutunnus postilaatikolle (gmail.readonly) — ERILLINEN lähetystunnuksesta.
+   Tuotannon lähetystunnuksella on vain send + calendar, eikä sitä vaihdeta:
+   salattua vanhaa arvoa ei voi ottaa talteen, ja rikkinäinen tunnus
+   pysäyttäisi kaikki vahvistuspostit. Vahvistusten luku käyttää tätä, jos
+   GMAIL_READ_* on asetettu; muuten lähetystunnusta (ja 403 näkyy sivulla). */
+let readToken: { token: string; expiresAt: number } | null = null;
+async function readAccessToken(): Promise<string> {
+  const refresh = process.env.GMAIL_READ_REFRESH_TOKEN;
+  if (!refresh) return accessToken();
+  if (readToken && readToken.expiresAt - 60_000 > Date.now()) return readToken.token;
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token', refresh_token: refresh,
+      client_id: process.env.GMAIL_READ_CLIENT_ID ?? '', client_secret: process.env.GMAIL_READ_CLIENT_SECRET ?? '',
+    }).toString(),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Gmail-lukutunnus ei toimi: ${res.status} ${text.slice(0, 150)}`);
+  const data = JSON.parse(text) as TokenResponse;
+  readToken = { token: data.access_token, expiresAt: Date.now() + (data.expires_in ?? 3600) * 1000 };
+  return readToken.token;
+}
+
 /* ---------- Kunnon tarkistus ---------- */
 
 /** Refresh tokenin tunniste lokitusta varten. Pelkkä tiiviste, ei itse
@@ -247,7 +272,7 @@ export async function sendMail(opts: {
  * Vaatii gmail.readonly-oikeuden; ilman sitä heittää virheen.
  */
 export async function getThreadMessages(threadId: string): Promise<{ id: string; from: string; at: Date; snippet: string }[]> {
-  const token = await accessToken();
+  const token = await readAccessToken();
   const res = await fetch(
     `https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(SENDER_EMAIL)}/threads/${encodeURIComponent(threadId)}?format=metadata&metadataHeaders=From`,
     { headers: { Authorization: `Bearer ${token}` } },
