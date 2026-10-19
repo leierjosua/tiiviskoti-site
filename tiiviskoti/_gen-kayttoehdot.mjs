@@ -94,7 +94,7 @@ const body = `
     </div>
 
     <h2>2. Palvelun sisältö</h2>
-    <p>Tiivistevaihtoon kuuluu vanhojen tiivisteiden poisto, pintojen puhdistus, uudet silikonitiivisteet ja ovien käynnin säätö oven omien säätövarojen puitteissa. Ikkunoissa tiivistetään kaksi puitetta; kolmas puite on lisätyö (20 € / ikkuna). Ikkunoita emme säädä, emmekä korjaa rakenteellisia vikoja, kuten painunutta karmia tai vääntynyttä ovilehteä. Ulko-oviin kuuluu lisäksi lukkojen ja saranoiden öljyäminen. Kynnyskumin vaihto on tarvittaessa erillinen lisätyö. Työ tehdään asiakkaan osoitteessa sovittuna aikana.</p>
+    <p>Tiivistevaihtoon kuuluu vanhojen tiivisteiden poisto, pintojen puhdistus, uudet silikonitiivisteet ja ovien käynnin säätö oven omien säätövarojen puitteissa. Ikkunan hintaan kuuluvat sisäpuitteen ja sisäkarmin tiivisteet; ulkopuitteen tiivistys on lisätyö (20 € / ikkuna) ja mahdollinen kolmas puite hinnoitellaan erikseen. Ikkunoita emme säädä, emmekä korjaa rakenteellisia vikoja, kuten painunutta karmia tai vääntynyttä ovilehteä. Ulko-oviin kuuluu lisäksi lukkojen ja saranoiden öljyäminen. Kynnyskumin vaihto on tarvittaessa erillinen lisätyö. Työ tehdään asiakkaan osoitteessa sovittuna aikana.</p>
     <p>Toiminta-alue on Uusimaa ja Riihimäki. Vahvistamme varauksen yhteydessä, että palvelemme
       antamassasi postinumerossa.</p>
 
@@ -116,9 +116,9 @@ ${ikkunaRivit()}
       Ikkunoiden yksikköhinta määräytyy saman käynnin ikkunamäärän mukaan yllä olevan
       porrastuksen mukaisesti.</p>
     <p><b>Lisätyöt</b> veloitetaan erikseen vain, jos ne on tilattu: karmin ja seinän välin
-      akryylisaumaus 19 € / aukko, kolmannen puitteen tiivistys 20 € / ikkuna sekä kahvan vaihto 29 € / kpl ja vaihdettavan kahvan hinta.
-      Ikkunan hintaan sisältyy kahden puitteen tiivistys ja saranoiden öljyäminen. Kolmannen puitteen
-      (ulkopuite) tiivistys on lisätyö, 20 € / ikkuna. Ikkunoita ei säädetä. Ovien käynnin säätö tehdään
+      akryylisaumaus 19 € / aukko, ulkopuitteen tiivistys 20 € / ikkuna sekä kahvan vaihto 29 € / kpl ja vaihdettavan kahvan hinta.
+      Ikkunan hintaan sisältyvät sisäpuitteen ja sisäkarmin tiivisteet sekä saranoiden öljyäminen. Ulkopuitteen
+      tiivistys on lisätyö, 20 € / ikkuna, ja mahdollinen kolmas puite hinnoitellaan erikseen. Ikkunoita ei säädetä. Ovien käynnin säätö tehdään
       oven omien säätövarojen puitteissa, eikä palvelu sisällä rakenteellisten vikojen korjausta, kuten
       painuneen karmin, vääntyneen ovilehden tai lahovaurion korjausta.</p>
     <p>Hinnat sisältävät arvonlisäveron 25,5 %. Näet kokonaishinnan hintalaskurista ennen

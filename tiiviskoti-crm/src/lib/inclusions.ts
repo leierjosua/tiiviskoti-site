@@ -16,8 +16,9 @@
 
    19.10.2026 (Josua): ikkunoita EI säädetä, ovet säädetään vain oven omien
    säätövarojen puitteissa, eikä työ sisällä rakenteellisten vikojen
-   korjausta. Ikkunassa tiivistetään kaksi puitetta, kolmas on lisätyö
-   20 € / ikkuna (pricing.ts 'puite3'). Rajaukset ovat listalla tarkoituksella:
+   korjausta. Ikkunan hintaan kuuluvat sisäpuitteen ja sisäkarmin
+   tiivisteet; ulkopuite on lisätyö 20 € / ikkuna (pricing.ts 'puite3') ja
+   kolmas puite hinnoitellaan erikseen. Rajaukset ovat listalla tarkoituksella:
    ne on sovittava kirjallisesti ennen työtä.
 
    TAKUU EIKÄ VASTUUVAKUUTUS OLE LISTALLA — tietoinen valinta (25.8.2026).
@@ -35,7 +36,7 @@ export const DEFAULT_INCLUSIONS: string[] = [
   'Vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus',
   'Silikonimassan levitys kiinnityspinnalle tarvittaessa',
   'Uusien tiivisteiden asennus — tiivisteet ja tarvikkeet sisältyvät hintaan',
-  'Ikkunoissa kahden puitteen tiivistys — kolmas puite lisätyönä 20 € / ikkuna',
+  'Ikkunoissa sisäpuitteen ja sisäkarmin tiivisteet — ulkopuite lisätyönä 20 € / ikkuna, kolmas puite erikseen',
   'Ovien käynnin säätö oven omien säätövarojen puitteissa sekä saranoiden öljyäminen',
   'Ikkunoiden ja ovien toimivuuden tarkastus työn jälkeen',
   'Työalueen suojaus ja siivous — vanhat tiivisteet ja jätteet viedään pois',

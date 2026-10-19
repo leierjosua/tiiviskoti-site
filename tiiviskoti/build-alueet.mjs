@@ -66,7 +66,7 @@ const YHTEINEN_FAQ = [
   ['Kannattaako tiivistys vai ikkunoiden vaihto?',
    'Jos lasi ja karmi ovat ehjät eikä puussa ole lahoa, tiivistys riittää. Uusi ikkuna asennettuna maksaa noin 1 200 €, kun saman ikkunan tiivistäminen maksaa alkaen 75 € — eli vaihtaminen on kymmeniä kertoja kalliimpaa. Jos tiivistys ei sinun kohteessasi riitä, sanomme sen käynnillä emmekä veloita turhasta.'],
   ['Säädetäänkö ikkunat ja ovet?',
-   'Ovet kyllä: säädämme oven käynnin niin pitkälle kuin oven omat säätövarat riittävät ja öljyämme lukot ja saranat. Ikkunoita emme säädä — ikkunan hintaan kuuluvat kahden puitteen tiivisteet ja saranoiden öljyäminen, kolmas puite on lisätyö 20 € / ikkuna. Työ ei sisällä rakenteellisten vikojen korjausta, kuten painuneen karmin tai vääntyneen ovilehden oikaisua.'],
+   'Ovet kyllä: säädämme oven käynnin niin pitkälle kuin oven omat säätövarat riittävät ja öljyämme lukot ja saranat. Ikkunoita emme säädä — ikkunan hintaan kuuluvat sisäpuitteen ja sisäkarmin tiivisteet ja saranoiden öljyäminen; ulkopuitteen tiivistys on lisätyö 20 € / ikkuna ja mahdollinen kolmas puite hinnoitellaan erikseen. Työ ei sisällä rakenteellisten vikojen korjausta, kuten painuneen karmin tai vääntyneen ovilehden oikaisua.'],
   ['Saako työstä kotitalousvähennyksen?',
    'Saa. Työ on kotitaloustyötä, ja lasku erittelee työn osuuden valmiiksi vähennystä varten. Vähennys on 40 % työn osuudesta.'],
 ];
@@ -457,8 +457,8 @@ const PALVELUT = [
     hintaMin: WINDOW_LOW,
     hintaMax: WINDOW_HIGH,
     hintaSelite: 'per ikkuna, määrän mukaan',
-    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_RANGE} € / ikkuna. Kahden puitteen tiivisteet ja öljyäminen, kolmas puite +20 €. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
-    lead: 'Vaihdamme kahden puitteen tiivisteet, öljyämme saranat ja tarkistamme että ikkuna sulkeutuu tiiviisti. Kolmannen puitteen tiivistys on lisätyö, 20 € / ikkuna. Näet hinnan laskurista ilman tarjouspyyntöä.',
+    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_RANGE} € / ikkuna. Sisäpuitteen ja sisäkarmin tiivisteet ja öljyäminen, ulkopuite +20 €. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
+    lead: 'Vaihdamme sisäpuitteen ja sisäkarmin tiivisteet, öljyämme saranat ja tarkistamme että ikkuna sulkeutuu tiiviisti. Ulkopuitteen tiivistys on lisätyö, 20 € / ikkuna. Näet hinnan laskurista ilman tarjouspyyntöä.',
     oireetOtsikko: 'Milloin ikkunat kannattaa tiivistää',
     oireet: [
       ['Ikkunalaudalta tuntuu veto', 'Kylmä ilmavirta lattian rajassa tai ikkunapenkillä on tavallisin merkki painuneesta tiivisteestä.'],
@@ -473,7 +473,7 @@ const PALVELUT = [
       ['Mitä tiivisteitä käytätte?', 'Aukon mukaan valittu silikonitiiviste. Paksuus valitaan mitatun välyksen mukaan — liian ohut ei tiivistä ja liian paksu estää ikkunaa sulkeutumasta.'],
       ['Voiko tiivisteet vaihtaa talvella?', 'Kyllä. Työ tehdään sisäkautta eikä se vaadi lämpimiä olosuhteita. Syksy on silti helpoin aika, koska vedon huomaa heti ensimmäisillä pakkasilla.'],
       ['Kannattaako vanhat ikkunat tiivistää vai vaihtaa?', 'Jos puitteet ja karmit ovat kunnossa, tiivistys maksaa murto-osan ikkunaremontista ja poistaa vedon. Lahonneita rakenteita se ei korjaa — kerromme rehellisesti jos vaihto on järkevämpi.'],
-      ['Tiivistetäänkö myös ulkopuite?', 'Hintaan sisältyy kahden puitteen tiivistys. Kolmen puitteen ikkunassa kolmannen puitteen (ulkopuite) tiivistys on lisätyö, 20 € / ikkuna. Ulkopuite tiivistetään urallisella tiivisteellä uraan — ei massalla — ja siihen jätetään aina noin 5 cm:n rako, jotta ikkunoiden välinen tila pääsee tuulettumaan eikä kosteus jää lasien väliin.'],
+      ['Tiivistetäänkö myös ulkopuite?', 'Kyllä, lisätyönä 20 € / ikkuna. Hintaan sisältyvät sisäpuitteen ja sisäkarmin tiivisteet; mahdollinen kolmas puite hinnoitellaan erikseen. Ulkopuite tiivistetään urallisella tiivisteellä uraan — ei massalla — ja siihen jätetään aina noin 5 cm:n rako, jotta ikkunoiden välinen tila pääsee tuulettumaan eikä kosteus jää lasien väliin.'],
       ['Vaihdatteko karmitiivisteen vai puitetiivisteen?', 'Molemmat kuuluvat samaan hintaan. Kumpi on kulunut, selviää vasta paikan päällä: tiiviste voi olla karmissa, puitteessa tai molemmissa, ja paksuus valitaan mitatun välyksen mukaan.'],
     ],
     ctaOtsikko: 'Näet ikkunoiden hinnan heti — ilman tarjouspyyntöä',
@@ -523,10 +523,10 @@ const SISALTYY = [
   'Silikonimassan levitys kiinnityspinnalle tarvittaessa',
   'Uusien tiivisteiden asennus — tiivisteet ja tarvikkeet sisältyvät hintaan',
   /* 19.10.2026 (Josua): ikkunoita EI säädetä, ovet vain säätövaran
-     puitteissa, rakenteellisia vikoja ei korjata, ja ikkunassa tiivistetään
-     kaksi puitetta (kolmas +20 € / ikkuna). Sama sanamuoto kuin
+     puitteissa, rakenteellisia vikoja ei korjata, ja hintaan kuuluvat
+     sisäpuitteen ja sisäkarmin tiivisteet (ulkopuite +20 € / ikkuna, kolmas puite erikseen). Sama sanamuoto kuin
      tiiviskoti-crm:n inclusions.ts:ssä — listat on pidettävä samoina. */
-  'Ikkunoissa kahden puitteen tiivistys — kolmas puite lisätyönä 20 € / ikkuna',
+  'Ikkunoissa sisäpuitteen ja sisäkarmin tiivisteet — ulkopuite lisätyönä 20 € / ikkuna, kolmas puite erikseen',
   'Ovien käynnin säätö oven omien säätövarojen puitteissa sekä saranoiden öljyäminen',
   'Ikkunoiden ja ovien toimivuuden tarkastus työn jälkeen',
   'Työalueen suojaus ja siivous — vanhat tiivisteet ja jätteet viedään pois',

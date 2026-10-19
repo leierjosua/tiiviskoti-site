@@ -32,7 +32,7 @@ export type OfferType = {
 };
 
 export const TYPES: OfferType[] = [
-  { id: 'ikkuna',  name: 'Ikkuna',                  desc: 'Kahden puitteen tiivisteet ja öljyäminen',      tiers: WINDOW_TIERS, price: 90, min: 25 },
+  { id: 'ikkuna',  name: 'Ikkuna',                  desc: 'Sisäpuitteen ja sisäkarmin tiivisteet, öljyäminen',      tiers: WINDOW_TIERS, price: 90, min: 25 },
   { id: 'ulko',    name: 'Ulko-ovi',                desc: 'Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen, säätö säätövaran puitteissa', price: 99,  min: 30 },
   { id: 'parveke', name: 'Parvekeovi',              desc: 'Puu-/alumiiniparvekeovi, koko kehä',         price: 99,  min: 30 },
   { id: 'terassi', name: 'Liuku- tai pariovi', desc: 'Iso lasiovi tai liukuovi, kiskon huolto',    price: 149, min: 30 },
@@ -52,8 +52,8 @@ export type OfferExtra = {
 
 export const EXTRAS: OfferExtra[] = [
   { id: 'sauma', name: 'Karmin ja seinän välin akryylisaumaus', price: 19, per: 'aukko',  unit: 'aukko',  min: 10 },
-  /* 19.10.2026: kolmas puite lisätyönä — PIDÄ SYNKASSA tiiviskoti/pricing.mjs. */
-  { id: 'puite3', name: 'Kolmannen puitteen (ulkopuite) tiivistys', price: 20, per: 'kpl', unit: 'ikkuna', min: 10 },
+  /* 19.10.2026: ulkopuitteen tiivistys lisätyönä (kolmas puite hinnoitellaan erikseen vapaana rivinä) — PIDÄ SYNKASSA tiiviskoti/pricing.mjs. */
+  { id: 'puite3', name: 'Ulkopuitteen tiivistys', price: 20, per: 'kpl', unit: 'ikkuna', min: 10 },
   { id: 'kahva', name: 'Kahvan vaihto',                         price: 29, per: 'kpl',    unit: 'kpl',    min: 15, note: '+ osa' },
 ];
 
@@ -103,7 +103,7 @@ function extraQtyFor(extra: OfferExtra, counts: Record<string, unknown>, totalIt
   switch (extra.per) {
     case 'aukko':  return totalItems;
     case 'ikkuna': return int(counts.ikkuna);
-    // Ikkunakohtainen kappalelisä (kolmas puite) enintään ikkunoiden määrä — sama kuin pricing.mjs.
+    // Ikkunakohtainen kappalelisä (ulkopuite) enintään ikkunoiden määrä — sama kuin pricing.mjs.
     case 'kpl':    return extra.unit === 'ikkuna'
       ? Math.min(int(counts[`extra_${extra.id}`]), int(counts.ikkuna))
       : int(counts[`extra_${extra.id}`]);

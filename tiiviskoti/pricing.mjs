@@ -51,7 +51,7 @@ export const WINDOW_TIERS = [
    `tiers`   = määräporrastus, korvaa `price`n kokonaan
    `min`     = arvioitu työaika minuutteina per kappale (= kalenterivaraus) */
 export const TYPES = [
-  { id: 'ikkuna',  name: 'Ikkuna',                   desc: 'Kahden puitteen tiivisteet ja öljyäminen',      tiers: WINDOW_TIERS, price: 90, min: 25 },
+  { id: 'ikkuna',  name: 'Ikkuna',                   desc: 'Sisäpuitteen ja sisäkarmin tiivisteet, öljyäminen',      tiers: WINDOW_TIERS, price: 90, min: 25 },
   { id: 'ulko',    name: 'Ulko-ovi',                 desc: 'Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen, säätö säätövaran puitteissa', price: 99,  min: 30 },
   { id: 'parveke', name: 'Parvekeovi',               desc: 'Puu-/alumiiniparvekeovi, koko kehä',         price: 99,  min: 30 },
   { id: 'terassi', name: 'Liuku- tai pariovi',       desc: 'Iso lasiovi tai liukuovi, kiskon huolto',    price: 149, min: 30 },
@@ -76,16 +76,18 @@ export const TYPES = [
    minuuttiin, jotta kalenterivaraus kattaa edelleen saman työn. Öljyämiseen
    kuluvaa aikaa ei ole erikseen arvioitu — tarkista luku Josualta jos
    varaukset alkavat venyä. */
-/* 19.10.2026 (Josua): ikkunan perushintaan kuuluu KAHDEN puitteen tiivistys.
-   Kolmen puitteen ikkunassa kolmas (ulkopuite) on lisätyö 20 € / ikkuna.
-   `per: 'kpl'`, koska talon kaikki ikkunat eivät aina ole kolmipuitteisia —
+/* 19.10.2026 (Josua, tarkennettu): ikkunan perushintaan kuuluvat SISÄPUITTEEN ja
+   SISÄKARMIN tiivisteet. Ulkopuitteen tiivistys on lisätyö 20 € / ikkuna (id
+   'puite3' säilyy, ettei vanhoja valintoja hukata). Mahdollinen kolmas puite
+   hinnoitellaan erikseen paikan päällä — sitä ei ole laskurissa.
+   `per: 'kpl'`, koska ulkopuitetta ei aina tiivistetä joka ikkunaan —
    asiakas valitsee montako. Samalla: ikkunoita EI säädetä, ovet vain
    säätövaran puitteissa (desc-tekstit yllä). `min` 10 on arvio. */
 export const EXTRAS = [
   { id: 'sauma',  name: 'Karmin ja seinän välin akryylisaumaus', price: 19, per: 'aukko',  unit: 'aukko',  min: 10 },
   /* Määrällinen lisätyö viimeisenä: se vie laskurissa oman koko rivinsä,
      joten muut lisätyöt saavat täyttää kaksi saraketta rauhassa. */
-  { id: 'puite3', name: 'Kolmannen puitteen (ulkopuite) tiivistys', price: 20, per: 'kpl',    unit: 'ikkuna', min: 10 },
+  { id: 'puite3', name: 'Ulkopuitteen tiivistys', price: 20, per: 'kpl',    unit: 'ikkuna', min: 10 },
   { id: 'kahva',  name: 'Kahvan vaihto',                         price: 29, per: 'kpl',    unit: 'kpl',    min: 15, note: '+ osa' },
 ];
 
@@ -144,7 +146,7 @@ export function extraQtyFor(extra, counts, totalItems) {
   switch (extra.per) {
     case 'aukko':  return totalItems;
     case 'ikkuna': return int(counts.ikkuna);
-    /* Ikkunakohtainen kappalelisä (kolmas puite) ei voi ylittää ikkunoiden
+    /* Ikkunakohtainen kappalelisä (ulkopuite) ei voi ylittää ikkunoiden
        määrää: muuten sen voisi tilata ovelle tai useammin kuin ikkunoita on. */
     case 'kpl':    return extra.unit === 'ikkuna'
       ? Math.min(int(counts[`extra_${extra.id}`]), int(counts.ikkuna))

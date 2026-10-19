@@ -1,6 +1,6 @@
 'use client';
 
-import { startTransition, useActionState, useEffect, useMemo, useRef, useState } from 'react';
+import { startTransition, useActionState, useEffect, useMemo, useState } from 'react';
 import { Card, CardHeader, Input, Textarea, cx } from '@/components/ui';
 import { computePricing, EXTRAS, TYPES } from '@/lib/pricing';
 import { DEFAULT_INCLUSIONS } from '@/lib/inclusions';
@@ -82,14 +82,6 @@ export function KartoitusForm({ id, jobId, initial, locked }: {
   }), [d.counts, d.extras, d.alennus, travel.cents]);
   const autoHours = Math.round((pricing.minutes / 60) * 2) / 2;
 
-  /* 3 puitetta → kolmas puite lisätyönä kaikille ikkunoille oletuksena. */
-  const ikkunat = d.counts.ikkuna ?? 0;
-  const prevPuitteet = useRef(d.ikkunaPuitteet);
-  useEffect(() => {
-    if (prevPuitteet.current === d.ikkunaPuitteet) return;
-    prevPuitteet.current = d.ikkunaPuitteet;
-    setCount('extra_puite3', d.ikkunaPuitteet === '3' ? ikkunat : 0);
-  }, [d.ikkunaPuitteet, ikkunat]);
 
   const toggleHavainto = (h: HavaintoKey) =>
     set('havainnot', d.havainnot.includes(h) ? d.havainnot.filter((x) => x !== h) : [...d.havainnot, h]);
@@ -210,7 +202,7 @@ export function KartoitusForm({ id, jobId, initial, locked }: {
                       <Chip on={d.ikkunaPuitteet === '2'} onClick={() => set('ikkunaPuitteet', '2')}>2 puitetta</Chip>
                       <Chip on={d.ikkunaPuitteet === '3'} onClick={() => set('ikkunaPuitteet', '3')}>3 puitetta</Chip>
                     </div>
-                    <p className="mt-2 text-xs text-faint">Hintaan kuuluu kaksi puitetta. Kolmas puite +20 € / ikkuna.</p>
+                    <p className="mt-2 text-xs text-faint">Hintaan kuuluvat sisäpuitteen ja sisäkarmin tiivisteet. Ulkopuite +20 € / ikkuna (Lisätyöt). Kolmas puite hinnoitellaan erikseen: kirjaa se Lisätiedot-kenttään.</p>
                   </div>
                 )}
               </div>
