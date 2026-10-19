@@ -14,8 +14,11 @@
    puhuu kiinnityspinnan pohjustuksesta — ei karmisaumasta. Jos tätä
    sanamuotoa löysää, myyt lisätyön ilmaiseksi jokaisessa tarjouksessa.
 
-   18.9.2026: ikkunan säätö ja öljyäminen SIIRTYIVÄT perushintaan (lisätyö
-   'helat' poistettiin), joten säätörivi saa nyt puhua myös ikkunoista.
+   19.10.2026 (Josua): ikkunoita EI säädetä, ovet säädetään vain oven omien
+   säätövarojen puitteissa, eikä työ sisällä rakenteellisten vikojen
+   korjausta. Ikkunassa tiivistetään kaksi puitetta, kolmas on lisätyö
+   20 € / ikkuna (pricing.ts 'puite3'). Rajaukset ovat listalla tarkoituksella:
+   ne on sovittava kirjallisesti ennen työtä.
 
    TAKUU EIKÄ VASTUUVAKUUTUS OLE LISTALLA — tietoinen valinta (25.8.2026).
    Molemmat ovat olemassa ja lukevat sivuston FAQ:ssa, mutta lista kertoo
@@ -32,10 +35,12 @@ export const DEFAULT_INCLUSIONS: string[] = [
   'Vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus',
   'Silikonimassan levitys kiinnityspinnalle tarvittaessa',
   'Uusien tiivisteiden asennus — tiivisteet ja tarvikkeet sisältyvät hintaan',
-  'Ikkunoiden ja ovien käynnin säätö sekä saranoiden öljyäminen',
+  'Ikkunoissa kahden puitteen tiivistys — kolmas puite lisätyönä 20 € / ikkuna',
+  'Ovien käynnin säätö oven omien säätövarojen puitteissa sekä saranoiden öljyäminen',
   'Ikkunoiden ja ovien toimivuuden tarkastus työn jälkeen',
   'Työalueen suojaus ja siivous — vanhat tiivisteet ja jätteet viedään pois',
   'Kirjallinen raportti huollon vaiheista ja käytetyistä tuotteista',
+  'Ei sisällä ikkunoiden säätöä eikä rakenteellisten vikojen korjausta (esim. painunut karmi, vääntynyt ovilehti)',
 ];
 
 /** Enintään näin monta riviä. Sama raja lomakkeella, palvelimella ja kannassa. */

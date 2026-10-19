@@ -65,8 +65,8 @@ const YHTEINEN_FAQ = [
    `Yksittäinen ikkuna maksaa ${WINDOW_TIERS[0].price} €, ja kappalehinta laskee määrän mukaan aina ${WINDOW_TIERS[WINDOW_TIERS.length - 1].price} €:oon asti. Käytännössä ${(() => { const p = computePricing({ ikkuna: 15, ulko: 2 }, {}, {}); return `15 ikkunan ja kahden ulko-oven omakotitalo maksaa ${p.total.toLocaleString('fi-FI')} €`; })()}, ja viiden ikkunan sekä parvekeoven kerrostaloasunto ${computePricing({ ikkuna: 5, parveke: 1 }, {}, {}).total} €. Näet oman summasi laskurista ennen varausta.`],
   ['Kannattaako tiivistys vai ikkunoiden vaihto?',
    'Jos lasi ja karmi ovat ehjät eikä puussa ole lahoa, tiivistys riittää. Uusi ikkuna asennettuna maksaa noin 1 200 €, kun saman ikkunan tiivistäminen maksaa alkaen 75 € — eli vaihtaminen on kymmeniä kertoja kalliimpaa. Jos tiivistys ei sinun kohteessasi riitä, sanomme sen käynnillä emmekä veloita turhasta.'],
-  ['Kuuluuko ikkunan säätö ja öljyäminen hintaan?',
-   'Kyllä. Ikkunan käynnin säätö ja saranoiden öljyäminen sisältyvät ikkunan hintaan, eikä niistä veloiteta erikseen. Ovissa hintaan kuuluu samoin oven säätö sekä lukkojen ja saranoiden öljyäminen.'],
+  ['Säädetäänkö ikkunat ja ovet?',
+   'Ovet kyllä: säädämme oven käynnin niin pitkälle kuin oven omat säätövarat riittävät ja öljyämme lukot ja saranat. Ikkunoita emme säädä — ikkunan hintaan kuuluvat kahden puitteen tiivisteet ja saranoiden öljyäminen, kolmas puite on lisätyö 20 € / ikkuna. Työ ei sisällä rakenteellisten vikojen korjausta, kuten painuneen karmin tai vääntyneen ovilehden oikaisua.'],
   ['Saako työstä kotitalousvähennyksen?',
    'Saa. Työ on kotitaloustyötä, ja lasku erittelee työn osuuden valmiiksi vähennystä varten. Vähennys on 40 % työn osuudesta.'],
 ];
@@ -457,14 +457,14 @@ const PALVELUT = [
     hintaMin: WINDOW_LOW,
     hintaMax: WINDOW_HIGH,
     hintaSelite: 'per ikkuna, määrän mukaan',
-    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_RANGE} € / ikkuna. Karmi- ja puitetiivisteet, ikkunan säätö ja öljyäminen. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
-    lead: 'Vaihdamme karmi- ja puitetiivisteet, säädämme ja öljyämme ikkunan ja tarkistamme että se sulkeutuu tiiviisti. Näet hinnan laskurista ilman tarjouspyyntöä.',
+    desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_RANGE} € / ikkuna. Kahden puitteen tiivisteet ja öljyäminen, kolmas puite +20 €. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
+    lead: 'Vaihdamme kahden puitteen tiivisteet, öljyämme saranat ja tarkistamme että ikkuna sulkeutuu tiiviisti. Kolmannen puitteen tiivistys on lisätyö, 20 € / ikkuna. Näet hinnan laskurista ilman tarjouspyyntöä.',
     oireetOtsikko: 'Milloin ikkunat kannattaa tiivistää',
     oireet: [
       ['Ikkunalaudalta tuntuu veto', 'Kylmä ilmavirta lattian rajassa tai ikkunapenkillä on tavallisin merkki painuneesta tiivisteestä.'],
       ['Tiiviste on kova tai halkeillut', 'Kumi kovettuu 10–15 vuodessa. Kun sitä painaa sormella eikä se jousta takaisin, se ei enää tiivistä.'],
       ['Lasin alareuna huurtuu', 'Sisäilman kosteus tiivistyy kylmään kohtaan. Vuotava tiiviste tuo kylmän pinnan lähemmäs sisätilaa.'],
-      ['Ikkuna vinkuu tai on jäykkä', 'Helojen välykset ovat muuttuneet. Pelkkä uusi tiiviste ei riitä, jos puite ei purista sitä tasaisesti.'],
+      ['Ikkuna vinkuu tai on jäykkä', 'Usein syy on kovettunut tiiviste. Jos puite ei kuitenkaan sulkeudu tasaisesti, syy on heloissa tai rakenteessa — ikkunoita emme säädä, ja kerromme sen paikan päällä ennen työn aloittamista.'],
       ['Paperi irtoaa ilman vastusta', 'Nopein oma testi: sulje ikkuna paperiarkin päälle ja vedä arkkia. Jos se tulee ulos vastuksetta, tiiviste ei enää purista siitä kohtaa.'],
     ],
     faq: [
@@ -473,7 +473,7 @@ const PALVELUT = [
       ['Mitä tiivisteitä käytätte?', 'Aukon mukaan valittu silikonitiiviste. Paksuus valitaan mitatun välyksen mukaan — liian ohut ei tiivistä ja liian paksu estää ikkunaa sulkeutumasta.'],
       ['Voiko tiivisteet vaihtaa talvella?', 'Kyllä. Työ tehdään sisäkautta eikä se vaadi lämpimiä olosuhteita. Syksy on silti helpoin aika, koska vedon huomaa heti ensimmäisillä pakkasilla.'],
       ['Kannattaako vanhat ikkunat tiivistää vai vaihtaa?', 'Jos puitteet ja karmit ovat kunnossa, tiivistys maksaa murto-osan ikkunaremontista ja poistaa vedon. Lahonneita rakenteita se ei korjaa — kerromme rehellisesti jos vaihto on järkevämpi.'],
-      ['Tiivistetäänkö myös ulkopuite?', 'Tarvittaessa kyllä. Ulkopuite tiivistetään urallisella tiivisteellä uraan — ei massalla. Ulkopuitteeseen jätetään aina noin 5 cm:n rako, jotta ikkunoiden välinen tila pääsee tuulettumaan eikä kosteus jää lasien väliin.'],
+      ['Tiivistetäänkö myös ulkopuite?', 'Hintaan sisältyy kahden puitteen tiivistys. Kolmen puitteen ikkunassa kolmannen puitteen (ulkopuite) tiivistys on lisätyö, 20 € / ikkuna. Ulkopuite tiivistetään urallisella tiivisteellä uraan — ei massalla — ja siihen jätetään aina noin 5 cm:n rako, jotta ikkunoiden välinen tila pääsee tuulettumaan eikä kosteus jää lasien väliin.'],
       ['Vaihdatteko karmitiivisteen vai puitetiivisteen?', 'Molemmat kuuluvat samaan hintaan. Kumpi on kulunut, selviää vasta paikan päällä: tiiviste voi olla karmissa, puitteessa tai molemmissa, ja paksuus valitaan mitatun välyksen mukaan.'],
     ],
     ctaOtsikko: 'Näet ikkunoiden hinnan heti — ilman tarjouspyyntöä',
@@ -493,22 +493,22 @@ const PALVELUT = [
     kicker: 'Ovien tiivistys',
     hinta: TYPES[1].price,
     hintaSelite: 'ulko- ja parvekeovi',
-    desc: `Ulko-oven tiivistys ${TYPES[1].price} € kiinteään hintaan — myös parvekeoven ja terassin liukuoven tiivistys. Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö samalla käynnillä.`,
-    lead: 'Ulko-oven tiivistyksessä vaihdamme oven tiivisteet, öljyämme lukot ja saranat sekä säädämme oven käynnin niin, että ovi painuu tasaisesti tiivistettä vasten. Kaikki samalla käynnillä.',
+    desc: `Ulko-oven tiivistys ${TYPES[1].price} € kiinteään hintaan — myös parvekeoven ja terassin liukuoven tiivistys. Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö säätövaran puitteissa samalla käynnillä.`,
+    lead: 'Ulko-oven tiivistyksessä vaihdamme oven tiivisteet, öljyämme lukot ja saranat sekä säädämme oven käynnin niin pitkälle kuin oven säätövara riittää. Kaikki samalla käynnillä.',
     oireetOtsikko: 'Milloin ulko-ovi kannattaa tiivistää',
     oireet: [
       ['Kynnyksestä vetää', 'Kynnyskumi kuluu ensimmäisenä, koska se jää oven ja kynnyksen väliin joka kerta.'],
       ['Ovi ei sulkeudu tiiviisti', 'Sarana on painunut tai käyntiväli muuttunut. Tiiviste ei auta, jos ovi ei purista sitä koko matkalta.'],
       ['Valo näkyy oven raosta', 'Nopein oma testi: jos ulkoa näkyy valoa karmin ja oven välistä, siitä kulkee myös ilma.'],
-      ['Lukko takkuaa tai ovi kolisee', 'Merkki siitä että vastarauta ja tiiviste eivät ole samassa linjassa. Säätö kuuluu työhön.'],
+      ['Lukko takkuaa tai ovi kolisee', 'Merkki siitä että vastarauta ja tiiviste eivät ole samassa linjassa. Säätö säätövaran puitteissa kuuluu työhön.'],
     ],
     faq: [
       ['Paljonko ulko-oven tiivistys maksaa?', `Ulko-ovi ja parvekeovi maksavat ${TYPES[1].price} € ovelta riippumatta siitä, montako ovea kohteessa on. Pelkkä kynnyskumin vaihto on ${TYPES[5].price} € ja väli- tai huoneovi ${TYPES[4].price} €${TYPES[4].combo ? ` — tai ${TYPES[4].combo} €, kun samalla käynnillä on vähintään kaksi kohdetta` : ''}. Pienin veloitus käynniltä on ${MIN_PRICE} €.`],
-      ['Sisältyykö kynnyskumi hintaan?', `Ei. Ulko-oven hintaan kuuluvat tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö. Kynnyskumin vaihto on tarvittaessa erillinen lisätyö, ${TYPES[5].price} €.`],
+      ['Sisältyykö kynnyskumi hintaan?', `Ei. Ulko-oven hintaan kuuluvat tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö säätövaran puitteissa. Kynnyskumin vaihto on tarvittaessa erillinen lisätyö, ${TYPES[5].price} €.`],
       ['Entä terassin liuku- tai pariovi?', `Iso lasiovi ja liukuovi ovat ${TYPES[3].price} €, koska niissä on enemmän tiivistettävää kehää ja kiskon huolto kuuluu työhön.`],
-      ['Miten oven tiivistäminen tehdään?', 'Poistamme vanhat tiivisteet ja puhdistamme kiinnityspinnat, asennamme uudet tiivisteet, öljyämme lukot ja saranat ja säädämme oven käynnin. Lopuksi tarkistamme, että ovi sulkeutuu ja painuu tiivistettä vasten koko matkalta. Tiivisteet ja tarvikkeet sisältyvät hintaan.'],
+      ['Miten oven tiivistäminen tehdään?', 'Poistamme vanhat tiivisteet ja puhdistamme kiinnityspinnat, asennamme uudet tiivisteet, öljyämme lukot ja saranat ja säädämme oven käynnin oven säätövarojen puitteissa. Lopuksi tarkistamme, miten ovi sulkeutuu. Tiivisteet ja tarvikkeet sisältyvät hintaan.'],
       ['Kuinka kauan oven tiivistys kestää?', 'Noin 30 minuuttia ovea kohti. Useampi ovi tehdään samalla käynnillä, jolloin hinta ovea kohti on edullisempi.'],
-      ['Korjaako tiivistys vinon oven?', 'Säädämme käyntivälyksen ja saranat siltä osin kuin ne ovat säädettävissä. Jos ovilehti on vääntynyt tai karmi liikkunut, kerromme sen paikan päällä ennen työn aloittamista.'],
+      ['Korjaako tiivistys vinon oven?', 'Ei, jos syy on rakenteessa. Säädämme käyntivälyksen ja saranat niin pitkälle kuin oven omat säätövarat riittävät. Rakenteellisia vikoja, kuten vääntynyttä ovilehteä, painunutta karmia tai lahovauriota, emme korjaa — jos huomaamme sellaisen, kerromme siitä ennen työn aloittamista.'],
     ],
     ctaOtsikko: 'Näet ovien hinnan heti — ilman tarjouspyyntöä',
   },
@@ -522,14 +522,16 @@ const SISALTYY = [
   'Vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus',
   'Silikonimassan levitys kiinnityspinnalle tarvittaessa',
   'Uusien tiivisteiden asennus — tiivisteet ja tarvikkeet sisältyvät hintaan',
-  /* 18.9.2026: ikkunan säätö ja öljyäminen siirtyivät perushintaan
-     (lisätyö 'helat' poistettiin pricing.mjs:stä), joten rivi ei saa
-     enää puhua vain ovista. Sama sanamuoto kuin tiiviskoti-crm:n
-     inclusions.ts:ssä — ne kaksi listaa on pidettävä samoina. */
-  'Ikkunoiden ja ovien käynnin säätö sekä saranoiden öljyäminen',
+  /* 19.10.2026 (Josua): ikkunoita EI säädetä, ovet vain säätövaran
+     puitteissa, rakenteellisia vikoja ei korjata, ja ikkunassa tiivistetään
+     kaksi puitetta (kolmas +20 € / ikkuna). Sama sanamuoto kuin
+     tiiviskoti-crm:n inclusions.ts:ssä — listat on pidettävä samoina. */
+  'Ikkunoissa kahden puitteen tiivistys — kolmas puite lisätyönä 20 € / ikkuna',
+  'Ovien käynnin säätö oven omien säätövarojen puitteissa sekä saranoiden öljyäminen',
   'Ikkunoiden ja ovien toimivuuden tarkastus työn jälkeen',
   'Työalueen suojaus ja siivous — vanhat tiivisteet ja jätteet viedään pois',
   'Kirjallinen raportti huollon vaiheista ja käytetyistä tuotteista',
+  'Ei sisällä ikkunoiden säätöä eikä rakenteellisten vikojen korjausta (esim. painunut karmi, vääntynyt ovilehti)',
 ];
 
 function palveluSivu(c) {
@@ -1433,7 +1435,7 @@ ${nav(R, '/#laskuri')}
       ${[
         ['1', 'Kartoitus veloituksetta', 'Käymme kohteessa, mittaamme vetokohdat ja käymme ovet läpi yksi kerrallaan. Et maksa käynnistä mitään etkä sitoudu mihinkään.'],
         ['2', 'Kiinteä hinta kirjallisena', 'Saat hinnan ennen työn aloitusta. Se ei muutu matkan varrella — jos laajuus poikkeaa, sovimme siitä kanssasi etukäteen.'],
-        ['3', 'Asennus sovittuna päivänä', 'Vanhat tiivisteet pois, pinnat puhtaaksi, uudet tiivisteet ja oven käynnin säätö. Jäljet siivotaan mennessä.'],
+        ['3', 'Asennus sovittuna päivänä', 'Vanhat tiivisteet pois, pinnat puhtaaksi, uudet tiivisteet ja oven käynnin säätö säätövaran puitteissa. Jäljet siivotaan mennessä.'],
         ['4', 'Jälkihoito', 'Jos jokin ei toimi kuten pitää, tulemme korjaamaan sen.'],
       ].map(([n, t, d]) => `<div style="display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)">
         <span aria-hidden="true" style="flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px">${n}</span>

@@ -84,7 +84,7 @@ export const ARTIKKELIT = [
         'Näiden päälle tulee vielä kotitalousvähennys, joka pienentää työn osuutta. Siitä kerrotaan tarkemmin omassa artikkelissaan.',
       ]],
       ['Mitä työhön sisältyy', [
-        'Sisältö on sama jokaisessa kohteessa: aukkojen tarkastus ja oikean tiivistetyypin valinta, vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus, silikonimassan levitys tarvittaessa, uusien tiivisteiden asennus, ikkunoiden ja ovien käynnin säätö sekä saranoiden öljyäminen, toimivuuden tarkastus työn jälkeen sekä työalueen suojaus ja siivous.',
+        'Sisältö on sama jokaisessa kohteessa: aukkojen tarkastus ja oikean tiivistetyypin valinta, vanhojen tiivisteiden poisto ja kiinnityspintojen puhdistus, silikonimassan levitys tarvittaessa, uusien tiivisteiden asennus, ovien käynnin säätö säätövarojen puitteissa sekä saranoiden öljyäminen, toimivuuden tarkastus työn jälkeen sekä työalueen suojaus ja siivous.',
         'Vanhat tiivisteet ja jätteet viedään pois. Käynnin päätteeksi jää kirjallinen raportti huollon vaiheista ja käytetyistä tuotteista.',
         'Tiivisteet ja tarvikkeet sisältyvät hintaan. Erillistä materiaalilaskua ei tule.',
       ]],
@@ -273,7 +273,7 @@ export const ARTIKKELIT = [
     faq: [
       ['Pitääkö kaikki tiivisteet vaihtaa kerralla?', 'Ei ole pakko, mutta yleensä kannattaa. Pienin veloitus käynniltä on {{MIN}} €, joten yhden ikkunan tilaaminen erikseen tulee suhteessa kalliiksi. Lisäksi saman ikäiset tiivisteet ovat yleensä samassa kunnossa.'],
       ['Voiko tiivisteitä huoltaa niin että ne kestävät pidempään?', 'Silikonipohjainen hoitoaine pitää kumin joustavampana ja hidastaa kovettumista. Se ei palauta jo kovettunutta tiivistettä, mutta uusien kanssa siitä on hyötyä.'],
-      ['Mistä tiedän, tarvitseeko ovi säätöä vai uudet tiivisteet?', 'Jos ovi hankaa tai ei sulkeudu tasaisesti, kyse on säädöstä. Jos ovi sulkeutuu hyvin mutta vetää, kyse on tiivisteistä. Usein tarvitaan molemmat, ja säätö sisältyy meillä työhön.'],
+      ['Mistä tiedän, tarvitseeko ovi säätöä vai uudet tiivisteet?', 'Jos ovi hankaa tai ei sulkeudu tasaisesti, kyse on säädöstä. Jos ovi sulkeutuu hyvin mutta vetää, kyse on tiivisteistä. Usein tarvitaan molemmat. Oven säätö sisältyy meillä työhön niin pitkälle kuin oven omat säätövarat riittävät; rakenteellisia vikoja, kuten painunutta karmia, emme korjaa.'],
       ["Kuinka usein kynnyskumi pitää vaihtaa?", "Selvästi useammin kuin ikkunatiivisteet, tyypillisesti 5–10 vuoden välein. Se kuluu askelten alla. Pelkän kynnyskumin vaihto on erillinen ja edullinen työ."],
       ["Näkeekö tiivisteen kunnon ilman työkaluja?", "Näkee usein. Paina tiivistettä sormella: terve palautuu, kovettunut jää painaumaan. Halkeamat ja litistyminen kertovat myös selvästi."],
     ],
