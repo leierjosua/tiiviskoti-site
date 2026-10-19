@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
+import { startTransition, useActionState, useEffect, useMemo, useRef, useState } from 'react';
 import { Card, CardHeader, Input, Textarea, cx } from '@/components/ui';
 import { computePricing, EXTRAS, TYPES } from '@/lib/pricing';
 import { DEFAULT_INCLUSIONS } from '@/lib/inclusions';
@@ -105,7 +105,17 @@ export function KartoitusForm({ id, jobId, initial, locked }: {
   const lbl = 'mb-1.5 block text-sm font-semibold text-text';
 
   return (
-    <form action={action} className="space-y-4 pb-36">
+    /* onSubmit eikä <form action>: action-lomake tyhjennetään Reactissa
+       jokaisen kutsun jälkeen, jolloin "Tallenna" näytti tyhjentävän kentät
+       vaikka tiedot olivat tallessa. Painettu nappi (mode) tulee submitterista. */
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget, (e.nativeEvent as SubmitEvent).submitter);
+        startTransition(() => action(fd));
+      }}
+      className="space-y-4 pb-36"
+    >
       <input type="hidden" name="payload" value={JSON.stringify(d)} />
       {id && <input type="hidden" name="id" value={id} />}
       {jobId && <input type="hidden" name="jobId" value={jobId} />}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { startTransition, useActionState, useState } from 'react';
 import { acceptAction, type AcceptState } from './actions';
 
 /* Hyväksyntälomake. Nappi on iso ja nimi kirjoitetaan itse: kirjoitettu
@@ -10,7 +10,8 @@ export function AcceptForm({ token, offerNumber, totalText, via }: {
   token: string; offerNumber: string; totalText: string; via: string;
 }) {
   const [state, action, pending] = useActionState<AcceptState, FormData>(acceptAction, {});
-  /* Ohjatut kentät: React tyhjentää lomakkeen jokaisen actionin jälkeen, ja
+  /* Lähetys onSubmitilla eikä <form action>illa: React tyhjentää action-
+     lomakkeen jokaisen kutsun jälkeen (myös ohjatut kentät DOMissa), ja
      virheilmoituksen kohdalla asiakkaan nimi ja rasti katosivat. */
   const [name, setName] = useState('');
   const [terms, setTerms] = useState(false);
@@ -28,7 +29,10 @@ export function AcceptForm({ token, offerNumber, totalText, via }: {
   }
 
   return (
-    <form action={action} className="space-y-4">
+    <form
+      onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); startTransition(() => action(fd)); }}
+      className="space-y-4"
+    >
       <input type="hidden" name="token" value={token} />
       <input type="hidden" name="via" value={via} />
       <label className="block">
