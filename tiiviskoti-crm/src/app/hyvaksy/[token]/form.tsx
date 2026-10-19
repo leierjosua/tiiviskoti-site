@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { acceptAction, type AcceptState } from './actions';
 
 /* Hyväksyntälomake. Nappi on iso ja nimi kirjoitetaan itse: kirjoitettu
@@ -10,6 +10,10 @@ export function AcceptForm({ token, offerNumber, totalText, via }: {
   token: string; offerNumber: string; totalText: string; via: string;
 }) {
   const [state, action, pending] = useActionState<AcceptState, FormData>(acceptAction, {});
+  /* Ohjatut kentät: React tyhjentää lomakkeen jokaisen actionin jälkeen, ja
+     virheilmoituksen kohdalla asiakkaan nimi ja rasti katosivat. */
+  const [name, setName] = useState('');
+  const [terms, setTerms] = useState(false);
 
   if (state.done) {
     return (
@@ -30,13 +34,13 @@ export function AcceptForm({ token, offerNumber, totalText, via }: {
       <label className="block">
         <span className="text-sm font-bold text-[#183A28]">Etu- ja sukunimi</span>
         <input
-          name="name" required autoComplete="name" placeholder="Matti Meikäläinen"
+          name="name" required autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Matti Meikäläinen"
           className="mt-1.5 block w-full rounded-xl border-[1.5px] border-[#D2D9CE] bg-white px-4 py-3.5 text-[17px] text-[#183A28]
                      outline-none focus:border-[#217A4E]"
         />
       </label>
       <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-[#ECF0E9] p-4">
-        <input name="terms" type="checkbox" required className="mt-0.5 h-5 w-5 shrink-0 accent-[#217A4E]" />
+        <input name="terms" type="checkbox" required checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#217A4E]" />
         <span className="text-[15px] leading-snug text-[#183A28]">
           Hyväksyn tarjouksen <b>{offerNumber}</b> ({totalText}) ja sen sisällön sekä TiivisKodin{' '}
           <a href="https://tiiviskoti.fi/kayttoehdot.html" target="_blank" rel="noreferrer" className="font-bold text-[#217A4E] underline">käyttöehdot</a>.
