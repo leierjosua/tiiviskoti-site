@@ -1609,7 +1609,7 @@ ${JSON.stringify(ld, null, 2)}
 <body>
 ${nav(R, '/#laskuri')}
 
-<div class="wrap crumb"><a href="/">Etusivu</a> › <a href="${R}hinta.html">Hinta</a><a href="${R}artikkelit.html">Artikkelit</a> › ${esc(a.title)}</div>
+<div class="wrap crumb"><a href="/">Etusivu</a> › <a href="${R}artikkelit.html">Artikkelit</a> › ${esc(a.title)}</div>
 
 <article class="sec"><div class="wrap" style="max-width:76ch">
   <div class="kicker">${esc(a.kicker)}</div>
