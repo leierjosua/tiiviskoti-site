@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { KARTOITUS_MINUTES, KOTI_KARTOITUS_BOOKABLE_FROM, KOTI_KARTOITUS_MINUTES } from '@/lib/availability';
-import { areaForPostal, calendarAreaForPostal, kartoitusCalendarId, purgeExpiredHolds } from '@/lib/data';
+import { areaForPostal, calendarAreaForPostal, purgeExpiredHolds } from '@/lib/data';
 import { campaignFromVisitorTrail, fbcFromVisitorTrail } from '@/lib/visitor';
 import { deliverKartoitus, removeCalendarEventForJob } from '@/lib/deliver';
 
@@ -117,34 +117,20 @@ export async function POST(request: Request) {
   if (starts.getTime() < Date.now()) {
     return Response.json({ error: 'in_past' }, { status: 400 });
   }
-  // Kotikartoituksia vasta alkupäivästä (ks. availability.ts). slot_taken saa sivun hakemaan ajat uudelleen.
-  if (koti && starts < KOTI_KARTOITUS_BOOKABLE_FROM) {
+  // Kartoituksia vasta alkupäivästä (ks. availability.ts). slot_taken saa sivun hakemaan ajat uudelleen.
+  if (starts < KOTI_KARTOITUS_BOOKABLE_FROM) {
     return Response.json({ error: 'slot_taken' }, { status: 409 });
   }
 
   await purgeExpiredHolds();
 
-  /* Kartoituksen saa varata VAIN kartoituskalenteriin. Varausreitillä sama
-     tarkistus tehdään `tk.calendar_areas`-taulusta, mutta kartoituskalenteri
-     ei kuulu mihinkään alueeseen — juuri siksi se ei näy kuluttajan
-     saatavuushaussa. Tarkistus on siis kalenterin tunnusta vasten, ja se on
-     yhtä tärkeä: ilman sitä pyyntöä muokkaamalla voisi ujuttaa maksuttoman
-     käynnin keskelle asentajan maksullista työpäivää. */
-  /* Kotikartoitus menee asentajan kalenteriin, joten tarkistus on sama kuin
-     varausreitillä: kalenterin on palveltava postinumeroa. */
-  if (koti) {
-    if (!(await calendarAreaForPostal(d.calendarId, d.postalCode))) {
-      return Response.json({ error: 'area_not_served', postal: d.postalCode }, { status: 409 });
-    }
-  } else {
-    const expectedCalendarId = kartoitusCalendarId();
-    if (!expectedCalendarId) {
-      console.error('public/kartoitus: KARTOITUS_CALENDAR_ID puuttuu');
-      return Response.json({ error: 'kartoitus_unavailable' }, { status: 503 });
-    }
-    if (d.calendarId.toLowerCase() !== expectedCalendarId.toLowerCase()) {
-      return Response.json({ error: 'calendar_not_kartoitus' }, { status: 409 });
-    }
+  /* Kartoitus (koti ja taloyhtiö) menee alueen asentajan kalenteriin, joten
+     tarkistus on sama kuin varausreitillä: kalenterin on palveltava
+     postinumeroa. Ilman tätä pyyntöä muokkaamalla voisi ujuttaa käynnin
+     kalenteriin, joka ei palvele aluetta. Taloyhtiön erillinen
+     kartoituskalenteri (KARTOITUS_CALENDAR_ID) poistui käytöstä 27.10.2026. */
+  if (!(await calendarAreaForPostal(d.calendarId, d.postalCode))) {
+    return Response.json({ error: 'area_not_served', postal: d.postalCode }, { status: 409 });
   }
 
   const [calendar] = await sql<{ id: string; google_calendar_id: string | null }[]>`

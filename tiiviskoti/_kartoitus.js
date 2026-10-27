@@ -35,7 +35,7 @@ const TXT = {
   taloyhtio: {
     pickDay: 'Valitkaa päivä nähdäksenne vapaat ajat', pickFirst: 'Valitkaa ensin aika',
     otherDay: 'Ei vapaita aikoja tänä päivänä. Valitkaa toinen päivä.',
-    postal: 'Kartoituskäynneillä on oma kalenterinsa — näytämme vapaat ajat heti.',
+    postal: 'Näytämme alueenne asentajan vapaat ajat heti.',
     unserved: (tel) => `Otamme mielellämme yhteyttä kun laajennumme alueellenne — soittakaa ${tel}.`,
     error: (tel) => `Soittakaa ${tel}, niin sovitaan aika puhelimessa.`,
     full: (tel) => `Soittakaa ${tel}, niin etsimme ajan yhdessä.`,

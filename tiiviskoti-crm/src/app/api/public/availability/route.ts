@@ -73,35 +73,24 @@ export async function GET(request: Request) {
     return json({ served: false, postal, slots: [] }, { origin });
   }
 
-  /* Taloyhtiön veloitukseton kartoituskäynti hakee ajat omasta kalenteristaan
-     (`?kartoitus=1`). Alue tarkistetaan silti yllä: postinumero kertoo
-     palvellaanko taloyhtiötä lainkaan, vaikka aikoja ei rajatakaan alueella —
-     kartoituskalenteri ei ole `tk.calendar_areas`-taulussa, mikä on juuri se
-     seikka joka pitää sen erossa kuluttajan varauskalenterista. */
+  /* Kartoituskäynnit — sekä taloyhtiön (`?kartoitus=1`) että kotitalouden
+     (`?kartoitus=koti`) — hakevat ajat SAMOISTA alueen asentajien
+     kalentereista kuin tavallinen varaus (Josua 27.10.2026: "sama kalenteri").
+     Aiemmin taloyhtiöllä oli oma "Kartoituskäynnit, taloyhtiöt" -kalenteri
+     (KARTOITUS_CALENDAR_ID), jossa ei ollut yhtään vapaata aikaa, joten
+     taloyhtiö ei voinut varata käyntiä lainkaan. Samassa kalenterissa
+     käynti ja asennus eivät myöskään voi enää osua päällekkäin
+     (tk.jobs-päällekkäisyysrajoite on kalenterikohtainen).
+     Ero tyyppien välillä on vain kesto: taloyhtiö 20 min, koti 45 min. */
   const wantsKartoitus = params.get('kartoitus') === '1';
-  /* Kotitalouden kartoituskäynti (`?kartoitus=koti`) EI käytä kartoituskalenteria
-     vaan alueen asentajien omia kalentereita, kuten tavallinen varaus — käynnin
-     tekee se asentaja joka myös asentaa. Ero varaukseen on vain kesto ja se,
-     ettei matkalisää ole (käynti on veloitukseton). */
   const wantsKotiKartoitus = params.get('kartoitus') === 'koti';
-  let calendarId: string | undefined;
-  let areaIds: string[] | undefined = areas.map((a) => a.id);
-  let durationMinutes = wantsKotiKartoitus ? KOTI_KARTOITUS_MINUTES : minutes;
-
-  if (wantsKartoitus) {
-    const kartoitusId = kartoitusCalendarId();
-    if (!kartoitusId) {
-      /* Kalenteria ei ole määritetty. Palautetaan virhe eikä tyhjää listaa:
-         tyhjä lista näyttäisi sivulla "kalenteri on täynnä", mikä on valhe —
-         kalenteria ei ole olemassa. Sivu ohjaa tällöin soittamaan. */
-      console.error('availability: KARTOITUS_CALENDAR_ID puuttuu');
-      return json({ error: 'kartoitus_unavailable' }, { status: 503, origin });
-    }
-    calendarId = kartoitusId;
-    areaIds = undefined;
-    // Kesto tulee palvelimelta, jottei tarjottu aika ja varattava lohko voi erota.
-    durationMinutes = KARTOITUS_MINUTES;
-  }
+  const anyKartoitus = wantsKartoitus || wantsKotiKartoitus;
+  const calendarId: string | undefined = undefined;
+  const areaIds: string[] | undefined = areas.map((a) => a.id);
+  // Kesto tulee palvelimelta, jottei tarjottu aika ja varattava lohko voi erota.
+  const durationMinutes = wantsKartoitus ? KARTOITUS_MINUTES
+    : wantsKotiKartoitus ? KOTI_KARTOITUS_MINUTES
+    : minutes;
 
   const rawGroups = await availability({
     durationMinutes,
@@ -109,11 +98,9 @@ export async function GET(request: Request) {
     areaIds,
     calendarId,
   });
-  /* Varattavuuden alkupäivä tyypin mukaan (ks. availability.ts). Taloyhtiön
-     kartoituskalenteria ei rajata. */
-  const bookableFrom = wantsKartoitus ? null
-    : wantsKotiKartoitus ? KOTI_KARTOITUS_BOOKABLE_FROM
-    : INSTALL_BOOKABLE_FROM;
+  /* Varattavuuden alkupäivä tyypin mukaan (ks. availability.ts). Kartoitukset
+     (koti ja taloyhtiö) samasta päivästä, koska ne ovat samoissa kalentereissa. */
+  const bookableFrom = anyKartoitus ? KOTI_KARTOITUS_BOOKABLE_FROM : INSTALL_BOOKABLE_FROM;
   const groups = bookableFrom
     ? rawGroups.map((g) => ({ ...g, slots: g.slots.filter((s) => s.start >= bookableFrom) }))
     : rawGroups;
@@ -135,8 +122,8 @@ export async function GET(request: Request) {
       }
     }
   }
-  // Veloitukseton kotikartoitus: ei matkalisää, vaikka kalenteri on alueella jolla on lisä.
-  const feeOf = (calendarId: string) => (wantsKotiKartoitus ? 0 : feeByCalendar.get(calendarId) ?? 0);
+  // Veloitukseton kartoitus (koti tai taloyhtiö): ei matkalisää, vaikka kalenteri on alueella jolla on lisä.
+  const feeOf = (calendarId: string) => (anyKartoitus ? 0 : feeByCalendar.get(calendarId) ?? 0);
 
   // Sivu ei tarvitse tietää kuka työn tekee — se valitsee ajan, ja kalenteri
   // ratkeaa siitä. Päällekkäiset alkuajat eri asentajilta yhdistetään;
