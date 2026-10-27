@@ -381,3 +381,19 @@ body nav.top .nlinks a,body nav.top .ntel{color:var(--ink)!important}
 body nav.top .burger{color:var(--ink)!important}
 body nav.top .burger span{background:currentColor!important}
 body nav.top .wrap,body nav.top.scr .wrap{max-width:1120px}
+/* Sama katkaisukohta kuin etusivulla: yli 1060 px linkit näkyvät aina,
+   sen alle Valikko-nappi. taloyhtio/kartoitus piilottivat linkit jo 1150 px:ssä,
+   jolloin välillä 1061–1150 navissa ei ollut linkkejä eikä valikkoa. */
+@media (min-width:1061px){
+  body nav.top .nlinks{display:flex!important}
+  body nav.top .burger{display:none!important}
+  body nav.top .ntel{display:inline-flex!important}
+}
+/* Logo samankokoiseksi kuin etusivun navissa. */
+body nav.top .logo{font-size:22px;gap:10px;font-weight:700}
+body nav.top .logo .mark{width:32px;height:32px}
+body .ntel{font-variant-numeric:tabular-nums}
+@media (max-width:620px){
+  body nav.top .logo{font-size:20px}
+  body nav.top .logo .mark{width:28px;height:28px}
+}

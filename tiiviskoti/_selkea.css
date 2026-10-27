@@ -451,3 +451,8 @@ body.selkea .mf-col .mf-hours b{color:var(--ink)}
   .s-hero .s-more{animation-delay:.55s}
   .s-hero-img{animation-delay:.6s}
 }
+
+/* Navi pikselilleen sama kuin muilla sivuilla (_teema.css): ei hyppää sivua vaihtaessa. */
+.s-nav .s-wrap{max-width:1120px;gap:24px;min-height:68px}
+.s-links{gap:22px}
+@media (max-width:620px){ .s-nav .s-wrap{min-height:60px} }

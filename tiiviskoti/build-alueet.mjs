@@ -102,10 +102,14 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
    '/#laskuri' — muuten navipalkin "Varaa aika" ja footerin "Hintalaskuri"
    osoittavat ankkuriin jota sivulla ei ole eivätkä tee yhtään mitään.
    Todettu 12.9.2026 auditissa: 10 sivua, joilla pääkutsu oli kuollut. */
+/* Navin linkit ovat SAMAT joka sivulla (Josua 27.10.2026): Hinnat,
+   Ilmainen kartoitus, Taloyhtiöt, Meistä, Yhteystiedot. Ikkuna- ja
+   ovisivut löytyvät footerista. Etusivun (index.html) navi on käsin
+   tehty — pidä sen linkit samoina. */
 const nav = (R, calc = '#laskuri') => `<nav class="top" id="nav"><div class="wrap">
   <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
   <div class="nlinks" id="nlinks">
-    <a href="${R}ikkunoiden-tiivistys.html">Ikkunoiden tiivistys</a><a href="${R}ovien-tiivistys.html">Ovien tiivistys</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}varaa.html">Varaa aika</a><a href="${R}ota-yhteytta.html">Ota yhteyttä</a>
+    <a href="${R}hinta.html">Hinnat</a><a href="${R}kartoitus.html">Ilmainen kartoitus</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}meista.html">Meistä</a><a href="${R}ota-yhteytta.html">Yhteystiedot</a>
   </div>
   <a href="tel:${TELH}" class="ntel">${TEL}</a>
   <a href="${calc}" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
