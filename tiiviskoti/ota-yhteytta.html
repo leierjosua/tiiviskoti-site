@@ -278,6 +278,15 @@
 <script type="module" src="_anchors.js"></script>
 <script src="_chat.js" defer></script>
 <script type="module">
+/* VALIKKO puhelimessa. Sivu ei lataa _shared.js:ää, joten valikkonappi ei
+   aiemmin tehnyt mitään (löydetty 27.10.2026). Sama .op-luokka kuin muualla. */
+{
+  const bg = document.getElementById('burger'), nl = document.getElementById('nlinks');
+  if (bg && nl) {
+    bg.addEventListener('click', () => nl.classList.toggle('op'));
+    nl.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nl.classList.remove('op')));
+  }
+}
 /* SISÄÄNTULO. `.rv`-elementit ovat CSS:ssä opacity:0 ja ne paljastetaan
    JS:llä. Etusivulla sen tekee `_shared.js`, jota tämä sivu ei lataa (se on
    koko varauslaskuri, eikä sitä tarvita täällä). Ilman tätä KOKO SIVU jäi
