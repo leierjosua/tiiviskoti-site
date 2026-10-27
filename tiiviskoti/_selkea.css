@@ -423,3 +423,31 @@ body.selkea .sv-facts b{white-space:nowrap}
 body.selkea .mf-col h4,body.selkea .mf-cities h4{font-size:16px;letter-spacing:.02em}
 body.selkea .mf-rate,body.selkea .mf-col .mf-hours,body.selkea .mf-col .mf-hours b,body.selkea .mf-col .mf-hours span{font-size:16px}
 body.selkea .mf-col .mf-hours b{color:var(--ink)}
+
+/* ---------- PUHELIMEN HERO: VARIAATIO 6 (Josua 27.10.) ----------
+   Kysymys ja valinnat ylimpänä, kuva alla. Ikonit vaaleissa palloissa,
+   arvosana pienenä merkkinä kuvan kulmassa. Korvaa aiemmat puhelinsäännöt
+   (kuva ylhäällä), koska tämä on tiedoston lopussa. */
+.s-badge{display:none}
+@media (max-width:900px){
+  .s-hero{padding-top:28px}
+  .s-hero-img{order:2;position:relative}
+}
+@media (max-width:620px){
+  body.selkea .s-choose{font-size:28px;margin:0 0 14px}
+  .s-opt{min-height:80px}
+  .s-opt>svg:first-child{width:44px;height:44px;padding:10px;border-radius:50%;background:var(--green-soft);flex:0 0 auto}
+  .s-opt-p>svg:first-child{background:rgba(255,255,255,.18)}
+  .s-hero-img img{aspect-ratio:4/3;object-position:50% 70%;border-radius:24px;box-shadow:0 18px 40px -24px rgba(0,0,0,.45)}
+  .s-badge{display:block;position:absolute;left:14px;top:14px;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:999px;padding:8px 14px;
+    font:600 16px/1 var(--s-font);color:var(--ink)}
+  .s-badge span{color:var(--star)}
+  /* Liike: valinnat ensin, kuva viimeisenä (nyt alimpana). */
+  .s-hero .s-choose{animation-delay:.15s}
+  .s-hero .s-opt:nth-child(1){animation-delay:.25s}
+  .s-hero .s-opt:nth-child(2){animation-delay:.35s}
+  .s-hero .s-opt:nth-child(3){animation-delay:.45s}
+  .s-hero .s-more{animation-delay:.55s}
+  .s-hero-img{animation-delay:.6s}
+}
