@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>TiivisKoti — 3 Kauppa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="apple.css">
+<style>
+/* 3 KAUPPA — Apple Storen ostosivu: "Valitse kohteet." Iso kuva vasemmalla
+   pysyy paikallaan, valinnat oikealla isoina kortteina joissa + ja − (56 px).
+   Hinta kelluu lasipalkissa alareunassa koko ajan — ei tarvitse etsiä. */
+body{background:var(--canvas);padding-bottom:110px}
+.head{padding-block:56px 24px}
+.head p{font:600 1.15rem/1 var(--font);color:var(--green);margin-bottom:10px}
+.shop{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start;padding-bottom:72px}
+.media{position:sticky;top:88px}
+.media img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:var(--r-lg);background:var(--parch)}
+.media figcaption{margin-top:12px;font-size:1rem;color:var(--mute)}
+.opts h2{font-size:1.75rem;margin:0 0 6px}
+.opts .sub{color:var(--mute);margin-bottom:20px;font-size:1.1rem}
+.card{border:2px solid var(--hair);border-radius:var(--r);padding:22px 22px;margin-bottom:12px;transition:border-color .15s}
+.card.on{border-color:var(--green)}
+.card .top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.card b{font-size:1.3rem}
+.card .pr{font-weight:600;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.card p{font-size:1.05rem;color:var(--mute);margin:4px 0 16px}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:56px;height:56px;border-radius:50%;border:0;background:var(--parch);color:var(--ink);
+  font:400 2rem/1 var(--font);cursor:pointer;display:grid;place-items:center;transition:transform .1s ease-out,background .15s}
+.step button:active{transform:scale(.92);background:#e5e5ea}
+.step button:disabled{opacity:.35;cursor:default}
+.step output{min-width:64px;text-align:center;font:600 1.7rem/1 var(--font-d);color:var(--ink);font-variant-numeric:tabular-nums}
+.tiers{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tiers span{border:1.5px solid var(--hair);border-radius:999px;padding:8px 14px;font-size:.98rem;color:var(--body)}
+.tiers span.on{border-color:var(--green);color:var(--green);font-weight:600;background:rgba(31,122,77,.06)}
+.incl{background:var(--parch);border-radius:var(--r);padding:24px;margin-top:20px}
+.incl h3{font-size:1.2rem;margin-bottom:10px}
+.incl ul{list-style:none;display:grid;gap:8px}
+.incl li{padding-left:30px;position:relative}
+.incl li::before{content:"";position:absolute;left:4px;top:.45em;width:14px;height:8px;border-left:2.5px solid var(--green);border-bottom:2.5px solid var(--green);transform:rotate(-45deg)}
+.band{background:var(--parch);padding:72px 0}
+.band .g{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.band .g div{background:#fff;border-radius:var(--r);padding:28px}
+.band h3{margin-bottom:8px}
+/* lasipalkki */
+.bag{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(245,245,247,.82);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--hair)}
+.bag .wrap{display:flex;align-items:center;gap:20px;min-height:88px}
+.bag .sum{font:600 1.7rem/1.1 var(--font-d);color:var(--ink);font-variant-numeric:tabular-nums}
+.bag .sum small{display:block;font:400 1rem/1.3 var(--font);color:var(--mute)}
+.bag .btn{margin-left:auto}
+.bag .call{color:var(--ink);font-weight:600}
+@media (prefers-reduced-transparency:reduce){.bag{background:var(--parch);backdrop-filter:none}}
+@media (max-width:860px){
+  .shop{grid-template-columns:1fr;gap:28px}
+  .media{position:static}.media img{aspect-ratio:16/10}
+  .band .g{grid-template-columns:1fr}
+  .bag .call{display:none}
+  .bag .sum{font-size:1.4rem}
+  .bag .btn{padding:0 22px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Siirry sisältöön</a>
+<header class="nav"><div class="wrap">
+  <a class="logo" href="#">Tiivis<span>Koti</span></a>
+  <nav class="nav-links" aria-label="Päävalikko"><a href="#valitse">Valitse kohteet</a><a href="#sisaltyy">Mitä sisältyy</a><a class="tel" href="tel:+3584578311972">045 7831 1972</a></nav>
+</div></header>
+
+<main id="main">
+  <div class="wrap head">
+    <p>Tiivisteiden vaihto</p>
+    <h1 class="rv">Valitse kohteet.<br><span style="color:var(--mute)">Näet hinnan heti.</span></h1>
+  </div>
+
+  <div class="wrap shop" id="valitse">
+    <figure class="media rv">
+      <img id="pic" src="../assets/ikkunat.webp" alt="Valkoinen ikkuna harmaassa puutalossa">
+      <figcaption>Kiinteä hinta. Ei lisiä jälkikäteen.</figcaption>
+    </figure>
+
+    <div class="opts">
+      <h2>Montako on?</h2>
+      <p class="sub">Paina + tai −. Arvio riittää, tarkistamme määrän paikan päällä.</p>
+
+      <div class="card" data-k="win" data-pic="../assets/ikkunat.webp">
+        <div class="top"><b>Ikkunat</b><span class="pr" id="winPr">90 € / kpl</span></div>
+        <p>Sisäpuitteen ja sisäkarmin tiivisteet.</p>
+        <div class="step"><button type="button" data-d="-1" aria-label="Vähemmän ikkunoita">−</button><output aria-live="polite">0</output><button type="button" data-d="1" aria-label="Lisää ikkuna">+</button></div>
+        <div class="tiers" aria-label="Määräalennus"><span data-t="90">1–4: 90 €</span><span data-t="85">5–9: 85 €</span><span data-t="80">10–13: 80 €</span><span data-t="75">14+: 75 €</span></div>
+      </div>
+      <div class="card" data-k="door" data-pic="../assets/ulko-ovet.webp">
+        <div class="top"><b>Ulko-ovet</b><span class="pr">99 € / kpl</span></div>
+        <p>Tiivisteet, säätö, lukkojen ja saranoiden öljyäminen.</p>
+        <div class="step"><button type="button" data-d="-1" aria-label="Vähemmän ulko-ovia">−</button><output aria-live="polite">0</output><button type="button" data-d="1" aria-label="Lisää ulko-ovi">+</button></div>
+      </div>
+      <div class="card" data-k="slide" data-pic="../assets/ulko-ovet.webp">
+        <div class="top"><b>Liuku- tai pariovet</b><span class="pr">149 € / kpl</span></div>
+        <p>Terassin ja parvekkeen isot ovet.</p>
+        <div class="step"><button type="button" data-d="-1" aria-label="Vähemmän liukuovia">−</button><output aria-live="polite">0</output><button type="button" data-d="1" aria-label="Lisää liukuovi">+</button></div>
+      </div>
+      <div class="card" data-k="inner" data-pic="../assets/miksi-tyo.webp">
+        <div class="top"><b>Huoneovet</b><span class="pr" id="innerPr">89 € / kpl</span></div>
+        <p>59 €, kun samalla käynnillä tehdään muutakin.</p>
+        <div class="step"><button type="button" data-d="-1" aria-label="Vähemmän huoneovia">−</button><output aria-live="polite">0</output><button type="button" data-d="1" aria-label="Lisää huoneovi">+</button></div>
+      </div>
+
+      <div class="incl" id="sisaltyy">
+        <h3>Hintaan sisältyy</h3>
+        <ul><li>Käynti ja matkat</li><li>Lämpökamerakuvaus ennen työtä</li><li>Uudet tiivisteet ja asennus</li><li>Siivous lähtiessä</li><li>Maksu vasta työn jälkeen</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <section class="band"><div class="wrap">
+    <h2 class="rv" style="margin-bottom:28px">Miksi TiivisKoti?</h2>
+    <div class="g">
+      <div class="rv"><h3>Oma porukka</h3><p>Ei alihankintaa. Tiedät kuka tulee.</p></div>
+      <div class="rv"><h3>5,0 Googlessa</h3><p><span class="stars" aria-hidden="true">★★★★★</span> 15 arvostelua.</p></div>
+      <div class="rv"><h3>−40 % verosta</h3><p>Kotitalousvähennys työn osuudesta.</p></div>
+    </div>
+  </div></section>
+</main>
+
+<footer class="foot"><div class="wrap">
+  <p>TiivisKoti · <a style="display:inline" class="tel" href="tel:+3584578311972">045 7831 1972</a> · info@tiiviskoti.fi · Uusimaa ja Riihimäki</p>
+</div></footer>
+
+<div class="bag" role="region" aria-label="Hinta">
+  <div class="wrap">
+    <div class="sum" aria-live="polite"><span id="tot">0 €</span><small id="net">Valitse kohteet</small></div>
+    <a class="call tel" href="tel:+3584578311972">Soita 045 7831 1972</a>
+    <a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Valitse aika</a>
+  </div>
+</div>
+
+<script src="apple.js"></script>
+<script>
+const q = { win: 0, door: 0, slide: 0, inner: 0 };
+const pic = document.getElementById('pic');
+function render() {
+  const r = tkPrice(q);
+  document.querySelectorAll('.card').forEach((c) => {
+    const n = q[c.dataset.k];
+    c.querySelector('output').textContent = n;
+    c.querySelector('[data-d="-1"]').disabled = n === 0;
+    c.classList.toggle('on', n > 0);
+  });
+  document.getElementById('winPr').textContent = r.tier + ' € / kpl';
+  document.getElementById('innerPr').textContent = (q.win + q.door + q.slide + q.inner > 1 ? 59 : 89) + ' € / kpl';
+  document.querySelectorAll('.tiers span').forEach((s) => s.classList.toggle('on', q.win > 0 && +s.dataset.t === r.tier));
+  document.getElementById('tot').textContent = tkEur(r.total);
+  document.getElementById('net').textContent = r.total
+    ? (r.net < r.total ? 'Vähennyksen jälkeen n. ' + tkEur(r.net) : 'Sis. ALV. Pienin veloitus 149 €')
+    : 'Valitse kohteet';
+}
+document.querySelectorAll('.card').forEach((c) => {
+  c.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    q[c.dataset.k] = Math.max(0, Math.min(60, q[c.dataset.k] + +b.dataset.d));
+    if (pic.getAttribute('src') !== c.dataset.pic) pic.src = c.dataset.pic;
+    render();
+  }));
+});
+render();
+</script>
+</body>
+</html>

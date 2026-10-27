@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>TiivisKoti — 1 Galleria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="apple.css">
+<style>
+/* 1 GALLERIA — Applen etusivu: koko leveyden tiilet, vaalea ↔ parchment ↔ tumma.
+   Värin vaihto on osion raja. Otsikko keskellä, kaksi nappia, kuva alla. */
+.tile{padding:88px 0 0;text-align:center;overflow:hidden}
+.tile.pad{padding-bottom:88px}
+.tile.parch{background:var(--parch)}
+.tile.dark{background:var(--tile);color:var(--mute-dark)}
+.tile.dark h2,.tile.dark h1{color:var(--on-dark)}
+.tile .eyebrow{font:600 1.15rem/1 var(--font);color:var(--green);margin-bottom:14px}
+.tile.dark .eyebrow{color:var(--green-on-dark)}
+.tile .btns{justify-content:center}
+.tile .lead{margin:16px auto 30px;max-width:30ch}
+.tile.dark .lead{color:var(--mute-dark)}
+.photo{margin:56px auto 0;max-width:1180px;padding-inline:20px}
+.photo img{width:100%;aspect-ratio:16/8;object-fit:cover;border-radius:var(--r-lg) var(--r-lg) 0 0}
+.hero h1{max-width:14ch;margin-inline:auto}
+.rating{display:inline-flex;gap:10px;align-items:center;font-size:1.05rem;color:var(--ink);margin-bottom:22px}
+/* kaksi rinnakkaista tiiltä kuten Applen tuoteruudukko */
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;background:var(--canvas)}
+.pair .tile{border-radius:var(--r-lg);padding:64px 28px 0;background:var(--parch)}
+.pair .tile img{margin:40px auto 0;width:100%;max-width:520px;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r) var(--r) 0 0}
+.price-big{font:600 clamp(3.4rem,9vw,6rem)/1 var(--font-d);color:var(--on-dark);letter-spacing:-.03em;margin:22px 0 6px}
+.table{max-width:620px;margin:40px auto 0;border-collapse:collapse;width:100%;font-size:1.2rem}
+.table td{padding:18px 8px;border-top:1px solid rgba(255,255,255,.14);text-align:left;color:var(--on-dark)}
+.table td:last-child{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:900px;margin:48px auto 0;text-align:center}
+.facts b{display:block;font:600 2.6rem/1.1 var(--font-d);color:var(--ink);letter-spacing:-.02em;margin-bottom:8px}
+.quote{max-width:24ch;margin:0 auto;font:600 clamp(1.8rem,3.6vw,2.6rem)/1.25 var(--font-d);color:var(--ink);letter-spacing:-.015em}
+.who{margin-top:22px;font-size:1.1rem}
+@media (max-width:760px){
+  .pair{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr;gap:28px}
+  .tile{padding-top:64px}.tile.pad{padding-bottom:64px}
+  .photo img{aspect-ratio:4/3}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Siirry sisältöön</a>
+<header class="nav"><div class="wrap">
+  <a class="logo" href="#">Tiivis<span>Koti</span></a>
+  <nav class="nav-links" aria-label="Päävalikko"><a href="#ikkunat">Ikkunat</a><a href="#ovet">Ovet</a><a href="#hinnat">Hinnat</a><a href="#yhteys">Yhteystiedot</a></nav>
+  <a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a>
+</div></header>
+
+<main id="main">
+  <section class="tile hero">
+    <div class="wrap">
+      <div class="rating"><span class="stars" aria-hidden="true">★★★★★</span> 5,0 · 15 Google-arvostelua</div>
+      <h1 class="rv">Kylmä veto ei kuulu kotiin.</h1>
+      <p class="lead rv">Vaihdamme ovien ja ikkunoiden tiivisteet. Kiinteä hinta, yksi käynti.</p>
+      <div class="btns rv"><a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a><a class="btn btn-s" href="#hinnat">Katso hinnat</a></div>
+    </div>
+    <div class="photo rv"><img src="../assets/hero-entrance.webp" alt="TiivisKodin asentajat puutalon ulko-oven edessä"></div>
+  </section>
+
+  <div class="pair">
+    <section class="tile" id="ikkunat">
+      <p class="eyebrow">Ikkunat</p>
+      <h2 class="rv">Ei enää vetoa ikkunasta.</h2>
+      <p class="lead rv">75–90 € ikkuna. Mitä enemmän ikkunoita, sitä halvempi.</p>
+      <div class="btns rv" style="justify-content:center"><a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Varaa</a><a class="btn btn-s" href="#hinnat">Lisää</a></div>
+      <img class="rv" src="../assets/ikkunat.webp" alt="Valkoinen ikkuna harmaassa puutalossa">
+    </section>
+    <section class="tile" id="ovet">
+      <p class="eyebrow">Ulko-ovet</p>
+      <h2 class="rv">Ovi sulkeutuu taas kunnolla.</h2>
+      <p class="lead rv">99 € ovi. Tiivisteet, säätö ja lukkojen öljyäminen.</p>
+      <div class="btns rv" style="justify-content:center"><a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Varaa</a><a class="btn btn-s" href="#hinnat">Lisää</a></div>
+      <img class="rv" src="../assets/ulko-ovet.webp" alt="Kaksi ulko-ovea">
+    </section>
+  </div>
+
+  <section class="tile dark pad" id="hinnat">
+    <div class="wrap">
+      <p class="eyebrow">Hinnat</p>
+      <h2 class="rv">Hinta, jonka näet etukäteen.</h2>
+      <p class="price-big rv">alk. 75 €</p>
+      <p class="lead rv" style="margin-top:6px">ikkunalta. Työ, tiivisteet ja ALV sisältyvät.</p>
+      <table class="table rv">
+        <tr><td>Ikkuna, 1–4 kpl</td><td>90 €</td></tr>
+        <tr><td>Ikkuna, 5–9 kpl</td><td>85 €</td></tr>
+        <tr><td>Ikkuna, 10–13 kpl</td><td>80 €</td></tr>
+        <tr><td>Ikkuna, 14 kpl tai enemmän</td><td>75 €</td></tr>
+        <tr><td>Ulko-ovi</td><td>99 €</td></tr>
+        <tr><td>Liuku- tai pariovi</td><td>149 €</td></tr>
+      </table>
+      <p style="margin-top:22px;font-size:1.05rem">Pienin veloitus 149 € käynniltä. Kotitalousvähennys pienentää hintaa.</p>
+      <div class="btns rv" style="justify-content:center;margin-top:30px"><a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Laske oma hintasi</a></div>
+    </div>
+  </section>
+
+  <section class="tile parch pad">
+    <div class="wrap">
+      <h2 class="rv">Helppoa alusta loppuun.</h2>
+      <div class="facts">
+        <div class="rv"><b>1 min</b>Varaat ajan verkosta tai soitat.</div>
+        <div class="rv"><b>0 €</b>Lämpökamerakuvaus ennen työtä.</div>
+        <div class="rv"><b>−40 %</b>Kotitalousvähennys työn osuudesta.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tile pad">
+    <div class="wrap">
+      <p class="stars" style="font-size:1.4rem;margin-bottom:18px" aria-label="5 tähteä">★★★★★</p>
+      <p class="quote rv">”Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta.”</p>
+      <p class="who">Edwin T., Google-arvostelu</p>
+    </div>
+    <div class="photo rv"><img src="../assets/tiimi-porukka-etusivu.webp" alt="TiivisKodin asentajat yhdessä"></div>
+  </section>
+
+  <section class="tile dark pad" id="yhteys">
+    <div class="wrap">
+      <h2 class="rv">Kysy rohkeasti.</h2>
+      <p class="lead rv">Soita, niin käydään kohteet ja hinta läpi yhdessä. Oma porukka, ei alihankintaa.</p>
+      <div class="btns rv" style="justify-content:center"><a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a><a class="btn btn-light tel" href="tel:+3584578311972">Soita 045 7831 1972</a></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><div class="wrap">
+  <div class="cols">
+    <div><h4>Palvelut</h4><a href="#">Ikkunoiden tiivistys</a><a href="#">Ovien tiivistys</a><a href="#">Taloyhtiöt</a></div>
+    <div><h4>Yritys</h4><a href="#">Meistä</a><a href="#">Usein kysyttyä</a><a href="#">Toiminta-alueet</a></div>
+    <div><h4>Yhteys</h4><a class="tel" href="tel:+3584578311972">045 7831 1972</a><a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a></div>
+  </div>
+  <p class="legal">Tiiviskoti Oy · Y-tunnus 3652671-7 · Uusimaa ja Riihimäki</p>
+</div></footer>
+<script src="apple.js"></script>
+</body>
+</html>

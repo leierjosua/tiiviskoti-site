@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>TiivisKoti — 4 Ilta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="apple.css">
+<style>
+/* 4 ILTA — kuin iPhone Pro -sivu: musta näyttämö, valokuva hoitaa tunnelman,
+   valkoinen teksti on suurta ja harvaa. Tummat ja vaaleat osiot vuorottelevat,
+   jotta lukeminen ei väsytä. Kontrasti tummalla 15:1. */
+body{background:#000;color:var(--mute-dark)}
+.nav.dk{background:rgba(0,0,0,.72);border-bottom-color:rgba(255,255,255,.12)}
+.nav.dk .logo,.nav.dk .nav-links a{color:#f5f5f7}
+.hero{position:relative;min-height:92vh;display:grid;align-items:end;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 30%,rgba(0,0,0,.88))}
+.hero .wrap{position:relative;z-index:1;padding-bottom:80px;width:100%}
+.hero h1{color:#fff;max-width:13ch}
+.hero .lead{color:#e5e5ea;margin:18px 0 32px;max-width:32ch}
+.dk h2{color:#f5f5f7}
+.sec{padding:110px 0}
+.sec.light{background:var(--canvas);color:var(--body)}
+.sec.parch{background:var(--parch);color:var(--body)}
+.sec.tile{background:var(--tile)}
+.kicker{font:600 1.15rem/1 var(--font);color:var(--green-on-dark);margin-bottom:14px}
+.light .kicker,.parch .kicker{color:var(--green)}
+.huge{font:600 clamp(3rem,10vw,7.5rem)/1 var(--font-d);letter-spacing:-.035em;color:#f5f5f7}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.split img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:var(--r-lg)}
+.specs{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.12);border-radius:var(--r);overflow:hidden;margin-top:56px}
+.specs div{background:var(--tile);padding:30px 24px}
+.specs b{display:block;font:600 2.3rem/1.1 var(--font-d);color:#f5f5f7;margin-bottom:8px;letter-spacing:-.02em}
+.list{list-style:none;margin-top:26px;display:grid;gap:14px;font-size:1.25rem}
+.list li{display:flex;justify-content:space-between;border-bottom:1px solid var(--hair);padding-bottom:14px;color:var(--ink)}
+.list li span:last-child{font-weight:600;font-variant-numeric:tabular-nums}
+.q{font:600 clamp(1.8rem,3.8vw,2.8rem)/1.25 var(--font-d);color:#f5f5f7;max-width:26ch;letter-spacing:-.015em}
+.end{text-align:center}
+.end .btns{justify-content:center;margin-top:30px}
+.dk a:not(.btn){color:var(--green-on-dark)}
+@media (max-width:860px){
+  .split{grid-template-columns:1fr;gap:32px}
+  .specs{grid-template-columns:1fr 1fr}
+  .sec{padding:72px 0}
+  .hero{min-height:86vh}
+}
+</style>
+</head>
+<body class="dk">
+<a class="skip" href="#main">Siirry sisältöön</a>
+<header class="nav dk"><div class="wrap">
+  <a class="logo" href="#">Tiivis<span style="color:var(--green-on-dark)">Koti</span></a>
+  <nav class="nav-links" aria-label="Päävalikko"><a href="#tyo">Työ</a><a href="#hinnat">Hinnat</a><a class="tel" href="tel:+3584578311972">045 7831 1972</a></nav>
+  <a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a>
+</div></header>
+
+<main id="main">
+  <section class="hero">
+    <img src="../assets/hero-kela.webp" alt="Tiivistekela lähikuvassa">
+    <div class="wrap">
+      <p class="kicker rv">Ovien ja ikkunoiden tiivistys</p>
+      <h1 class="rv">Lämpö pysyy sisällä.</h1>
+      <p class="lead rv">Uudet tiivisteet yhdellä käynnillä. Kiinteä hinta, jonka näet ennen varausta.</p>
+      <div class="btns rv"><a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a><a class="btn btn-light tel" href="tel:+3584578311972">Soita</a></div>
+    </div>
+  </section>
+
+  <section class="sec tile center"><div class="wrap">
+    <p class="kicker rv">Vetävä koti</p>
+    <p class="huge rv">10–15 %</p>
+    <p class="lead rv" style="color:var(--mute-dark);margin:20px auto 0;max-width:30ch">Niin paljon vetävä ovi tai ikkuna tyypillisesti nostaa lämmityskuluja.</p>
+    <div class="specs">
+      <div class="rv"><b>75 €</b>ikkuna alkaen</div>
+      <div class="rv"><b>99 €</b>ulko-ovi</div>
+      <div class="rv"><b>0 €</b>lämpökamerakuvaus</div>
+      <div class="rv"><b>−40 %</b>kotitalousvähennys</div>
+    </div>
+  </div></section>
+
+  <section class="sec light" id="tyo"><div class="wrap split">
+    <img class="rv" src="../assets/miksi-tyo.webp" alt="Asentaja vaihtaa oven tiivistettä">
+    <div>
+      <p class="kicker rv">Työ</p>
+      <h2 class="rv">Tehty käsin. Siivottu lähtiessä.</h2>
+      <p class="lead rv" style="margin-top:18px">Poistamme vanhat tiivisteet, puhdistamme pinnat ja asennamme uudet. Ulko-ovet säädetään ja lukot öljytään samalla.</p>
+      <p class="rv" style="margin-top:18px">Oma porukka, ei alihankintaa.</p>
+    </div>
+  </div></section>
+
+  <section class="sec parch" id="hinnat"><div class="wrap split">
+    <div>
+      <p class="kicker rv">Hinnat</p>
+      <h2 class="rv">Mitä enemmän, sitä edullisempi.</h2>
+      <ul class="list rv">
+        <li><span>Ikkuna, 1–4 kpl</span><span>90 €</span></li>
+        <li><span>Ikkuna, 5–9 kpl</span><span>85 €</span></li>
+        <li><span>Ikkuna, 10–13 kpl</span><span>80 €</span></li>
+        <li><span>Ikkuna, 14+ kpl</span><span>75 €</span></li>
+        <li><span>Ulko-ovi</span><span>99 €</span></li>
+        <li><span>Liuku- tai pariovi</span><span>149 €</span></li>
+      </ul>
+      <p class="rv" style="margin-top:18px;font-size:1.05rem">Sisältää työn, tiivisteet ja ALV:n. Pienin veloitus 149 € / käynti.</p>
+      <div class="btns rv" style="margin-top:28px"><a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Laske oma hinta</a></div>
+    </div>
+    <img class="rv" src="../assets/ikkunat.webp" alt="Valkoinen ikkuna harmaassa puutalossa">
+  </div></section>
+
+  <section class="sec tile"><div class="wrap">
+    <p class="stars rv" style="font-size:1.3rem;margin-bottom:20px" aria-label="5 tähteä">★★★★★</p>
+    <p class="q rv">”Lopputulos vaikuttaa hyvältä. Pari juttua oli korjattava ja nekin hoituivat nopeasti ilman viivettä.”</p>
+    <p class="rv" style="margin-top:20px">Marjut S. · 5,0 / 15 arvostelua Googlessa</p>
+  </div></section>
+
+  <section class="sec end"><div class="wrap">
+    <h2 class="rv">Talveen valmiiksi.</h2>
+    <p class="lead rv" style="color:var(--mute-dark);margin-top:14px">Varaa aika verkosta alle minuutissa, tai soita <a class="tel" href="tel:+3584578311972">045 7831 1972</a>.</p>
+    <div class="btns rv"><a class="btn btn-p" href="https://tiiviskoti.fi/varaa.html">Varaa aika</a></div>
+  </div></section>
+</main>
+
+<footer class="foot" style="background:#000;border-top:1px solid rgba(255,255,255,.12);color:var(--mute-dark)"><div class="wrap">
+  <p>Tiiviskoti Oy · Y-tunnus 3652671-7 · info@tiiviskoti.fi · Uusimaa ja Riihimäki</p>
+</div></footer>
+<script src="apple.js"></script>
+</body>
+</html>
