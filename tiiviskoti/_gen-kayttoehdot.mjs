@@ -245,6 +245,7 @@ const out = `<!doctype html>
 <style>
 ${css}
 ${extraCss}</style>
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body>
 ${nav}

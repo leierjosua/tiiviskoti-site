@@ -1,0 +1,301 @@
+/* ============================================================
+   TIIVISKOTI — SIVUSTON TEEMA (kaikki sivut paitsi etusivu)
+   Sama ilme kuin etusivulla (Selkeä, 27.10.2026): Applen hiljainen tyyli,
+   ikääntyneille helppo. Ladataan JOKAISEN sivun viimeisenä tyylinä, joten
+   tämä vain ylikirjoittaa: värit, fontti, napit, navi, kortit, varauskortti,
+   alatunniste. Sivujen rakenne ja skriptit ovat ennallaan.
+   Etusivu käyttää _selkea.css:ää (sama pohja + etusivun oma asettelu).
+   `body`-etuliite voittaa sivujen omat mediakyselyt spesifisyydellä.
+   Generaattorit (build-alueet.mjs, _gen-*.mjs) lisäävät tämän linkin.
+   ============================================================ */
+:root{
+  --bg:#ffffff; --alt:#f5f5f7; --card:#ffffff; --imgtop:#f5f5f7;
+  --ink:#1d1d1f; --text:#424245; --mute:#56565b;
+  --green:#1F7A4E; --green-d:#17623D; --green-l:#1F7A4E; --green-soft:#EAF3EE;
+  --deep:#1d1d1f; --deep2:#2c2c2e;
+  --line:#e5e5ea; --line2:#c2c2c8; --star:#B7790F;
+  --focus:#0B6BD6;
+  --s-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+  --s-font-d:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif;
+}
+body{font-family:var(--s-font);font-size:19px;line-height:1.55;color:var(--text);background:#fff;letter-spacing:-.005em}
+body h1,body h2,body h3{font-family:var(--s-font-d);font-weight:600;color:var(--ink);letter-spacing:-.022em}
+body b,body strong{font-weight:600}
+body :where(main a:not(.btn,.lnk,.card a),.sec p a,.faq a){color:var(--green);text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
+
+
+/* Napit */
+/* Napit */
+body .btn{min-height:56px;padding:14px 30px;font:600 18px/1.2 var(--s-font);border-radius:999px;white-space:nowrap;
+  transition:transform .12s ease-out,background-color .15s;letter-spacing:0}
+body .btn:active{transform:scale(.97)}
+body .btn-lg{min-height:60px;padding:16px 34px;font-size:19px}
+body .btn-p{background:var(--green);color:#fff;border:0}
+body .btn-p:hover{background:var(--green-d)}
+body .btn-alt,body .btn-o{background:var(--green-soft);color:var(--green);border:0}
+body .btn-alt:hover,body .btn-o:hover{background:#dcebe2}
+
+/* UKK */
+body .faq{margin-top:40px;max-width:none}
+body .faq .q{border-bottom:1px solid var(--line);background:none;border-radius:0;box-shadow:none;margin:0}
+body .faq .q:first-child{border-top:1px solid var(--line)}
+body .faq .q button{font:600 19px/1.35 var(--s-font);color:var(--ink);padding:22px 0;min-height:64px;gap:16px;letter-spacing:-.01em}
+body .faq .q .cv{width:22px;height:22px;color:var(--green);flex:0 0 auto}
+body .faq .a p{font-size:18px;line-height:1.6;color:var(--text);padding:0 0 22px}
+
+
+/* ---------- VARAUSKORTTI (index.html:n markup) ---------- */
+body .s-book-x .title{font-size:clamp(32px,3.8vw,44px);font-weight:600}
+body #laskuri .sub{font-size:19px;color:var(--mute)}
+body .stepcard{border-radius:28px;border:0;box-shadow:none}
+body .stepback{font-size:18px;min-height:48px;padding:8px 14px 8px 6px}
+body .steptag{font-size:16px;font-weight:700;color:var(--ink);background:var(--alt);padding:8px 14px;border-radius:999px}
+body .stepdots{gap:8px}
+/* postinumero + polun valinta */
+body .gate-tab{min-height:64px;font-size:18px;border-width:1.5px}
+body .gate-tab b{font-size:18px}
+body .gate-tab span{font-size:16px}
+body .gate-field label{font-size:20px}
+body .gate-hint{font-size:17px;line-height:1.5;color:var(--text)}
+body .gate-postal{font-size:24px!important;min-height:60px;max-width:220px;letter-spacing:.08em}
+body .gate-step{width:32px;height:32px;font-size:17px}
+body .gate-cta{min-height:60px;font-size:19px}
+body .gate-ticks{font-size:17px}
+body .gate-more summary{font-size:18px;min-height:48px;display:flex;align-items:center}
+body .gate-more p,body .gate-lead{font-size:18px}
+body .area-note{font-size:17px;line-height:1.5}
+/* laskuri */
+body .order-hd{font-size:16px}
+body .wtype-ic,body .wtype-ic svg{width:34px;height:34px}
+body .wtype-name{font-size:19px}
+body .wtype-desc{font-size:16px;color:var(--mute)}
+body .wtype-price,body .wtype-tier{font-size:16px}
+body .wtype-next{font-size:16px;padding:5px 10px}
+body .stepper-btns{gap:10px}
+body .stp{width:46px;height:46px;border-radius:50%;font-size:24px;border-width:1.5px}
+body .qty{font-size:22px;min-width:34px}
+body .qty-edit{width:64px;font-size:22px;min-height:44px}
+body .wtype-tiers .tl{font-size:16px}
+body .tchip{font-size:16px;padding:9px 15px;min-height:44px}
+body .morecats{font-size:18px;min-height:56px}
+body .extras-hd{font-size:16px;letter-spacing:.02em}
+body .extra{min-height:60px}
+body .extra-nm{font-size:17px;color:var(--ink)}
+body .extra-pr{font-size:16px}
+body .extra-note{font-size:15px}
+body .extra-chk{width:24px;height:24px;font-size:15px;border-width:1.5px}
+body .extra.extra-q{padding-left:58px}
+body .extra-stp .stp{width:44px;height:44px;font-size:22px}
+body .extra-stp .qty{font-size:20px;min-width:28px}
+body .order-note{font-size:16px}
+/* yhteenveto */
+body .quote{border-radius:20px}
+body .q-t{font-size:16px}
+body .rc-lines,body .rc-empty{font-size:17px}
+body .q-total .pt{font-size:16px}
+body .q-net{font-size:17px}
+body .q-meta span{font-size:15px}
+body .q-btn{min-height:60px;font-size:19px;background:var(--green);color:#fff}
+body .q-note{font-size:16px;line-height:1.5}
+body .cb-open{font-size:18px;min-height:56px;text-align:left}
+body .cb-lead,body .cb-l{font-size:17px}
+body .cb-i{font-size:19px;min-height:56px;border-width:1.5px;border-radius:14px}
+body .cb-send{min-height:56px;font-size:19px}
+/* kalenteri */
+body .mname{font-size:22px}
+body .mnav{width:52px;height:52px}
+body .dow span{font-size:16px}
+body .day{font-size:19px;border-radius:12px}
+body .slots-title{font-size:19px;color:var(--ink);font-weight:700}
+body .slots{gap:10px}
+body .slot{font-size:18px;min-height:56px;padding:14px 8px;border-radius:12px;border-width:1.5px}
+body .tk-vapaa{font-size:17px}
+/* yhteystiedot */
+body .steprecap .when{font-size:19px}
+body .steprecap .svc,body .steprecap .chg{font-size:17px}
+body .bside h3{font-size:24px}
+body .bsub{font-size:17px}
+body .bsum{font-size:17px}
+body .bk-field label{font-size:18px;font-weight:700;color:var(--ink)}
+body .bk-input{font-size:19px;min-height:56px;padding:14px 16px;border-width:1.5px;border-radius:14px;background:#fff}
+body .bk-note,body .bk-err{font-size:17px}
+body .bk-trust{font-size:16px;line-height:1.5}
+body .refno{font-size:22px}
+body .lead-f input{font-size:20px;min-height:56px}
+
+/* Loput alle 16 px:n tekstit varauskortissa (mitattu Playwrightilla 27.10.).
+   Osa tulee _shared.js:n ajonaikaisista tyyleistä — siksi #id ja !important. */
+body .wguide b{font-size:17px}
+body .wguide span{font-size:16px}
+body .ab-seg button{min-height:64px}
+body .ab-seg b{font-size:18px}
+body .ab-seg span{font-size:16px}
+body .cp-line{font-size:17px;color:var(--ink);border-bottom-color:var(--line)}
+body .cp-line b{color:var(--ink)}
+body .cp-line .cnt{color:var(--green)}
+body .tchip.on,body .tchip.on b{color:#fff}
+body .cp-unit{font-size:16px;color:var(--mute)}
+body .q-total .pv small{font-size:.5em}
+body .q-meta b{font-size:21px}
+body .q-meta span{font-size:16px}
+body .extra-chk{font-size:16px}
+body .extra-note{font-size:16px}
+body #bPrice span,body #bWhen span{font-size:16px!important;opacity:1!important}
+
+/* footer */
+body .mfoot{background:var(--alt);color:var(--text);border-top:1px solid var(--line)}
+body .mfoot .logo .d,body .mfoot h4{color:var(--ink)}
+body .mfoot p,body .mfoot a,body .mfoot span{font-size:16px;color:var(--text)}
+body .mfoot .mf-col a{line-height:2.3}
+body .mfoot .logo svg rect:first-child{fill:var(--green)}
+body .mf-bot{border-top-color:var(--line)}
+
+/* alapalkki puhelimessa */
+body .mcta{background:rgba(255,255,255,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+body .mcta .btn{flex:1;min-height:56px}
+
+
+/* Postinumerovaihe ilman sisäkkäisiä vihreitä laatikoita: kenttä suoraan
+   kortilla, aluehuomio kevyenä harmaana rivinä. */
+body .gate-field{background:none;border:0;padding:0;margin-top:28px}
+body .area-note{background:var(--alt);border:0;border-radius:14px}
+body .gate-tab{background:#fff}
+body .gate-tab.on{background:var(--green-soft);border-color:var(--green)}
+
+/* ---------- SÄÄSTÖLASKURI (index.html:n #saasto, rauhallisempana) ---------- */
+body .s-saasto{padding:120px 0;background:#fff}
+body .s-saasto .kicker{display:none}
+body .s-saasto .title{font-size:clamp(32px,3.8vw,44px);font-weight:600}
+body .s-saasto .sub{font-size:19px;color:var(--mute);max-width:40ch;margin-inline:auto}
+body .sv-calc{gap:48px;align-items:center}
+body .sv-lbl{font-size:17px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink)}
+body .sv-seg{background:var(--alt);border-radius:16px}
+body .sv-tab{font-size:17px;font-weight:600;min-height:52px;border-radius:12px}
+body .sv-tab.on{box-shadow:0 1px 3px rgba(0,0,0,.12)}
+body .sv-f{font-size:17px}
+body .sv-inp{border:1.5px solid var(--line2);min-height:58px}
+body .sv-inp input{font-size:20px;font-weight:600}
+body .sv-inp em{font-size:16px}
+body .sv-hint{font-size:16px}
+body .sv-out{background:var(--alt);border:0;box-shadow:none;border-radius:28px}
+body .sv-res{background:#fff}
+body .sv-res-l{font-size:17px}
+body .sv-big{font-weight:700;font-family:var(--s-font-d)}
+body .sv-res-s{font-size:16px}
+body .sv-row{font-size:17px}
+body .sv-track{background:#fff;height:8px}
+body .sv-facts{border-top-color:#dedee3}
+body .sv-facts>div{border-left-color:#dedee3}
+body .sv-facts b{font-size:18px;font-weight:700}
+body .sv-facts>div>span{font-size:16px}
+body .save-note{font-size:16px;color:var(--mute);max-width:52ch;margin-top:24px}
+@media (max-width:860px){body .s-saasto{padding:80px 0}}
+@media (max-width:480px){body .sv-tab{font-size:16px}}
+body .sv-big .pre{font-size:max(16px,.38em)}
+/* Kentän oletusleveys (size=20 × 20 px) venytti ruudukon yli kapealla näytöllä. */
+body .sv-fields{grid-template-columns:minmax(0,1fr)}
+body .sv-in,body .sv-f,body .sv-inp{min-width:0;max-width:100%}
+body .sv-inp input{width:100%}
+body .sv-facts b{white-space:nowrap}
+
+
+@media (max-width:620px){
+  body .stp{width:44px;height:44px}
+  body .extra.extra-q{flex-wrap:wrap;row-gap:6px}
+  body .extra-q .extra-nm{flex-basis:100%}
+  body .extra-pr{flex:0 0 auto;margin-right:auto}
+  body .quote{padding:12px 14px}
+  body .q-total .pt{display:none}
+  body .q-total .pv{font-size:30px}
+  body .q-total .pv small{font-size:18px}
+  body .q-net{font-size:16px}
+  body .q-btn{min-height:56px;font-size:18px;padding:12px 18px}
+  body .wguide b{font-size:17px}
+  body .wguide span{font-size:16px}
+}
+
+/* ---------- MUIDEN SIVUJEN RAKENTEET ---------- */
+body{font-size:18px}
+.wrap{max-width:1120px}
+
+/* Navi: valkoinen lasi, ohut reuna — sama kuin etusivulla */
+body nav.top,body nav.top.scr{background:rgba(255,255,255,.85);border-bottom:1px solid rgba(0,0,0,.06);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
+body nav.top .wrap{height:68px}
+body nav.top .logo{font-family:var(--s-font-d);letter-spacing:-.02em}
+body nav.top .logo .b,body .logo .b{color:var(--green)}
+body .nlinks a{font-size:16px;font-weight:400;color:var(--ink)}
+body .ntel{font-size:16px;font-weight:600;color:var(--ink)}
+body nav.top .btn{min-height:44px;padding:10px 20px;font-size:16px}
+@media (prefers-reduced-transparency:reduce){body nav.top{background:#fff;backdrop-filter:none}}
+
+/* Osiot ja otsikot */
+body .sec{padding-block:clamp(72px,9vw,112px)}
+body .alt{background:var(--alt)}
+body .kicker{font-size:16px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--green)}
+body .kicker::before{display:none}
+body h2.title{font-size:clamp(30px,3.8vw,44px);font-weight:600;line-height:1.1;letter-spacing:-.022em}
+body .sub{font-size:19px;color:var(--mute);line-height:1.5}
+body .lnk{font-size:17px;font-weight:600;color:var(--green)}
+
+/* Hero */
+body .hero h1{font-weight:600;letter-spacing:-.03em}
+body .hero h1 .a{color:var(--green)}
+body .hero-sub{font-size:clamp(19px,2vw,22px);line-height:1.45;color:var(--text)}
+body .hero .rating{font-size:16px}
+body .hero-fine{font-size:16px}
+body .hero-card{border-radius:28px;box-shadow:none;border:0}
+
+/* Mittarit, kortit, perustelut, arvostelut: ei reunoja eikä varjoja */
+body .metric,body .card,body .rev,body .wstat,body .tbadge{border:0;box-shadow:none}
+body .metric{background:var(--alt);border-radius:22px}
+body .metric>span,body .wstat>span{font-size:16px;color:var(--mute)}
+body .card{background:var(--alt);border-radius:24px;overflow:hidden}
+body .card:hover{box-shadow:none}
+body .card h3{font-size:22px;font-weight:600}
+body .card p{font-size:17px;color:var(--text)}
+body .card-fig .tag{font-size:16px;font-weight:600}
+body .why-fig{border-radius:28px;box-shadow:none;border:0}
+body .tbadge-main span{font-size:16px}
+body .rev{background:var(--alt);border-radius:22px}
+body .rev p{font-size:18px}
+body .pill{font-size:16px}
+body .save-note{font-size:16px}
+body .cta{border-radius:28px}
+body .cta p{font-size:19px}
+
+/* Alatunnisteen kaupunkilista */
+body .mf-cities .list a,body .mf-cities h4{font-size:16px}
+body .mf-col .mf-hours b{color:var(--ink)}
+
+/* Valokuvan päällä (taloyhtio.html, kartoitus.html) toissijainen nappi on
+   lasia: ilman reunaa ja taustaa se katosi kuvaan kokonaan. */
+body .ty-hero .hero-cta .btn-alt,body .ty-hero .hero-cta .btn-o{background:rgba(255,255,255,.16);color:#fff;
+  border:1.5px solid rgba(255,255,255,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+body .ty-hero .hero-cta .btn-alt:hover,body .ty-hero .hero-cta .btn-o:hover{background:rgba(255,255,255,.26)}
+
+/* ---------- Ei tekstiä alle 16 px (mitattu kaikilta 74 sivulta 27.10.) ---------- */
+body .mf-col h4,body .mf-cities h4{font-size:16px;letter-spacing:.02em}
+body .mf-rate,body .mf-col .mf-hours,body .mf-col .mf-hours b,body .mf-col .mf-hours span{font-size:16px}
+body .mf-bot,body .mf-bot a,body .mf-bot span{font-size:16px}
+body .wrap>.sub,body .sec .sub,body .sub{font-size:max(17px,1em)}
+body .faq-d p,body .faq .a p{font-size:17px}
+body table th,body table td,body table .mut,body table .num,body table strong,body table b{font-size:16px}
+body .osat .osa,body .aluecard span{font-size:16px}
+body article p,body article li,body time,body .wrap>p{font-size:max(17px,1em)}
+body .tkc-fab .t{font-size:16px}
+body .metric span,body .step p{font-size:16px}
+body .upd,body dl dt,body dl dd,body .box p,body .lg p{font-size:16px}
+body .h-lead,body .h-note,body .h-box p{font-size:17px}
+body .kt-phone{font-size:16px}
+body .tben p,body .tf label,body .tform-trust,body .tform-trust a{font-size:16px}
+body .yh-lead{font-size:18px}
+body .yh-vihje,body .yh-vihje b,body .yh-f label,body .yh-hinnat h4,body .yh-hinnat dt,body .yh-hinnat dd{font-size:16px}
+body p b,body p strong,body li b{font-size:inherit}
+/* Sivukohtaiset säännöt ovat tarkempia kuin yllä olevat; vähimmäiskoko
+   pakotetaan, mutta max(16px,1em) säilyttää isommat koot ennallaan. */
+body :is(.crumb,.crumb a,.osat span,th,td,td span,p.sub,article p,.metric span,.ty-metrics p,.upd,.lg p,.lg a,.box p,dd,dt,.h-faq p,li>span,li>b,figcaption span,.rv>p,.wrap>p,.step p){font-size:max(16px,1em)!important}
+/* Inline-tyylillä pienennetyt tekstit (meista.html, artikkelit.html, ota-yhteytta.html). */
+body :is(span,p,a,b,small,div)[style*="font-size:12"],body :is(span,p,a,b,small,div)[style*="font-size:13"],
+body :is(span,p,a,b,small,div)[style*="font-size:14"],body :is(span,p,a,b,small,div)[style*="font-size:15"],
+body dd span{font-size:16px!important}

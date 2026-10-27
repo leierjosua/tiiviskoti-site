@@ -68,7 +68,7 @@ body.selkea .s-choose{font-size:21px;font-weight:600;margin:40px 0 14px;letter-s
 .s-opt{display:flex;align-items:center;gap:16px;min-height:76px;padding:14px 20px;border-radius:20px;
   background:var(--alt);color:var(--ink);text-decoration:none;transition:transform .12s ease-out,background-color .15s}
 .s-opt:hover{background:#ebebef}
-.s-opt:active{transform:scale(.98)}
+
 .s-opt svg{width:26px;height:26px;flex:0 0 auto;color:var(--green)}
 .s-opt span{flex:1;min-width:0;line-height:1.3}
 body.selkea .s-opt b{display:block;font-size:20px;font-weight:600;color:var(--ink)}
@@ -381,3 +381,45 @@ body.selkea .sv-facts b{white-space:nowrap}
   .s-hero .s-rating,.s-hero .s-lead{display:none}
   body.selkea .s-choose{font-size:22px;margin:4px 0 12px}
 }
+
+/* ---------- LIIKE (samat arvot kuin _anim.css:n vanhalla herolla) ----------
+   Hero purkautuu latauksessa porrastetusti 0,8 s käyrällä
+   cubic-bezier(.16,1,.3,1); muut osiot nousevat .rv-luokalla vieritettäessä
+   (_shared.js + _anim.css). Kuva tulee viimeisenä hieman isompana nousuna. */
+.s-hero .s-rating,.s-hero h1,.s-hero .s-lead,.s-hero .s-choose,.s-hero .s-opt,.s-hero .s-more{
+  animation:tk-nousu .8s var(--anim-ease,cubic-bezier(.16,1,.3,1)) both}
+.s-hero h1{animation-name:tk-nousu-iso}
+.s-hero-img{animation:tk-nousu-iso .9s var(--anim-ease,cubic-bezier(.16,1,.3,1)) .15s both}
+.s-hero .s-rating{animation-delay:.2s}
+.s-hero h1{animation-delay:.35s}
+.s-hero .s-lead{animation-delay:.55s}
+.s-hero .s-choose{animation-delay:.7s}
+.s-hero .s-opt:nth-child(1){animation-delay:.8s}
+.s-hero .s-opt:nth-child(2){animation-delay:.9s}
+.s-hero .s-opt:nth-child(3){animation-delay:1s}
+.s-hero .s-more{animation-delay:1.1s}
+/* Puhelimessa kuva on ensin: se aloittaa, valinnat seuraavat heti perään. */
+@media (max-width:620px){
+  .s-hero-img{animation-delay:.1s}
+  .s-hero .s-choose{animation-delay:.3s}
+  .s-hero .s-opt:nth-child(1){animation-delay:.4s}
+  .s-hero .s-opt:nth-child(2){animation-delay:.5s}
+  .s-hero .s-opt:nth-child(3){animation-delay:.6s}
+  .s-hero .s-more{animation-delay:.7s}
+}
+/* Kortin hover ja painallus kuten muualla sivustolla. */
+.s-opt{transition:translate .18s cubic-bezier(.16,1,.3,1),background-color .18s,scale .18s}
+.s-opt:hover{translate:0 -2px}
+.s-opt:active{scale:.98;translate:0 0}
+@media (prefers-reduced-motion:reduce){
+  .s-hero *,.s-hero-img{animation:none!important;opacity:1!important;transform:none!important}
+  .s-opt:hover{translate:none}
+}
+
+/* Puhelinnäkymä hieman alemmas navista (Josua 27.10.). */
+@media (max-width:900px){ .s-hero{padding-top:40px} }
+
+/* Alatunnisteen otsikot ja aukioloajat vähintään 16 px (sama kuin _teema.css). */
+body.selkea .mf-col h4,body.selkea .mf-cities h4{font-size:16px;letter-spacing:.02em}
+body.selkea .mf-rate,body.selkea .mf-col .mf-hours,body.selkea .mf-col .mf-hours b,body.selkea .mf-col .mf-hours span{font-size:16px}
+body.selkea .mf-col .mf-hours b{color:var(--ink)}

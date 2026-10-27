@@ -1157,26 +1157,26 @@ header.hero .wrap.hero-grid{padding-top:clamp(124px,16vh,160px)}
 
 <!-- NÄIN SE TOIMII — kolme lyhyttä askelta ilman kortteja. -->
 <section class="s-sec" id="miksi"><div class="s-wrap">
-  <h2 class="s-h">Näin se toimii</h2>
+  <h2 class="s-h rv">Näin se toimii</h2>
   <ol class="s-steps">
-    <li><h3>Varaa aika</h3><p>Verkosta tai puhelimella. Hinta näkyy heti.</p></li>
-    <li><h3>Me tulemme</h3><p>Oma porukka, ei alihankintaa. Vaihdamme tiivisteet ja siivoamme jälkemme.</p></li>
-    <li><h3>Maksat jälkeenpäin</h3><p>Laskulla saat kotitalousvähennyksen.</p></li>
+    <li class="rv stagger" style="--rv-i:0"><h3>Varaa aika</h3><p>Verkosta tai puhelimella. Hinta näkyy heti.</p></li>
+    <li class="rv stagger" style="--rv-i:1"><h3>Me tulemme</h3><p>Oma porukka, ei alihankintaa. Vaihdamme tiivisteet ja siivoamme jälkemme.</p></li>
+    <li class="rv stagger" style="--rv-i:2"><h3>Maksat jälkeenpäin</h3><p>Laskulla saat kotitalousvähennyksen.</p></li>
   </ol>
 </div></section>
 
 <!-- HINNAT — kapea, rauhallinen lista. -->
 <section class="s-sec s-parch" id="hinnat"><div class="s-wrap s-narrow">
-  <h2 class="s-h">Hinnat</h2>
-  <p class="s-sub">Työ, tiivisteet ja ALV sisältyvät.</p>
-  <dl class="s-prices">
+  <h2 class="s-h rv">Hinnat</h2>
+  <p class="s-sub rv">Työ, tiivisteet ja ALV sisältyvät.</p>
+  <dl class="s-prices rv">
     <div><dt>Ikkuna<small>Halvempi, kun ikkunoita on monta</small></dt><dd>75–90 €</dd></div>
     <div><dt>Ulko-ovi</dt><dd>99 €</dd></div>
     <div><dt>Liuku- tai pariovi</dt><dd>149 €</dd></div>
     <div><dt>Huoneovi</dt><dd>89 €</dd></div>
   </dl>
-  <p class="s-fine">Pienin veloitus 149 € käynniltä. Esimerkki: kuusi ikkunaa 6 × 85 € = 510 €.</p>
-  <div class="s-btns s-btns-c"><a href="#laskuri" class="btn btn-p btn-lg">Laske oma hintasi</a></div>
+  <p class="s-fine rv">Pienin veloitus 149 € käynniltä. Esimerkki: kuusi ikkunaa 6 × 85 € = 510 €.</p>
+  <div class="s-btns s-btns-c rv"><a href="#laskuri" class="btn btn-p btn-lg">Laske oma hintasi</a></div>
 </div></section>
 
 <section class="sec alt" id="laskuri"><div class="wrap">
@@ -1449,15 +1449,15 @@ header.hero .wrap.hero-grid{padding-top:clamp(124px,16vh,160px)}
 
 <!-- ARVOSTELU — yksi lainaus isona. -->
 <section class="s-sec s-parch s-quote"><div class="s-wrap s-narrow">
-  <p class="s-stars s-stars-l" aria-label="5 tähteä">★★★★★</p>
-  <blockquote>”Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta. Vahva suositus.”</blockquote>
-  <p class="s-who">Edwin T. · 5,0 / 15 arvostelua Googlessa</p>
+  <p class="s-stars s-stars-l rv" aria-label="5 tähteä">★★★★★</p>
+  <blockquote class="rv">”Tosi nopeaa ja laadukasta työtä. Sopiminen oli myös mainion mutkatonta. Vahva suositus.”</blockquote>
+  <p class="s-who rv">Edwin T. · 5,0 / 15 arvostelua Googlessa</p>
   <a class="s-link" href="https://www.google.com/maps/place/?q=place_id:ChIJaT51gJWKmEkRCqEXyc6lGuo" target="_blank" rel="noopener">Lue kaikki arvostelut</a>
 </div></section>
 
 <!-- KYSYMYKSET -->
 <section class="s-sec" id="ukk"><div class="s-wrap s-narrow">
-  <h2 class="s-h">Usein kysyttyä</h2>
+  <h2 class="s-h rv">Usein kysyttyä</h2>
   <!-- ukk:alku · luotu _gen-faq.mjs:llä _shared.js:n FAQ-taulukosta — älä muokkaa käsin -->
   <div class="faq" id="faq">
     <div class="q"><button type="button">Paljonko tiivistys maksaa?<svg class="cv" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><div class="a"><p>Pienin veloitus on 149 €, joka kattaa käynnin, matkat, kartoituksen ja lämpökamerakuvauksen. Sen jälkeen hinta muodostuu valitsemistasi kohteista kiinteillä hinnoilla. Ikkuna maksaa 90 € kappaleelta, ja hinta laskee määrän mukaan: 5–9 ikkunaa 85 €, 10–13 ikkunaa 80 € ja 14 ikkunasta ylöspäin 75 € kappaleelta. Ulko- ja parvekeovi on 99 €, terassin liuku- tai pariovi 149 €. Esimerkiksi yksi ikkuna on 149 € (minimiveloitus) ja kuusi ikkunaa 6 × 85 € = 510 €. Näet kokonaishinnan heti laskurista, ja kotitalousvähennys pienentää työn osuutta jopa 40 %.</p></div></div>
@@ -1476,8 +1476,8 @@ header.hero .wrap.hero-grid{padding-top:clamp(124px,16vh,160px)}
 <!-- YHTEYS — puhelin isona, lomake avautuu vasta pyydettäessä.
      Sama /api/create-lead ja kind:'yksityinen' kuin ota-yhteytta.html:ssä. -->
 <section class="s-sec s-parch" id="yhteys"><div class="s-wrap s-narrow s-contact">
-  <h2 class="s-h">Kysy meiltä</h2>
-  <a class="s-bignum tel" href="tel:+3584578311972">045 7831 1972</a>
+  <h2 class="s-h rv">Kysy meiltä</h2>
+  <a class="s-bignum tel rv" href="tel:+3584578311972">045 7831 1972</a>
   <p class="s-hours">Ma–pe 8–20 · La–su 8–18.30 · <a href="mailto:info@tiiviskoti.fi">info@tiiviskoti.fi</a></p>
   <details class="s-write">
     <summary class="btn btn-alt">Kirjoita viesti</summary>

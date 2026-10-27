@@ -347,6 +347,7 @@ function kuntaSivu(a, i) {
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body>
 ${nav(R)}
@@ -600,6 +601,7 @@ function palveluSivu(c) {
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body>
 ${nav(R)}
@@ -1044,6 +1046,7 @@ function kumppaniSivu(k) {
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="${R}_alueet.css" />
 <link rel="stylesheet" href="${R}_anim.css" />
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body data-koodi="${k.koodi}">
 ${nav(R)}
@@ -1231,6 +1234,7 @@ function hubSivu() {
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body>
 ${nav(R)}
@@ -1372,6 +1376,7 @@ function meistaSivu() {
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body>
 ${nav(R, '/#laskuri')}
@@ -1595,6 +1600,7 @@ function artikkeliSivu(a) {
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body>
 ${nav(R, '/#laskuri')}
@@ -1693,6 +1699,7 @@ function artikkelitHub() {
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body>
 ${nav(R, '/#laskuri')}
@@ -1759,6 +1766,7 @@ function virhesivu() {
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="/_alueet.css" />
 <link rel="stylesheet" href="/_anim.css" />
+<link rel="stylesheet" href="/_teema.css" />
 </head>
 <body>
 ${nav(R, '/#laskuri')}
