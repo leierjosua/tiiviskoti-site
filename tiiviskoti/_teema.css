@@ -11,7 +11,7 @@
 :root{
   --bg:#ffffff; --alt:#f5f5f7; --card:#ffffff; --imgtop:#f5f5f7;
   --ink:#1d1d1f; --text:#424245; --mute:#56565b;
-  --green:#1F7A4E; --green-d:#17623D; --green-l:#1F7A4E; --green-soft:#EAF3EE;
+  --green:#17623D; --green-d:#124F31; --green-l:#17623D; --green-soft:#EAF3EE;
   --deep:#1d1d1f; --deep2:#2c2c2e;
   --line:#e5e5ea; --line2:#c2c2c8; --star:#B7790F;
   --focus:#0B6BD6;
@@ -397,3 +397,25 @@ body .ntel{font-variant-numeric:tabular-nums}
   body nav.top .logo{font-size:20px}
   body nav.top .logo .mark{width:28px;height:28px}
 }
+
+
+/* ---------- Apple HIG -tarkistus 27.10.2026 (Apple-HIG.md) ----------
+   - Vihreä #1F7A4E → #17623D: 5,3:1 → 7,4:1 valkoisella. HIG: "aim for 7:1
+     with custom colors, especially small text".
+   - Lomakekenttien reuna #86868b (3,6:1). Vanha #c2c2c8 oli 1,8:1, alle
+     WCAG 1.4.11:n 3:1 — kentän rajaa ei erottanut.
+   - Increase Contrast (prefers-contrast: more): tummempi teksti ja viivat,
+     navi kiinteänä ilman läpinäkyvyyttä.
+   - Napautusalue ≥ 44 px myös logolle ja arvosanalinkille. */
+body :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea,.bk-input,.cb-i,.sv-inp){border-color:#86868b}
+body :is(input,select,textarea,.bk-input,.cb-i):focus{border-color:var(--green)}
+body :is(.logo,.s-logo,.rating,.s-rating){min-height:44px;align-items:center}
+@media (prefers-contrast:more){
+  :root{--text:#1d1d1f;--mute:#3a3a3c;--line:#86868b;--line2:#6e6e73;--green:#124F31;--green-d:#0E3F27;--green-soft:#DDEDE3}
+  body :is(.s-nav,nav.top){background:#fff!important;backdrop-filter:none!important;border-bottom:1px solid #6e6e73!important}
+  body :is(.s-opt,.card,.metric,.rev,.stepcard,.s-prices,.s-form){box-shadow:inset 0 0 0 1.5px #6e6e73}
+  body :is(.s-opt-p){box-shadow:none}
+  body a{text-decoration-thickness:2px}
+}
+body .kt-phone{min-height:44px;display:inline-flex;align-items:center}
+body .qty.tap{min-height:44px;display:inline-flex;align-items:center;justify-content:center}

@@ -1485,13 +1485,13 @@ header.hero .wrap.hero-grid{padding-top:clamp(124px,16vh,160px)}
     <summary class="btn btn-alt">Kirjoita viesti</summary>
     <form class="s-form" id="yhForm" novalidate>
       <label for="yhName">Nimi</label>
-      <input id="yhName" name="name" autocomplete="name" required>
+      <input id="yhName" name="name" autocomplete="name" placeholder="Etu- ja sukunimi" required>
       <label for="yhPhone">Puhelinnumero tai sähköposti</label>
-      <input id="yhPhone" name="tel" autocomplete="tel">
+      <input id="yhPhone" name="tel" autocomplete="tel" placeholder="045 123 4567 tai nimi@esimerkki.fi">
       <input id="yhEmail" type="hidden">
       <input id="yhAddr" type="hidden">
       <label for="yhMsg">Viesti</label>
-      <textarea id="yhMsg" name="message" rows="4"></textarea>
+      <textarea id="yhMsg" name="message" rows="4" placeholder="Esim. montako ikkunaa ja ovea"></textarea>
       <div class="s-err" id="yhErr" role="alert" hidden></div>
       <button type="submit" class="btn btn-p btn-lg" id="yhSubmit">Lähetä</button>
     </form>

@@ -337,7 +337,7 @@ form.addEventListener('submit', async (ev) => {
     err.style.display = 'block'; return;
   }
   if (data.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) {
-    err.textContent = 'Tarkista sähköpostiosoite.';
+    err.textContent = 'Kirjoita sähköposti muodossa nimi@esimerkki.fi.';
     err.style.display = 'block'; return;
   }
   nappi.disabled = true; nappi.textContent = 'Lähetetään…';

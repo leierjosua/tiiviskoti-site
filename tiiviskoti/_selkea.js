@@ -38,7 +38,7 @@ if (form) {
       addr: v('yhAddr'), message: v('yhMsg'), pageUrl: location.href };
     if (!data.contact) return virhe('Kirjoita nimesi, niin tiedämme kenelle vastata.', 'yhName');
     if (!data.phone && !data.email) return virhe('Anna puhelinnumero tai sähköposti, jotta voimme vastata.', 'yhPhone');
-    if (data.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) return virhe('Tarkista sähköpostiosoite.', 'yhPhone');
+    if (data.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) return virhe('Kirjoita sähköposti muodossa nimi@esimerkki.fi tai anna puhelinnumero.', 'yhPhone');
     nappi.disabled = true; nappi.textContent = 'Lähetetään…';
     try {
       const r = await fetch('/api/create-lead', { method: 'POST',
