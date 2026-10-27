@@ -1,0 +1,383 @@
+/* ============================================================
+   TIIVISKOTI — SELKEÄ (etusivu)
+   Applen hiljainen ilme: vähän asioita, paljon tyhjää, yksi toimintaväri,
+   ei reunoja eikä varjoja koristeena. Ikääntyneille: teksti ≥ 16 px,
+   leipäteksti 19 px, napit ≥ 56 px, kontrasti ≥ 7:1, linkit alleviivattuja.
+   Ladataan index.html:n tyylien JÄLKEEN; varauskortin markup on sama kuin
+   etusivulla. `body.selkea`-etuliite voittaa index.html:n mediakyselyt.
+   Etusivu (index.html) käyttää tätä tiedostoa body.selkea-luokan kautta.
+   ============================================================ */
+:root{
+  --bg:#ffffff; --alt:#f5f5f7; --card:#ffffff; --imgtop:#f5f5f7;
+  --ink:#1d1d1f; --text:#424245; --mute:#56565b;
+  --green:#1F7A4E; --green-d:#17623D; --green-l:#1F7A4E; --green-soft:#EAF3EE;
+  --deep:#1d1d1f; --deep2:#2c2c2e;
+  --line:#e5e5ea; --line2:#c2c2c8; --star:#B7790F;
+  --focus:#0B6BD6;
+  --s-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+  --s-font-d:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif;
+}
+body.selkea{font-family:var(--s-font);font-size:19px;line-height:1.55;color:var(--text);background:#fff;letter-spacing:-.005em}
+body.selkea h1,body.selkea h2,body.selkea h3{font-family:var(--s-font-d);font-weight:600;color:var(--ink);letter-spacing:-.022em}
+body.selkea b,body.selkea strong{font-weight:600}
+body.selkea :where(a:not(.btn,.s-logo,.s-nav-tel,.logo,.s-opt)){color:var(--green);text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
+body.selkea :focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:10px}
+.tel{white-space:nowrap;font-variant-numeric:tabular-nums}
+.s-wrap{max-width:1080px;margin-inline:auto;padding-inline:24px}
+.s-narrow{max-width:720px}
+.s-skip{position:absolute;left:-999px;top:8px;z-index:200;background:var(--ink);color:#fff!important;padding:14px 20px;border-radius:10px}
+.s-skip:focus{left:8px}
+
+/* Napit */
+body.selkea .btn{min-height:56px;padding:14px 30px;font:600 18px/1.2 var(--s-font);border-radius:999px;white-space:nowrap;
+  transition:transform .12s ease-out,background-color .15s;letter-spacing:0}
+body.selkea .btn:active{transform:scale(.97)}
+body.selkea .btn-lg{min-height:60px;padding:16px 34px;font-size:19px}
+body.selkea .btn-p{background:var(--green);color:#fff;border:0}
+body.selkea .btn-p:hover{background:var(--green-d)}
+body.selkea .btn-alt,body.selkea .btn-o{background:var(--green-soft);color:var(--green);border:0}
+body.selkea .btn-alt:hover,body.selkea .btn-o:hover{background:#dcebe2}
+.s-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.s-btns-c{justify-content:center}
+
+/* Navi — lasi, ohut */
+.s-nav{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.82);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.06)}
+.s-nav .s-wrap{display:flex;align-items:center;gap:28px;min-height:68px}
+.s-logo{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font:700 22px/1 var(--s-font-d);letter-spacing:-.02em;min-height:48px}
+.s-logo svg{width:32px;height:32px}
+.s-logo b{color:var(--green);font-weight:700}
+.s-links{display:flex;gap:28px;margin-left:auto}
+body.selkea .s-links a{color:var(--ink);text-decoration:none;font-size:16px;display:inline-flex;align-items:center;min-height:48px;white-space:nowrap}
+body.selkea .s-links a:hover{color:var(--green)}
+.s-nav-tel{display:inline-flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-size:16px;font-weight:600;min-height:48px}
+.s-nav-tel svg{width:18px;height:18px;color:var(--green)}
+body.selkea .s-nav-cta{background:var(--green);color:#fff;min-height:44px;padding:10px 20px;font-size:16px}
+.s-burger{display:none}
+@media (prefers-reduced-transparency:reduce){.s-nav{background:#fff;backdrop-filter:none}}
+
+/* Hero — kaksi palstaa: teksti + valinnat | kuva */
+.s-hero{padding:80px 0 112px}
+.s-hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:72px;align-items:center}
+.s-rating{font-size:16px;color:var(--mute);margin-bottom:18px}
+.s-stars{color:var(--star);letter-spacing:1px}
+.s-hero h1{font-size:clamp(40px,5vw,62px);line-height:1.05;max-width:13ch}
+.s-lead{font-size:clamp(20px,1.8vw,22px);line-height:1.45;color:var(--text);max-width:32ch;margin-top:18px}
+body.selkea .s-choose{font-size:21px;font-weight:600;margin:40px 0 14px;letter-spacing:-.01em}
+.s-choice{display:grid;gap:10px;max-width:520px}
+.s-opt{display:flex;align-items:center;gap:16px;min-height:76px;padding:14px 20px;border-radius:20px;
+  background:var(--alt);color:var(--ink);text-decoration:none;transition:transform .12s ease-out,background-color .15s}
+.s-opt:hover{background:#ebebef}
+.s-opt:active{transform:scale(.98)}
+.s-opt svg{width:26px;height:26px;flex:0 0 auto;color:var(--green)}
+.s-opt span{flex:1;min-width:0;line-height:1.3}
+body.selkea .s-opt b{display:block;font-size:20px;font-weight:600;color:var(--ink)}
+.s-opt small{display:block;font-size:16px;color:var(--mute);margin-top:2px;white-space:normal}
+.s-opt .s-arr{width:20px;height:20px}
+.s-opt-p{background:var(--green)}
+.s-opt-p:hover{background:var(--green-d)}
+.s-opt-p svg,.s-opt-p small,body.selkea .s-opt-p b{color:#fff}
+.s-more{margin-top:18px;font-size:17px;color:var(--mute)}
+.s-hero-img{margin:0}
+.s-hero-img img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:54% 60%;border-radius:28px}
+@media (prefers-reduced-motion:reduce){.s-opt{transition:none}.s-opt:active{transform:none}}
+
+/* Osiot */
+.s-sec{padding:120px 0}
+.s-parch{background:var(--alt)}
+.s-h{font-size:clamp(32px,3.8vw,44px);line-height:1.1;text-align:center}
+.s-sub{text-align:center;color:var(--mute);margin-top:10px}
+.s-fine{text-align:center;color:var(--mute);font-size:17px;margin-top:24px}
+.s-link{display:inline-flex;align-items:center;min-height:48px;margin-top:12px;font-weight:600}
+
+.s-steps{list-style:none;padding:0;margin:56px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:48px;counter-reset:s;text-align:center}
+.s-steps li{counter-increment:s}
+.s-steps li::before{content:counter(s);display:grid;place-items:center;width:48px;height:48px;margin:0 auto 18px;border-radius:50%;
+  background:var(--green-soft);color:var(--green);font:600 21px/1 var(--s-font-d)}
+.s-steps h3{font-size:22px;margin-bottom:6px}
+.s-steps p{color:var(--text)}
+
+.s-prices{margin:40px 0 0;background:#fff;border-radius:22px;padding:8px 28px}
+.s-prices>div{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;border-top:1px solid var(--line)}
+.s-prices>div:first-child{border-top:0}
+.s-prices dt{font-size:20px;color:var(--ink);font-weight:600}
+.s-prices dt small{display:block;font-size:16px;font-weight:400;color:var(--mute)}
+.s-prices dd{margin:0;font:600 22px/1 var(--s-font-d);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.s-why{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.s-why img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:28px}
+.s-why .s-h{text-align:left}
+.s-ticks{list-style:none;padding:0;margin:28px 0 0;display:grid;gap:14px}
+.s-ticks li{position:relative;padding-left:34px;font-size:20px;color:var(--ink)}
+.s-ticks li::before{content:"";position:absolute;left:3px;top:.42em;width:16px;height:9px;border-left:2.5px solid var(--green);border-bottom:2.5px solid var(--green);transform:rotate(-45deg)}
+
+.s-quote{text-align:center}
+.s-stars-l{font-size:22px;letter-spacing:3px}
+.s-quote blockquote{margin:20px 0 0;font:600 clamp(24px,3vw,34px)/1.3 var(--s-font-d);color:var(--ink);letter-spacing:-.015em}
+.s-who{margin-top:20px;color:var(--mute);font-size:17px}
+
+/* UKK */
+body.selkea .faq{margin-top:40px;max-width:none}
+body.selkea .faq .q{border-bottom:1px solid var(--line);background:none;border-radius:0;box-shadow:none;margin:0}
+body.selkea .faq .q:first-child{border-top:1px solid var(--line)}
+body.selkea .faq .q button{font:600 19px/1.35 var(--s-font);color:var(--ink);padding:22px 0;min-height:64px;gap:16px;letter-spacing:-.01em}
+body.selkea .faq .q .cv{width:22px;height:22px;color:var(--green);flex:0 0 auto}
+body.selkea .faq .a p{font-size:18px;line-height:1.6;color:var(--text);padding:0 0 22px}
+
+/* Yhteys */
+.s-contact{text-align:center}
+body.selkea .s-bignum{display:inline-block;font:600 clamp(36px,5vw,52px)/1.1 var(--s-font-d);color:var(--ink);text-decoration:none;letter-spacing:-.02em;margin:24px 0 8px;padding:6px 0}
+.s-hours{color:var(--mute);font-size:17px}
+.s-write{margin-top:32px}
+.s-write summary{list-style:none;display:inline-flex;cursor:pointer}
+.s-write summary::-webkit-details-marker{display:none}
+.s-write[open] summary{display:none}
+.s-form,.s-ok{text-align:left;background:#fff;border-radius:22px;padding:28px;margin-top:8px}
+.s-form label{display:block;font-weight:600;color:var(--ink);font-size:17px;margin:18px 0 8px}
+.s-form label:first-child{margin-top:0}
+.s-form input,.s-form textarea{width:100%;min-height:56px;padding:14px 16px;border:1.5px solid var(--line2);border-radius:14px;font:inherit;font-size:19px;color:var(--ink);background:#fff}
+.s-form textarea{min-height:120px;resize:vertical}
+.s-form input:focus,.s-form textarea:focus{border-color:var(--green);outline:3px solid rgba(31,122,77,.2);outline-offset:0}
+.s-form .btn{width:100%;margin-top:22px}
+.s-err{margin-top:16px;padding:14px 16px;border-radius:12px;background:#FDECEA;color:#8A1C12;font-weight:600;font-size:17px}
+.s-err[hidden],.s-ok[hidden]{display:none}
+
+/* ---------- VARAUSKORTTI (index.html:n markup) ---------- */
+body.selkea #laskuri{padding:120px 0;background:var(--alt)}
+body.selkea #laskuri .kicker{font-size:17px;color:var(--green);letter-spacing:0;text-transform:none;font-weight:700}
+body.selkea #laskuri .title{font-size:clamp(32px,3.8vw,44px);font-weight:600}
+body.selkea #laskuri .sub{font-size:19px;color:var(--mute)}
+body.selkea .stepcard{border-radius:28px;border:0;box-shadow:none}
+body.selkea .stepback{font-size:18px;min-height:48px;padding:8px 14px 8px 6px}
+body.selkea .steptag{font-size:16px;font-weight:700;color:var(--ink);background:var(--alt);padding:8px 14px;border-radius:999px}
+body.selkea .stepdots{gap:8px}
+/* postinumero + polun valinta */
+body.selkea .gate-tab{min-height:64px;font-size:18px;border-width:1.5px}
+body.selkea .gate-tab b{font-size:18px}
+body.selkea .gate-tab span{font-size:16px}
+body.selkea .gate-field label{font-size:20px}
+body.selkea .gate-hint{font-size:17px;line-height:1.5;color:var(--text)}
+body.selkea .gate-postal{font-size:24px!important;min-height:60px;max-width:220px;letter-spacing:.08em}
+body.selkea .gate-step{width:32px;height:32px;font-size:17px}
+body.selkea .gate-cta{min-height:60px;font-size:19px}
+body.selkea .gate-ticks{font-size:17px}
+body.selkea .gate-more summary{font-size:18px;min-height:48px;display:flex;align-items:center}
+body.selkea .gate-more p,body.selkea .gate-lead{font-size:18px}
+body.selkea .area-note{font-size:17px;line-height:1.5}
+/* laskuri */
+body.selkea .order-hd{font-size:16px}
+body.selkea .wtype-ic,body.selkea .wtype-ic svg{width:34px;height:34px}
+body.selkea .wtype-name{font-size:19px}
+body.selkea .wtype-desc{font-size:16px;color:var(--mute)}
+body.selkea .wtype-price,body.selkea .wtype-tier{font-size:16px}
+body.selkea .wtype-next{font-size:16px;padding:5px 10px}
+body.selkea .stepper-btns{gap:10px}
+body.selkea .stp{width:46px;height:46px;border-radius:50%;font-size:24px;border-width:1.5px}
+body.selkea .qty{font-size:22px;min-width:34px}
+body.selkea .qty-edit{width:64px;font-size:22px;min-height:44px}
+body.selkea .wtype-tiers .tl{font-size:16px}
+body.selkea .tchip{font-size:16px;padding:9px 15px;min-height:44px}
+body.selkea .morecats{font-size:18px;min-height:56px}
+body.selkea .extras-hd{font-size:16px;letter-spacing:.02em}
+body.selkea .extra{min-height:60px}
+body.selkea .extra-nm{font-size:17px;color:var(--ink)}
+body.selkea .extra-pr{font-size:16px}
+body.selkea .extra-note{font-size:15px}
+body.selkea .extra-chk{width:24px;height:24px;font-size:15px;border-width:1.5px}
+body.selkea .extra.extra-q{padding-left:58px}
+body.selkea .extra-stp .stp{width:44px;height:44px;font-size:22px}
+body.selkea .extra-stp .qty{font-size:20px;min-width:28px}
+body.selkea .order-note{font-size:16px}
+/* yhteenveto */
+body.selkea .quote{border-radius:20px}
+body.selkea .q-t{font-size:16px}
+body.selkea .rc-lines,body.selkea .rc-empty{font-size:17px}
+body.selkea .q-total .pt{font-size:16px}
+body.selkea .q-net{font-size:17px}
+body.selkea .q-meta span{font-size:15px}
+body.selkea .q-btn{min-height:60px;font-size:19px;background:var(--green);color:#fff}
+body.selkea .q-note{font-size:16px;line-height:1.5}
+body.selkea .cb-open{font-size:18px;min-height:56px;text-align:left}
+body.selkea .cb-lead,body.selkea .cb-l{font-size:17px}
+body.selkea .cb-i{font-size:19px;min-height:56px;border-width:1.5px;border-radius:14px}
+body.selkea .cb-send{min-height:56px;font-size:19px}
+/* kalenteri */
+body.selkea .mname{font-size:22px}
+body.selkea .mnav{width:52px;height:52px}
+body.selkea .dow span{font-size:16px}
+body.selkea .day{font-size:19px;border-radius:12px}
+body.selkea .slots-title{font-size:19px;color:var(--ink);font-weight:700}
+body.selkea .slots{gap:10px}
+body.selkea .slot{font-size:18px;min-height:56px;padding:14px 8px;border-radius:12px;border-width:1.5px}
+body.selkea .tk-vapaa{font-size:17px}
+/* yhteystiedot */
+body.selkea .steprecap .when{font-size:19px}
+body.selkea .steprecap .svc,body.selkea .steprecap .chg{font-size:17px}
+body.selkea .bside h3{font-size:24px}
+body.selkea .bsub{font-size:17px}
+body.selkea .bsum{font-size:17px}
+body.selkea .bk-field label{font-size:18px;font-weight:700;color:var(--ink)}
+body.selkea .bk-input{font-size:19px;min-height:56px;padding:14px 16px;border-width:1.5px;border-radius:14px;background:#fff}
+body.selkea .bk-note,body.selkea .bk-err{font-size:17px}
+body.selkea .bk-trust{font-size:16px;line-height:1.5}
+body.selkea .refno{font-size:22px}
+body.selkea .lead-f input{font-size:20px;min-height:56px}
+
+/* Loput alle 16 px:n tekstit varauskortissa (mitattu Playwrightilla 27.10.).
+   Osa tulee _shared.js:n ajonaikaisista tyyleistä — siksi #id ja !important. */
+body.selkea .wguide b{font-size:17px}
+body.selkea .wguide span{font-size:16px}
+body.selkea .ab-seg button{min-height:64px}
+body.selkea .ab-seg b{font-size:18px}
+body.selkea .ab-seg span{font-size:16px}
+body.selkea .cp-line{font-size:17px;color:var(--ink);border-bottom-color:var(--line)}
+body.selkea .cp-line b{color:var(--ink)}
+body.selkea .cp-line .cnt{color:var(--green)}
+body.selkea .tchip.on,body.selkea .tchip.on b{color:#fff}
+body.selkea .cp-unit{font-size:16px;color:var(--mute)}
+body.selkea .q-total .pv small{font-size:.5em}
+body.selkea .q-meta b{font-size:21px}
+body.selkea .q-meta span{font-size:16px}
+body.selkea .extra-chk{font-size:16px}
+body.selkea .extra-note{font-size:16px}
+body.selkea #bPrice span,body.selkea #bWhen span{font-size:16px!important;opacity:1!important}
+
+/* footer */
+body.selkea .mfoot{background:var(--alt);color:var(--text);border-top:1px solid var(--line)}
+body.selkea .mfoot .logo .d,body.selkea .mfoot h4{color:var(--ink)}
+body.selkea .mfoot p,body.selkea .mfoot a,body.selkea .mfoot span{font-size:16px;color:var(--text)}
+body.selkea .mfoot .mf-col a{line-height:2.3}
+body.selkea .mfoot .logo svg rect:first-child{fill:var(--green)}
+body.selkea .mf-bot{border-top-color:var(--line)}
+
+/* alapalkki puhelimessa */
+body.selkea .mcta{background:rgba(255,255,255,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+body.selkea .mcta .btn{flex:1;min-height:56px}
+
+@media (max-width:1060px){
+  .s-links,.s-nav-cta{display:none!important}
+  .s-nav .s-wrap{gap:12px}
+  .s-nav-tel{margin-left:auto}
+  .s-burger{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 16px;border:0;border-radius:999px;
+    background:var(--alt);color:var(--ink);font:600 16px/1 var(--s-font);cursor:pointer}
+  .s-burger span{display:block;width:16px;height:2px;background:currentColor;border-radius:2px;box-shadow:0 -5px 0 currentColor,0 5px 0 currentColor}
+  .s-links.op{display:flex!important;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:0;margin:0;
+    background:#fff;border-bottom:1px solid var(--line);padding:4px 24px 16px;box-shadow:0 24px 40px -28px rgba(0,0,0,.3)}
+  body.selkea .s-links.op a{font-size:20px;min-height:60px;border-bottom:1px solid var(--line)}
+  body.selkea .s-links.op a:last-child{border-bottom:0}
+}
+@media (max-width:860px){
+  .s-sec,body.selkea #laskuri{padding:80px 0}
+  .s-hero{padding:40px 0 72px}
+  .s-hero-grid{grid-template-columns:1fr;gap:40px}
+  .s-choice{max-width:none}
+  .s-hero-img img{aspect-ratio:4/3;object-position:50% 70%;border-radius:22px}
+  .s-steps{grid-template-columns:1fr;gap:36px;margin-top:40px}
+  .s-why{grid-template-columns:1fr;gap:40px}
+  .s-why img{aspect-ratio:4/3;object-position:50% 40%}
+}
+@media (max-width:620px){
+  body.selkea{font-size:18px}
+  .s-wrap{padding-inline:20px}
+  .s-nav .s-wrap{min-height:60px}
+  .s-logo{font-size:20px}.s-logo svg{width:28px;height:28px}
+  .s-nav-tel span{display:none}
+  .s-nav-tel{width:48px;justify-content:center;border-radius:50%;background:var(--green-soft)}
+  .s-nav-tel svg{width:20px;height:20px}
+  .s-hero h1{font-size:40px}
+  .s-opt{min-height:72px;padding:12px 16px;gap:14px}
+  body.selkea .s-opt b{font-size:19px}
+  .s-prices{padding:4px 20px}
+  .s-prices dt{font-size:19px}
+  .s-form{padding:22px 18px}
+  body.selkea .stp{width:44px;height:44px}
+  body.selkea .extra.extra-q{flex-wrap:wrap;row-gap:6px}
+  body.selkea .extra-q .extra-nm{flex-basis:100%}
+  body.selkea .extra-pr{flex:0 0 auto;margin-right:auto}
+  body.selkea .quote{top:68px;padding:12px 14px}
+  body.selkea .q-total .pt{display:none}
+  body.selkea .q-total .pv{font-size:30px}
+  body.selkea .q-total .pv small{font-size:18px}
+  body.selkea .q-net{font-size:16px}
+  body.selkea .q-btn{min-height:56px;font-size:18px;padding:12px 18px}
+  body.selkea .wguide b{font-size:17px}
+  body.selkea .wguide span{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  body.selkea .btn{transition:none}
+  body.selkea .btn:active{transform:none}
+}
+
+/* Postinumerovaihe ilman sisäkkäisiä vihreitä laatikoita: kenttä suoraan
+   kortilla, aluehuomio kevyenä harmaana rivinä. */
+body.selkea .gate-field{background:none;border:0;padding:0;margin-top:28px}
+body.selkea .area-note{background:var(--alt);border:0;border-radius:14px}
+body.selkea .gate-tab{background:#fff}
+body.selkea .gate-tab.on{background:var(--green-soft);border-color:var(--green)}
+
+/* ---------- SÄÄSTÖLASKURI (index.html:n #saasto, rauhallisempana) ---------- */
+body.selkea .s-saasto{padding:120px 0;background:#fff}
+body.selkea .s-saasto .kicker{display:none}
+body.selkea .s-saasto .title{font-size:clamp(32px,3.8vw,44px);font-weight:600}
+body.selkea .s-saasto .sub{font-size:19px;color:var(--mute);max-width:40ch;margin-inline:auto}
+body.selkea .sv-calc{gap:48px;align-items:center}
+body.selkea .sv-lbl{font-size:17px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink)}
+body.selkea .sv-seg{background:var(--alt);border-radius:16px}
+body.selkea .sv-tab{font-size:17px;font-weight:600;min-height:52px;border-radius:12px}
+body.selkea .sv-tab.on{box-shadow:0 1px 3px rgba(0,0,0,.12)}
+body.selkea .sv-f{font-size:17px}
+body.selkea .sv-inp{border:1.5px solid var(--line2);min-height:58px}
+body.selkea .sv-inp input{font-size:20px;font-weight:600}
+body.selkea .sv-inp em{font-size:16px}
+body.selkea .sv-hint{font-size:16px}
+body.selkea .sv-out{background:var(--alt);border:0;box-shadow:none;border-radius:28px}
+body.selkea .sv-res{background:#fff}
+body.selkea .sv-res-l{font-size:17px}
+body.selkea .sv-big{font-weight:700;font-family:var(--s-font-d)}
+body.selkea .sv-res-s{font-size:16px}
+body.selkea .sv-row{font-size:17px}
+body.selkea .sv-track{background:#fff;height:8px}
+body.selkea .sv-facts{border-top-color:#dedee3}
+body.selkea .sv-facts>div{border-left-color:#dedee3}
+body.selkea .sv-facts b{font-size:18px;font-weight:700}
+body.selkea .sv-facts>div>span{font-size:16px}
+body.selkea .save-note{font-size:16px;color:var(--mute);max-width:52ch;margin-top:24px}
+@media (max-width:860px){body.selkea .s-saasto{padding:80px 0}}
+@media (max-width:480px){body.selkea .sv-tab{font-size:16px}}
+body.selkea .sv-big .pre{font-size:max(16px,.38em)}
+/* Kentän oletusleveys (size=20 × 20 px) venytti ruudukon yli kapealla näytöllä. */
+body.selkea .sv-fields{grid-template-columns:minmax(0,1fr)}
+body.selkea .sv-in,body.selkea .sv-f,body.selkea .sv-inp{min-width:0;max-width:100%}
+body.selkea .sv-inp input{width:100%}
+body.selkea .sv-facts b{white-space:nowrap}
+
+/* ---------- PUHELIMEN HERO samassa hengessä kuin työpöydällä ----------
+   Kuva ylös matalana nauhana, sen alle tiivis otsikko ja kolme valintaa,
+   jotta kuva + kaikki kolme tietä näkyvät ensimmäisellä ruudulla. */
+@media (max-width:900px){
+  .s-hero{padding:16px 0 64px}
+  .s-hero-grid{gap:22px}
+  .s-hero-img{order:-1}
+  .s-hero-img img{aspect-ratio:16/10;object-position:50% 74%;border-radius:20px}
+}
+@media (max-width:620px){
+  .s-rating{font-size:16px;margin-bottom:10px}
+  .s-hero h1{font-size:34px;line-height:1.08}
+  .s-lead{font-size:18px;margin-top:10px}
+  body.selkea .s-choose{font-size:18px;margin:22px 0 10px}
+  .s-choice{gap:8px}
+  .s-opt{min-height:64px;padding:10px 16px;gap:14px;border-radius:16px}
+  .s-opt svg{width:24px;height:24px}
+  body.selkea .s-opt b{font-size:18px}
+  .s-opt small{font-size:16px;margin-top:0}
+  .s-hrs{display:none}
+  .s-more{font-size:16px;margin-top:14px}
+}
+
+/* Puhelimen hero: VAIN kuva + "Mitä haluat tehdä?" (Josua 27.10.). Otsikko
+   jää ruudunlukijalle ja hakukoneelle näkymättömänä; arvosana ja ingressi pois. */
+@media (max-width:620px){
+  .s-hero h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .s-hero .s-rating,.s-hero .s-lead{display:none}
+  body.selkea .s-choose{font-size:22px;margin:4px 0 12px}
+}
