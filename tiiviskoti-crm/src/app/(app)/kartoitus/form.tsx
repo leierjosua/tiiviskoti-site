@@ -9,6 +9,7 @@ import {
 } from '@/lib/kartoitus-schema';
 import { lookupTravelFee } from '../tarjoukset/actions';
 import { saveKartoitus, type KartoitusState } from './actions';
+import { KartoitusPhotos } from './photos';
 
 /* =========================================================
    Kartoituslomake puhelimelle.
@@ -53,13 +54,19 @@ function Stepper({ value, onChange }: { value: number; onChange: (n: number) => 
   );
 }
 
-export function KartoitusForm({ id, jobId, initial, locked }: {
+export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
   id?: string; jobId?: string; initial: KartoitusInitial; locked?: boolean;
+  /** Tallennettujen kuvien allekirjoitetut osoitteet, polku → osoite. */
+  photoUrls?: Record<string, string>;
 }) {
+  /* Uuden kartoituksen tunniste keksitään heti, jotta kuvat voi ladata
+     ennen ensimmäistä tallennusta (polku kartoitus/<tunniste>/…). */
+  const [draftId] = useState(() => id ?? crypto.randomUUID());
   const [state, action, pending] = useActionState<KartoitusState, FormData>(saveKartoitus, {});
   const [d, setD] = useState<KartoitusData>(() => ({
     customerKind: 'asiakas', customerName: '', email: '', postalCode: '',
     counts: {}, extras: {}, kohteet: {}, havainnot: [], alennus: 0,
+    photos: {}, extraPhotos: [],
     inclusions: DEFAULT_INCLUSIONS,
     ...initial,
   } as KartoitusData));
@@ -111,6 +118,7 @@ export function KartoitusForm({ id, jobId, initial, locked }: {
       <input type="hidden" name="payload" value={JSON.stringify(d)} />
       {id && <input type="hidden" name="id" value={id} />}
       {jobId && <input type="hidden" name="jobId" value={jobId} />}
+      {!id && <input type="hidden" name="draftId" value={draftId} />}
 
       <fieldset disabled={locked} className="space-y-4">
       {/* ---------- asiakas ---------- */}
@@ -246,6 +254,16 @@ export function KartoitusForm({ id, jobId, initial, locked }: {
           ))}
         </div>
       </Card>
+
+      {/* ---------- kuvat ---------- */}
+      <KartoitusPhotos
+        kid={draftId}
+        saved={!!id}
+        value={{ photos: d.photos ?? {}, extraPhotos: d.extraPhotos ?? [] }}
+        onChange={(update) => setD((p) => ({ ...p, ...update({ photos: p.photos ?? {}, extraPhotos: p.extraPhotos ?? [] }) }))}
+        urls={photoUrls}
+        disabled={locked}
+      />
 
       {/* ---------- työhön kuuluu ---------- */}
       <Card>

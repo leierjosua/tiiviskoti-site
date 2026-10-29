@@ -4,6 +4,7 @@ import { requireStaff } from '@/lib/session';
 import { PageHead } from '@/components/ui';
 import { acceptUrl, getKartoitus } from '@/lib/kartoitus';
 import { formatInstant } from '@/lib/time';
+import { signPhotoPaths } from '@/lib/photos';
 import { KartoitusForm } from '../form';
 import { ConfirmBox } from '../confirm-box';
 
@@ -24,6 +25,9 @@ export default async function KartoitusDetail({ params, searchParams }: {
   const k = await getKartoitus(id, staff);
   if (!k) notFound();
 
+  const photoUrls = await signPhotoPaths([
+    ...Object.values(k.data.photos ?? {}), ...(k.data.extraPhotos ?? []),
+  ]);
   const link = k.accept_token ? acceptUrl(k.accept_token) : null;
   const accepted = !!k.accepted_at;
 
@@ -62,7 +66,7 @@ export default async function KartoitusDetail({ params, searchParams }: {
         <p className="rounded-xl bg-[#FFF4E0] px-4 py-3 text-sm font-semibold text-warn">Hyväksyntälinkki puuttuu — aja db/038 Supabasessa.</p>
       ) : null}
 
-      <KartoitusForm id={k.id} initial={k.data} locked={accepted} />
+      <KartoitusForm id={k.id} initial={k.data} locked={accepted} photoUrls={photoUrls} />
     </div>
   );
 }

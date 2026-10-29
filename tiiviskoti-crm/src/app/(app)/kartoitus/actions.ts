@@ -1,5 +1,6 @@
 'use server';
 
+import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { sql } from '@/lib/db';
@@ -10,7 +11,8 @@ import { cleanInclusions } from '@/lib/inclusions';
 import { generateOfferPdf } from '@/lib/offer-pdf';
 import { sendMail } from '@/lib/google';
 import { offerEmailHtml, offerEmailSubject, offerEmailText } from '@/lib/mail-templates';
-import { kartoitusNote, kartoitusSchema, TALOTYYPIT, type KartoitusData } from '@/lib/kartoitus-schema';
+import { KARTOITUS_PHOTO_SLOTS, kartoitusNote, kartoitusSchema, TALOTYYPIT, type KartoitusData, type KartoitusPhotoSlot } from '@/lib/kartoitus-schema';
+import { createKartoitusPhotoUpload, kartoitusPhotoPrefix, removeKartoitusFiles, syncKartoitusPhotosToJob } from '@/lib/photos';
 import { acceptUrl, ensureAcceptToken, getKartoitus, migrationMissing } from '@/lib/kartoitus';
 
 export type KartoitusState = { error?: string; ok?: string };
@@ -31,6 +33,72 @@ export type KartoitusState = { error?: string; ok?: string };
    ========================================================= */
 
 const OFFER_VALID_DAYS = 14;
+const UUID = /^[0-9a-f-]{36}$/i;
+
+/* ---------- kuvat ---------- */
+
+type Photos = Pick<KartoitusData, 'photos' | 'extraPhotos'>;
+
+/** Vain tämän kartoituksen polut kelpaavat — muuten payloadilla voisi
+ *  liittää kartoitukseen minkä tahansa ämpärin tiedoston. */
+function ownPhotos(kid: string, p: Photos): Photos {
+  const own = (x: string) => x.startsWith(kartoitusPhotoPrefix(kid)) && !x.includes('..');
+  return {
+    photos: Object.fromEntries(Object.entries(p.photos ?? {}).filter(([, v]) => own(v))),
+    extraPhotos: [...new Set((p.extraPhotos ?? []).filter(own))],
+  };
+}
+
+const allPaths = (p: Photos) => [...Object.values(p.photos ?? {}), ...(p.extraPhotos ?? [])];
+
+function captioned(p: Photos) {
+  return [
+    ...Object.entries(p.photos ?? {}).map(([slot, path]) => ({
+      path, caption: `Kartoitus: ${KARTOITUS_PHOTO_SLOTS[slot as KartoitusPhotoSlot]?.[0] ?? slot}`,
+    })),
+    ...(p.extraPhotos ?? []).map((path) => ({ path, caption: 'Kartoitus: muu kuva' })),
+  ];
+}
+
+/** Siivoaa tiedostot jotka poistettiin, ja päivittää työn kuvat. */
+async function afterPhotoChange(kid: string, jobId: string | null, before: Photos, after: Photos, staffId: string) {
+  const keep = new Set(allPaths(after));
+  await removeKartoitusFiles(kid, allPaths(before).filter((x) => !keep.has(x)));
+  if (jobId) await syncKartoitusPhotosToJob(kid, jobId, captioned(after), staffId);
+}
+
+/**
+ * Latauslupa kartoituksen kuvalle. Uudella kartoituksella riviä ei vielä ole:
+ * tunniste on selaimen keksimä ja rivi luodaan sillä tallennettaessa.
+ */
+export async function prepareKartoitusPhoto(
+  kid: string, contentType: string,
+): Promise<{ error: string } | { path: string; token: string }> {
+  const staff = await requireStaff();
+  if (!UUID.test(kid)) return { error: 'Virheellinen kartoitus.' };
+  if (!(await getKartoitus(kid, staff))) {
+    const [exists] = await sql<{ id: string }[]>`select id from tk.kartoitukset where id = ${kid}::uuid`;
+    if (exists) return { error: 'Kartoitusta ei löytynyt.' };
+  }
+  return createKartoitusPhotoUpload(kid, contentType);
+}
+
+/** Tallennetun kartoituksen kuvat heti talteen, ilman Tallenna-nappia. */
+export async function saveKartoitusPhotos(kid: string, input: Photos): Promise<KartoitusState> {
+  const staff = await requireStaff();
+  const k = UUID.test(kid) ? await getKartoitus(kid, staff) : null;
+  if (!k) return {};  // luonnos: kuvat tallentuvat lomakkeen mukana
+  const p = ownPhotos(kid, input);
+  await sql`
+    update tk.kartoitukset
+       set data = data || ${sql.json({ photos: p.photos, extraPhotos: p.extraPhotos } as never)}, updated_at = now()
+     where id = ${kid}::uuid
+  `;
+  await afterPhotoChange(kid, k.job_id, k.data, p, staff.id);
+  revalidatePath(`/kartoitus/${kid}`);
+  if (k.job_id) revalidatePath(`/tyot/${k.job_id}`);
+  return { ok: 'Kuvat tallennettu.' };
+}
 const eurToCents = (e: number) => Math.round(e * 100);
 
 export async function saveKartoitus(_prev: KartoitusState, formData: FormData): Promise<KartoitusState> {
@@ -38,6 +106,7 @@ export async function saveKartoitus(_prev: KartoitusState, formData: FormData): 
   const mode = formData.get('mode') === 'send' ? 'send' : 'save';
   const id = String(formData.get('id') ?? '');
   const jobId = String(formData.get('jobId') ?? '');
+  const draftId = String(formData.get('draftId') ?? '');
 
   let raw: unknown;
   try {
@@ -55,6 +124,10 @@ export async function saveKartoitus(_prev: KartoitusState, formData: FormData): 
     extras: Object.fromEntries(Object.entries(parsed.data.extras).filter(([k]) => EXTRAS.some((e) => e.id === k && e.per !== 'kpl'))),
     inclusions: cleanInclusions(parsed.data.inclusions),
   };
+  /* Uusi kartoitus luodaan selaimen keksimällä tunnisteella, jotta jo
+     ladatut kuvat (kartoitus/<tunniste>/…) kuuluvat sille. */
+  const kid = id || (UUID.test(draftId) ? draftId : randomUUID());
+  Object.assign(d, ownPhotos(kid, d));
 
   // --- kartoitusrivi ---
   let kartoitusId = id;
@@ -66,14 +139,18 @@ export async function saveKartoitus(_prev: KartoitusState, formData: FormData): 
       existingOfferId = k.offer_id;
       if (k.accepted_at) return { error: 'Asiakas on jo hyväksynyt tämän tarjouksen — muutokset tehdään työlle.' };
       await sql`update tk.kartoitukset set data = ${sql.json(d as never)}, updated_at = now() where id = ${id}::uuid`;
+      await afterPhotoChange(id, k.job_id, k.data, d, staff.id);
     } else {
-      const job = /^[0-9a-f-]{36}$/i.test(jobId) && (await ownsJob(staff, jobId)) ? jobId : null;
+      const job = UUID.test(jobId) && (await ownsJob(staff, jobId)) ? jobId : null;
       const [row] = await sql<{ id: string }[]>`
-        insert into tk.kartoitukset (job_id, staff_id, data)
-        values (${job}, ${staff.id}::uuid, ${sql.json(d as never)})
+        insert into tk.kartoitukset (id, job_id, staff_id, data)
+        values (${kid}::uuid, ${job}, ${staff.id}::uuid, ${sql.json(d as never)})
+        on conflict (id) do nothing
         returning id
       `;
+      if (!row) return { error: 'Kartoitus on jo tallennettu. Lataa sivu uudelleen.' };
       kartoitusId = row.id;
+      if (job) await syncKartoitusPhotosToJob(kid, job, captioned(d), staff.id);
     }
   } catch (e) {
     if (migrationMissing(e)) return { error: 'Kartoitus vaatii migraation db/038_kartoitus_ja_hyvaksynta.sql. Aja se Supabasen SQL-editorissa.' };

@@ -222,3 +222,72 @@ export async function setJobPhotoCaption(id: string, caption: string): Promise<v
     if (!missingTable(e)) throw e;
   }
 }
+
+
+/* ---------- kartoituksen kuvat ----------
+
+   Samaan yksityiseen ämpäriin polulla `kartoitus/<id>/`. Uudella
+   kartoituksella ei ole vielä riviä, joten selain keksii tunnisteen
+   etukäteen ja rivi luodaan sillä (ks. kartoitus/actions.ts). Polut
+   tallentuvat kartoituksen `data`-kenttään eikä omaan tauluun — ei
+   migraatiota. Jos kartoitus on tehty työltä, kuvat kopioidaan myös
+   työn kuviin, jotta asentaja näkee ne keikalla. */
+
+export const kartoitusPhotoPrefix = (kartoitusId: string) => `kartoitus/${kartoitusId}/`;
+
+export async function createKartoitusPhotoUpload(
+  kartoitusId: string, contentType: string,
+): Promise<{ error: string } | { path: string; token: string }> {
+  if (!adminAuthConfigured()) return { error: 'SUPABASE_SECRET_KEY puuttuu — kuvia ei voi tallentaa.' };
+  if (!SALLITUT.has(contentType)) return { error: 'vain kuvatiedostot käyvät' };
+  const path = `${kartoitusPhotoPrefix(kartoitusId)}${randomUUID()}.${EXT[contentType] ?? 'jpg'}`;
+  const { data, error } = await supabaseAdmin().storage.from(BUCKET).createSignedUploadUrl(path);
+  if (error || !data) return { error: error?.message ?? 'allekirjoitus epäonnistui' };
+  return { path, token: data.token };
+}
+
+/** Allekirjoitetut katseluosoitteet polku → osoite. */
+export async function signPhotoPaths(paths: string[]): Promise<Record<string, string>> {
+  if (paths.length === 0 || !adminAuthConfigured()) return {};
+  const { data } = await supabaseAdmin().storage.from(BUCKET).createSignedUrls(paths, SIGNED_URL_SECONDS);
+  const out: Record<string, string> = {};
+  for (const d of data ?? []) if (d.path && d.signedUrl) out[d.path] = d.signedUrl;
+  return out;
+}
+
+/**
+ * Kartoituksen kuvat työn kuviin: lisää puuttuvat, poistaa kartoituksesta
+ * poistetut. Vain rivit — tiedosto on yhteinen eikä sitä poisteta täällä.
+ */
+export async function syncKartoitusPhotosToJob(
+  kartoitusId: string, jobId: string, photos: { path: string; caption: string }[], staffId: string | null,
+): Promise<void> {
+  const prefix = kartoitusPhotoPrefix(kartoitusId);
+  const keep = photos.filter((p) => p.path.startsWith(prefix));
+  try {
+    await sql`
+      delete from tk.job_photos
+       where job_id = ${jobId}::uuid and path like ${prefix + '%'}
+         and not (path = any(${keep.map((p) => p.path)}::text[]))
+    `;
+    for (const p of keep) {
+      await sql`
+        insert into tk.job_photos (job_id, path, caption, sort_order, created_by)
+        select ${jobId}::uuid, ${p.path}, ${p.caption},
+               coalesce((select max(sort_order) + 1 from tk.job_photos where job_id = ${jobId}::uuid), 0),
+               ${staffId}
+         where not exists (select 1 from tk.job_photos where job_id = ${jobId}::uuid and path = ${p.path})
+      `;
+    }
+  } catch (e) {
+    if (missingTable(e)) return;
+    throw e;
+  }
+}
+
+/** Poista kartoituksen tiedostoja, joihin mikään ei enää viittaa. */
+export async function removeKartoitusFiles(kartoitusId: string, paths: string[]): Promise<void> {
+  const own = paths.filter((p) => p.startsWith(kartoitusPhotoPrefix(kartoitusId)));
+  if (own.length === 0 || !adminAuthConfigured()) return;
+  await supabaseAdmin().storage.from(BUCKET).remove(own).catch(() => {});
+}

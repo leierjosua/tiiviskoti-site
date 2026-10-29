@@ -37,6 +37,18 @@ export const HAVAINNOT = {
 } as const;
 export type HavaintoKey = keyof typeof HAVAINNOT;
 
+/** Kuvapaikat — samat kuin asiakkaan kohdetietokyselyssä (survey-schema.ts)
+ *  ja ohjeet samat kuin varausvahvistuksessa (mail-templates.ts). */
+export const KARTOITUS_PHOTO_SLOTS = {
+  ikkuna_sisa: ['Ikkuna sisältä', 'avaa ikkuna niin, että puitteet ja karmi näkyvät'],
+  ikkuna_tiiviste: ['Lähikuva tiivisteestä', 'nykyinen tiiviste karmin tai puitteen reunassa'],
+  ikkuna_ulko: ['Ikkuna ulkoa', 'koko ikkuna talon ulkopuolelta'],
+  ovi_sisa: ['Ovi sisältä', 'avaa ovi niin, että karmi ja tiiviste näkyvät'],
+  ovi_tiiviste: ['Lähikuva oven tiivisteestä', 'nykyinen tiiviste karmin tai oven reunassa'],
+  ovi_ulko: ['Ovi ulkoa', 'koko ovi talon ulkopuolelta'],
+} as const;
+export type KartoitusPhotoSlot = keyof typeof KARTOITUS_PHOTO_SLOTS;
+
 /** Kohteet joille kirjataan materiaali ja huomio. Avain = pricing.ts TYPES[].id. */
 export const KOHDE_IDS = ['ikkuna', 'parveke', 'ulko', 'terassi', 'vali', 'kynnys'] as const;
 
@@ -79,6 +91,13 @@ export const kartoitusSchema = z.object({
   lisatiedot: z.string().trim().max(1500).optional(),
   /** Vain toimistolle. */
   sisainen: z.string().trim().max(2000).optional(),
+
+  /** Kuvat: kuvapaikka → Storage-polku (`kartoitus/<id>/…`). Polut
+   *  tarkistetaan palvelimella kuuluviksi tälle kartoitukselle. */
+  photos: z.record(z.string().max(30), z.string().max(300)).default({})
+    .transform((o) => Object.fromEntries(Object.entries(o).filter(([k]) => k in KARTOITUS_PHOTO_SLOTS))),
+  /** Muut kuvat vapaassa järjestyksessä. */
+  extraPhotos: z.array(z.string().max(300)).max(40).default([]),
 });
 export type KartoitusData = z.infer<typeof kartoitusSchema>;
 
