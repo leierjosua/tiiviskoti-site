@@ -5,7 +5,7 @@
 const PATHS = {
   home: <><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V20h5v-6h4v6h5V9.5" /></>,
   calendar: <><rect x="3" y="4.5" width="18" height="16.5" rx="3" /><path d="M3 9.5h18M8 2.5v4M16 2.5v4" /></>,
-  wrench: <><path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5" /><path d="M14.5 6.5 17 4l3 3-2.5 2.5" /></>,
+  wrench: <><rect x="3" y="7.5" width="18" height="12.5" rx="2.5" /><path d="M8.5 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h4a1.5 1.5 0 0 1 1.5 1.5v2M3 13h18M10.5 13v2h3v-2" /></>,
   clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></>,
   clipboard: <><rect x="5" y="4" width="14" height="17" rx="2.5" /><path d="M9 4V3h6v1M8.5 10h7M8.5 14h7M8.5 18h4" /></>,
   doc: <><path d="M6 3h8l4 4v14H6z" /><path d="M14 3v4h4M9 12h6M9 16h6" /></>,

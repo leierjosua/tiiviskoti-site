@@ -165,3 +165,17 @@ input, select, textarea { font-size: max(1rem, 1em); }
 .nav-surface {
   scrollbar-color: var(--color-nav-line) transparent;
 }
+
+/* Napautusalue vähintään 48 px KAIKILLE napiksi muotoilluille linkeille ja
+   painikkeille (pyöristys + vaakatäyte), myös niille jotka sivut ovat
+   tyylittäneet itse pieniksi. Yksi sääntö tässä 60 käsin muokatun
+   tiedoston sijaan. Pois rajattu: absoluuttisesti sijoitetut (kalenterin
+   keikkalohkot, kuvan poistonappi), pyöreät merkit ja .no-min. */
+:is(a, button)[class*='rounded'][class*='px-']:not([class*='rounded-full']):not([class*='absolute']):not(.no-min) {
+  min-height: 48px;
+}
+:is(a, button)[class*='rounded'][class*='px-']:not([class*='rounded-full']):not([class*='absolute']):not(.no-min):not([class*='flex']):not([class*='block']):not([class*='grid']) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
