@@ -102,7 +102,10 @@ export async function saatavuus(
       select c.id, c.name, c.staff_id, s.full_name as staff_name
         from tk.calendars c
         join tk.staff s on s.id = c.staff_id
-       where ${calendarIds?.length ? sql`c.id = any(${calendarIds})` : sql`true`}
+       /* Ilman rajausta vain käytössä olevat: suljettu kalenteri (esim.
+          Josuan, suljettu 29.10.2026) näkyi muuten yhä ja sen ilmoitetut
+          päivät laskettiin vapaiksi asentajapäiviksi. */
+       where ${calendarIds?.length ? sql`c.id = any(${calendarIds})` : sql`c.active and s.active`}
        order by s.full_name, c.name
     `,
     sql<{ calendar_id: string; weekday: number; start_time: string; end_time: string }[]>`
