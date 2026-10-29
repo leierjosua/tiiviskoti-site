@@ -8,6 +8,8 @@ import { NewJobForm } from './ui';
 export const dynamic = 'force-dynamic';
 
 const DURATIONS = [60, 90, 120, 180, 240, 300];
+/* Kartoituskäynti on lyhyt (verkossa 20 min), joten sille omat kestot. */
+const KARTOITUS_DURATIONS = [30, 45, 60, 90];
 
 const eur = (cents: number) =>
   (cents / 100).toLocaleString('fi-FI', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €';
@@ -70,14 +72,20 @@ export default async function NewJobPage({
        osoiteriviltä: rivit ja summa siirtyvät työlle, eikä niitä voi
        väärentää linkkiä muokkaamalla. */
     tarjous?: string;
+    /* 'kartoitus' = pelkkä kartoituskäynti: ei rivejä eikä hintaa,
+       asiakkaalle kartoituksen vahvistus eikä varausvahvistusta. */
+    tyyppi?: string;
   }>;
 }) {
   // Varauksen tekeminen on toimiston työtä, ei asentajan.
   await requireManager();
   const {
     kalenteri, kalenteri2, kesto, liidi, nimi, email, puhelin, postinumero, osoite,
-    muistiinpano, tarjous,
+    muistiinpano, tarjous, tyyppi,
   } = await searchParams;
+  /* Tarjouksesta laitettu aika on aina asennus — tarjous on jo kartoitettu. */
+  const isKartoitus = tyyppi === 'kartoitus' && !tarjous;
+  const durations = isKartoitus ? KARTOITUS_DURATIONS : DURATIONS;
 
   const [calendars, offer] = await Promise.all([
     listCalendars(true),
@@ -86,7 +94,8 @@ export default async function NewJobPage({
 
   const offerPrefill = offer ? prefillFromOffer(offer) : null;
   const suggested = offer ? estimateDuration(offer.lines) : null;
-  const duration = DURATIONS.includes(Number(kesto)) ? Number(kesto) : (suggested ?? 120);
+  const duration = durations.includes(Number(kesto)) ? Number(kesto)
+    : isKartoitus ? 30 : (suggested ?? 120);
 
   /* Oletukseksi asennuskalenteri, ei taloyhtiöiden kartoituskalenteria.
      Se sattui olemaan listan ensimmäinen, joten "Laita aika" olisi
@@ -129,7 +138,7 @@ export default async function NewJobPage({
         <Link href={offer ? `/tarjoukset/${offer.id}` : '/tyot'} className="text-xs text-muted hover:text-text">
           ← {offer ? `Tarjous ${offer.offer_number}` : 'Työt'}
         </Link>
-        <h1 className="text-xl font-semibold tracking-tight">Uusi työ</h1>
+        <h1 className="text-xl font-semibold tracking-tight">{isKartoitus ? 'Uusi kartoituskäynti' : 'Uusi työ'}</h1>
       </header>
 
       {tarjous && !offer && (
@@ -147,6 +156,7 @@ export default async function NewJobPage({
           <CardHeader
             title={
               offer ? `Laita aika — tarjous ${offer.offer_number}`
+                : isKartoitus ? 'Varaa kartoituskäynti'
                 : liidi ? 'Varaa aika — liidistä'
                 : 'Varaa aika'
             }
@@ -156,7 +166,8 @@ export default async function NewJobPage({
             calendarId={calendarId!}
             calendarId2={calendarId2}
             duration={duration}
-            durations={DURATIONS}
+            durations={durations}
+            kartoitus={isKartoitus}
             slots={slots}
             leadId={liidi}
             offer={offer ? {

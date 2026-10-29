@@ -61,7 +61,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
   const minutes = Math.round((job.ends_at.getTime() - job.starts_at.getTime()) / 60_000);
   const address = [job.address, job.postal_code, job.city].filter(Boolean).join(', ');
 
-  const [ownLines, mails, completion, kuvat, links, units] = await Promise.all([
+  const [ownLines, mails, completion, kuvat, links, units, kartoitusRows] = await Promise.all([
     sql<{ name: string; quantity: number }[]>`
       select name, quantity from tk.job_lines
        where job_id = ${job.id} order by sort_order
@@ -75,7 +75,12 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
     /* Saman hetken väli riittää: haetaan vain tämän varauksen luvut. */
     jobUnitCounts(new Date(job.starts_at.getTime() - 1000).toISOString(),
                   new Date(job.starts_at.getTime() + 1000).toISOString(), null, { crew: true }),
+    /* Työltä tehty kartoitus (db/038). Puuttuva taulu ei kaada sivua. */
+    sql<{ id: string }[]>`
+      select id from tk.kartoitukset where job_id = ${job.id} order by created_at desc limit 1
+    `.catch(() => [] as { id: string }[]),
   ]);
+  const kartoitusId = kartoitusRows[0]?.id ?? null;
   const maara = unitLabel(units.find((u) => u.job_id === job.id));
   const pari = mateLabel(links.mates.map((m) => m.staff_name));
 
@@ -114,6 +119,14 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
           <Link href={`/tyot/${job.id}/viimeistely`}
                 className="rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-accent-ink hover:bg-[#1A6340]">
             {job.status === 'done' ? 'Viimeistele uudelleen' : 'Viimeistele'}
+          </Link>
+        )}
+        {/* Kartoitus keikalta: asiakas haluaa usein tarjouksen lisätöistä
+            kun asentaja on jo paikalla. */}
+        {job.status !== 'cancelled' && (
+          <Link href={kartoitusId ? `/kartoitus/${kartoitusId}` : `/kartoitus/uusi?tyo=${job.id}`}
+                className="rounded-lg border border-line bg-ink-800 px-4 py-2.5 text-sm font-semibold text-text hover:bg-ink-700">
+            {kartoitusId ? 'Avaa kartoitus' : 'Tee kartoitus'}
           </Link>
         )}
         {address && (

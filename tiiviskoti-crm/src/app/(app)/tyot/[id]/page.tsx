@@ -45,7 +45,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   );
 
   // Rivit, viestiloki ja liitokset ovat toisistaan riippumattomia — rinnakkain.
-  const [lines, mails, links, photos, deliveryRows, calendars, reportRes] = await Promise.all([
+  const [lines, mails, links, photos, deliveryRows, calendars, reportRes, kartoitusRows] = await Promise.all([
     sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
       select name, quantity, unit_price_cents from tk.job_lines
        where job_id = ${id} order by sort_order
@@ -66,8 +66,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     listCalendars(true),
     /* Asentajan työraportti (db/033). Puuttuva taulu ei kaada sivua. */
     getJobReport(id),
+    /* Työltä tehty kartoitus (db/038). Puuttuva taulu ei kaada sivua. */
+    sql<{ id: string }[]>`
+      select id from tk.kartoitukset where job_id = ${id} order by created_at desc limit 1
+    `.catch(() => [] as { id: string }[]),
   ]);
   const report = reportRes.report;
+  const kartoitusId = kartoitusRows[0]?.id ?? null;
   const delivery = deliveryRows[0];
   const lineSumCents = lines.reduce((s, l) => s + l.quantity * l.unit_price_cents, 0);
 
@@ -78,11 +83,22 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl font-semibold tracking-tight tabular">{job.job_number}</h1>
           <StatusBadge status={job.status} />
+          {/* Kartoitus suoraan työltä: asiakastiedot tulevat valmiiksi ja
+              kartoitus liittyy tähän työhön. Mikä tahansa työ kelpaa, ei vain
+              kalenterin kartoituskäynti — asentaja huomaa usein keikalla
+              lisätöitä, joista asiakas haluaa tarjouksen. */}
+          <Link
+            href={kartoitusId ? `/kartoitus/${kartoitusId}` : `/kartoitus/uusi?tyo=${job.id}`}
+            className="ml-auto rounded-lg border border-accent/50 px-3 py-1.5 text-xs
+                       font-bold text-accent transition-colors hover:bg-accent/10"
+          >
+            {kartoitusId ? 'Avaa kartoitus' : '+ Tee kartoitus'}
+          </Link>
           {/* Jatkotarjous samalle asiakkaalle. Asiakastiedot tulevat
               valmiiksi, hinnat eivät — ks. tarjoukset/uusi/page.tsx. */}
           <Link
             href={`/tarjoukset/uusi?tyo=${job.id}`}
-            className="ml-auto rounded-lg border border-accent/50 px-3 py-1.5 text-xs
+            className="rounded-lg border border-accent/50 px-3 py-1.5 text-xs
                        font-bold text-accent transition-colors hover:bg-accent/10"
           >
             + Uusi tarjous

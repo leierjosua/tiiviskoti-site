@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { isSlotTaken, sql } from '@/lib/db';
 import { requireManager, requireStaff } from '@/lib/session';
-import { deliverBooking, ensureCalendarEventForJob, reassignCalendarEventForJob, refreshCrewCalendarEvents, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
+import { deliverBooking, deliverKartoitus, ensureCalendarEventForJob, reassignCalendarEventForJob, refreshCrewCalendarEvents, removeCalendarEventForJob, syncCalendarEventForJob } from '@/lib/deliver';
 import { getJob } from '@/lib/data';
 import { computePricing } from '@/lib/pricing';
 import { generateReceiptPdf } from '@/lib/receipt-pdf';
@@ -84,12 +84,17 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
      on roskaa, työ syntyy silti — liidin tilan päivitys on kirjanpitoa,
      ei ehto työn luomiselle. */
   const leadId = String(formData.get('leadId') ?? '').trim() || null;
+  /* Pelkkä kartoituskäynti: veloitukseton, ei rivejä. Otsikossa on oltava
+     "kartoitu", koska /kartoitus tunnistaa käynnit siitä (lib/kartoitus.ts).
+     Tarjouksesta laitettu aika on aina asennus. */
+  const isKartoitus = formData.get('tyyppi') === 'kartoitus' && !d.offerId;
+  if (isKartoitus && !/kartoitu/i.test(d.title)) d.title = `Kartoituskäynti: ${d.title}`;
   /* Puhelimessa sovitun keikan rivit. Hinnasto on sama kuin tarjouslaskurissa
      ja sivuston varauksessa, joten ikkunan määräporras ja 149 €:n minimi
      pätevät ilman erillistä logiikkaa. Roskadata ei kaada työn luontia:
      ilman rivejä työ syntyy kuten ennenkin. */
   const omat = (() => {
-    if (!d.tuotteet) return null;
+    if (!d.tuotteet || isKartoitus) return null;
     try {
       const v = JSON.parse(d.tuotteet) as {
         counts?: Record<string, number>;
@@ -172,6 +177,8 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
       googleCalendarId = kal?.google_calendar_id ?? null;
 
       const source = d.offerId ? 'tarjous' : leadId ? 'liidi' : 'admin';
+      /* Kartoituskäynti ei ole kauppa: avointa tarjousta ei merkitä
+         hyväksytyksi eikä liidiä asiakkaaksi (alla). */
       metaLeadId = lead?.external_id ?? null;
       saleCents = offer?.total_cents ?? omatCents;
 
@@ -266,7 +273,7 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
           update tk.offers set status = 'accepted'
            where id = ${d.offerId}::uuid and status in ('draft', 'sent', 'expired')
         `;
-      } else if (d.email) {
+      } else if (d.email && !isKartoitus) {
         /* Työ syntyi liidiltä tai käsin, vaikka asiakkaalle oli lähetetty
            tarjous. Ilman tätä tarjous jäi "Lähetetty"-tilaan ja tarjousten
            hyväksymisaste näytti todellista huonommalta (8.10.2026: T-0021,
@@ -288,10 +295,16 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
       }
       /* Liidi merkitään asiakkaaksi samassa transaktiossa: muuten se jäisi
          Liidit-sivulle avoimeksi ja joku soittaisi perään turhaan. */
-      if (leadId) {
+      if (leadId && !isKartoitus) {
         await tx`
           update tk.leads set status = 'converted', updated_at = now()
            where id = ${leadId}::uuid
+        `;
+      } else if (leadId) {
+        /* Kartoitus sovittu: liidi on hoidettu muttei vielä kauppa. */
+        await tx`
+          update tk.leads set status = 'contacted', updated_at = now()
+           where id = ${leadId}::uuid and status in ('new', 'no_answer')
         `;
       }
       return job.id;
@@ -314,7 +327,26 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
      Ei kaada työn luontia: aika on jo varattu, ja epäonnistunut posti on
      pienempi vahinko kuin kadonnut varaus. `deliverBooking` kirjaa oman
      tuloksensa `tk.mail_log`iin, joten vika näkyy työn sivulla. */
-  if (d.lahetaVahvistus && d.email) {
+  if (d.lahetaVahvistus && d.email && isKartoitus) {
+    try {
+      await deliverKartoitus({
+        jobId, jobNumber, googleCalendarId,
+        kind: 'koti',
+        association: '',
+        contactName: d.customerName,
+        phone: d.phone ?? '',
+        email: d.email,
+        startsAt: starts,
+        endsAt: ends,
+        address: d.address ?? '',
+        postalCode: d.postalCode ?? '',
+        city: d.city ?? null,
+        notes: d.notes ?? null,
+      });
+    } catch (e) {
+      console.error('createJob: kartoituksen vahvistus epäonnistui', jobNumber, e);
+    }
+  } else if (d.lahetaVahvistus && d.email) {
     try {
       await deliverBooking({
         jobId, jobNumber,
@@ -358,6 +390,7 @@ export async function createJob(_prev: ActionState, formData: FormData): Promise
   revalidatePath('/tyot');
   revalidatePath('/kalenteri');
   if (leadId) revalidatePath('/liidit');
+  if (isKartoitus) revalidatePath('/kartoitus');
   if (d.offerId) { revalidatePath('/tarjoukset'); revalidatePath(`/tarjoukset/${d.offerId}`); }
   redirect(`/tyot/${jobId}`);
 }

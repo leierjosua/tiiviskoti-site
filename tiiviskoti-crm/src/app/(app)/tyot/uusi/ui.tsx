@@ -17,13 +17,15 @@ type Prefill = {
 type OfferHead = { id: string; number: string; total: string; customer: string };
 
 export function NewJobForm({
-  calendars, calendarId, calendarId2, duration, durations, slots, leadId, offer, prefill,
+  calendars, calendarId, calendarId2, duration, durations, kartoitus, slots, leadId, offer, prefill,
 }: {
   calendars: { id: string; label: string }[];
   calendarId: string;
   calendarId2: string;
   duration: number;
   durations: number[];
+  /** Pelkkä kartoituskäynti: ei laskuria, kartoituksen vahvistusposti. */
+  kartoitus: boolean;
   slots: string[];
   leadId?: string;
   offer?: OfferHead;
@@ -45,7 +47,7 @@ export function NewJobForm({
 
   // Kalenterin ja keston vaihto hakee vapaat ajat uudelleen palvelimelta,
   // koska laskenta on siellä.
-  const reload = (next: { kalenteri?: string; kalenteri2?: string; kesto?: number }) => {
+  const reload = (next: { kalenteri?: string; kalenteri2?: string; kesto?: number; kartoitus?: boolean }) => {
     /* Esitäyttö kulkee mukana kun kalenteri tai kesto vaihtuu — muuten
        liidistä tulleet tiedot katoaisivat ensimmäisestä valinnasta. */
     const params = new URLSearchParams({
@@ -54,6 +56,10 @@ export function NewJobForm({
     });
     const toinen = next.kalenteri2 ?? calendarId2;
     if (toinen) params.set('kalenteri2', toinen);
+    /* Tyypin vaihto pudottaa keston, koska kartoituksella on omat kestot. */
+    const onKartoitus = next.kartoitus ?? kartoitus;
+    if (onKartoitus) params.set('tyyppi', 'kartoitus');
+    if (next.kartoitus !== undefined) params.delete('kesto');
     /* Tarjouksesta tullut varaus säilyttää tarjouksen: ilman tätä toisen
        asentajan valinta pudottaisi linkin ja työ jäisi irralleen. */
     if (offer) params.set('tarjous', offer.id);
@@ -84,8 +90,28 @@ export function NewJobForm({
       <input type="hidden" name="startsAt" value={vapaaAika || selected || ''} />
       {leadId ? <input type="hidden" name="leadId" value={leadId} /> : null}
       {offer ? <input type="hidden" name="offerId" value={offer.id} /> : null}
+      {kartoitus ? <input type="hidden" name="tyyppi" value="kartoitus" /> : null}
 
       <div className="space-y-4">
+        {/* Tarjouksesta laitettu aika on aina asennus, joten valinta vain muuten. */}
+        {!offer && (
+          <div className="grid grid-cols-2 gap-1 rounded-md border border-line p-1">
+            {[{ v: false, label: 'Tiivistystyö' }, { v: true, label: 'Kartoituskäynti' }].map((o) => (
+              <button
+                key={o.label}
+                type="button"
+                onClick={() => { if (o.v !== kartoitus) reload({ kartoitus: o.v }); }}
+                className={cx(
+                  'rounded px-3 py-2 text-sm font-medium transition-colors',
+                  o.v === kartoitus ? 'bg-accent text-accent-ink' : 'text-muted hover:text-text',
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-3">
           <Field label="Asentaja">
             <Select value={calendarId} onChange={(e) => reload({ kalenteri: e.target.value })}>
@@ -209,12 +235,17 @@ export function NewJobForm({
         )}
 
         <Field label="Työn nimi">
-          <Input name="title" defaultValue={prefill?.title || 'Tiivistetyö'} required />
+          <Input
+            key={kartoitus ? 'k' : 't'}
+            name="title"
+            defaultValue={prefill?.title || (kartoitus ? 'Kartoituskäynti' : 'Tiivistetyö')}
+            required
+          />
         </Field>
         {/* Tarjouksesta tehdyllä työllä rivit tulevat tarjoukselta, joten
             laskuri näytetään vain kun niitä ei ole. Kaksi hintalähdettä
             samalle työlle olisi tapa saada ne eroamaan toisistaan. */}
-        {!offer && (
+        {!offer && !kartoitus && (
           <TilatutTuotteet
             suositeltuKesto={(min) => {
               const sopiva = durations.find((d) => d >= min) ?? durations[durations.length - 1];
@@ -263,9 +294,14 @@ export function NewJobForm({
           <span className="text-sm">
             <span className="font-medium text-text">Lähetä vahvistus asiakkaalle</span>
             <span className="mt-0.5 block text-xs text-muted">
-              Asiakkaalle varausvahvistus, sinulle työmääräin, ja käynti Google-kalenteriin.
-              Vaatii sähköpostiosoitteen. Viestin summa tulee yltä
-              {offer ? ' tarjoukselta' : ' Tilatut tuotteet -laskurista'}.
+              {kartoitus ? (
+                <>Asiakkaalle kartoituskäynnin vahvistus (veloitukseton, ei hintoja), sinulle
+                työmääräin, ja käynti Google-kalenteriin. Vaatii sähköpostiosoitteen.</>
+              ) : (
+                <>Asiakkaalle varausvahvistus, sinulle työmääräin, ja käynti Google-kalenteriin.
+                Vaatii sähköpostiosoitteen. Viestin summa tulee yltä
+                {offer ? ' tarjoukselta' : ' Tilatut tuotteet -laskurista'}.</>
+              )}
             </span>
           </span>
         </label>
@@ -275,6 +311,7 @@ export function NewJobForm({
             ? 'Valitse ensin aika'
             : pending
               ? 'Tallennetaan…'
+              : kartoitus ? 'Varaa kartoituskäynti'
               : calendarId2 ? 'Luo työ kahdelle asentajalle' : 'Luo työ'}
         </Button>
       </div>
