@@ -1,7 +1,7 @@
 'use client';
 
 import { startTransition, useActionState, useEffect, useMemo, useState } from 'react';
-import { Card, CardHeader, Input, Textarea, cx } from '@/components/ui';
+import { Card, Input, Textarea, cx } from '@/components/ui';
 import { computePricing, EXTRAS, TYPES } from '@/lib/pricing';
 import { DEFAULT_INCLUSIONS } from '@/lib/inclusions';
 import {
@@ -10,6 +10,7 @@ import {
 import { lookupTravelFee } from '../tarjoukset/actions';
 import { saveKartoitus, type KartoitusState } from './actions';
 import { KartoitusPhotos } from './photos';
+import { StepHeader } from './step-header';
 
 /* =========================================================
    Kartoituslomake puhelimelle.
@@ -31,7 +32,7 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
     <button
       type="button" onClick={onClick} aria-pressed={on}
       className={cx(
-        'min-h-11 rounded-xl border-[1.5px] px-3.5 py-2 text-left text-[15px] font-semibold transition-colors',
+        'min-h-[52px] rounded-[14px] border-[1.5px] px-4 py-2.5 text-left text-[17px] font-semibold',
         on ? 'border-accent bg-accent text-white' : 'border-line bg-ink-800 text-text hover:border-accent/60',
       )}
     >{children}</button>
@@ -42,14 +43,14 @@ function Stepper({ value, onChange }: { value: number; onChange: (n: number) => 
   return (
     <div className="flex items-center gap-1">
       <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
-        className="grid h-11 w-11 place-items-center rounded-xl border border-line text-xl font-bold text-text active:bg-ink-700" aria-label="Vähemmän">−</button>
+        className="grid h-14 w-14 place-items-center rounded-[14px] border-[1.5px] border-line bg-white text-[26px] font-bold text-text active:bg-ink-700" aria-label="Vähemmän">−</button>
       <input
         inputMode="numeric" value={value || ''} placeholder="0"
         onChange={(e) => onChange(Math.min(999, Math.max(0, Number(e.target.value.replace(/\D/g, '')) || 0)))}
-        className="h-11 w-14 rounded-xl border border-line bg-ink-800 text-center text-lg font-bold tabular-nums text-text focus:border-accent focus:outline-none"
+        className="h-14 w-16 rounded-[14px] border-[1.5px] border-line bg-white text-center text-[22px] font-bold tabular-nums text-text focus:border-accent focus:outline-none"
       />
       <button type="button" onClick={() => onChange(value + 1)}
-        className="grid h-11 w-11 place-items-center rounded-xl border border-line text-xl font-bold text-text active:bg-ink-700" aria-label="Enemmän">+</button>
+        className="grid h-14 w-14 place-items-center rounded-[14px] border-[1.5px] border-line bg-white text-[26px] font-bold text-text active:bg-ink-700" aria-label="Enemmän">+</button>
     </div>
   );
 }
@@ -89,6 +90,13 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
   }), [d.counts, d.extras, d.alennus, travel.cents]);
   const autoHours = Math.round((pricing.minutes / 60) * 2) / 2;
 
+  /** Mitä tarjouksen lähettämiseen vielä tarvitaan: [teksti, osion id]. */
+  const puuttuu: [string, string][] = [
+    ...(!d.customerName.trim() ? [['asiakkaan nimi', 'osio-1'] as [string, string]] : []),
+    ...(!/^\S+@\S+\.\S+$/.test(d.email.trim()) ? [['sähköposti', 'osio-1'] as [string, string]] : []),
+    ...(pricing.total <= 0 ? [['vähintään yksi ikkuna tai ovi', 'osio-3'] as [string, string]] : []),
+  ];
+
 
   const toggleHavainto = (h: HavaintoKey) =>
     set('havainnot', d.havainnot.includes(h) ? d.havainnot.filter((x) => x !== h) : [...d.havainnot, h]);
@@ -113,7 +121,7 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
         const fd = new FormData(e.currentTarget, (e.nativeEvent as SubmitEvent).submitter);
         startTransition(() => action(fd));
       }}
-      className="space-y-4 pb-36"
+      className="space-y-4 pb-52"
     >
       <input type="hidden" name="payload" value={JSON.stringify(d)} />
       {id && <input type="hidden" name="id" value={id} />}
@@ -122,8 +130,8 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
 
       <fieldset disabled={locked} className="space-y-4">
       {/* ---------- asiakas ---------- */}
-      <Card>
-        <CardHeader title="Asiakas" />
+      <Card className="scroll-mt-24" id="osio-1">
+        <StepHeader n={1} title="Asiakas" hint="Kenelle tarjous lähetetään. Nimi ja sähköposti tarvitaan." />
         <div className={sec}>
           <div className="flex gap-2">
             <Chip on={d.customerKind === 'asiakas'} onClick={() => set('customerKind', 'asiakas')}>Yksityinen</Chip>
@@ -153,8 +161,8 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
       </Card>
 
       {/* ---------- kohde ---------- */}
-      <Card>
-        <CardHeader title="Kohde" />
+      <Card className="scroll-mt-24" id="osio-2">
+        <StepHeader n={2} title="Talo" hint="Talotyyppi ja perustiedot. Ei pakollinen." />
         <div className={sec}>
           <div className="flex flex-wrap gap-2">
             {Object.entries(TALOTYYPIT).map(([k, v]) => (
@@ -173,8 +181,8 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
       </Card>
 
       {/* ---------- kohteet ---------- */}
-      <Card>
-        <CardHeader title="Kohteet" action={<span className="text-xs text-faint">määrä · materiaali · huomio</span>} />
+      <Card className="scroll-mt-24" id="osio-3">
+        <StepHeader n={3} title="Ikkunat ja ovet" hint="Paina + niin monta kertaa kuin kappaleita on. Hinta lasketaan itse." />
         <div className="divide-y divide-line-soft">
           {types.map((t) => {
             const n = d.counts[t.id] ?? 0;
@@ -220,8 +228,8 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
       </Card>
 
       {/* ---------- lisätyöt ---------- */}
-      <Card>
-        <CardHeader title="Lisätyöt" />
+      <Card className="scroll-mt-24" id="osio-4">
+        <StepHeader n={4} title="Lisätyöt" hint="Vain jos tarvitaan. Muuten ohita." />
         <div className="divide-y divide-line-soft">
           {qtyExtras.map((e) => (
             <div key={e.id} className="flex items-center justify-between gap-3 px-4 py-3">
@@ -246,8 +254,8 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
       </Card>
 
       {/* ---------- havainnot ---------- */}
-      <Card>
-        <CardHeader title="Havainnot" />
+      <Card className="scroll-mt-24" id="osio-5">
+        <StepHeader n={5} title="Mitä huomasit?" hint="Napauta kaikki jotka pitävät paikkansa." />
         <div className="flex flex-wrap gap-2 px-4 py-4">
           {(Object.entries(HAVAINNOT) as [HavaintoKey, string][]).map(([k, v]) => (
             <Chip key={k} on={d.havainnot.includes(k)} onClick={() => toggleHavainto(k)}>{v}</Chip>
@@ -266,8 +274,8 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
       />
 
       {/* ---------- työhön kuuluu ---------- */}
-      <Card>
-        <CardHeader title="Työhön kuuluu" action={<span className="text-xs text-faint">näkyy tarjouksessa</span>} />
+      <Card className="scroll-mt-24" id="osio-7">
+        <StepHeader n={7} title="Työhön kuuluu" hint="Nämä näkyvät asiakkaan tarjouksessa. Valmiiksi valittu." />
         <div className="divide-y divide-line-soft">
           {allInclusions.map((i) => (
             <label key={i} className="flex cursor-pointer items-start gap-3 px-4 py-2.5 text-sm">
@@ -279,8 +287,8 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
       </Card>
 
       {/* ---------- hinta ja aika ---------- */}
-      <Card>
-        <CardHeader title="Hinta-arvio ja aika" />
+      <Card className="scroll-mt-24" id="osio-8">
+        <StepHeader n={8} title="Hinta ja aika" hint="Tarkista summa. Alennus ja kesto ovat vapaaehtoisia." />
         <div className={sec}>
           <ul className="space-y-1 text-sm">
             {pricing.lines.map((l, i) => (
@@ -305,8 +313,8 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
         </div>
       </Card>
 
-      <Card>
-        <CardHeader title="Lisätiedot" />
+      <Card className="scroll-mt-24" id="osio-9">
+        <StepHeader n={9} title="Lisätiedot" hint="Vapaaehtoinen." />
         <div className={sec}>
           <label className="block"><span className={lbl}>Asiakkaalle (näkyy tarjouksessa)</span>
             <Textarea rows={3} value={d.lisatiedot ?? ''} onChange={(e) => set('lisatiedot', e.target.value)} /></label>
@@ -321,18 +329,34 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
         <div className="fixed inset-x-0 bottom-(--tabbar-h) z-30 border-t border-line bg-white/90 px-4 pt-3 pb-3 backdrop-blur-xl md:bottom-0 md:pb-[calc(12px+env(safe-area-inset-bottom))]">
           <div className="mx-auto max-w-3xl">
             {(state.error || state.ok) && (
-              <p className={cx('mb-2 text-sm font-semibold', state.error ? 'text-danger' : 'text-accent')}>{state.error ?? state.ok}</p>
+              <p role={state.error ? 'alert' : 'status'} className={cx('mb-2 text-[17px] font-semibold', state.error ? 'text-danger' : 'text-accent')}>{state.error ?? state.ok}</p>
+            )}
+            {/* Miksi Lähetä ei toimi — himmeä nappi ilman syytä on arvoitus.
+                Jokainen puute vie oikeaan kohtaan lomaketta. */}
+            {!state.error && puuttuu.length > 0 && (
+              <p className="mb-2 text-[15px] leading-snug text-warn">
+                <span className="font-semibold">Ennen lähetystä puuttuu: </span>
+                {puuttuu.map(([txt, osio], i) => (
+                  <span key={txt}>
+                    {i > 0 && ', '}
+                    <button type="button" className="no-min font-semibold underline underline-offset-2"
+                      onClick={() => document.getElementById(osio)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+                      {txt}
+                    </button>
+                  </span>
+                ))}
+              </p>
             )}
             <div className="flex items-center gap-2">
               <div className="mr-auto">
-                <div className="text-[15px] font-semibold text-faint uppercase">Yhteensä</div>
-                <div className="text-xl font-extrabold tabular-nums text-text">{eur(pricing.total)}</div>
+                <div className="text-[15px] font-semibold text-faint">Yhteensä</div>
+                <div className="text-[24px] leading-tight font-bold tabular-nums text-text">{eur(pricing.total)}</div>
               </div>
               <button type="submit" name="mode" value="save" disabled={pending}
-                className="rounded-xl border border-line bg-white px-4 py-3 text-sm font-bold text-text disabled:opacity-50">Tallenna</button>
-              <button type="submit" name="mode" value="send" disabled={pending || pricing.total <= 0 || !d.email}
-                className="rounded-xl bg-accent px-4 py-3 text-sm font-extrabold text-white disabled:opacity-50">
-                {pending ? 'Lähetetään…' : id ? 'Lähetä tarjous' : 'Lähetä tarjous'}
+                className="min-h-14 rounded-[14px] border-[1.5px] border-line bg-white px-4 text-[17px] font-semibold text-text disabled:opacity-50">Tallenna</button>
+              <button type="submit" name="mode" value="send" disabled={pending || puuttuu.length > 0}
+                className="min-h-14 rounded-[14px] bg-accent px-5 text-[17px] font-bold text-white disabled:opacity-40">
+                {pending ? 'Hetki…' : 'Lähetä tarjous'}
               </button>
             </div>
           </div>

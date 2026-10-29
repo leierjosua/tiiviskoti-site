@@ -28,9 +28,9 @@ export function Button({
   return <button {...props} className={cx(BUTTON_BASE, BUTTON_VARIANTS[variant], className)} />;
 }
 
-export function Card({ children, className }: { children: ReactNode; className?: string }) {
+export function Card({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
   return (
-    <div className={cx(
+    <div id={id} className={cx(
       'rounded-(--radius-card) border border-line-soft bg-ink-800 shadow-(--shadow-card)',
       className,
     )}>

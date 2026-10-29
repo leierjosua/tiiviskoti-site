@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Card, CardHeader, cx } from '@/components/ui';
+import { Card, cx } from '@/components/ui';
+import { StepHeader } from './step-header';
 import { KARTOITUS_PHOTO_SLOTS, type KartoitusData, type KartoitusPhotoSlot } from '@/lib/kartoitus-schema';
 import { prepareKartoitusPhoto, saveKartoitusPhotos } from './actions';
 
@@ -124,8 +125,8 @@ export function KartoitusPhotos({ kid, saved, value, onChange, urls: initialUrls
   );
 
   return (
-    <Card>
-      <CardHeader title="Kuvat" action={<span className="text-xs text-faint">sisäiseen käyttöön</span>} />
+    <Card className="scroll-mt-24" id="osio-6">
+      <StepHeader n={6} title="Kuvat" hint="Napauta ruutua ja ota kuva. Kuvat jäävät vain meille, asiakas ei näe niitä." />
       <div className="space-y-5 px-4 py-4">
         {GROUPS.map((g) => (
           <div key={g.title}>
