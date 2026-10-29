@@ -11,6 +11,7 @@ import { lookupTravelFee } from '../tarjoukset/actions';
 import { saveKartoitus, type KartoitusState } from './actions';
 import { KartoitusPhotos } from './photos';
 import { StepHeader } from './step-header';
+import { AsentajienSaatavuus } from './saatavuus';
 
 /* =========================================================
    Kartoituslomake puhelimelle.
@@ -89,6 +90,14 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
     travelFee: travel.cents / 100, discount: d.alennus, discountLabel: 'Kartoitusalennus',
   }), [d.counts, d.extras, d.alennus, travel.cents]);
   const autoHours = Math.round((pricing.minutes / 60) * 2) / 2;
+
+  /* Saatavuushaun kesto: käsin annettu tai hinnaston arvio, puolen tunnin
+     tarkkuudella (ettei jokainen näppäily hae aikoja uudelleen). */
+  const kestoMin = (() => {
+    const h = Number(String(d.kestoH ?? '').replace(',', '.'));
+    const raw = h > 0 ? h * 60 : pricing.minutes || 120;
+    return Math.max(60, Math.ceil(raw / 30) * 30);
+  })();
 
   /** Mitä tarjouksen lähettämiseen vielä tarvitaan: [teksti, osion id]. */
   const puuttuu: [string, string][] = [
@@ -313,8 +322,22 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
         </div>
       </Card>
 
-      <Card className="scroll-mt-24" id="osio-9">
-        <StepHeader n={9} title="Lisätiedot" hint="Vapaaehtoinen." />
+      <AsentajienSaatavuus
+        step={9}
+        postalCode={d.postalCode}
+        minutes={kestoMin}
+        value={{ iso: d.ehdotettuAlku, calendarId: d.ehdotettuKalenteri }}
+        disabled={locked}
+        onPick={(v) => setD((p) => ({
+          ...p,
+          ehdotettuAika: v ? v.label : (p.ehdotettuAlku ? undefined : p.ehdotettuAika),
+          ehdotettuAlku: v?.iso,
+          ehdotettuKalenteri: v?.calendarId,
+        }))}
+      />
+
+      <Card className="scroll-mt-24" id="osio-10">
+        <StepHeader n={10} title="Lisätiedot" hint="Vapaaehtoinen." />
         <div className={sec}>
           <label className="block"><span className={lbl}>Asiakkaalle (näkyy tarjouksessa)</span>
             <Textarea rows={3} value={d.lisatiedot ?? ''} onChange={(e) => set('lisatiedot', e.target.value)} /></label>

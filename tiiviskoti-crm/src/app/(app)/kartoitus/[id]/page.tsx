@@ -10,6 +10,16 @@ import { ConfirmBox } from '../confirm-box';
 
 export const dynamic = 'force-dynamic';
 
+/* Varaus kartoituksessa valitulle asentajalle ja ajalle. Kesto pyöristetään
+   ylös varauslomakkeen kestovaihtoehtoihin. */
+function varausLinkki(offerId: string, calendarId: string, alku: string, kestoH?: string): string {
+  const h = Number(String(kestoH ?? '').replace(',', '.'));
+  const kesto = [60, 90, 120, 180, 240, 300].find((d) => d >= h * 60) ?? (h > 0 ? 300 : undefined);
+  const q = new URLSearchParams({ tarjous: offerId, kalenteri: calendarId, alku });
+  if (kesto) q.set('kesto', String(kesto));
+  return `/tyot/uusi?${q}`;
+}
+
 const eur = (c: number) => (c / 100).toLocaleString('fi-FI', { maximumFractionDigits: 2 }) + ' €';
 
 /* Kartoitus: tila ylhäällä, lomake alla. Lähetyksen jälkeen iso nappi
@@ -48,7 +58,14 @@ export default async function KartoitusDetail({ params, searchParams }: {
           <p className="text-lg font-extrabold text-white">✓ Asiakas hyväksyi tarjouksen</p>
           <p className="mt-1 text-sm">{formatInstant(k.accepted_at!)} · {k.accepted_name} · {k.offer_total_cents ? eur(k.offer_total_cents) : ''}</p>
           {k.offer_id && <ConfirmBox offerId={k.offer_id} back={`/kartoitus/${k.id}`} />}
-          <p className="mt-2 text-sm">Seuraavaksi: sovi asennusaika ja tee työ tarjoukselta (Tarjous CRM:ssä → Laita aika).</p>
+          {k.offer_id && k.data.ehdotettuAlku && k.data.ehdotettuKalenteri && staff.role !== 'installer' ? (
+            <a href={varausLinkki(k.offer_id, k.data.ehdotettuKalenteri, k.data.ehdotettuAlku, k.data.kestoH)}
+               className="mt-4 flex min-h-14 items-center justify-center rounded-[14px] bg-white px-5 text-[18px] font-bold text-[#163A28]">
+              Varaa tämä aika: {k.data.ehdotettuAika ?? formatInstant(new Date(k.data.ehdotettuAlku))} →
+            </a>
+          ) : (
+            <p className="mt-2 text-sm">Seuraavaksi: sovi asennusaika ja tee työ tarjoukselta (Tarjous CRM:ssä → Laita aika).</p>
+          )}
         </div>
       ) : link ? (
         <div className="rounded-2xl border-2 border-accent bg-white p-5">

@@ -87,6 +87,10 @@ export const kartoitusSchema = z.object({
   alennus: z.number().min(0).max(100000).default(0),
   kestoH: z.string().trim().max(10).optional(),
   ehdotettuAika: z.string().trim().max(80).optional(),
+  /** Saatavuusosiosta valittu aika: kenen kalenteriin ja milloin. Käytetään
+   *  "Varaa tämä aika" -napissa kun asiakas on hyväksynyt. */
+  ehdotettuKalenteri: z.string().uuid().optional(),
+  ehdotettuAlku: z.string().max(40).optional(),
   /** Näkyy asiakkaalle tarjouksessa. */
   lisatiedot: z.string().trim().max(1500).optional(),
   /** Vain toimistolle. */

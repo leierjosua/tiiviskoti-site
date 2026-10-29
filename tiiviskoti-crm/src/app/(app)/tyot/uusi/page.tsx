@@ -75,13 +75,16 @@ export default async function NewJobPage({
     /* 'kartoitus' = pelkkä kartoituskäynti: ei rivejä eikä hintaa,
        asiakkaalle kartoituksen vahvistus eikä varausvahvistusta. */
     tyyppi?: string;
+    /* Valmiiksi valittu aika (ISO), esim. kartoituksessa ehdotettu. Valitaan
+       vain jos se on yhä vapaana — muuten käyttäjä valitsee toisen. */
+    alku?: string;
   }>;
 }) {
   // Varauksen tekeminen on toimiston työtä, ei asentajan.
   await requireManager();
   const {
     kalenteri, kalenteri2, kesto, liidi, nimi, email, puhelin, postinumero, osoite,
-    muistiinpano, tarjous, tyyppi,
+    muistiinpano, tarjous, tyyppi, alku,
   } = await searchParams;
   /* Tarjouksesta laitettu aika on aina asennus — tarjous on jo kartoitettu. */
   const isKartoitus = tyyppi === 'kartoitus' && !tarjous;
@@ -132,8 +135,15 @@ export default async function NewJobPage({
     slots = slots.filter((iso) => mine.has(iso));
   }
 
+  const alkuVapaana = alku ? slots.includes(new Date(alku).toISOString()) : false;
+
   return (
     <div className="space-y-6">
+      {alku && !alkuVapaana && (
+        <p role="alert" className="rounded-[14px] bg-[#FFF4E0] px-5 py-4 text-[17px] font-semibold text-warn">
+          Kartoituksessa ehdotettu aika ei ole enää vapaana. Valitse toinen aika alta.
+        </p>
+      )}
       <header className="space-y-1">
         <Link href={offer ? `/tarjoukset/${offer.id}` : '/tyot'} className="text-xs text-muted hover:text-text">
           ← {offer ? `Tarjous ${offer.offer_number}` : 'Työt'}
@@ -169,6 +179,7 @@ export default async function NewJobPage({
             durations={durations}
             kartoitus={isKartoitus}
             slots={slots}
+            initialSelected={alkuVapaana ? new Date(alku!).toISOString() : undefined}
             leadId={liidi}
             offer={offer ? {
               id: offer.id,

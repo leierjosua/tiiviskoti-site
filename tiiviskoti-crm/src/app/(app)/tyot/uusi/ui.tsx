@@ -17,7 +17,7 @@ type Prefill = {
 type OfferHead = { id: string; number: string; total: string; customer: string };
 
 export function NewJobForm({
-  calendars, calendarId, calendarId2, duration, durations, kartoitus, slots, leadId, offer, prefill,
+  calendars, calendarId, calendarId2, duration, durations, kartoitus, slots, initialSelected, leadId, offer, prefill,
 }: {
   calendars: { id: string; label: string }[];
   calendarId: string;
@@ -27,13 +27,14 @@ export function NewJobForm({
   /** Pelkkä kartoituskäynti: ei laskuria, kartoituksen vahvistusposti. */
   kartoitus: boolean;
   slots: string[];
+  initialSelected?: string;
   leadId?: string;
   offer?: OfferHead;
   prefill?: Prefill;
 }) {
   const router = useRouter();
   const [state, action, pending] = useActionState<ActionState, FormData>(createJob, {});
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(initialSelected ?? null);
   /* Vapaa aika kalenterin ulkopuolelta. Vapaat ajat kattavat työaikojen
      sisällä olevat ruudut, mutta keikka sovitaan joskus niiden ulkopuolelle:
      ilta, lauantai, tai asiakkaan ainoa mahdollinen hetki. Aiemmin sellaista

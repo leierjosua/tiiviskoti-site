@@ -5,7 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { sql } from '@/lib/db';
 import { ownsJob, requireStaff } from '@/lib/session';
-import { areaForPostal, type OfferLine } from '@/lib/data';
+import { areaForPostal, areasForPostal, availability, kartoitusCalendarId, type OfferLine } from '@/lib/data';
+import { dateKeyOf, isoWeekday, timeOf, weekdayShort } from '@/lib/time';
 import { computePricing, EXTRAS, TYPES } from '@/lib/pricing';
 import { cleanInclusions } from '@/lib/inclusions';
 import { generateOfferPdf } from '@/lib/offer-pdf';
@@ -271,4 +272,64 @@ export async function saveKartoitus(_prev: KartoitusState, formData: FormData): 
   /* Posti voi epäonnistua, mutta tarjous ja hyväksyntälinkki ovat silti
      olemassa — asiakas voi hyväksyä heti kartoittajan puhelimella. */
   redirect(`/kartoitus/${kartoitusId}?${sendErr ? `postivirhe=${encodeURIComponent(sendErr.slice(0, 200))}` : 'lahetetty=1'}`);
+}
+
+
+/* ---------- asentajien saatavuus ---------- */
+
+export type SaatavuusSlot = { iso: string; time: string };
+export type SaatavuusDay = {
+  dayKey: string; label: string;
+  staff: { calendarId: string; name: string; inArea: boolean; slots: SaatavuusSlot[] }[];
+};
+
+/**
+ * Kaikkien asentajien vapaat ajat kartoituslomakkeelle.
+ *
+ * Sama laskenta kuin varauksessa (`availability`), joten näkyvä aika on
+ * oikeasti varattavissa. Kartoituskalenteri jätetään pois — se ei tee
+ * asennuksia. `inArea` kertoo palveleeko asentaja asiakkaan postinumeroa;
+ * käyttöliittymä näyttää oletuksena vain ne.
+ *
+ * Asentajakin näkee kaikkien vapaat ajat: kartoittaja ehdottaa aikaa
+ * asiakkaalle paikan päällä. Ajoissa ei ole asiakastietoja, vain vapaus.
+ */
+export async function asentajienSaatavuus(postalCode: string, durationMinutes: number, days = 14): Promise<SaatavuusDay[]> {
+  await requireStaff();
+  const kesto = Math.min(600, Math.max(30, Math.round(durationMinutes / 15) * 15 || 120));
+  const until = new Date(Date.now() + Math.min(60, Math.max(7, days)) * 86_400_000);
+  const skip = kartoitusCalendarId();
+
+  const [all, areas] = await Promise.all([
+    availability({ durationMinutes: kesto, until }),
+    /^\d{5}$/.test(postalCode) ? areasForPostal(postalCode) : Promise.resolve([]),
+  ]);
+  const served = new Set<string>();
+  if (areas.length > 0) {
+    const rows = await sql<{ calendar_id: string }[]>`
+      select distinct calendar_id from tk.calendar_areas where area_id in ${sql(areas.map((a) => a.id))}
+    `;
+    rows.forEach((r) => served.add(r.calendar_id));
+  }
+
+  const byDay = new Map<string, SaatavuusDay>();
+  for (const cal of all) {
+    if (cal.calendarId === skip) continue;
+    for (const slot of cal.slots) {
+      const key = dateKeyOf(slot.start);
+      let day = byDay.get(key);
+      if (!day) {
+        const [, m, d] = key.split('-').map(Number);
+        day = { dayKey: key, label: `${weekdayShort(isoWeekday(key))} ${d}.${m}.`, staff: [] };
+        byDay.set(key, day);
+      }
+      let st = day.staff.find((x) => x.calendarId === cal.calendarId);
+      if (!st) {
+        st = { calendarId: cal.calendarId, name: cal.staffName, inArea: areas.length === 0 || served.has(cal.calendarId), slots: [] };
+        day.staff.push(st);
+      }
+      st.slots.push({ iso: slot.start.toISOString(), time: timeOf(slot.start).replace(':', '.') });
+    }
+  }
+  return [...byDay.values()].sort((a, b) => a.dayKey.localeCompare(b.dayKey));
 }
