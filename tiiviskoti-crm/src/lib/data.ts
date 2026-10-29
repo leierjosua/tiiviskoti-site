@@ -31,6 +31,18 @@ export function kartoitusCalendarId(): string | null {
   return id && /^[0-9a-f-]{36}$/i.test(id) ? id : null;
 }
 
+/* Apuasentajat: kalenteri on käytössä, mutta sen päiviä EI tarjota
+   varattaviksi (sivusto, kartoituksen vapaat ajat, Saatavuus-koonti eikä
+   Uusi työ -lomakkeen päävastuullinen). Henkilön voi silti valita työpariksi
+   ("Toinen asentaja"), jolloin hänen kalenterinsa varautuu normaalisti.
+   Ympäristömuuttuja samasta syystä kuin KARTOITUS_CALENDAR_ID yllä (ei
+   DDL-oikeutta sarakkeelle). Pilkuilla erotettu lista; muutos vaatii
+   redeployn. 29.10.2026: Nestori Frilander. */
+export function apuasentajaCalendarIds(): string[] {
+  return (process.env.APUASENTAJA_CALENDAR_IDS ?? '')
+    .split(',').map((x) => x.trim()).filter((x) => /^[0-9a-f-]{36}$/i.test(x));
+}
+
 export type StaffRow = {
   id: string; email: string; full_name: string; phone: string | null;
   role: 'owner' | 'admin' | 'installer'; active: boolean;
@@ -459,6 +471,8 @@ export async function availability(opts: {
       join tk.staff s on s.id = c.staff_id
      where c.active and s.active
        ${opts.calendarId ? sql`and c.id = ${opts.calendarId}` : sql``}
+       ${!opts.calendarId && apuasentajaCalendarIds().length
+         ? sql`and not (c.id = any(${apuasentajaCalendarIds()}::uuid[]))` : sql``}
        ${opts.areaIds
          ? opts.areaIds.length === 0
            ? sql`and false`

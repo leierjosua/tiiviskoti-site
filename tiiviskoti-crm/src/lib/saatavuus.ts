@@ -1,6 +1,6 @@
 import 'server-only';
 import { sql } from '@/lib/db';
-import { kartoitusCalendarId } from '@/lib/data';
+import { apuasentajaCalendarIds, kartoitusCalendarId } from '@/lib/data';
 import { addDays, isoWeekday, todayKey } from '@/lib/time';
 
 /* =========================================================
@@ -106,8 +106,10 @@ export async function saatavuus(
        /* Ilman rajausta vain käytössä olevat: suljettu kalenteri (esim.
           Josuan, suljettu 29.10.2026) näkyi muuten yhä ja sen ilmoitetut
           päivät laskettiin vapaiksi asentajapäiviksi. Kartoituskalenteri
-          ei tee asennuksia, joten sekään ei kuulu asennuskapasiteettiin. */
-       where ${calendarIds?.length ? sql`c.id = any(${calendarIds})` : sql`c.active and s.active and c.id is distinct from ${kartoitusCalendarId()}::uuid`}
+          ei tee asennuksia, joten sekään ei kuulu asennuskapasiteettiin.
+          Apuasentajien päivät eivät myöskään (apuasentajaCalendarIds). */
+       where ${calendarIds?.length ? sql`c.id = any(${calendarIds})` : sql`c.active and s.active and c.id is distinct from ${kartoitusCalendarId()}::uuid
+                     and not (c.id = any(${apuasentajaCalendarIds()}::uuid[]))`}
        order by s.full_name, c.name
     `,
     sql<{ calendar_id: string; weekday: number; start_time: string; end_time: string }[]>`

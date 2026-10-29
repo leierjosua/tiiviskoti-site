@@ -17,9 +17,11 @@ type Prefill = {
 type OfferHead = { id: string; number: string; total: string; customer: string };
 
 export function NewJobForm({
-  calendars, calendarId, calendarId2, duration, durations, kartoitus, slots, initialSelected, leadId, offer, prefill,
+  calendars, mates, calendarId, calendarId2, duration, durations, kartoitus, slots, initialSelected, leadId, offer, prefill,
 }: {
   calendars: { id: string; label: string }[];
+  /** Toisen asentajan vaihtoehdot: kaikki, myös apuasentajat. */
+  mates: { id: string; label: string }[];
   calendarId: string;
   calendarId2: string;
   duration: number;
@@ -134,7 +136,7 @@ export function NewJobForm({
         <Field label="Toinen asentaja">
           <Select value={calendarId2} onChange={(e) => reload({ kalenteri2: e.target.value })}>
             <option value="">— ei toista —</option>
-            {calendars.filter((c) => c.id !== calendarId).map((c) => (
+            {mates.filter((c) => c.id !== calendarId).map((c) => (
               <option key={c.id} value={c.id}>{c.label}</option>
             ))}
           </Select>

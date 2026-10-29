@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { availability, getOffer, kartoitusCalendarId, listCalendars, type OfferLine, type OfferRow } from '@/lib/data';
+import { apuasentajaCalendarIds, availability, getOffer, kartoitusCalendarId, listCalendars, type OfferLine, type OfferRow } from '@/lib/data';
 import { EXTRAS, TYPES } from '@/lib/pricing';
 import { requireManager } from '@/lib/session';
 import { Card, CardHeader, Empty } from '@/components/ui';
@@ -106,8 +106,12 @@ export default async function NewJobPage({
      olisi mennyt väärään kalenteriin ilman että kukaan huomaa. Valittavissa
      se on yhä, jos joku tarvitsee sitä tietoisesti. */
   const kartoitus = kartoitusCalendarId();
-  const oletusKalenteri = (calendars.find((c) => c.id !== kartoitus) ?? calendars[0])?.id;
-  const calendarId = calendars.some((c) => c.id === kalenteri) ? kalenteri : oletusKalenteri;
+  /* Apuasentaja ei ole päävastuullinen: hän on valittavissa vain toiseksi
+     asentajaksi (apuasentajaCalendarIds, lib/data.ts). */
+  const apu = new Set(apuasentajaCalendarIds());
+  const paa = calendars.filter((c) => !apu.has(c.id));
+  const oletusKalenteri = (paa.find((c) => c.id !== kartoitus) ?? paa[0])?.id;
+  const calendarId = paa.some((c) => c.id === kalenteri) ? kalenteri : oletusKalenteri;
   /* Toinen asentaja kelpaa vain jos hän on eri henkilö kuin ensimmäinen —
      muuten sama kalenteri varattaisiin kahdesti eikä työ syntyisi lainkaan. */
   const calendarId2 = kalenteri2 && kalenteri2 !== calendarId
@@ -172,7 +176,8 @@ export default async function NewJobPage({
             }
           />
           <NewJobForm
-            calendars={calendars.map((c) => ({ id: c.id, label: `${c.staff_name} — ${c.name}` }))}
+            calendars={paa.map((c) => ({ id: c.id, label: `${c.staff_name} — ${c.name}` }))}
+            mates={calendars.map((c) => ({ id: c.id, label: `${c.staff_name}${apu.has(c.id) ? ' (apuasentaja)' : ''} — ${c.name}` }))}
             calendarId={calendarId!}
             calendarId2={calendarId2}
             duration={duration}
