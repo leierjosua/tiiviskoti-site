@@ -22,7 +22,7 @@ const CHIP: Record<string, string> = {
 export function OfferStatusChip({ status, label }: { status: string; label: string }) {
   return (
     <span className={cx(
-      'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-bold whitespace-nowrap',
+      'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[15px] font-bold whitespace-nowrap',
       CHIP[status] ?? CHIP.sent,
     )}>
       {label}

@@ -57,7 +57,7 @@ export function Metric({ label, value, prevValue, nowValue, tone = 'sales', sub,
 }) {
   return (
     <Card className="p-4">
-      <p className="text-[12px] font-bold tracking-wide text-muted uppercase">{label}</p>
+      <p className="text-[15px] font-bold tracking-wide text-muted uppercase">{label}</p>
       <p className={cx(
         'mt-2 leading-none font-extrabold tabular text-text',
         big ? 'text-[30px]' : 'text-[26px]',
@@ -82,7 +82,7 @@ export function Section({ title, tone, children }: {
   const t = SECTION_TONES[tone];
   return (
     <section className={cx('rounded-(--radius-card) p-3', t.panel)}>
-      <h2 className={cx('mb-2.5 flex items-center gap-2 px-1 text-[12px] font-extrabold tracking-widest uppercase', t.text)}>
+      <h2 className={cx('mb-2.5 flex items-center gap-2 px-1 text-[15px] font-extrabold tracking-widest uppercase', t.text)}>
         <span className={cx('h-3.5 w-1 rounded-full', t.bar)} />
         {title}
       </h2>
@@ -133,7 +133,7 @@ export function MonthChart({ months }: { months: MonthPoint[] }) {
             {/* Akselilla pelkkä kuukausi: vuosiluku toistuisi 12 kertaa
                 eikä mahtuisi puolen leveyden korttiin. Vuosi näkyy
                 taulukossa ja pylvään pikaohjeessa. */}
-            <span className="text-[11px] whitespace-nowrap text-faint">{p.label.split(' ')[0]}</span>
+            <span className="text-[15px] whitespace-nowrap text-faint">{p.label.split(' ')[0]}</span>
           </div>
         ))}
       </div>

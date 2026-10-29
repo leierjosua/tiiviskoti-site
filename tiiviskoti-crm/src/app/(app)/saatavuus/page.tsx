@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic';
 const VIIKKOJA = 6;
 
 function Ruutu({ p }: { p: SaatavuusPaiva }) {
-  const yhteinen = 'flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold';
+  const yhteinen = 'flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[13px] font-bold';
   if (p.tila === 'poissa') {
     return <div className={`${yhteinen} bg-danger/15 text-danger`} title={`${p.date} poissa${p.note ? ` — ${p.note}` : ''}`}>✕</div>;
   }
@@ -138,7 +138,7 @@ export default async function SaatavuusPage() {
                 {paivat.map((d) => {
                   const vkp = isoWeekday(d);
                   return (
-                    <th key={d} className={`px-0.5 py-2 text-center text-[10px] font-semibold
+                    <th key={d} className={`px-0.5 py-2 text-center text-[13px] font-semibold
                                             ${vkp >= 6 ? 'text-faint' : 'text-muted'}`}>
                       <div>{weekdayShort(vkp)}</div>
                       <div className="tabular font-normal text-faint">{d.slice(8)}.{d.slice(5, 7)}.</div>

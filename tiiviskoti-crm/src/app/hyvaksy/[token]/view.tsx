@@ -37,7 +37,7 @@ export function OfferView({ o, token, paikalla }: { o: PublicOffer; token: strin
 
   return (
     <Shell>
-      <p className="text-[13px] font-bold tracking-[.12em] text-[#217A4E] uppercase">Tarjous {o.offer_number}</p>
+      <p className="text-[15px] font-bold tracking-[.12em] text-[#217A4E] uppercase">Tarjous {o.offer_number}</p>
       <h1 className="mt-2 text-[30px] leading-tight font-extrabold tracking-tight text-[#183A28]">
         {o.accepted_at ? (o.confirmed_at ? 'Tarjous on vahvistettu' : 'Tarjous on hyväksytty') : 'Tarkista ja hyväksy tarjous'}
       </h1>
@@ -60,7 +60,7 @@ export function OfferView({ o, token, paikalla }: { o: PublicOffer; token: strin
           <span className="text-lg font-extrabold text-[#183A28]">Yhteensä</span>
           <span className="text-2xl font-extrabold text-[#217A4E] tabular-nums">{eur(o.total_cents)}</span>
         </div>
-        <p className="mt-1 text-[13px] text-[#7B857D]">
+        <p className="mt-1 text-[15px] text-[#7B857D]">
           Sisältää ALV 25,5 %. Työn osuudesta voi hakea kotitalousvähennystä.
           {o.valid_until && !o.accepted_at && <> Voimassa {fiDate(o.valid_until)} asti.</>}
         </p>
@@ -75,7 +75,7 @@ export function OfferView({ o, token, paikalla }: { o: PublicOffer; token: strin
             ))}
           </ul>
           {rajaukset.map((r) => (
-            <p key={r} className="mt-3 rounded-xl bg-white px-3.5 py-2.5 text-[14px] font-semibold text-[#183A28]">{r}</p>
+            <p key={r} className="mt-3 rounded-xl bg-white px-3.5 py-2.5 text-[16px] font-semibold text-[#183A28]">{r}</p>
           ))}
         </section>
       )}

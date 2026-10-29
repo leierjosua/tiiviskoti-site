@@ -272,7 +272,7 @@ export default async function WeekPage({
               <div>
                 {hours.map((h) => (
                   <div key={h} style={{ height: HOUR_PX }}
-                       className="pr-2 pt-0.5 text-right text-[11px] text-faint tabular">
+                       className="pr-2 pt-0.5 text-right text-[13px] text-faint tabular">
                     {String(h).padStart(2, '0')}
                   </div>
                 ))}
@@ -299,7 +299,7 @@ export default async function WeekPage({
                           href={`/tyot/${job.id}`}
                           style={{ top, height }}
                           className={`absolute inset-x-1 overflow-hidden rounded-md border border-line border-l-[3px] px-1.5 py-1
-                                      text-[11px] leading-tight shadow-sm transition-shadow hover:shadow-md
+                                      text-[13px] leading-tight shadow-sm transition-shadow hover:shadow-md
                                       ${colorOf.get(job.calendar_id) ?? COLORS[0]}`}
                         >
                           <div className="tabular font-medium">{timeOf(job.starts_at)}</div>

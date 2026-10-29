@@ -35,54 +35,61 @@
    uudelleennimeäminen olisi pelkkää kohinaa ilman hyötyä.
    ========================================================= */
 
+/* =========================================================
+   29.10.2026 — "selkeä" uudistus (Josua: niin simppeli että 75-vuotias
+   osaa käyttää). Apple HIG:n periaatteet webiin:
+   - Järjestelmäfontti (iPhonessa San Francisco): optinen koko ja
+     harvennus tulevat fontista itsestään, ei latausta.
+   - Leipäteksti 17 px (iOS:n Body), pienin teksti 15 px. Tailwindin
+     text-xs/text-sm nostettu tässä, jotta muutos osuu kaikille sivuille.
+   - Napautusalueet vähintään 48–52 px (Button, kentät, valikko).
+   - Applen neutraalit harmaat; vihreä vain merkitykselle (ks. alla).
+   - Painalluspalaute heti painettaessa (scale .97), ei vasta päästäessä.
+   ========================================================= */
+
 @theme {
-  /* Pinnat, vaaleasta syvempään. Neutraali harmaa, ei vihreää sävyä. */
-  --color-ink-900: #EEF1F3;   /* sivun tausta */
-  --color-ink-800: #FFFFFF;   /* kortti */
-  --color-ink-700: #F2F4F6;   /* hover */
-  --color-ink-600: #E7EFEA;   /* korostettu pinta, valittu tila */
-  --color-line: #D8DEE3;
-  --color-line-soft: #E7EBEF;
+  /* Pinnat. Nimet historiallisia: 900 = sivun tausta, 800 = kortti,
+     700 = hover, 600 = korostettu pinta. */
+  --color-ink-900: #F2F2F7;   /* iOS systemGroupedBackground */
+  --color-ink-800: #FFFFFF;
+  --color-ink-700: #F2F2F7;
+  --color-ink-600: #E6F2EB;
+  --color-line: #C9CDD3;
+  --color-line-soft: #E5E5EA;
 
-  /* Teksti. Kaikki kolme yltävät WCAG AA:han valkoisella (4,5:1). */
-  --color-text: #16211B;      /* 15,8:1 */
-  --color-muted: #47534C;     /*  7,9:1 */
-  --color-faint: #616C66;     /*  5,4:1 */
+  /* Teksti — kaikki selvästi yli WCAG AA:n, koska ikääntyvä silmä
+     tarvitsee kontrastia enemmän kuin 4,5:1. */
+  --color-text: #111214;      /* 18:1 */
+  --color-muted: #3A3D42;     /* 11:1 */
+  --color-faint: #55595F;     /* 7,2:1 */
 
-  /* Brändi */
-  --color-accent: #217A4E;       /* 5,3:1 — sama kuin tiiviskoti.fi */
-  --color-accent-ink: #FFFFFF;   /* teksti vihreän päällä */
-  --color-accent-dim: #E4F0E9;
+  /* Brändi — sama vihreä kuin tiiviskoti.fi (älä vaihda yksin). */
+  --color-accent: #217A4E;
+  --color-accent-ink: #FFFFFF;
+  --color-accent-dim: #E6F2EB;
 
-  /* Sivupalkki — vaalea paneeli, ei oma maailmansa */
   --color-nav: #FFFFFF;
-  --color-nav-deep: #F2F4F6;
-  --color-nav-line: #E1E6EA;
-  --color-nav-text: #16211B;
-  --color-nav-muted: #47534C;
+  --color-nav-deep: #F2F2F7;
+  --color-nav-line: #E5E5EA;
+  --color-nav-text: #111214;
+  --color-nav-muted: #3A3D42;
 
-  /* Tilat. Kaikki tummennettu AA-tasolle — näitä käytetään tekstivärinä
-     omalla sävytetyllä taustallaan, mikä laskee kontrastia entisestään. */
-  --color-warn: #8A5A0C;      /* 5,9:1 */
-  --color-danger: #B03A2E;    /* 6,1:1 */
-  --color-info: #1F5F85;      /* 7,0:1 */
+  --color-warn: #7A4D00;
+  --color-danger: #B3261E;
+  --color-info: #1F5F85;
 
-  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
 
-  /* Tekstikoot isommiksi KOKO sovelluksessa kerralla. `text-xs` on
-     käytössä 80:ssä ja `text-sm` kymmenissä paikoissa; koon nostaminen
-     täällä osuu niihin kaikkiin ilman että 23 tiedostoa muokataan yksi
-     kerrallaan. Tailwindin oletukset ovat 12 px ja 14 px. */
-  --text-xs: 0.8125rem;       /* 13 px */
+  --text-xs: 0.9375rem;        /* 15 px — pienin teksti */
   --text-xs--line-height: 1.45;
-  --text-sm: 0.9375rem;       /* 15 px */
+  --text-sm: 1.0625rem;        /* 17 px — leipäteksti (iOS Body) */
   --text-sm--line-height: 1.5;
+  --text-base: 1.125rem;       /* 18 px */
+  --text-base--line-height: 1.55;
 
-  /* Pyöristys ennallaan; varjo neutraaliksi, koska vihreään taittuva varjo
-     harmaalla pinnalla näytti likaiselta. */
-  --radius-card: 14px;
-  --shadow-card: 0 1px 2px rgba(16, 24, 32, .05), 0 12px 28px -20px rgba(16, 24, 32, .22);
+  --radius-card: 18px;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px -16px rgba(0, 0, 0, .18);
   --shadow-nav: none;
 }
 
@@ -90,12 +97,47 @@ html {
   color-scheme: light;
 }
 
+/* Puhelimen alapalkin korkeus (components/nav.tsx). Kiinteät alapalkit
+   (esim. kartoituslomakkeen summa) asettuvat sen yläpuolelle. */
+:root { --tabbar-h: calc(64px + env(safe-area-inset-bottom)); }
+@media (min-width: 768px) { :root { --tabbar-h: 0px; } }
+
 body {
+  font-size: 1.0625rem;
+  line-height: 1.5;
   background: var(--color-ink-900);
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Otsikoissa negatiivinen harvennus, leipätekstissä ei (koko-
+   riippuvainen harvennus, Apple: The Details of UI Typography). */
+h1, h2 { letter-spacing: -0.015em; }
+
+/* Painalluspalaute heti kun sormi koskee, ja ei 300 ms:n napautusviivettä. */
+a, button, label, summary, [role='button'] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button:not(:disabled), .press {
+  transition: transform 120ms ease-out, background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+button:not(:disabled):active, a.press:active {
+  transform: scale(0.97);
+}
+
+/* Kentät 17 px: iPhone zoomaa alle 16 px:n kenttään, ja zoomattu sivu
+   on ikäihmiselle eksyttävä. */
+input, select, textarea { font-size: max(1rem, 1em); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+  button:active, a.press:active { transform: none; }
 }
 
 /* Numerot ja kellonajat tasalevyisinä, jotta taulukon sarakkeet eivät
@@ -110,7 +152,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 3px solid var(--color-accent);
   outline-offset: 2px;
 }
 

@@ -91,7 +91,7 @@ function OfferCallCard({ r }: { r: Row }) {
                  className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-bold text-accent-ink shadow-sm hover:bg-[#1A6340]">
                 <span aria-hidden>📞</span> {p.display}
               </a>
-              {p.check && <span className="text-[11px] font-semibold text-warn">{p.check} ({r.phone})</span>}
+              {p.check && <span className="text-[15px] font-semibold text-warn">{p.check} ({r.phone})</span>}
             </span>
           );
         })() : (

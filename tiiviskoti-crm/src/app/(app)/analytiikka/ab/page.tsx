@@ -51,7 +51,7 @@ export default async function AbTestsPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           <section className="space-y-4">
-            <h2 className="text-[13px] font-extrabold tracking-widest text-muted uppercase">
+            <h2 className="text-[15px] font-extrabold tracking-widest text-muted uppercase">
               Käynnissä {running.length > 0 && `(${running.length})`}
             </h2>
             {running.length === 0 ? (
@@ -68,7 +68,7 @@ export default async function AbTestsPage() {
 
           {ended.length > 0 && (
             <section className="space-y-4">
-              <h2 className="text-[13px] font-extrabold tracking-widest text-muted uppercase">
+              <h2 className="text-[15px] font-extrabold tracking-widest text-muted uppercase">
                 Päättyneet ({ended.length})
               </h2>
               {ended.map((t) => <TestCard key={t.id} t={t} />)}

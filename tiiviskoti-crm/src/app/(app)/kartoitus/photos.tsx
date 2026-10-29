@@ -149,7 +149,7 @@ export function KartoitusPhotos({ kid, saved, value, onChange, urls: initialUrls
                         </div>
                       )}
                     </label>
-                    <div className="text-[13px] font-semibold leading-tight text-text">{title}</div>
+                    <div className="text-[15px] font-semibold leading-tight text-text">{title}</div>
                     <div className="text-xs leading-snug text-faint">{help}</div>
                   </div>
                 );

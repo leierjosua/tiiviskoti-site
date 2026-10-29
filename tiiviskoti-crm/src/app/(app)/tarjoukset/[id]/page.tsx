@@ -61,7 +61,7 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
           <div className="flex items-center gap-2">
             {/* Tyyppi näkyviin: sama tarjousnumerosarja palvelee molempia,
                 joten pelkästä numerosta ei näe kummasta on kyse. */}
-            <span className="inline-flex items-center rounded-full border border-line bg-ink-700 px-2.5 py-1 text-[12px] font-bold whitespace-nowrap text-muted">
+            <span className="inline-flex items-center rounded-full border border-line bg-ink-700 px-2.5 py-1 text-[15px] font-bold whitespace-nowrap text-muted">
               {talo ? 'Taloyhtiö' : 'Asiakas'}
             </span>
             <OfferStatusChip status={offer.error ? 'error' : offer.status} label={offer.error ? 'Lähetys epäonnistui' : OFFER_STATUS[offer.status]} />

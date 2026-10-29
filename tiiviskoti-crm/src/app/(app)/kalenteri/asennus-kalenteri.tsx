@@ -350,7 +350,7 @@ export default async function AsennusKalenteri({
               <div>
                 {hours.map((h) => (
                   <div key={h} style={{ height: HOUR_PX }}
-                       className="pr-2 pt-0.5 text-right text-[11px] text-faint tabular">
+                       className="pr-2 pt-0.5 text-right text-[13px] text-faint tabular">
                     {String(h).padStart(2, '0')}:00
                   </div>
                 ))}
@@ -377,7 +377,7 @@ export default async function AsennusKalenteri({
                           href={`/tyot/${job.id}`}
                           style={{ top, height }}
                           className={`absolute inset-x-1 overflow-hidden rounded-md border border-line
-                                      border-l-[3px] px-1.5 py-1 text-[11px] leading-tight shadow-sm
+                                      border-l-[3px] px-1.5 py-1 text-[13px] leading-tight shadow-sm
                                       transition-shadow hover:shadow-md ${BLOCK[job.status]}`}
                         >
                           <div className="tabular font-bold">{timeOf(job.starts_at)}</div>

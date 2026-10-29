@@ -193,7 +193,7 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
                       {MATERIAALIT.map((m) => (
                         <button key={m} type="button"
                           onClick={() => setKohde(t.id, 'materiaali', d.kohteet[t.id]?.materiaali === m ? '' : m)}
-                          className={cx('rounded-full border px-3 py-1.5 text-[13px] font-semibold',
+                          className={cx('rounded-full border px-3 py-1.5 text-[15px] font-semibold',
                             d.kohteet[t.id]?.materiaali === m ? 'border-accent bg-accent-dim text-accent' : 'border-line text-muted')}>
                           {m}
                         </button>
@@ -318,14 +318,14 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
 
       {/* ---------- alapalkki ---------- */}
       {!locked && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] backdrop-blur">
+        <div className="fixed inset-x-0 bottom-(--tabbar-h) z-30 border-t border-line bg-white/90 px-4 pt-3 pb-3 backdrop-blur-xl md:bottom-0 md:pb-[calc(12px+env(safe-area-inset-bottom))]">
           <div className="mx-auto max-w-3xl">
             {(state.error || state.ok) && (
               <p className={cx('mb-2 text-sm font-semibold', state.error ? 'text-danger' : 'text-accent')}>{state.error ?? state.ok}</p>
             )}
             <div className="flex items-center gap-2">
               <div className="mr-auto">
-                <div className="text-[11px] font-semibold text-faint uppercase">Yhteensä</div>
+                <div className="text-[15px] font-semibold text-faint uppercase">Yhteensä</div>
                 <div className="text-xl font-extrabold tabular-nums text-text">{eur(pricing.total)}</div>
               </div>
               <button type="submit" name="mode" value="save" disabled={pending}

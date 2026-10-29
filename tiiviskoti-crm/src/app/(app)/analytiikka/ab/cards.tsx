@@ -113,7 +113,7 @@ export function TestCard({ t }: { t: AbTestResult }) {
           </p>
         </div>
         <span className={cx(
-          'shrink-0 rounded-full border px-2.5 py-1 text-[12px] font-bold whitespace-nowrap',
+          'shrink-0 rounded-full border px-2.5 py-1 text-[15px] font-bold whitespace-nowrap',
           running
             ? 'border-accent/35 bg-accent-dim text-accent'
             : 'border-line bg-ink-700 text-muted',
