@@ -24,7 +24,7 @@ export function AsentajienSaatavuus({ step, postalCode, minutes, value, onPick, 
   step: number;
   postalCode: string;
   minutes: number;
-  value?: { iso?: string; calendarId?: string };
+  value?: { iso?: string; calendarId?: string; label?: string };
   onPick: (v: Valinta | null) => void;
   disabled?: boolean;
 }) {
@@ -43,6 +43,7 @@ export function AsentajienSaatavuus({ step, postalCode, minutes, value, onPick, 
   }, [postalCode, minutes]);
 
   const alueella = /^\d{5}$/.test(postalCode);
+  const nimi = (days ?? []).flatMap((d) => d.staff).find((x) => x.calendarId === value?.calendarId)?.name;
   const shown = (days ?? [])
     .map((d) => ({ ...d, staff: d.staff.filter((s) => kaikki || s.inArea) }))
     .filter((d) => d.staff.length > 0);
@@ -69,7 +70,10 @@ export function AsentajienSaatavuus({ step, postalCode, minutes, value, onPick, 
         {value?.iso && (
           <div className="flex items-center gap-3 rounded-[14px] border-[1.5px] border-accent bg-accent-dim px-4 py-3">
             <span aria-hidden className="text-[22px] text-accent">✓</span>
-            <div className="flex-1 text-[17px] font-semibold text-accent">Valittu aika on tarjouksessa.</div>
+            <div className="flex-1 text-[17px] text-accent">
+              <div className="font-bold">{value.label ?? 'Aika valittu'}{nimi ? ` · ${nimi}` : ''}</div>
+              <div className="text-[15px]">Tulee tarjoukseen ehdotettuna aikana. Ei vielä varattu.</div>
+            </div>
             {!disabled && (
               <button type="button" onClick={() => onPick(null)}
                 className="no-min min-h-11 rounded-[10px] px-3 text-[16px] font-semibold text-accent underline underline-offset-2">

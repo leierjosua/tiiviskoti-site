@@ -326,7 +326,7 @@ export function KartoitusForm({ id, jobId, initial, locked, photoUrls = {} }: {
         step={9}
         postalCode={d.postalCode}
         minutes={kestoMin}
-        value={{ iso: d.ehdotettuAlku, calendarId: d.ehdotettuKalenteri }}
+        value={{ iso: d.ehdotettuAlku, calendarId: d.ehdotettuKalenteri, label: d.ehdotettuAika }}
         disabled={locked}
         onPick={(v) => setD((p) => ({
           ...p,
