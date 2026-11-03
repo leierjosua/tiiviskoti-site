@@ -59,84 +59,73 @@ export default async function LeadsPage() {
         </Card>
       )}
 
-      <Card className="overflow-x-auto">
+      <Card>
         <CardHeader title="Yhteydenottopyynnöt" />
         {leads.length === 0 ? (
           <Empty>Ei liidejä.</Empty>
         ) : (
-          <table className="w-full min-w-[640px] text-sm">
-            <thead>
-              <tr className="border-b border-line text-left text-xs text-faint">
-                <th className="px-4 py-2 font-medium">Saapui</th>
-                <th className="px-4 py-2 font-medium">Nimi</th>
-                <th className="px-4 py-2 font-medium">Puhelin</th>
-                <th className="px-4 py-2 font-medium">Sähköposti</th>
-                <th className="px-4 py-2 font-medium">Postinro</th>
-                <th className="px-4 py-2 font-medium">Tila</th>
-                <th className="px-4 py-2 font-medium" />
-                <th className="px-4 py-2 font-medium" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line-soft">
-              {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-ink-700">
-                  <td className="px-4 py-2.5 text-muted tabular">{fmt(lead.created_at)}</td>
-                  {/* Tarjous tehdään nimen vierestä, koska se on se kohta
-                      johon katse osuu liidiä luettaessa. Linkki vie laskurin
-                      alkuun yhteystiedot valmiiksi täytettynä — hintoja se ei
-                      esitäytä, koska liidissä ei ole yhtään hinnoiteltua riviä. */}
-                  <td className="px-4 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <span>{lead.full_name}</span>
-                      <Link
-                        href={{ pathname: '/tarjoukset/uusi', query: { liidi: lead.id } }}
-                        className="shrink-0 rounded border border-line px-2 py-0.5 text-xs text-accent hover:bg-ink-700"
-                      >
-                        Tee tarjous
-                      </Link>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2.5 tabular">
+          /* Lista eikä taulukko: 8 sarakkeen taulukko ei mahtunut edes
+             läppärille (sivupalkki vie 272 px), vaan sitä piti vierittää
+             sivuttain. Rivi rivittyy nyt kapealla ruudulla kahteen osaan:
+             tiedot ylös, tila ja napit alle. */
+          <ul className="divide-y divide-line-soft">
+            {leads.map((lead) => (
+              <li key={lead.id}
+                  className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 hover:bg-ink-700">
+                <div className="min-w-0 flex-1 basis-72">
+                  <div className="flex flex-wrap items-baseline gap-x-2">
+                    <span className="font-semibold">{lead.full_name}</span>
+                    <span className="text-xs tabular text-faint">
+                      {fmt(lead.created_at)}{lead.postal_code ? ` · ${lead.postal_code}` : ''}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 text-sm">
                     {lead.phone
-                      ? <a href={`tel:${lead.phone}`} className="text-accent hover:underline">{lead.phone}</a>
-                      : '—'}
-                  </td>
-                  <td className="px-4 py-2.5 text-muted">
-                    {lead.email
-                      ? <a href={`mailto:${lead.email}`} className="hover:text-text">{lead.email}</a>
-                      : '—'}
-                  </td>
-                  <td className="px-4 py-2.5 tabular">{lead.postal_code ?? '—'}</td>
-                  <td className="px-4 py-2.5"><LeadStatus id={lead.id} status={lead.status} /></td>
-                  <td className="px-4 py-2.5 whitespace-nowrap">
-                    {/* Ilman tätä linkkiä sovittu käynti jäi kirjaamatta: tiedot
-                        olisi pitänyt näpytellä uudestaan Uusi työ -lomakkeelle.
-                        Nyt liidi siirtyy kalenteriin yhdellä klikkauksella ja
-                        merkitään samalla asiakkaaksi. */}
-                    <Link
-                      href={{
-                        pathname: '/tyot/uusi',
-                        query: {
-                          liidi: lead.id,
-                          nimi: lead.full_name,
-                          ...(lead.email ? { email: lead.email } : {}),
-                          ...(lead.phone ? { puhelin: lead.phone } : {}),
-                          ...(lead.postal_code ? { postinumero: lead.postal_code } : {}),
-                          ...(lead.message ? { muistiinpano: lead.message } : {}),
-                        },
-                      }}
-                      className="rounded border border-line px-2.5 py-1 text-xs text-accent hover:bg-ink-700"
-                    >
-                      Luo työ
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2.5 text-right">
-                    <DeleteButton id={lead.id} action={deleteLead} nimi={lead.full_name} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      ? <a href={`tel:${lead.phone}`} className="tabular text-accent hover:underline">{lead.phone}</a>
+                      : <span className="text-muted">—</span>}
+                    {lead.email && (
+                      <a href={`mailto:${lead.email}`} className="min-w-0 break-all text-muted hover:text-text">
+                        {lead.email}
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <LeadStatus id={lead.id} status={lead.status} />
+                  {/* Tarjouslinkki vie laskurin alkuun yhteystiedot valmiiksi
+                      täytettynä — hintoja se ei esitäytä, koska liidissä ei
+                      ole yhtään hinnoiteltua riviä. */}
+                  <Link
+                    href={{ pathname: '/tarjoukset/uusi', query: { liidi: lead.id } }}
+                    className="rounded border border-line px-2.5 py-1 text-xs text-accent hover:bg-ink-700"
+                  >
+                    Tee tarjous
+                  </Link>
+                  {/* Ilman tätä linkkiä sovittu käynti jäi kirjaamatta: tiedot
+                      olisi pitänyt näpytellä uudestaan Uusi työ -lomakkeelle.
+                      Nyt liidi siirtyy kalenteriin yhdellä klikkauksella ja
+                      merkitään samalla asiakkaaksi. */}
+                  <Link
+                    href={{
+                      pathname: '/tyot/uusi',
+                      query: {
+                        liidi: lead.id,
+                        nimi: lead.full_name,
+                        ...(lead.email ? { email: lead.email } : {}),
+                        ...(lead.phone ? { puhelin: lead.phone } : {}),
+                        ...(lead.postal_code ? { postinumero: lead.postal_code } : {}),
+                        ...(lead.message ? { muistiinpano: lead.message } : {}),
+                      },
+                    }}
+                    className="rounded border border-line px-2.5 py-1 text-xs text-accent hover:bg-ink-700"
+                  >
+                    Luo työ
+                  </Link>
+                  <DeleteButton id={lead.id} action={deleteLead} nimi={lead.full_name} />
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </Card>
     </div>
