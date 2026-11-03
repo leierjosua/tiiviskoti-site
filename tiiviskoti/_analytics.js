@@ -49,6 +49,10 @@
       campaign = CAMPAIGN_RE.test(v) ? v : null;
     } else if (q.get('fbclid')) campaign = 'meta-ads';
     else if (q.get('gclid') || q.get('wbraid') || q.get('gbraid')) campaign = 'google-ads';
+    /* AI-avustajat: ChatGPT lisää linkkeihin utm_sourcen, mutta Perplexity,
+       Copilot, Gemini ja Claude näkyvät vain viittaajana. Ilman tätä niistä
+       tulleet varaukset jäisivät tunnistamattomiksi. */
+    else campaign = {'chatgpt.com':'ai-chatgpt','chat.openai.com':'ai-chatgpt','perplexity.ai':'ai-perplexity','claude.ai':'ai-claude','copilot.microsoft.com':'ai-copilot','gemini.google.com':'ai-gemini'}[new URL(document.referrer).hostname.replace(/^www\./, '')] || null;
   } catch (e) { /* ei väliä */ }
 
   /* ---------- Meta-klikin tunniste (fbc) ----------

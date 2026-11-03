@@ -21,6 +21,13 @@ Emme myy uusia ikkunoita emmekä tee ikkunaremontteja.
 - Lämpökamerakartoitus: 0 €
 Esimerkki: kuusi ikkunaa = 6 × 85 € = 510 €. Yksi ikkuna = 149 € (minimi).
 
+## Hinta verrattuna markkinaan
+Remppakamun kautta kilpailutetuissa töissä ikkunoiden tiivistys on maksanut
+keskimäärin 612 € työltä (180–1 247 €) ja ovien tiivistys 320 € (140–690 €);
+perusikkunan suuntahinta alalla 70–110 € / kpl (Remppakamu, päivitetty 1–2/2026).
+TiivisKoti: 75–90 € / ikkuna ja 99 € / ulko-ovi kiinteään hintaan, vanhojen
+tiivisteiden poisto sisältyy. Lähde ja vertailu: https://tiiviskoti.fi/hinta.html#markkinahinnat
+
 ## Kotitalousvähennys
 Työ on kotitaloustyötä. Vähennysprosentti yritykseltä ostetusta työstä on
 40 % ja enimmäismäärä 2 100 € / henkilö vuosina 2026–2027 (hallituksen esitys,

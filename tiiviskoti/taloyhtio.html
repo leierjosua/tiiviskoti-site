@@ -886,7 +886,10 @@ function tkCampaign(){
   }
   if(q.get('fbclid')) return 'meta-ads';
   if(q.get('gclid')||q.get('wbraid')||q.get('gbraid')) return 'google-ads';
-  return undefined;
+  /* AI-avustajat: ChatGPT lisää linkkeihin utm_sourcen, mutta Perplexity,
+     Copilot, Gemini ja Claude näkyvät vain viittaajana. Ilman tätä niistä
+     tulleet varaukset jäisivät tunnistamattomiksi. */
+  try{ return {'chatgpt.com':'ai-chatgpt','chat.openai.com':'ai-chatgpt','perplexity.ai':'ai-perplexity','claude.ai':'ai-claude','copilot.microsoft.com':'ai-copilot','gemini.google.com':'ai-gemini'}[new URL(document.referrer).hostname.replace(/^www\./,'')]; }catch(_){ return undefined; }
 }
 /* Google Ads -klikin tunniste.
 
