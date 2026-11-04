@@ -6,6 +6,7 @@ import {
 } from '@/lib/time';
 import { Card, Empty, StatusBadge } from '@/components/ui';
 import { jobMateNames, jobUnitCounts, mateLabel, unitLabel, type JobUnits } from '@/lib/data';
+import { materialLabel } from '@/lib/materiaalit';
 
 /* =========================================================
    Asennusnäkymän kalenteri.
@@ -74,6 +75,7 @@ function Metric({ label, value, sub, tone = 'plain' }: {
 function JobLine({ job, showDay, units, mates }: { job: Job; showDay?: boolean; units?: JobUnits; mates?: string[] }) {
   const address = [job.address, job.postal_code, job.city].filter(Boolean).join(', ');
   const maara = unitLabel(units);
+  const materiaali = materialLabel(units);
   const pari = mateLabel(mates);
   return (
     <li>
@@ -97,6 +99,7 @@ function JobLine({ job, showDay, units, mates }: { job: Job; showDay?: boolean; 
           </p>
           <p className="truncate text-sm text-muted">{job.title}</p>
           <p className="truncate text-sm text-faint">{address || 'Ei osoitetta'}</p>
+          {materiaali && <p className="mt-0.5 truncate text-sm text-muted">{materiaali}</p>}
           {pari && <p className="mt-0.5 truncate text-sm font-semibold text-text">👥 Työpari: {pari}</p>}
         </div>
       </Link>

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getJob, jobLinks, listCalendars } from '@/lib/data';
+import { getJob, jobLinks, jobUnitCounts, listCalendars, unitLabel } from '@/lib/data';
+import { materialLabel } from '@/lib/materiaalit';
 import { ownsJob, requireStaff, viewMode } from '@/lib/session';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib/time';
@@ -45,7 +46,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   );
 
   // Rivit, viestiloki ja liitokset ovat toisistaan riippumattomia — rinnakkain.
-  const [lines, mails, links, photos, deliveryRows, calendars, reportRes, kartoitusRows] = await Promise.all([
+  const [lines, mails, links, photos, deliveryRows, calendars, reportRes, kartoitusRows, unitRows] = await Promise.all([
     sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
       select name, quantity, unit_price_cents from tk.job_lines
        where job_id = ${id} order by sort_order
@@ -70,7 +71,11 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
     sql<{ id: string }[]>`
       select id from tk.kartoitukset where job_id = ${id} order by created_at desc limit 1
     `.catch(() => [] as { id: string }[]),
+    /* Saman hetken väli riittää: haetaan vain tämän varauksen luvut. */
+    jobUnitCounts(new Date(job.starts_at.getTime() - 1000).toISOString(),
+                  new Date(job.starts_at.getTime() + 1000).toISOString(), null, { crew: true }),
   ]);
+  const units = unitRows.find((u) => u.job_id === id);
   const report = reportRes.report;
   const kartoitusId = kartoitusRows[0]?.id ?? null;
   const delivery = deliveryRows[0];
@@ -118,6 +123,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
             <Row label="Nimi" value={job.title} />
             <Row label="Kalenteri" value={`${job.staff_name} — ${job.calendar_name}`} />
             <Row label="Kesto" value={<span className="tabular">{durationMinutes} min</span>} />
+            {unitLabel(units) && <Row label="Määrä" value={unitLabel(units)} />}
+            {materialLabel(units) && <Row label="Materiaali" value={materialLabel(units)} />}
             <Row
               label="Hinta"
               value={<span className="tabular">{(job.price_cents / 100).toFixed(2)} €</span>}

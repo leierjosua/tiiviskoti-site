@@ -7,6 +7,7 @@ import {
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { GoogleKalenteriKortti } from './google-kalenteri-kortti';
 import { jobMateNames, jobUnitCounts, mateLabel, unitLabel, type JobUnits } from '@/lib/data';
+import { materialLabel } from '@/lib/materiaalit';
 
 /* =========================================================
    Asennusnäkymän etusivu.
@@ -90,6 +91,7 @@ function JobRow({ job, showDay, units, mates, children }: {
 }) {
   const address = addressOf(job);
   const maara = unitLabel(units);
+  const materiaali = materialLabel(units);
   const pari = mateLabel(mates);
   return (
     <li className="px-4 py-3.5 transition-colors hover:bg-ink-700">
@@ -121,6 +123,11 @@ function JobRow({ job, showDay, units, mates, children }: {
               {maara && (
                 <span className="rounded-full border border-accent/35 bg-accent-dim px-2.5 py-0.5 text-xs font-bold text-accent">
                   {maara}
+                </span>
+              )}
+              {materiaali && (
+                <span className="rounded-full border border-line bg-ink-700 px-2.5 py-0.5 text-xs font-semibold text-text">
+                  {materiaali}
                 </span>
               )}
               {pari && (

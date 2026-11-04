@@ -145,7 +145,7 @@ export function unitsFromLines(
     if (catalogId) return null; // lisäpalvelu
     const n = name.toLowerCase();
     if (/parveke/.test(n)) return 'balconyDoors';
-    if (/^\s*ikkuna/.test(n) || (/ilmain/.test(n) && /ikkuna/.test(n))) return 'windows';
+    if (/^\s*(tuuletus|pikku)?ikkuna/.test(n) || (/ilmain/.test(n) && /ikkuna/.test(n))) return 'windows';
     if (/(ovi|kynnys)/.test(n)) return 'otherDoors';
     return null;
   };

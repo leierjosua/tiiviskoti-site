@@ -170,7 +170,8 @@ export type JobUnits = {
  * datasta:
  *
  *   1. "Aukipitolaite / 2 per ikkuna" sisältää sanan *ikkuna* muttei ole
- *      ikkuna. Siksi ikkuna täsmätään vain nimen ALUSTA.
+ *      ikkuna. Siksi ikkuna täsmätään vain nimen ALUSTA (myös Tuuletusikkuna
+ *      ja Pikkuikkuna, jotka tiivistetään siinä missä muutkin).
  *   2. Alennusrivit ovat negatiivisia, joten veloitetut kohteet rajataan
  *      hinnalla (`unit_price_cents > 0`).
  *   3. ILMAINEN KOHDE lasketaan mukaan — se on tehtyä työtä vaikkei tuo
@@ -217,7 +218,7 @@ export function jobUnitCounts(
 ) {
   const sums = sql`
     coalesce(sum(jl.quantity) filter (
-      where jl.name ~* '^ikkuna' and jl.unit_price_cents > 0), 0)::int as ikk_maksettu,
+      where jl.name ~* '^(tuuletus|pikku)?ikkuna' and jl.unit_price_cents > 0), 0)::int as ikk_maksettu,
     coalesce(sum(jl.quantity) filter (
       where jl.name ~* 'ilmain' and jl.name ~* 'ikkuna'), 0)::int as ikk_ilmainen,
     coalesce(sum(jl.quantity) filter (

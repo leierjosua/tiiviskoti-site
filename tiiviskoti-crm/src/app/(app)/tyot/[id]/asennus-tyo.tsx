@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { sql } from '@/lib/db';
 import { jobLinks, jobUnitCounts, mateLabel, unitLabel, type JobRow } from '@/lib/data';
+import { materialLabel } from '@/lib/materiaalit';
 import { satisfactionLabel } from '@/lib/completion';
 import { dateKeyOf, formatDateKey, isoWeekday, timeOf, weekdayName } from '@/lib/time';
 import { JobPhotos } from './photos';
@@ -82,6 +83,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
   ]);
   const kartoitusId = kartoitusRows[0]?.id ?? null;
   const maara = unitLabel(units.find((u) => u.job_id === job.id));
+  const materiaali = materialLabel(units.find((u) => u.job_id === job.id));
   const pari = mateLabel(links.mates.map((m) => m.staff_name));
 
   /* Työparin lisätyllä tekijällä ei ole omia rivejä (päärivi kantaa ne),
@@ -179,6 +181,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
               <span className="tabular">{timeOf(job.starts_at)} – {timeOf(job.ends_at)}</span>
             </Fact>
             <Fact icon="🧰" sub={maara ?? undefined}>{job.title}</Fact>
+            {materiaali && <Fact icon="📦" sub="Arvio, ota mukaan">{materiaali}</Fact>}
             <Fact icon="◎">{address || 'Ei osoitetta'}</Fact>
             {pari && (
               <Fact icon="👥" sub="Teette keikan yhdessä">Työpari: {pari}</Fact>
