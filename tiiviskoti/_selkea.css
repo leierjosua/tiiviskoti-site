@@ -482,13 +482,20 @@ body.selkea .qty.tap{min-height:44px;display:inline-flex;align-items:center;just
    Sama hero kuin etusivulla, mutta hakusanan pitää näkyä otsikossa myös
    puhelimessa: h1 ja ingressi jäävät näkyviin, kuva valintojen alle. */
 body.s-palvelu .crumb{max-width:1080px;padding:18px 24px 0}
-body.s-palvelu :is(nav,footer,.crumb) a{text-decoration:none}
+body.s-palvelu :is(nav,footer,.crumb) a,body.s-palvelu a.aluecard{text-decoration:none}
 .s-palvelu .s-hero{padding-top:40px}
 .s-palvelu .s-rating{display:block;width:max-content;max-width:100%;text-decoration:none;color:var(--mute)}
 .s-palvelu .s-rating b{font-weight:400}
 .s-palvelu .s-hero h1{max-width:none}
 .s-palvelu .s-myos{margin-top:10px;animation-delay:.6s}
 .s-palvelu .s-sub{text-wrap:pretty}
+.s-h3{font-size:26px;line-height:1.2;text-align:center;margin-top:56px}
+.s-teksti{max-width:62ch;margin:28px auto 0;color:var(--text);text-wrap:pretty}
+.s-palvelu .osat{justify-content:center;margin-top:32px}
+.s-alue .s-hero h1{font-size:clamp(36px,3.8vw,50px);line-height:1.08}
+.s-keskus{padding-top:56px}
+.s-keskus h1{max-width:20ch;margin-inline:auto}
+.s-keskus .s-sub{max-width:62ch;margin-inline:auto}
 .s-palvelu .s-sec-yhd{padding-top:0}
 .s-palvelu .s-prices dd{white-space:nowrap}
 .s-palvelu .s-ticks{margin-top:36px}
