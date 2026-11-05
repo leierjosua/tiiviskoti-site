@@ -182,8 +182,8 @@ ${d.sisaltyy?.length ? `<p style="margin-top:5px">Työhön sisältyy: ${d.sisalt
 <div class="maksu">
   <h2>4. Maksuehto</h2>
   <p><b>Tilaaja sitoutuu maksamaan sopimuksen mukaisen hinnan, kun työ on tehty.</b>
-  Lasku lähetetään vasta sen jälkeen, kun työ on valmis ja osapuolet ovat todenneet sen
-  tehdyksi. Ennakkomaksua ei peritä eikä osalaskuja lähetetä.</p>
+  Lasku lähetetään vasta sen jälkeen, kun työ on tehty.
+  Ennakkomaksua ei peritä eikä osalaskuja lähetetä.</p>
   <p>Maksuaika on ${esc(String(d.maksuehto.paivia))} päivää laskun päiväyksestä.
   Viivästyskorko on korkolain mukainen.</p>
   ${d.maksuehto.lisatieto ? `<p>${esc(d.maksuehto.lisatieto)}</p>` : ''}
