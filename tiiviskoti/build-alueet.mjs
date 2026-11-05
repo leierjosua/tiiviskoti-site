@@ -249,6 +249,21 @@ function hintaTaulukko() {
   </table>`;
 }
 
+/* Palvelusivujen hinnasto etusivun .s-prices-listana. */
+function hintaLista() {
+  const rivit = TYPES.map((t) => {
+    const hinta = t.tiers ? `${WINDOW_RANGE} €` : `${t.price} €`;
+    const lisa = t.tiers
+      ? t.tiers.map((p, i) => `${p.price}\u00a0€\u00a0(${tierRange(i)}\u00a0kpl)`).join(' · ')
+      : (t.combo ? `${t.combo} € samalla käynnillä muun työn kanssa` : '');
+    return `<div><dt>${esc(t.name)}<small>${esc(t.desc)}${lisa ? `<br>${esc(lisa)}` : ''}</small></dt><dd>${hinta}</dd></div>`;
+  }).join('\n    ');
+  return `<dl class="s-prices rv">
+    ${rivit}
+    <div><dt>Pienin veloitus / käynti<small>Sisältää matkat, kartoituksen ja lämpökamerakuvauksen</small></dt><dd>${MIN_PRICE} €</dd></div>
+  </dl>`;
+}
+
 /* ---------- kuntasivu ---------- */
 
 function kuntaSivu(a, i) {
@@ -463,6 +478,7 @@ const PALVELUT = [
     hintaMax: WINDOW_HIGH,
     hintaSelite: 'per ikkuna, määrän mukaan',
     desc: `Ikkunoiden tiivisteiden vaihto kiinteään hintaan ${WINDOW_RANGE} € / ikkuna. Sisäpuitteen ja sisäkarmin tiivisteet ja öljyäminen, ulkopuite +20 €. Näet hinnan heti laskurista ja varaat ajan verkosta.`,
+    leadLyhyt: `Vaihdamme ikkunoiden tiivisteet. ${WINDOW_RANGE} € ikkunalta, maksu vasta työn jälkeen.`,
     lead: 'Vaihdamme sisäpuitteen ja sisäkarmin tiivisteet, öljyämme saranat ja tarkistamme että ikkuna sulkeutuu tiiviisti. Ulkopuitteen tiivistys on lisätyö, 20 € / ikkuna. Näet hinnan laskurista ilman tarjouspyyntöä.',
     oireetOtsikko: 'Milloin ikkunat kannattaa tiivistää',
     oireet: [
@@ -499,6 +515,7 @@ const PALVELUT = [
     hinta: TYPES[1].price,
     hintaSelite: 'ulko- ja parvekeovi',
     desc: `Ulko-oven tiivistys ${TYPES[1].price} € kiinteään hintaan — myös parvekeoven ja terassin liukuoven tiivistys. Tiivisteiden vaihto, lukkojen ja saranoiden öljyäminen ja oven säätö säätövaran puitteissa samalla käynnillä.`,
+    leadLyhyt: `Vaihdamme ulko-oven tiivisteet. ${TYPES[1].price} € ovelta, maksu vasta työn jälkeen.`,
     lead: 'Ulko-oven tiivistyksessä vaihdamme oven tiivisteet, öljyämme lukot ja saranat sekä säädämme oven käynnin niin pitkälle kuin oven säätövara riittää. Kaikki samalla käynnillä.',
     oireetOtsikko: 'Milloin ulko-ovi kannattaa tiivistää',
     oireet: [
@@ -602,84 +619,90 @@ function palveluSivu(c) {
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="${R}_alueet.css" />
 <link rel="stylesheet" href="${R}_anim.css" />
+<link rel="stylesheet" href="/_selkea.css" />
 <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2)}
 </script>
 <link rel="stylesheet" href="/_teema.css" />
 </head>
-<body>
+<body class="selkea s-palvelu">
 ${nav(R)}
 
 <div class="wrap crumb"><a href="/">Etusivu</a> › ${esc(c.h1a)}</div>
 
-<header class="hero"><div class="wrap hero-grid">
+<header class="s-hero"><div class="s-wrap s-hero-grid">
   <div>
-    <a class="rating rating-g" href="https://www.google.com/maps/place/?q=place_id:ChIJaT51gJWKmEkRCqEXyc6lGuo" target="_blank" rel="noopener" aria-label="5,0 tähteä, 15 Google-arvostelua"><span class="stars"><svg class="st" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="st" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="st" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="st" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg class="st" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span><b>5,0</b><span class="r-sep"></span><span class="r-txt">15 Google-arvostelua</span></a>
-    <h1>${esc(c.h1a)}<br><span class="a">${esc(c.h1b)}</span></h1>
-    <p class="hero-sub">${esc(c.lead)}</p>
-    <div class="hero-cta">
-      <a href="#laskuri" class="btn btn-p btn-lg">Laske hinta ja varaa aika</a>
-      <a href="tel:${TELH}" class="btn btn-o btn-lg">Soita ${TEL}</a>
+    <a class="s-rating rating-g" href="https://www.google.com/maps/place/?q=place_id:ChIJaT51gJWKmEkRCqEXyc6lGuo" target="_blank" rel="noopener" aria-label="5,0 tähteä, 15 Google-arvostelua"><span class="s-stars" aria-hidden="true">★★★★★</span> <b>5,0</b> · <span>15 Google-arvostelua</span></a>
+    <h1>${esc(c.h1a)}<br>${esc(c.h1b)}</h1>
+    <p class="s-lead">${esc(c.leadLyhyt)}</p>
+    <p class="s-more s-myos">${c.slug === 'ikkunoiden-tiivistys' ? `Tiivistämme myös <a href="${R}ovien-tiivistys.html">ovet samalla käynnillä</a>.` : `Tiivistämme myös <a href="${R}ikkunoiden-tiivistys.html">ikkunat samalla käynnillä</a>.`}</p>
+    <h2 class="s-choose">Mitä haluat tehdä?</h2>
+    <div class="s-choice">
+      <a class="s-opt s-opt-p" href="#laskuri">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        <span><b>Varaa asennus</b><small>Näet hinnan heti ja valitset ajan</small></span>
+        <svg class="s-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="s-opt" href="${R}kartoitus.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+        <span><b>Ilmainen kartoitus</b><small>Asentaja käy ja kertoo hinnan paikan päällä</small></span>
+        <svg class="s-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="s-opt" href="tel:${TELH}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+        <span><b>Soita meille</b><small><span class="tel">${TEL}</span><span class="s-hrs"> · ma–pe 8–20, la–su 8–18.30</span></small></span>
+        <svg class="s-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
     </div>
-    <p class="hero-fine"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiinteä hinta heti · kotitalousvähennys −40 % · ei tarjouspyyntöjä</p>
+    <p class="s-more">Taloyhtiö? <a href="${R}taloyhtio.html">Varaa ilmainen kartoituskäynti</a></p>
   </div>
-  <div class="hero-card rv">
-    <img src="${R}img/${c.kuva}?v=3" alt="${esc(c.alt)}" width="1100" height="880" fetchpriority="high">
-  </div>
+  <figure class="s-hero-img">
+    <picture><img src="${R}img/hero-entrance-1600.webp?v=4" srcset="${R}img/hero-entrance-1600.webp?v=4 1600w, ${R}img/hero-entrance-2400.webp?v=4 2400w" sizes="(max-width:900px) 100vw, 520px" alt="Kaksi TiivisKodin asentajaa talon ulko-oven edessä" width="2400" height="1803" fetchpriority="high"></picture>
+    <figcaption class="s-badge"><span aria-hidden="true">★</span> 5,0 · 15 arvostelua</figcaption>
+  </figure>
 </div></header>
 
-<section class="wrap" style="padding-bottom:clamp(16px,3vw,32px)">
-  <div class="metrics rv">
-    <div class="metric"><b><span class="a">${c.hinta} €</span></b><span>${esc(c.hintaSelite)}</span></div>
-    <div class="metric"><b><span class="a">1 käynti</span></b><span>työ valmiiksi kerralla</span></div>
-    <div class="metric"><b><span class="a">−40 %</span></b><span>kotitalousvähennys työn osuudesta</span></div>
-  </div>
-</section>
+<section class="s-sec s-parch" id="hinnat"><div class="s-wrap s-narrow">
+  <h2 class="s-h rv">Hinnat</h2>
+  <p class="s-sub rv">Samat hinnat koko Uudellamaalla ja Riihimäellä. Työ, tiivisteet ja ALV 25,5&nbsp;% sisältyvät.</p>
+  ${hintaLista()}
+  <p class="s-fine rv">Kotitalousvähennys −40&nbsp;% työn osuudesta. Mahdollinen matkalisä määräytyy postinumeron mukaan ja näkyy laskurissa ennen varauksen vahvistamista — sitä ei lisätä jälkikäteen laskuun.</p>
+  <div class="s-btns s-btns-c rv"><a href="#laskuri" class="btn btn-p btn-lg">Laske oma hintasi</a></div>
+</div></section>
 
-<section class="sec"><div class="wrap">
-  <div class="kicker">${esc(c.kicker)}</div>
-  <h2 class="title">${esc(c.oireetOtsikko)}</h2>
-  <div class="osat" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:24px">
-    ${c.oireet.map(([o, t]) => `<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px">
-      <b style="display:block;margin-bottom:6px">${esc(o)}</b><span style="color:var(--mute);font-size:15px;line-height:1.6">${esc(t)}</span></div>`).join('\n    ')}
+<section class="s-sec"><div class="s-wrap">
+  <h2 class="s-h rv">${esc(c.oireetOtsikko)}</h2>
+  <div class="s-merkit">
+    ${c.oireet.map(([o, t], i) => `<div class="rv stagger" style="--rv-i:${i}"><h3>${esc(o)}</h3><p>${esc(t)}</p></div>`).join('\n    ')}
   </div>
 </div></section>
 
-<section class="sec alt"><div class="wrap">
-  <div class="kicker">Työn sisältö</div>
-  <h2 class="title">Mitä työhön sisältyy</h2>
-  <p class="sub">Sama sisältö jokaisessa kohteessa — ei lisälaskuja jälkikäteen.</p>
-  <ul style="margin-top:22px;max-width:70ch;line-height:1.9;padding-left:22px">
-    ${SISALTYY.map((x) => `<li>${esc(x)}</li>`).join('\n    ')}
+<section class="s-sec s-sec-yhd"><div class="s-wrap s-narrow">
+  <h2 class="s-h rv">Mitä työhön sisältyy</h2>
+  <p class="s-sub rv">${esc(c.lead)}</p>
+  <ul class="s-ticks rv">
+    ${SISALTYY.filter((x) => !x.startsWith('Ei ')).map((x) => `<li>${esc(x)}</li>`).join('\n    ')}
   </ul>
-</div></section>
-
-<section class="sec"><div class="wrap">
-  <div class="kicker">Hinnasto</div>
-  <h2 class="title">Kiinteät hinnat</h2>
-  <p class="sub">Samat hinnat koko Uudellamaalla ja Riihimäellä. Kaikki hinnat sisältävät ALV 25,5 %, tiivisteet ja työn.</p>
-  ${hintaTaulukko()}
-  <p class="sub" style="margin-top:18px;font-size:15px">Mahdollinen matkalisä määräytyy postinumeron mukaan ja näkyy laskurissa ennen varauksen vahvistamista — sitä ei lisätä jälkikäteen laskuun.</p>
+  <p class="s-fine rv">${esc(SISALTYY.find((x) => x.startsWith('Ei ')))}.</p>
 </div></section>
 
 ${laskuriOsio(R, null)}
 
-<section class="sec alt"><div class="wrap">
-  <div class="kicker">Kysyttyä</div>
-  <h2 class="title">Usein kysyttyä</h2>
+<section class="s-sec"><div class="s-wrap s-narrow">
+  <h2 class="s-h rv">Usein kysyttyä</h2>
+  <div class="s-ukk">
   ${c.faq.map(([q, v]) => `<details class="faq-d"><summary>${esc(q)}</summary><p>${esc(v)}</p></details>`).join('\n  ')}
+  </div>
 </div></section>
 
-<section class="sec"><div class="wrap">
-  <div class="ctaband rv">
-    <h2>${esc(c.ctaOtsikko)}</h2>
-    <p>Valitse ovet ja ikkunat laskurista, niin näet kiinteän hinnan, arvioidun keston ja kotitalousvähennyksen. Ajan varaat suoraan kalenterista.</p>
-    <div class="hero-cta">
-      <a href="#laskuri" class="btn btn-p btn-lg">Varaa aika</a>
-      <a href="tel:${TELH}" class="btn btn-o btn-lg on-deep">Soita ${TEL}</a>
-    </div>
+<section class="s-sec s-sec-yhd"><div class="s-wrap s-narrow">
+  <h2 class="s-h rv">${esc(c.ctaOtsikko)}</h2>
+  <p class="s-sub rv">Valitse ovet ja ikkunat laskurista, niin näet kiinteän hinnan, arvioidun keston ja kotitalousvähennyksen. Ajan varaat suoraan kalenterista.</p>
+  <div class="s-btns s-btns-c rv">
+    <a href="#laskuri" class="btn btn-p btn-lg">Varaa aika</a>
+    <a href="tel:${TELH}" class="btn btn-o btn-lg">Soita ${TEL}</a>
   </div>
-  <p class="sub" style="margin-top:30px">Katso myös: <a href="${R}${c.slug === 'ikkunoiden-tiivistys' ? 'ovien-tiivistys' : 'ikkunoiden-tiivistys'}.html" style="color:var(--green);font-weight:700">${c.slug === 'ikkunoiden-tiivistys' ? 'ovien tiivistys' : 'ikkunoiden tiivistys'}</a> · <a href="${R}taloyhtio.html" style="color:var(--green);font-weight:700">taloyhtiöt</a> · <a href="${R}toiminta-alueet.html" style="color:var(--green);font-weight:700">toiminta-alueet</a></p>
+  <p class="s-fine rv">Katso myös: <a href="${R}${c.slug === 'ikkunoiden-tiivistys' ? 'ovien-tiivistys' : 'ikkunoiden-tiivistys'}.html">${c.slug === 'ikkunoiden-tiivistys' ? 'ovien tiivistys' : 'ikkunoiden tiivistys'}</a> · <a href="${R}taloyhtio.html">taloyhtiöt</a> · <a href="${R}toiminta-alueet.html">toiminta-alueet</a></p>
 </div></section>
 
 ${footer(R, c.slug)}

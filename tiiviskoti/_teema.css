@@ -240,8 +240,9 @@ body .lnk{font-size:17px;font-weight:600;color:var(--green)}
 
 /* Hero */
 body .hero h1{font-weight:600;letter-spacing:-.03em}
-body .hero h1 .a{color:var(--green)}
-body .hero-sub{font-size:clamp(19px,2vw,22px);line-height:1.45;color:var(--text)}
+body .hero-sub{font-size:clamp(19px,2vw,22px);line-height:1.45}
+/* Vain työpöydällä: puhelimessa teksti on tumman kuvan päällä (_alueet.css). */
+@media(min-width:621px){body .hero h1 .a{color:var(--green)}body .hero-sub{color:var(--text)}}
 body .hero .rating{font-size:16px}
 body .hero-fine{font-size:16px}
 body .hero-card{border-radius:28px;box-shadow:none;border:0}

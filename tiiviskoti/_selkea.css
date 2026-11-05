@@ -477,3 +477,40 @@ body.selkea :is(.logo,.s-logo,.rating,.s-rating){min-height:44px;align-items:cen
   body.selkea a{text-decoration-thickness:2px}
 }
 body.selkea .qty.tap{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+
+/* ---------- PALVELUSIVUT (ikkunat, ovet) ----------
+   Sama hero kuin etusivulla, mutta hakusanan pitää näkyä otsikossa myös
+   puhelimessa: h1 ja ingressi jäävät näkyviin, kuva valintojen alle. */
+body.s-palvelu .crumb{max-width:1080px;padding:18px 24px 0}
+body.s-palvelu :is(nav,footer,.crumb) a{text-decoration:none}
+.s-palvelu .s-hero{padding-top:40px}
+.s-palvelu .s-rating{display:block;width:max-content;max-width:100%;text-decoration:none;color:var(--mute)}
+.s-palvelu .s-rating b{font-weight:400}
+.s-palvelu .s-hero h1{max-width:none}
+.s-palvelu .s-myos{margin-top:10px;animation-delay:.6s}
+.s-palvelu .s-sub{text-wrap:pretty}
+.s-palvelu .s-sec-yhd{padding-top:0}
+.s-palvelu .s-prices dd{white-space:nowrap}
+.s-palvelu .s-ticks{margin-top:36px}
+.s-palvelu .s-ticks li{font-size:19px;line-height:1.4}
+.s-merkit{display:flex;flex-wrap:wrap;justify-content:center;gap:44px 48px;margin:56px auto 0}
+.s-merkit:has(>:nth-child(4):last-child){max-width:760px}
+.s-merkit>div{flex:0 1 300px;text-align:center}
+.s-merkit h3{font-size:22px;line-height:1.25;margin-bottom:8px}
+.s-ukk{margin-top:40px;border-top:1px solid var(--line)}
+body.s-palvelu .faq-d{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;margin:0}
+body.s-palvelu .faq-d summary{font:600 19px/1.35 var(--s-font);color:var(--ink);padding:22px 0;min-height:64px;gap:16px;align-items:center}
+body.s-palvelu .faq-d p{font-size:18px;line-height:1.6;padding:0 0 22px}
+@media (max-width:900px){
+  .s-palvelu .s-hero{padding-top:24px}
+}
+@media (max-width:620px){
+  body.s-palvelu .crumb{padding:14px 20px 0}
+  .s-palvelu .s-hero{padding-top:18px}
+  .s-palvelu .s-hero h1{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;font-size:36px}
+  .s-palvelu .s-hero .s-rating{display:block}
+  .s-palvelu .s-hero .s-lead{display:block}
+  body.s-palvelu .s-choose{font-size:20px;margin:24px 0 12px}
+  .s-merkit{gap:32px;margin-top:40px}
+  .s-merkit>div{flex-basis:100%}
+}
