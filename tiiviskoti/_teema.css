@@ -334,7 +334,7 @@ body .burger{display:none}
   body .nlinks.op a:last-child,body .nlinks.open a:last-child{border-bottom:0}
 }
 @media (max-width:620px){
-  body nav.top .wrap{height:60px;padding-inline:20px}
+  body nav.top .wrap,body nav.top.scr .wrap{height:60px;padding-inline:20px}
   /* Puhelin pyöreänä ikoninappina, numero jää ruudunlukijalle */
   body .ntel{width:48px;height:48px;justify-content:center;border-radius:50%;background:var(--green-soft);font-size:0;gap:0}
   body .ntel::before{width:20px;height:20px}

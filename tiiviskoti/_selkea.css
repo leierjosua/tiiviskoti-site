@@ -487,7 +487,7 @@ body.s-palvelu :is(nav,footer,.crumb) a,body.s-palvelu a.aluecard{text-decoratio
 .s-palvelu .s-rating{display:block;width:max-content;max-width:100%;text-decoration:none;color:var(--mute)}
 .s-palvelu .s-rating b{font-weight:400}
 .s-palvelu .s-hero h1{max-width:none}
-.s-palvelu .s-myos{margin-top:10px;animation-delay:.6s}
+.s-palvelu .s-myos{margin-top:16px;animation-delay:.6s}
 .s-palvelu .s-sub{text-wrap:pretty}
 .s-h3{font-size:26px;line-height:1.2;text-align:center;margin-top:56px}
 .s-teksti{max-width:62ch;margin:28px auto 0;color:var(--text);text-wrap:pretty}
@@ -516,8 +516,11 @@ body.s-palvelu .faq-d p{font-size:18px;line-height:1.6;padding:0 0 22px}
   .s-palvelu .s-hero{padding-top:18px}
   .s-palvelu .s-hero h1{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;font-size:36px}
   .s-palvelu .s-hero .s-rating{display:block}
-  .s-palvelu .s-hero .s-lead{display:block}
-  body.s-palvelu .s-choose{font-size:20px;margin:24px 0 12px}
+  /* Puhelimessa vain otsikko ja valinnat (Josua 6.11.): liikaa tekstiä. */
+  body.s-palvelu .s-choose,.s-alue .s-myos{display:none}
+  .s-palvelu .s-choice{margin-top:24px}
+  .s-palvelu .s-btns{flex-direction:column}
+  .s-palvelu .s-btns .btn{width:100%}
   .s-merkit{gap:32px;margin-top:40px}
   .s-merkit>div{flex-basis:100%}
 }

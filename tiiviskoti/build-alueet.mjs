@@ -233,7 +233,7 @@ function selkeaHero(R, otsikko, lead, lisa) {
     <a class="s-rating rating-g" href="https://www.google.com/maps/place/?q=place_id:ChIJaT51gJWKmEkRCqEXyc6lGuo" target="_blank" rel="noopener" aria-label="5,0 tähteä, 15 Google-arvostelua"><span class="s-stars" aria-hidden="true">★★★★★</span> <b>5,0</b> · <span>15 Google-arvostelua</span></a>
     <h1>${otsikko}</h1>
     <p class="s-lead">${esc(lead)}</p>
-    <p class="s-more s-myos">${lisa}</p>
+    ${lisa ? `<p class="s-more s-myos">${lisa}</p>` : ''}
     <h2 class="s-choose">Mitä haluat tehdä?</h2>
     <div class="s-choice">
       <a class="s-opt s-opt-p" href="#laskuri">
