@@ -18,7 +18,7 @@ export function AnalyticsTabs({ current }: { current: string }) {
       {TABS.map((t) => {
         const active = current === t.href;
         return (
-          <Link
+          <Link prefetch={false}
             key={t.href}
             href={t.href}
             aria-current={active ? 'page' : undefined}

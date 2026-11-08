@@ -113,7 +113,7 @@ export default async function DiscountCodesPage() {
                                 {' · '}
                                 <span className="text-muted">{r.customer_name ?? 'poistettu asiakas'}</span>
                                 {' · '}
-                                <Link href={`/tyot/${r.job_id}`} className="underline underline-offset-2 hover:text-text">
+                                <Link prefetch={false} href={`/tyot/${r.job_id}`} className="underline underline-offset-2 hover:text-text">
                                   {r.job_number}
                                 </Link>
                                 {' · '}−{eur(r.amount_cents)}

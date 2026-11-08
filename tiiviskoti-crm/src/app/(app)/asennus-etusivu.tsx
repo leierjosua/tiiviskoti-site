@@ -109,7 +109,7 @@ function JobRow({ job, showDay, units, mates, children }: {
         </div>
 
         <div className="min-w-0 flex-1">
-          <Link href={`/tyot/${job.id}`} className="font-bold text-text hover:text-accent">
+          <Link prefetch={false} href={`/tyot/${job.id}`} className="font-bold text-text hover:text-accent">
             {job.customer_name ?? job.title}
           </Link>
           <p className="truncate text-sm text-muted">{job.title}</p>
@@ -327,7 +327,7 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
                       </a>
                     )}
                     {job.status !== 'done' && (
-                      <Link href={`/tyot/${job.id}/viimeistely`}
+                      <Link prefetch={false} href={`/tyot/${job.id}/viimeistely`}
                             className="rounded-lg border border-accent px-3 py-2 text-sm font-semibold text-accent
                                        hover:bg-accent-dim">
                         Viimeistele
@@ -345,7 +345,7 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
           <CardHeader
             title="Tulevat työt"
             action={
-              <Link href="/kalenteri" className="text-xs font-semibold text-accent hover:underline">
+              <Link prefetch={false} href="/kalenteri" className="text-xs font-semibold text-accent hover:underline">
                 Kalenteri →
               </Link>
             }
@@ -380,7 +380,7 @@ export default async function AsennusEtusivu({ staff }: { staff: Staff }) {
             {overdue.map((job) => (
               <JobRow key={job.id} job={job} showDay units={unitsOf.get(job.id)} mates={matesOf.get(job.id)}>
                 <div className="mt-3 flex flex-wrap items-center gap-2 pl-[116px]">
-                  <Link href={`/tyot/${job.id}/viimeistely`}
+                  <Link prefetch={false} href={`/tyot/${job.id}/viimeistely`}
                         className="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-ink
                                    hover:bg-[#1A6340]">
                     Viimeistele

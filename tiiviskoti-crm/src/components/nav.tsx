@@ -81,7 +81,7 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout, viewSwitc
   const sideLink = (item: NavItem) => {
     const active = isActive(item.href);
     return (
-      <Link
+      <Link prefetch={false}
         key={item.href}
         href={item.href}
         aria-current={active ? 'page' : undefined}
@@ -115,7 +115,7 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout, viewSwitc
           {tabs.map((item) => {
             const active = isActive(item.href);
             return (
-              <Link
+              <Link prefetch={false}
                 key={item.href}
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
@@ -181,7 +181,7 @@ export function Nav({ items, staffName, staffEmail, staffRole, logout, viewSwitc
                   {list.map((item) => {
                     const active = isActive(item.href);
                     return (
-                      <Link
+                      <Link prefetch={false}
                         key={item.href}
                         href={item.href}
                         aria-current={active ? 'page' : undefined}

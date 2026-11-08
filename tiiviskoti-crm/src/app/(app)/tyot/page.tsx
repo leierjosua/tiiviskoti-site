@@ -77,7 +77,7 @@ export default async function JobsPage({
         {/* Varauksen tekeminen on toimiston työtä: asennusnäkymässä nappi
             johtaisi sivulle jota `requireManager` ei päästä auki. */}
         {!asennus && (
-          <Link
+          <Link prefetch={false}
             href="/tyot/uusi"
             className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-ink hover:bg-accent/90"
           >
@@ -92,7 +92,7 @@ export default async function JobsPage({
           action={
             <div className="flex gap-1 text-xs">
               {TABS.map((r) => (
-                <Link
+                <Link prefetch={false}
                   key={r}
                   href={`/tyot?jakso=${r}`}
                   className={
@@ -121,7 +121,7 @@ export default async function JobsPage({
             <ul className="divide-y divide-line-soft md:hidden">
               {ordered.map((job) => (
                 <li key={job.id}>
-                  <Link href={`/tyot/${job.id}`} className="block px-4 py-3 hover:bg-ink-700">
+                  <Link prefetch={false} href={`/tyot/${job.id}`} className="block px-4 py-3 hover:bg-ink-700">
                     <div className="flex items-baseline gap-2">
                       <span className="text-sm font-bold tabular">
                         {formatDateKey(dateKeyOf(job.starts_at))}
@@ -170,7 +170,7 @@ export default async function JobsPage({
               {ordered.map((job) => (
                 <tr key={job.id} className="hover:bg-ink-700">
                   <td className="px-4 py-2.5">
-                    <Link href={`/tyot/${job.id}`} className="text-accent hover:underline tabular">
+                    <Link prefetch={false} href={`/tyot/${job.id}`} className="text-accent hover:underline tabular">
                       {job.job_number}
                     </Link>
                   </td>

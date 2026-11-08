@@ -29,7 +29,7 @@ export default async function CalendarsPage() {
             <ul className="divide-y divide-line-soft">
               {calendars.map((cal) => (
                 <li key={cal.id}>
-                  <Link
+                  <Link prefetch={false}
                     href={`/kalenterit/${cal.id}`}
                     className="flex flex-col gap-1 px-4 py-3 text-sm hover:bg-ink-700 sm:flex-row sm:items-center sm:gap-3"
                   >

@@ -149,7 +149,7 @@ export default async function NewJobPage({
         </p>
       )}
       <header className="space-y-1">
-        <Link href={offer ? `/tarjoukset/${offer.id}` : '/tyot'} className="text-xs text-muted hover:text-text">
+        <Link prefetch={false} href={offer ? `/tarjoukset/${offer.id}` : '/tyot'} className="text-xs text-muted hover:text-text">
           ← {offer ? `Tarjous ${offer.offer_number}` : 'Työt'}
         </Link>
         <h1 className="text-xl font-semibold tracking-tight">{isKartoitus ? 'Uusi kartoituskäynti' : 'Uusi työ'}</h1>

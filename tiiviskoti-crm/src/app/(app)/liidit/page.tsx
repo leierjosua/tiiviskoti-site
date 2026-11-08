@@ -95,7 +95,7 @@ export default async function LeadsPage() {
                   {/* Tarjouslinkki vie laskurin alkuun yhteystiedot valmiiksi
                       täytettynä — hintoja se ei esitäytä, koska liidissä ei
                       ole yhtään hinnoiteltua riviä. */}
-                  <Link
+                  <Link prefetch={false}
                     href={{ pathname: '/tarjoukset/uusi', query: { liidi: lead.id } }}
                     className="rounded border border-line px-2.5 py-1 text-xs text-accent hover:bg-ink-700"
                   >
@@ -105,7 +105,7 @@ export default async function LeadsPage() {
                       olisi pitänyt näpytellä uudestaan Uusi työ -lomakkeelle.
                       Nyt liidi siirtyy kalenteriin yhdellä klikkauksella ja
                       merkitään samalla asiakkaaksi. */}
-                  <Link
+                  <Link prefetch={false}
                     href={{
                       pathname: '/tyot/uusi',
                       query: {

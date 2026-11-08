@@ -68,12 +68,12 @@ function JobRow({ j, today }: { j: KartoitusJob; today: boolean }) {
         <div className="text-[16px] text-muted">{[j.address, j.city].filter(Boolean).join(', ') || 'Osoite puuttuu'}</div>
       </div>
       {j.kartoitus_id ? (
-        <Link href={`/kartoitus/${j.kartoitus_id}`}
+        <Link prefetch={false} href={`/kartoitus/${j.kartoitus_id}`}
               className="flex min-h-14 items-center justify-center rounded-[14px] border-[1.5px] border-line bg-white px-6 text-[18px] font-semibold text-text sm:w-56">
           Avaa kartoitus
         </Link>
       ) : (
-        <Link href={`/kartoitus/uusi?tyo=${j.id}`}
+        <Link prefetch={false} href={`/kartoitus/uusi?tyo=${j.id}`}
               className="flex min-h-14 items-center justify-center rounded-[14px] bg-accent px-6 text-[18px] font-bold text-white sm:w-56">
           Aloita kartoitus →
         </Link>
@@ -109,7 +109,7 @@ export default async function KartoitusPage() {
 
       <Steps />
 
-      <Link href="/kartoitus/uusi"
+      <Link prefetch={false} href="/kartoitus/uusi"
             className="flex min-h-16 items-center justify-center gap-3 rounded-[16px] bg-accent px-6 text-[20px] font-bold text-white shadow-[0_6px_20px_-8px_rgba(33,122,78,.6)]">
         <span aria-hidden className="text-[28px] leading-none">＋</span> Aloita uusi kartoitus
       </Link>
@@ -137,7 +137,7 @@ export default async function KartoitusPage() {
                   const t = tila(k);
                   return (
                     <li key={k.id}>
-                      <Link href={`/kartoitus/${k.id}`} className="flex items-center gap-4 px-5 py-4 active:bg-ink-700 hover:bg-ink-700">
+                      <Link prefetch={false} href={`/kartoitus/${k.id}`} className="flex items-center gap-4 px-5 py-4 active:bg-ink-700 hover:bg-ink-700">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-[18px] font-bold text-text">{k.data.customerName || 'Nimetön'}</span>

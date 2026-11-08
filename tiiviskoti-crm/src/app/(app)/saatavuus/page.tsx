@@ -81,7 +81,7 @@ export default async function SaatavuusPage() {
         title="Saatavuus"
         sub={<span className="text-sm text-muted">
           Kuka voi tehdä töitä ja milloin — seuraavat {VIIKKOJA} viikkoa.{' '}
-          <Link href="/kalenterit" className="text-accent hover:underline">Työajat →</Link>
+          <Link prefetch={false} href="/kalenterit" className="text-accent hover:underline">Työajat →</Link>
         </span>}
       />
 
@@ -153,7 +153,7 @@ export default async function SaatavuusPage() {
                 return (
                   <tr key={kal.calendarId} className="border-t border-line-soft">
                     <td className="sticky left-0 z-10 bg-ink-900 px-4 py-2">
-                      <Link href={`/kalenterit/${kal.calendarId}`}
+                      <Link prefetch={false} href={`/kalenterit/${kal.calendarId}`}
                             className="text-sm font-semibold text-text hover:text-accent">
                         {kal.staffName}
                       </Link>

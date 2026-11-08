@@ -197,7 +197,7 @@ export default async function TodayPage() {
             {formatDateKey(today)} · {todayJobs.length} keikkaa tänään
           </p>
         </div>
-        <Link href="/tyot/uusi"
+        <Link prefetch={false} href="/tyot/uusi"
               className="rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink hover:bg-[#1A6340]">
           Uusi työ
         </Link>
@@ -244,7 +244,7 @@ export default async function TodayPage() {
               <ul className="divide-y divide-line-soft">
                 {newBookings.map((b) => (
                   <li key={b.id}>
-                    <Link href={`/tyot/${b.id}`}
+                    <Link prefetch={false} href={`/tyot/${b.id}`}
                           className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 px-4 py-2.5 text-sm hover:bg-ink-700">
                       <span className="min-w-0 flex-1 truncate font-semibold">
                         {b.customer_name ?? b.title}
@@ -264,7 +264,7 @@ export default async function TodayPage() {
           )}
 
           {s.liidit_uudet > 0 && (
-            <Link href="/liidit"
+            <Link prefetch={false} href="/liidit"
                   className="block rounded-lg border border-warn/35 bg-warn/10 px-4 py-3 text-sm text-warn hover:bg-warn/15">
               <b>{s.liidit_uudet} uutta liidiä</b> palvelualueiden ulkopuolelta odottaa käsittelyä →
             </Link>
@@ -286,7 +286,7 @@ export default async function TodayPage() {
                   {timeOf(job.starts_at)}–{timeOf(job.ends_at)}
                 </span>
                 <StatusBadge status={job.status} />
-                <Link href={`/tyot/${job.id}`}
+                <Link prefetch={false} href={`/tyot/${job.id}`}
                       className="ml-auto text-xs font-semibold text-accent hover:underline tabular">
                   {job.job_number} →
                 </Link>
@@ -333,7 +333,7 @@ export default async function TodayPage() {
         <Card className="overflow-x-auto">
           <CardHeader
             title="Seuraavat 7 päivää"
-            action={<Link href="/kalenteri" className="text-xs font-semibold text-accent hover:underline">
+            action={<Link prefetch={false} href="/kalenteri" className="text-xs font-semibold text-accent hover:underline">
               Kalenteri →
             </Link>}
           />
@@ -341,7 +341,7 @@ export default async function TodayPage() {
           <ul className="divide-y divide-line-soft md:hidden">
             {laterJobs.map((job) => (
               <li key={job.id}>
-                <Link href={`/tyot/${job.id}`}
+                <Link prefetch={false} href={`/tyot/${job.id}`}
                       className="flex items-baseline gap-2 px-4 py-2.5 text-sm hover:bg-ink-700">
                   <span className="shrink-0 tabular font-semibold">
                     {formatDateKey(dateKeyOf(job.starts_at)).slice(0, -5)}
@@ -363,7 +363,7 @@ export default async function TodayPage() {
                   </td>
                   <td className="px-4 py-2.5 tabular whitespace-nowrap">{timeOf(job.starts_at)}</td>
                   <td className="px-4 py-2.5">
-                    <Link href={`/tyot/${job.id}`} className="hover:text-accent">
+                    <Link prefetch={false} href={`/tyot/${job.id}`} className="hover:text-accent">
                       {job.customer_name ?? job.title}
                     </Link>
                   </td>

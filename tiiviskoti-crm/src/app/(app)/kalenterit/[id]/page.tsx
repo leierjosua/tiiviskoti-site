@@ -39,7 +39,7 @@ export default async function CalendarDetailPage({ params }: { params: Promise<{
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <Link href="/kalenterit" className="text-xs text-muted hover:text-text">← Työajat</Link>
+        <Link prefetch={false} href="/kalenterit" className="text-xs text-muted hover:text-text">← Työajat</Link>
         <h1 className="text-xl font-semibold tracking-tight">{calendar.name}</h1>
         <p className="text-sm text-muted">{calendar.staff_name}</p>
       </header>

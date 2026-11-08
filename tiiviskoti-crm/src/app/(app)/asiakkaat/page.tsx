@@ -67,7 +67,7 @@ export default async function CustomersPage({
           <ul className="divide-y divide-line-soft md:hidden">
             {customers.map((c) => (
               <li key={c.id}>
-                <Link href={`/asiakkaat/${c.id}`} className="block px-4 py-3 hover:bg-ink-700">
+                <Link prefetch={false} href={`/asiakkaat/${c.id}`} className="block px-4 py-3 hover:bg-ink-700">
                   <div className="flex items-baseline gap-2">
                     <span className="min-w-0 flex-1 truncate text-sm font-semibold">{c.full_name}</span>
                     <span className="shrink-0 text-xs tabular text-faint">
@@ -98,7 +98,7 @@ export default async function CustomersPage({
               {customers.map((c) => (
                 <tr key={c.id} className="hover:bg-ink-700">
                   <td className="px-4 py-2.5">
-                    <Link href={`/asiakkaat/${c.id}`} className="text-accent hover:underline">
+                    <Link prefetch={false} href={`/asiakkaat/${c.id}`} className="text-accent hover:underline">
                       {c.full_name}
                     </Link>
                     {c.email && <div className="text-xs text-faint">{c.email}</div>}

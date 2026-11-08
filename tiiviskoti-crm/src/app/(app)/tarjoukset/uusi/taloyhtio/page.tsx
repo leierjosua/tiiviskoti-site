@@ -14,7 +14,7 @@ export default async function NewTaloyhtioOfferPage() {
     <div className="space-y-6">
       <PageHead
         title="Uusi taloyhtiötarjous"
-        sub={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
+        sub={<Link prefetch={false} href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
       />
       <OfferBuilder kind="taloyhtio" />
     </div>

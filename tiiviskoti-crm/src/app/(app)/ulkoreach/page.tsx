@@ -65,7 +65,7 @@ export default async function UlkoreachPage({
         {SEGMENTS.map((s) => {
           const on = s.key === seg.key;
           return (
-            <Link key={s.key} href={`/ulkoreach?segment=${s.key}`}
+            <Link prefetch={false} key={s.key} href={`/ulkoreach?segment=${s.key}`}
               className={`-mb-px border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
                 on ? 'border-accent text-accent' : 'border-transparent text-muted hover:text-text'}`}>
               {s.label}

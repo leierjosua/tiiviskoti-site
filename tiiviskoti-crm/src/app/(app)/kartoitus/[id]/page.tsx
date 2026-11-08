@@ -43,11 +43,11 @@ export default async function KartoitusDetail({ params, searchParams }: {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <Link href="/kartoitus" className="text-xs text-muted hover:text-text">← Kartoitus</Link>
+      <Link prefetch={false} href="/kartoitus" className="text-xs text-muted hover:text-text">← Kartoitus</Link>
       <PageHead
         title={k.data.customerName || 'Kartoitus'}
         sub={`${formatInstant(k.created_at)}${k.staff_name ? ` · ${k.staff_name}` : ''}${k.offer_number ? ` · tarjous ${k.offer_number}` : ''}`}
-        action={k.offer_id ? <Link href={`/tarjoukset/${k.offer_id}`} className="rounded-xl border border-line px-3.5 py-2.5 text-sm font-bold text-text">Tarjous CRM:ssä</Link> : undefined}
+        action={k.offer_id ? <Link prefetch={false} href={`/tarjoukset/${k.offer_id}`} className="rounded-xl border border-line px-3.5 py-2.5 text-sm font-bold text-text">Tarjous CRM:ssä</Link> : undefined}
       />
 
       {sp.tallennettu && !k.offer_id && <p className="rounded-xl bg-accent-dim px-4 py-3 text-sm font-semibold text-accent">Kartoitus tallennettu. Voit jatkaa ja lähettää tarjouksen kun olet valmis.</p>}

@@ -67,7 +67,7 @@ function OfferCallCard({ r }: { r: Row }) {
         </div>
         <p className="mt-0.5 text-xs text-faint">
           {r.contact_name && <>{r.contact_name} · </>}
-          <Link href={`/tarjoukset/${r.id}`} className="font-semibold text-accent hover:underline">{r.offer_number}</Link>
+          <Link prefetch={false} href={`/tarjoukset/${r.id}`} className="font-semibold text-accent hover:underline">{r.offer_number}</Link>
           {' · lähetetty '}{fmtTime(r.sent_at).split(' ')[0]}
           {' · voimassa '}{fmtDay(r.valid_until)}
           {' · '}<a href={`mailto:${r.email}`} className="hover:text-text">{r.email}</a>
@@ -97,7 +97,7 @@ function OfferCallCard({ r }: { r: Row }) {
         })() : (
           <span className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-xs text-warn">Ei puhelinnumeroa</span>
         )}
-        <Link href={`/tyot/uusi?tarjous=${r.id}`}
+        <Link prefetch={false} href={`/tyot/uusi?tarjous=${r.id}`}
               className="rounded-lg border border-accent/50 px-3 py-2 text-xs font-semibold text-accent hover:bg-accent/10">
           Sovittu → laita aika
         </Link>
@@ -184,7 +184,7 @@ export default async function CallListPage() {
           Avoimet tarjoukset vanhenemisjärjestyksessä. Viikon sisällä vanhenee <b>{soon.length}</b> tarjousta,
           yhteensä <b>{eur(soon.reduce((s, r) => s + r.total_cents, 0))}</b> — näistä {notCalled} soittamatta.
         </>}
-        action={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
+        action={<Link prefetch={false} href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
       />
 
       {rows.length === 0 && <Card><Empty>Ei avoimia tarjouksia. 🎉</Empty></Card>}

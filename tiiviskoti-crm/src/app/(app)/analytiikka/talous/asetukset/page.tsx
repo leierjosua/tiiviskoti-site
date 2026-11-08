@@ -30,7 +30,7 @@ export default async function KuluasetuksetPage() {
         title="Kuluasetukset"
         sub="Mistä talousnäkymän kulut, kate ja tulos lasketaan."
         action={
-          <Link
+          <Link prefetch={false}
             href="/analytiikka/talous"
             className="rounded-lg border border-line bg-ink-800 px-3.5 py-2 text-sm font-semibold text-text transition-colors hover:bg-ink-700"
           >

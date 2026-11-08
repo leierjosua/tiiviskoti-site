@@ -37,7 +37,7 @@ export default async function TalousPage({
           </>
         }
         action={
-          <Link
+          <Link prefetch={false}
             href="/analytiikka/talous/asetukset"
             className="rounded-lg border border-line bg-ink-800 px-3.5 py-2 text-sm font-semibold text-text transition-colors hover:bg-ink-700"
           >
@@ -52,7 +52,7 @@ export default async function TalousPage({
           hyppää sen mukaan mikä on valittuna. */}
       <div className="flex flex-wrap items-center gap-1.5">
         {RANGES.map((opt) => (
-          <Link
+          <Link prefetch={false}
             key={opt.key}
             href={`/analytiikka/talous?r=${opt.key}`}
             aria-current={opt.key === rangeKey ? 'true' : undefined}
@@ -84,7 +84,7 @@ export default async function TalousPage({
           <b>Kuluja ei ole vielä asetettu.</b>
           <span className="mt-1 block text-info/85">
             Kate ja tulos ovat toistaiseksi sama kuin liikevaihto.{' '}
-            <Link href="/analytiikka/talous/asetukset" className="font-semibold underline underline-offset-2">
+            <Link prefetch={false} href="/analytiikka/talous/asetukset" className="font-semibold underline underline-offset-2">
               Aseta kuluprosentit ja kiinteät kulut
             </Link>{' '}
             — sen jälkeen luvut ovat todellisia.

@@ -150,10 +150,10 @@ export default async function NewOfferPage({
     return (
       <div className="space-y-6">
         <PageHead title="Muuta tarjousta"
-          sub={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>} />
+          sub={<Link prefetch={false} href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>} />
         <p className="rounded-lg border border-line bg-ink-800 px-3 py-2 text-sm text-muted">
           Tarjousta ei voi muuttaa: sitä ei löytynyt, se on hyväksytty tai siitä on jo tehty työ kalenteriin.{' '}
-          <Link href={`/tarjoukset/${muokkaa}`} className="text-accent">Takaisin tarjoukseen</Link>
+          <Link prefetch={false} href={`/tarjoukset/${muokkaa}`} className="text-accent">Takaisin tarjoukseen</Link>
         </p>
       </div>
     );
@@ -164,7 +164,7 @@ export default async function NewOfferPage({
       <div className="space-y-6">
         <PageHead
           title={`Muuta tarjousta ${edit.offer_number}`}
-          sub={<Link href={`/tarjoukset/${edit.id}`} className="text-sm text-muted hover:text-text">← Tarjous {edit.offer_number}</Link>}
+          sub={<Link prefetch={false} href={`/tarjoukset/${edit.id}`} className="text-sm text-muted hover:text-text">← Tarjous {edit.offer_number}</Link>}
         />
         <p className="rounded-lg border border-line bg-ink-800 px-3 py-2 text-sm text-muted">
           {edit.draft_state
@@ -198,7 +198,7 @@ export default async function NewOfferPage({
         title={draft ? `Jatka luonnosta ${draft.offer_number}`
                : fromLead ? `Tarjous liidille ${fromLead.customerName}`
                : 'Uusi asiakastarjous'}
-        sub={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
+        sub={<Link prefetch={false} href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
       />
       {luonnos && !draft && (
         <p className="rounded-lg border border-line bg-ink-800 px-3 py-2 text-sm text-muted">

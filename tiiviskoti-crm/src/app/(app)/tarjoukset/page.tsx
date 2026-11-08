@@ -21,14 +21,14 @@ const fmt = (d: Date) => new Intl.DateTimeFormat('fi-FI', {
 function BookingCell({ offer }: { offer: OfferRow }) {
   if (offer.job_id) {
     return (
-      <Link href={`/tyot/${offer.job_id}`} className="whitespace-nowrap font-semibold text-accent hover:underline">
+      <Link prefetch={false} href={`/tyot/${offer.job_id}`} className="whitespace-nowrap font-semibold text-accent hover:underline">
         {offer.job_starts_at ? fmt(new Date(offer.job_starts_at)) : offer.job_number}
       </Link>
     );
   }
   if (offer.status === 'declined') return <span className="text-faint">—</span>;
   return (
-    <Link
+    <Link prefetch={false}
       href={`/tyot/uusi?tarjous=${offer.id}`}
       className="inline-flex whitespace-nowrap rounded-md border border-line bg-ink-800 px-2.5 py-1 text-xs font-semibold text-text hover:border-accent/50 hover:text-accent"
     >
@@ -81,7 +81,7 @@ function OfferTable({ rows, talo }: { rows: OfferRow[]; talo: boolean }) {
         {rows.map((o) => (
           <tr key={o.id} className="hover:bg-ink-700">
             <td className="px-4 py-2.5">
-              <Link href={`/tarjoukset/${o.id}`} className="font-semibold text-accent hover:underline">{o.offer_number}</Link>
+              <Link prefetch={false} href={`/tarjoukset/${o.id}`} className="font-semibold text-accent hover:underline">{o.offer_number}</Link>
             </td>
             <td className="px-4 py-2.5 text-muted tabular">{o.sent_at ? fmt(o.sent_at) : (o.error ? 'virhe' : '—')}</td>
             <td className="px-4 py-2.5">{o.customer_name}</td>
@@ -147,9 +147,9 @@ export default async function OffersPage() {
         sub="Sähköpostilla lähetetyt tarjoukset. Kuluttajat ja taloyhtiöt omissa listoissaan."
         action={
           <div className="flex flex-wrap gap-2">
-            <Link href="/tarjoukset/soittolista"><Button variant="outline">📞 Soittolista</Button></Link>
-            <Link href="/tarjoukset/uusi"><Button>Uusi asiakastarjous</Button></Link>
-            <Link href="/tarjoukset/uusi/taloyhtio"><Button variant="outline">Uusi taloyhtiötarjous</Button></Link>
+            <Link prefetch={false} href="/tarjoukset/soittolista"><Button variant="outline">📞 Soittolista</Button></Link>
+            <Link prefetch={false} href="/tarjoukset/uusi"><Button>Uusi asiakastarjous</Button></Link>
+            <Link prefetch={false} href="/tarjoukset/uusi/taloyhtio"><Button variant="outline">Uusi taloyhtiötarjous</Button></Link>
           </div>
         }
       />

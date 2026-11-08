@@ -107,7 +107,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
   return (
     <div className="space-y-5">
       <header className="space-y-2">
-        <Link href="/" className="text-sm text-muted hover:text-text">← Takaisin</Link>
+        <Link prefetch={false} href="/" className="text-sm text-muted hover:text-text">← Takaisin</Link>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-[28px] leading-tight font-extrabold tracking-tight text-text tabular">
             Varaus {job.job_number}
@@ -118,7 +118,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
 
       <div className="flex flex-wrap gap-2">
         {job.status !== 'cancelled' && (
-          <Link href={`/tyot/${job.id}/viimeistely`}
+          <Link prefetch={false} href={`/tyot/${job.id}/viimeistely`}
                 className="rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-accent-ink hover:bg-[#1A6340]">
             {job.status === 'done' ? 'Viimeistele uudelleen' : 'Viimeistele'}
           </Link>
@@ -126,7 +126,7 @@ export default async function AsennusTyo({ job }: { job: JobRow }) {
         {/* Kartoitus keikalta: asiakas haluaa usein tarjouksen lisätöistä
             kun asentaja on jo paikalla. */}
         {job.status !== 'cancelled' && (
-          <Link href={kartoitusId ? `/kartoitus/${kartoitusId}` : `/kartoitus/uusi?tyo=${job.id}`}
+          <Link prefetch={false} href={kartoitusId ? `/kartoitus/${kartoitusId}` : `/kartoitus/uusi?tyo=${job.id}`}
                 className="rounded-lg border border-line bg-ink-800 px-4 py-2.5 text-sm font-semibold text-text hover:bg-ink-700">
             {kartoitusId ? 'Avaa kartoitus' : 'Tee kartoitus'}
           </Link>

@@ -115,7 +115,7 @@ export default async function SivustoAnalytics({
         action={
           <div className="flex items-center gap-1 text-sm">
             {Object.entries(RANGES).map(([key, r]) => (
-              <Link key={key} href={`/analytiikka/sivusto?d=${key}`}
+              <Link prefetch={false} key={key} href={`/analytiikka/sivusto?d=${key}`}
                     className={`rounded-md border px-2.5 py-1.5 ${
                       (d ?? '30') === key ? 'border-accent text-accent' : 'border-line text-muted hover:text-text'
                     }`}>

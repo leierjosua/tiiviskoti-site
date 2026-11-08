@@ -79,7 +79,7 @@ function JobLine({ job, showDay, units, mates }: { job: Job; showDay?: boolean; 
   const pari = mateLabel(mates);
   return (
     <li>
-      <Link href={`/tyot/${job.id}`}
+      <Link prefetch={false} href={`/tyot/${job.id}`}
             className="flex gap-3 px-4 py-3 transition-colors hover:bg-ink-700">
         <div className="w-[104px] shrink-0">
           <div className="text-[15px] leading-none font-bold tabular text-text">
@@ -252,7 +252,7 @@ export default async function AsennusKalenteri({
           Hae
         </button>
         {searching && (
-          <Link href={href({ haku: undefined, nakyma: undefined })}
+          <Link prefetch={false} href={href({ haku: undefined, nakyma: undefined })}
                 className="rounded-lg px-3 py-2.5 text-sm font-semibold text-muted hover:text-text">
             Tyhjennä
           </Link>
@@ -261,7 +261,7 @@ export default async function AsennusKalenteri({
 
       <div className="flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => (
-          <Link key={f.key}
+          <Link prefetch={false} key={f.key}
                 href={href({ tila: f.key === 'kaikki' ? undefined : f.key })}
                 className={chip(filter === f.key)}>
             {f.label}
@@ -272,12 +272,12 @@ export default async function AsennusKalenteri({
       {!searching && (
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex overflow-hidden rounded-lg border border-line">
-            <Link href={href({ nakyma: undefined })}
+            <Link prefetch={false} href={href({ nakyma: undefined })}
                   className={`px-3 py-1.5 text-sm font-semibold ${
                     asList ? 'text-muted hover:text-text' : 'bg-accent-dim text-accent'}`}>
               Viikko
             </Link>
-            <Link href={href({ nakyma: 'lista' })}
+            <Link prefetch={false} href={href({ nakyma: 'lista' })}
                   className={`border-l border-line px-3 py-1.5 text-sm font-semibold ${
                     asList ? 'bg-accent-dim text-accent' : 'text-muted hover:text-text'}`}>
               Lista
@@ -285,19 +285,19 @@ export default async function AsennusKalenteri({
           </div>
 
           <div className="flex items-center gap-1">
-            <Link href={href({ viikko: addDays(monday, -7) })}
+            <Link prefetch={false} href={href({ viikko: addDays(monday, -7) })}
                   aria-label="Edellinen viikko"
                   className="rounded-lg border border-line px-3 py-1.5 text-sm text-muted hover:text-text">
               ←
             </Link>
-            <Link href={href({ viikko: addDays(monday, 7) })}
+            <Link prefetch={false} href={href({ viikko: addDays(monday, 7) })}
                   aria-label="Seuraava viikko"
                   className="rounded-lg border border-line px-3 py-1.5 text-sm text-muted hover:text-text">
               →
             </Link>
           </div>
 
-          <Link href={href({ viikko: undefined })}
+          <Link prefetch={false} href={href({ viikko: undefined })}
                 className="rounded-lg border border-line px-3 py-1.5 text-sm font-semibold text-muted hover:text-text">
             Tänään
           </Link>
@@ -375,7 +375,7 @@ export default async function AsennusKalenteri({
                       const height = Math.max(28, (minutes / 60) * HOUR_PX - 2);
 
                       return (
-                        <Link
+                        <Link prefetch={false}
                           key={job.id}
                           href={`/tyot/${job.id}`}
                           style={{ top, height }}

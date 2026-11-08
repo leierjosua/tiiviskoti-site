@@ -56,7 +56,7 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
       ) : null}
       <PageHead
         title={`Tarjous ${offer.offer_number}`}
-        sub={<Link href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
+        sub={<Link prefetch={false} href="/tarjoukset" className="text-sm text-muted hover:text-text">← Tarjoukset</Link>}
         action={
           <div className="flex items-center gap-2">
             {/* Tyyppi näkyviin: sama tarjousnumerosarja palvelee molempia,
@@ -145,7 +145,7 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
                 <p className="text-sm text-text">
                   {offer.job_starts_at ? fmtTime(offer.job_starts_at) : 'Aika sovittu'}
                 </p>
-                <Link
+                <Link prefetch={false}
                   href={`/tyot/${offer.job_id}`}
                   className="block w-full rounded-lg border border-line bg-ink-800 px-4 py-2 text-center text-sm font-semibold text-accent hover:bg-ink-700"
                 >
@@ -157,7 +157,7 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
               </>
             ) : (
               <>
-                <Link
+                <Link prefetch={false}
                   href={`/tyot/uusi?tarjous=${offer.id}`}
                   className="block w-full rounded-lg border border-accent/40 bg-accent-dim px-4 py-2 text-center text-sm font-semibold text-accent hover:border-accent"
                 >
@@ -198,7 +198,7 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
                   linkkiä siihen ei saisi riviä lisää muuten kuin
                   näpyttelemällä koko tarjous alusta. Vain luonnos aukeaa —
                   lähetettyä ei muuteta, koska asiakkaalla on siitä kopio. */}
-              <Link
+              <Link prefetch={false}
                 href={`/tarjoukset/uusi?luonnos=${offer.id}`}
                 className="block w-full rounded-lg border border-line bg-ink-800 px-4 py-2 text-center text-sm font-semibold text-accent hover:bg-ink-700"
               >
@@ -218,7 +218,7 @@ export default async function OfferDetailPage({ params }: { params: Promise<{ id
           <Card>
             <CardHeader title="Muuta tarjousta" />
             <div className="space-y-2 p-4">
-              <Link
+              <Link prefetch={false}
                 href={`/tarjoukset/uusi?muokkaa=${offer.id}`}
                 className="block w-full rounded-lg border border-accent/40 bg-accent-dim px-4 py-2 text-center text-sm font-semibold text-accent hover:border-accent"
               >

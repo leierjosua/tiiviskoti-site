@@ -29,7 +29,7 @@ export default async function UusiKartoitus({ searchParams }: { searchParams: Pr
   }
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <Link href="/kartoitus" className="text-xs text-muted hover:text-text">← Kartoitus</Link>
+      <Link prefetch={false} href="/kartoitus" className="text-xs text-muted hover:text-text">← Kartoitus</Link>
       <PageHead title="Uusi kartoitus" />
       <KartoitusForm jobId={jobId} initial={initial} />
     </div>

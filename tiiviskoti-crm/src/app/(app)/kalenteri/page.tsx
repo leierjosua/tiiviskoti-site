@@ -149,15 +149,15 @@ export default async function WeekPage({
           </p>
         </div>
         <div className="flex items-center gap-1 text-sm">
-          <Link href={href({ viikko: addDays(monday, -7), asentaja: selected ?? undefined })}
+          <Link prefetch={false} href={href({ viikko: addDays(monday, -7), asentaja: selected ?? undefined })}
                 className="rounded-md border border-line px-2.5 py-1.5 text-muted hover:text-text">
             ← Edellinen
           </Link>
-          <Link href={href({ asentaja: selected ?? undefined })}
+          <Link prefetch={false} href={href({ asentaja: selected ?? undefined })}
                 className="rounded-md border border-line px-2.5 py-1.5 text-muted hover:text-text">
             Tämä viikko
           </Link>
-          <Link href={href({ viikko: addDays(monday, 7), asentaja: selected ?? undefined })}
+          <Link prefetch={false} href={href({ viikko: addDays(monday, 7), asentaja: selected ?? undefined })}
                 className="rounded-md border border-line px-2.5 py-1.5 text-muted hover:text-text">
             Seuraava →
           </Link>
@@ -182,14 +182,14 @@ export default async function WeekPage({
 
       {staff.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <Link href={href({ viikko: weekParam })}
+          <Link prefetch={false} href={href({ viikko: weekParam })}
                 className={`rounded-md border px-2.5 py-1 font-semibold ${
                   selected ? 'border-line text-muted hover:text-text' : 'border-accent text-accent'
                 }`}>
             Kaikki
           </Link>
           {staff.map((s) => (
-            <Link key={s.id} href={href({ viikko: weekParam, asentaja: s.id })}
+            <Link prefetch={false} key={s.id} href={href({ viikko: weekParam, asentaja: s.id })}
                   className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 font-semibold ${s.text} ${
                     selected === s.id ? 'border-current' : 'border-line hover:border-current'
                   }`}>
@@ -230,7 +230,7 @@ export default async function WeekPage({
                 <ul className="divide-y divide-line-soft">
                   {dayJobs.map((job) => (
                     <li key={job.id}>
-                      <Link href={`/tyot/${job.id}`}
+                      <Link prefetch={false} href={`/tyot/${job.id}`}
                             className="flex items-baseline gap-3 px-4 py-2.5 text-sm hover:bg-ink-700">
                         <span className="tabular font-semibold">{timeOf(job.starts_at)}</span>
                         <span className="min-w-0 flex-1 truncate">
@@ -294,7 +294,7 @@ export default async function WeekPage({
                       if (top < 0) return null;
 
                       return (
-                        <Link
+                        <Link prefetch={false}
                           key={job.id}
                           href={`/tyot/${job.id}`}
                           style={{ top, height }}

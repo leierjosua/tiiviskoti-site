@@ -41,7 +41,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <Link href="/asiakkaat" className="text-xs text-muted hover:text-text">← Asiakkaat</Link>
+        <Link prefetch={false} href="/asiakkaat" className="text-xs text-muted hover:text-text">← Asiakkaat</Link>
         <h1 className="text-xl font-semibold tracking-tight">{customer.full_name}</h1>
         <p className="text-sm text-muted">
           {jobs.length} työtä · yhteensä {(billed / 100).toLocaleString('fi-FI')} €
@@ -102,7 +102,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 {jobs.map((j) => (
                   <tr key={j.id} className="hover:bg-ink-700">
                     <td className="px-4 py-2.5">
-                      <Link href={`/tyot/${j.id}`} className="text-accent hover:underline tabular">
+                      <Link prefetch={false} href={`/tyot/${j.id}`} className="text-accent hover:underline tabular">
                         {j.job_number}
                       </Link>
                     </td>

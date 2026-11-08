@@ -306,7 +306,7 @@ export function ViimeistelyWizard({
   return (
     <div className="space-y-5">
       <header className="flex items-center gap-3">
-        <Link href={`/tyot/${job.id}`} aria-label="Takaisin varaukseen"
+        <Link prefetch={false} href={`/tyot/${job.id}`} aria-label="Takaisin varaukseen"
               className="text-muted hover:text-text">←</Link>
         <h1 className="text-[22px] font-extrabold tracking-tight text-text tabular">
           Viimeistely {job.jobNumber}
