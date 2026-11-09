@@ -633,3 +633,9 @@ body.selkea .mcta.show{transition:transform .51s var(--spring-b),visibility 0s}
   .s-links.op,.s-links.op a{translate:none!important;scale:none!important}
   body.selkea :is(.btn,.s-opt,.slot,.tchip,.gate-tab,.sv-tab):active{scale:none}
 }
+/* Sama kapean puhelimen sääntö etusivun navissa (vrt. _teema.css 9.11.). */
+@media (max-width:380px){
+  .s-nav .s-wrap{padding-inline:16px;gap:8px}
+  .s-logo{font-size:19px;gap:8px}.s-logo svg{width:26px;height:26px;flex:none}
+  .s-burger{flex:none;padding:0 14px}
+}

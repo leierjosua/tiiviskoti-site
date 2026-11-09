@@ -420,3 +420,20 @@ body :is(.logo,.s-logo,.rating,.s-rating){min-height:44px;align-items:center}
 }
 body .kt-phone{min-height:44px;display:inline-flex;align-items:center}
 body .qty.tap{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+
+/* Kapea puhelin (320–380 px, iPhone SE ja moni Android): logo, soittonappi
+   ja Valikko eivät mahtuneet riviin, joten flex kutisti pyöreän soittonapin
+   soikioksi (27 × 48 px) — luuri valui vihreän ympyrän yli — ja logon ikoni
+   katosi kokonaan. Napit eivät saa kutistua; tila otetaan logon tekstistä
+   ja välistyksistä. (9.11.2026) */
+@media (max-width:620px){
+  body .ntel,body .burger{flex:none}
+  body nav.top .logo svg,body nav.top .logo img{flex:none}
+  body nav.top .logo{min-width:0}
+}
+@media (max-width:380px){
+  body nav.top .wrap,body nav.top.scr .wrap{padding-inline:16px;gap:8px}
+  body nav.top .logo{font-size:19px;gap:8px}
+  body nav.top .logo svg{width:26px;height:26px}
+  body .burger{padding:0 14px;gap:8px}
+}
