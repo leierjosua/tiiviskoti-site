@@ -31,7 +31,7 @@ body.selkea :focus-visible{outline:3px solid var(--focus);outline-offset:3px;bor
 /* Napit */
 body.selkea .btn{min-height:56px;padding:14px 30px;font:600 18px/1.2 var(--s-font);border-radius:999px;white-space:nowrap;
   transition:transform .12s ease-out,background-color .15s;letter-spacing:0}
-body.selkea .btn:active{transform:scale(.97)}
+/* Painallus: _anim.css (scale .96) — ei omaa transform-skaalausta, ettei kaksi kerrostu. */
 body.selkea .btn-lg{min-height:60px;padding:16px 34px;font-size:19px}
 body.selkea .btn-p{background:var(--green);color:#fff;border:0}
 body.selkea .btn-p:hover{background:var(--green-d)}
@@ -409,8 +409,8 @@ body.selkea .sv-facts b{white-space:nowrap}
 }
 /* Kortin hover ja painallus kuten muualla sivustolla. */
 .s-opt{transition:translate .18s cubic-bezier(.16,1,.3,1),background-color .18s,scale .18s}
-.s-opt:hover{translate:0 -2px}
-.s-opt:active{scale:.98;translate:0 0}
+@media (hover:hover){.s-opt:hover{translate:0 -2px}}
+.s-opt:active{scale:.96;translate:0 0}
 @media (prefers-reduced-motion:reduce){
   .s-hero *,.s-hero-img{animation:none!important;opacity:1!important;transform:none!important}
   .s-opt:hover{translate:none}
@@ -523,4 +523,113 @@ body.s-palvelu .faq-d p{font-size:18px;line-height:1.6;padding:0 0 22px}
   .s-palvelu .s-btns .btn{width:100%}
   .s-merkit{gap:32px;margin-top:40px}
   .s-merkit>div{flex-basis:100%}
+}
+
+/* ---------- Hienosäätö 9.11.2026 (Apple Look + better-interface) ----------
+   - UKK: index.html:n .q antaa reunan joka sivulle, mutta nappi on
+     reunaan kiinni (padding 0) → teksti hipoi pystyviivaa. Pelkät erotinviivat.
+   - Hover-värit vain hiirellä: kosketuksella :hover jää päälle.
+   - Puhelimen soittonappi ei saa kutistua soikioksi (iPhone SE 29 px).
+   - Otsikot tasapainotetaan, kappaleissa ei jää yksinäistä sanaa riville.
+   - "— Hintalaskuri"-ylätunniste oli sivun ainoa (säästöosion on jo piilossa).
+   - Kuvan reuna erottuu valkoisesta taustasta ohuella mustalla 8 %:n viivalla.
+   - Alatunnisteen linkit 44 px korkeiksi napautusta varten. */
+body.selkea .faq .q{border:0;border-bottom:1px solid var(--line)}
+body.selkea .faq .q:first-child{border-top:1px solid var(--line)}
+body.selkea .faq .q.op{border-color:var(--line)}
+.s-opt:hover,.s-links a:hover{transition-duration:.15s}
+@media (hover:none){
+  .s-opt:hover{background:var(--alt)}
+  .s-opt-p:hover{background:var(--green)}
+  body.selkea .btn-p:hover{background:var(--green)}
+}
+.s-nav-tel{flex:none}
+body.selkea :is(h1,h2,h3,.s-quote blockquote,.title){text-wrap:balance}
+body.selkea :is(p,dd,li){text-wrap:pretty}
+body.selkea #laskuri .kicker{display:none}
+.s-hero-img img{outline:1px solid rgba(0,0,0,.08);outline-offset:-1px}
+body.selkea .mfoot .mf-col a{display:flex;align-items:center;min-height:44px;line-height:1.3;margin:0}
+
+/* ---------- LIIKE: jousi, ei aikajana (9.11.2026, apple-design) ----------
+   Applen "Designing Fluid Interfaces": vuorovaikutus vastaa heti painalluksella,
+   liike lähtee aina nykyisestä arvosta ja sen voi kääntää kesken (siksi CSS-
+   siirtymät, ei keyframeja — siirtymä jatkaa siitä mihin jäi).
+   --spring  = kriittisesti vaimennettu jousi, response .35 s (ei ylitystä), asettuu .47 s.
+   --spring-b = vaimennus .8, response .4 s: pieni ylitys vain siellä missä
+                liikkeellä on "massaa" (alapalkki nousee, valikko laskeutuu).
+   Käyrät laskettu jousen yhtälöstä linear()-pisteiksi. Vanhat selaimet
+   ilman linear()-tukea saavat cubic-bezier(.16,1,.3,1)-varan. */
+:root{
+  --spring:cubic-bezier(.16,1,.3,1);
+  --spring-b:cubic-bezier(.16,1,.3,1);
+}
+@supports (transition-timing-function:linear(0,1)){
+  :root{
+    --spring:linear(0, 0.037, 0.123, 0.23, 0.34, 0.445, 0.541, 0.624, 0.695, 0.755, 0.804, 0.844, 0.877, 0.903, 0.924, 0.94, 0.954, 0.964, 0.972, 0.978, 0.983, 0.987, 0.99, 0.992, 0.994, 0.995, 0.997, 0.997, 1);
+    --spring-b:linear(0, 0.035, 0.12, 0.232, 0.352, 0.471, 0.58, 0.677, 0.759, 0.827, 0.881, 0.923, 0.955, 0.978, 0.994, 1.004, 1.011, 1.014, 1.015, 1.015, 1.014, 1.012, 1.01, 1.009, 1.007, 1.005, 1.004, 1.003, 1);
+  }
+}
+
+/* 1. Painallus: alas heti (100 ms ease-out), ylös jousella. Sama kaikissa
+   painettavissa, jotta koko sivu tuntuu yhdeltä materiaalilta. */
+body.selkea :is(.btn,.s-opt,.slot,.stp,.tchip,.gate-tab,.sv-tab,.mnav,.day,.tkc-fab,.s-burger,.s-nav-tel){
+  -webkit-tap-highlight-color:transparent}
+body.selkea :is(.btn,.s-opt,.slot,.tchip,.gate-tab,.sv-tab,.s-burger,.s-nav-tel){
+  transition:scale .47s var(--spring),translate .47s var(--spring),background-color .15s,box-shadow .3s,border-color .15s,color .15s}
+body.selkea :is(.btn,.s-opt,.slot,.tchip,.gate-tab,.sv-tab,.s-burger,.s-nav-tel):not(:disabled):active{
+  scale:.96;translate:0 0;transition-duration:.1s;transition-timing-function:ease-out}
+
+/* 2. Vihje liikkeen suuntaan: valintakortin nuoli nytkähtää sinne minne kortti vie. */
+.s-opt .s-arr{transition:translate .47s var(--spring)}
+@media (hover:hover){ .s-opt:hover .s-arr{translate:4px 0} }
+.s-opt:active .s-arr{translate:6px 0;transition-duration:.1s}
+
+/* 3. Navin reunaviiva vasta kun sisältö liukuu sen alle (scroll edge effect,
+   ei kiinteää viivaa). _shared.js lisää .scr-luokan yli 10 px vierityksellä. */
+.s-nav{transition:border-color .3s,background-color .3s,box-shadow .3s}
+.s-nav:not(.scr){border-bottom-color:transparent;background:rgba(255,255,255,.9)}
+.s-nav.scr{box-shadow:0 8px 24px -20px rgba(0,0,0,.35)}
+
+/* 4. Puhelimen valikko laskeutuu Valikko-napista (transform-origin oikea yläkulma)
+   ja hampurilainen muuttuu ruksiksi samalla jousella. @starting-style antaa
+   sisääntulon display:none → flex -vaihdolle. Sulkeutuminen on välitön:
+   valinta on jo tehty, eikä poistuva valikko saa viivyttää. */
+@media (max-width:1060px){
+  .s-links.op{transform-origin:100% 0;
+    transition:opacity .2s ease-out,translate .51s var(--spring-b),scale .51s var(--spring-b)}
+  @starting-style{ .s-links.op{opacity:0;translate:0 -8px;scale:.98} }
+  .s-links.op a{transition:opacity .3s ease-out,translate .47s var(--spring)}
+  @starting-style{ .s-links.op a{opacity:0;translate:0 -4px} }
+  .s-links.op a:nth-child(2){transition-delay:.03s}
+  .s-links.op a:nth-child(3){transition-delay:.06s}
+  .s-links.op a:nth-child(4){transition-delay:.09s}
+  .s-links.op a:nth-child(n+5){transition-delay:.12s}
+  .s-burger span{position:relative;transition:box-shadow .3s var(--spring),rotate .47s var(--spring),background-color .2s}
+  .s-burger span::after{content:"";position:absolute;inset:0;background:currentColor;border-radius:2px;rotate:0deg;opacity:0;
+    transition:rotate .47s var(--spring),opacity .1s}
+  .s-burger[aria-expanded="true"] span{box-shadow:0 0 0 currentColor,0 0 0 currentColor;rotate:45deg}
+  .s-burger[aria-expanded="true"] span::after{rotate:90deg;opacity:1}
+}
+
+/* 5. UKK: vastaus avautuu jousella ja teksti tarkentuu 4 px ylhäältä — plussa
+   kääntyy ruksiksi samassa tahdissa. Kesken avaamisen voi sulkea; siirtymä
+   kääntyy nykyisestä korkeudesta. */
+body.selkea .faq .q .a{transition:max-height .47s var(--spring)}
+body.selkea .faq .q .cv{transition:rotate .47s var(--spring),transform .47s var(--spring)}
+body.selkea .faq .q .a p{opacity:0;translate:0 -4px;transition:opacity .15s ease-out,translate .15s ease-out}
+body.selkea .faq .q.op .a p{opacity:1;translate:0 0;transition:opacity .3s ease-out .06s,translate .47s var(--spring) .06s}
+@media (hover:hover){ body.selkea .faq .q button:hover{color:var(--green)} }
+body.selkea .faq .q button{transition:color .15s}
+
+/* 6. Puhelimen alapalkki: nousee jousella (pieni ylitys = sillä on massaa),
+   laskeutuu nopeammin samaa reittiä alas. */
+body.selkea .mcta{transition:transform .2s ease-in,visibility 0s linear .2s}
+body.selkea .mcta.show{transition:transform .51s var(--spring-b),visibility 0s}
+
+/* Liikkeenvähennys: _anim.css nollaa kaikki kestot; tämä pitää valikon ja
+   UKK:n tekstin näkyvissä ilman siirtymää. */
+@media (prefers-reduced-motion:reduce){
+  body.selkea .faq .q .a p{translate:none}
+  .s-links.op,.s-links.op a{translate:none!important;scale:none!important}
+  body.selkea :is(.btn,.s-opt,.slot,.tchip,.gate-tab,.sv-tab):active{scale:none}
 }

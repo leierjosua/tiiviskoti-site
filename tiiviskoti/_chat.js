@@ -34,7 +34,7 @@
   background:var(--green,#217A4E);color:#fff;font-family:inherit;font-weight:700;
   font-size:15px;padding:13px 19px;border-radius:99px;
   box-shadow:0 6px 22px rgba(22,58,40,.28);transition:transform .18s,background .18s}
-.tkc-fab:hover{background:var(--deep,#163A28);transform:translateY(-1px)}
+@media (hover:hover){.tkc-fab:hover{background:var(--deep,#163A28);transform:translateY(-1px)}}
 .tkc-fab svg{width:20px;height:20px;flex:none}
 .tkc-fab .x{display:none}
 #tkChat.open .tkc-fab .t,#tkChat.open .tkc-fab .c{display:none}
@@ -44,9 +44,10 @@
 .tkc-panel{width:min(340px,calc(100vw - 32px));background:var(--card,#fff);
   border:1px solid var(--line,#E4E8E0);border-radius:18px;overflow:hidden;
   box-shadow:0 18px 50px rgba(22,58,40,.22);
-  opacity:0;transform:translateY(10px) scale(.98);pointer-events:none;
-  transition:opacity .2s,transform .2s}
-#tkChat.open .tkc-panel{opacity:1;transform:none;pointer-events:auto}
+  opacity:0;transform:translateY(8px) scale(.96);transform-origin:100% 100%;pointer-events:none;
+  transition:opacity .15s ease-out,transform .15s ease-out}
+#tkChat.open .tkc-panel{opacity:1;transform:none;pointer-events:auto;
+  transition:opacity .2s ease-out,transform .47s var(--spring,cubic-bezier(.16,1,.3,1))}
 
 .tkc-head{background:var(--deep,#163A28);color:#fff;padding:16px 18px}
 /* Väri on pakko sanoa: sivuilla on globaali b,strong{color:var(--ink)},

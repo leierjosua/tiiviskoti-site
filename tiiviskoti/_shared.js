@@ -783,11 +783,16 @@ if(faqEl){
       faqEl.appendChild(d);
     });
   }
+  /* Ruudunlukija kuulee onko vastaus auki (WCAG 4.1.2). */
+  faqEl.querySelectorAll('.q').forEach((x,i)=>{
+    const b=x.querySelector('button'), a=x.querySelector('.a'); if(!b||!a) return;
+    a.id=a.id||'faq-a-'+i; b.setAttribute('aria-controls',a.id); b.setAttribute('aria-expanded','false');
+  });
   faqEl.addEventListener('click',e=>{
     const btn=e.target.closest('button'); if(!btn) return;
     const q=btn.parentElement, a=q.querySelector('.a'), open=q.classList.contains('op');
-    faqEl.querySelectorAll('.q').forEach(x=>{x.classList.remove('op'); x.querySelector('.a').style.maxHeight='';});
-    if(!open){ q.classList.add('op'); a.style.maxHeight=a.scrollHeight+'px'; }
+    faqEl.querySelectorAll('.q').forEach(x=>{x.classList.remove('op'); x.querySelector('.a').style.maxHeight=''; x.querySelector('button')?.setAttribute('aria-expanded','false');});
+    if(!open){ q.classList.add('op'); a.style.maxHeight=a.scrollHeight+'px'; btn.setAttribute('aria-expanded','true'); }
   });
 }
 
@@ -2100,8 +2105,13 @@ const nav=document.getElementById('nav'), nl=document.getElementById('nlinks');
 if(nav){ const onScroll=()=>nav.classList.toggle('scr',window.scrollY>10); onScroll();
   addEventListener('scroll',onScroll,{passive:true}); }
 const burger=document.getElementById('burger');
-if(burger){ burger.addEventListener('click',()=>nl.classList.toggle('op'));
-  nl.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nl.classList.remove('op'))); }
+if(burger){
+  /* Tila ruudunlukijalle (aria-expanded) ja Esc sulkee, fokus palaa napille. */
+  const setMenu=open=>{ nl.classList.toggle('op',open); burger.setAttribute('aria-expanded',String(open));
+    burger.setAttribute('aria-label',open?'Sulje valikko':'Avaa valikko'); };
+  burger.addEventListener('click',()=>setMenu(!nl.classList.contains('op')));
+  nl.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setMenu(false)));
+  addEventListener('keydown',e=>{ if(e.key==='Escape'&&nl.classList.contains('op')){ setMenu(false); burger.focus(); } }); }
 /* Porrastus: ruudukon lapset ilmestyvät peräkkäin. Indeksi menee
    CSS-muuttujaan, jotta viive lasketaan tyylitiedostossa (_anim.css) eikä
    kahdessa paikassa. Katto viidessä: pidempi jono alkaa tuntua

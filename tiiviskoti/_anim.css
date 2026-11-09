@@ -99,18 +99,18 @@
 .card{ transition: translate var(--anim-base) var(--anim-ease),
                    border-color var(--anim-base) var(--anim-ease),
                    box-shadow var(--anim-base) var(--anim-ease); }
-.card:hover{
+@media (hover:hover){ .card:hover{
   translate: 0 -6px;
   border-color: var(--green);
   box-shadow: 0 2px 4px rgba(24,58,40,.05), 0 26px 50px -28px rgba(24,58,40,.42);
-}
+} }
 .card-fig .pic{ transition: transform .6s var(--anim-ease); }
-.card:hover .card-fig .pic{ transform: scale(1.055); }
+@media (hover:hover){ .card:hover .card-fig .pic{ transform: scale(1.055); } }
 
 /* Linkin nuoli nytkähtää eteenpäin. Sama liike on jo napeissa; tässä se
    annetaan myös tekstilinkeille, jotka ovat korttien pääkutsu. */
 .lnk .arrow{ transition: transform var(--anim-fast) var(--anim-ease); }
-.lnk:hover .arrow, .card:hover .lnk .arrow{ transform: translateX(4px); }
+@media (hover:hover){ .lnk:hover .arrow, .card:hover .lnk .arrow{ transform: translateX(4px); } }
 .lnk{ transition: color var(--anim-fast) var(--anim-ease); }
 
 /* Napit: kevyt nousu ja varjo, painallus takaisin alas. Painallus on se
@@ -121,25 +121,29 @@
                   background-color var(--anim-fast) var(--anim-ease),
                   box-shadow var(--anim-fast) var(--anim-ease),
                   border-color var(--anim-fast) var(--anim-ease); }
-.btn-p:hover{ translate: 0 -2px; box-shadow: 0 10px 24px -12px rgba(33,122,78,.65); }
-.btn:active{ translate: 0 0; scale: .985; }
+/* Hover vain hiirellä: kosketusnäytöllä :hover jää päälle napautuksen
+   jälkeen ja nappi näyttää jumittuneen ylös. Painallus 0,96 = sama kaikissa
+   painettavissa (better-ui), ja _selkea.css:n oma transform-skaalaus on
+   poistettu ettei kaksi skaalausta kerrostu. */
+@media (hover:hover){ .btn-p:hover{ translate: 0 -2px; box-shadow: 0 10px 24px -12px rgba(33,122,78,.65); } }
+.btn:not(:disabled):active{ translate: 0 0; scale: .96; }
 
 /* Laskurin määräpainikkeet: napautus tuntuu heti. */
 .stp{ transition: scale var(--anim-fast) var(--anim-ease),
                   background-color var(--anim-fast) var(--anim-ease); }
-.stp:active{ scale: .9; }
+.stp:not(:disabled):active{ scale: .96; }
 
 /* Kalenterin aika: valinta on tärkein klikki koko sivulla. */
 .slot{ transition: translate var(--anim-fast) var(--anim-ease),
                    scale var(--anim-fast) var(--anim-ease),
                    border-color var(--anim-fast) var(--anim-ease),
                    background-color var(--anim-fast) var(--anim-ease); }
-.slot:hover{ translate: 0 -2px; }
+@media (hover:hover){ .slot:hover{ translate: 0 -2px; } }
 .slot:active{ scale: .96; }
 
 /* Palveluruudukon ja hinnaston rivit: hienovarainen taustan kirkastuminen. */
 .wtype{ transition: background-color var(--anim-fast) var(--anim-ease); }
-.wtype:hover{ background: var(--green-soft); }
+@media (hover:hover){ .wtype:hover{ background: var(--green-soft); } }
 
 /* ---------- 3. HUOMIO ----------
    Yksi ainoa huomioliike koko sivulla, ja se on hinnalla: kun summa
@@ -163,7 +167,7 @@
   background: var(--green); border-radius:2px;
   transition: left var(--anim-base) var(--anim-ease), right var(--anim-base) var(--anim-ease);
 }
-.nlinks a:hover::after{ left:0; right:0; }
+@media (hover:hover){ .nlinks a:hover::after{ left:0; right:0; } }
 
 /* Avattavat osiot (Muut kohteet, UKK) kääntyvät pehmeästi. */
 summary, .morecats{ transition: color var(--anim-fast) var(--anim-ease); }
