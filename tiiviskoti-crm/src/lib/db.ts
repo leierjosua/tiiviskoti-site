@@ -32,6 +32,14 @@ export const sql: postgres.Sql =
     /* Serverless-instanssi voi jäädä lämpimänä pitkäksi aikaa. Lyhyt
        idle_timeout vapauttaa yhteydet poolerille käyttämättömänä. */
     idle_timeout: 20,
+    /* 9.11.2026: kirjautuneet sivut jäivät latausnäkymään 300 s:n
+       aikakatkaisuun asti, vaikka sama kanta vastasi muualta heti. pg_cron
+       pitää instanssin lämpimänä (ping 4 min välein), joten sen yhteydet
+       eivät koskaan uusiudu: kuollut, puoliavoin yhteys poolerille ei
+       palauta mitään eikä virhettä. Yhteys vaihdetaan nyt uuteen viimeistään
+       5 min iässä ja hiljainen yhteys tarkistetaan 30 s välein. */
+    max_lifetime: 60 * 5,
+    keep_alive: 30,
     connect_timeout: 15,
     ssl: 'require',
     transform: { undefined: null },

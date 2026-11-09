@@ -51,6 +51,11 @@ const ROLE_LABELS: Record<string, string> = {
   installer: 'Asentaja',
 };
 
+/* Jumiutunut pyyntö katkeaa minuutissa eikä viidessä (Vercelin oletus 300 s):
+   käyttäjä näkee virheen ja voi yrittää uudestaan sen sijaan että latausnäkymä
+   pyörii loputtomiin. Yksikään sivu ei normaalisti kestä yli 5 s. */
+export const maxDuration = 60;
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const staff = await requireStaff();
   const isManager = staff.role !== 'installer';
