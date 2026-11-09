@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import { sql } from './db';
+import { timed } from './timing';
 import { resolveView, VIEW_COOKIE, type ViewMode } from './view';
 
 /* =========================================================
@@ -66,14 +67,14 @@ export const supabaseServer = cache(async function supabaseServer() {
    renderöintinsä, joten tunnistus tarkistetaan niissä yhä uudestaan. */
 export const currentStaff = cache(async function currentStaff(): Promise<Staff | null> {
   const supabase = await supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await timed('auth.getUser', supabase.auth.getUser());
   if (!user?.email) return null;
 
   /* Luku ensin, kirjoitus vain kun se on tarpeen.
      Tämä oli aiemmin pelkkä UPDATE … RETURNING, joten JOKA sivulataus teki
      kirjoituksen kantaan. Kirjoitus on tarpeen vain kertaalleen, kun kutsuttu
      henkilö kirjautuu ensimmäisen kerran ja `user_id` sidotaan riviin. */
-  const rows = await sql<{
+  const rows = await timed('staff', sql<{
     id: string; email: string; full_name: string; role: Staff['role']; user_id: string | null;
   }[]>`
     select id, email, full_name, role, user_id
@@ -81,7 +82,7 @@ export const currentStaff = cache(async function currentStaff(): Promise<Staff |
      where active
        and (user_id = ${user.id} or (user_id is null and lower(email) = lower(${user.email})))
      limit 1
-  `;
+  `);
   const row = rows[0];
   if (!row) return null;
 

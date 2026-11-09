@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { sql } from '@/lib/db';
+import { timed } from '@/lib/timing';
 import { readHealthBanner, type HealthBanner } from '@/lib/health';
 import { requireStaff, viewMode } from '@/lib/session';
 import { addDays, dateKeyOf, formatDateKey, formatInstant, helsinkiDateTime, timeOf } from '@/lib/time';
@@ -114,7 +115,7 @@ export default async function TodayPage() {
   const weekAhead = helsinkiDateTime(addDays(today, 8), '00:00');
 
   const [jobs, newBookings, stats, health] = await Promise.all([
-    sql<DayJob[]>`
+    timed('etusivu:jobs', sql<DayJob[]>`
       select j.id, j.job_number, j.starts_at, j.ends_at, j.status::text as status, j.title,
              j.address, j.postal_code, j.city, j.price_cents, j.notes,
              s.full_name as staff_name, cu.full_name as customer_name, cu.phone as customer_phone
@@ -125,11 +126,11 @@ export default async function TodayPage() {
        where j.starts_at >= ${dayStart.toISOString()} and j.starts_at < ${weekAhead.toISOString()}
          and j.status <> 'cancelled'
        order by j.starts_at
-    `,
+    `),
     /* Tänään SAAPUNEET varaukset koko riveinä, ei pelkkänä lukumääränä.
        Järjestys on varauspäivän mukaan eikä saapumisjärjestyksessä: kysymys
        johon tämä lista vastaa on "mihin päiville ne menivät". */
-    sql<NewBooking[]>`
+    timed('etusivu:newBookings', sql<NewBooking[]>`
       select j.id, j.job_number, j.created_at, j.starts_at, j.price_cents, j.source,
              j.title, cu.full_name as customer_name, s.full_name as staff_name
         from tk.jobs j
@@ -139,10 +140,10 @@ export default async function TodayPage() {
        where j.created_at >= ${dayStart.toISOString()}
          and j.status <> 'cancelled'
        order by j.starts_at
-    `,
+    `),
     /* Kaikki tunnusluvut yhdellä kyselyllä: erilliset kyselyt olisivat neljä
        kanta-edestakaista matkaa siinä missä tässä riittää yksi. */
-    sql<{
+    timed('etusivu:stats', sql<{
       myynti_tanaan: number; keikat_tanaan: number;
       uudet_varaukset: number; uudet_arvo: number;
       kpl_30pv: number; myynti_30pv: number;
@@ -173,8 +174,8 @@ export default async function TodayPage() {
         (select count(*)::int from tk.leads where status = 'new')             as liidit_uudet
       from tk.jobs j
       where j.status <> 'cancelled'
-    `,
-    readHealthBanner(),
+    `),
+    timed('etusivu:health', readHealthBanner()),
   ]);
 
   const s = stats[0];

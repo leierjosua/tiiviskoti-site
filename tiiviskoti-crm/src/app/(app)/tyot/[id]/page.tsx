@@ -6,6 +6,7 @@ import { ownsJob, requireStaff, viewMode } from '@/lib/session';
 import { Card, CardHeader, StatusBadge } from '@/components/ui';
 import { dateKeyOf, formatDateKey, timeOf, weekdayName, isoWeekday } from '@/lib/time';
 import { sql } from '@/lib/db';
+import { timed } from '@/lib/timing';
 import { DeleteJob, EditJobForm, InvoiceMark, RescheduleForm, SendConfirmation, SendOffer, SendReceipt, StatusButtons, TransferJobForm } from './ui';
 import AsennusTyo from './asennus-tyo';
 import { JobPhotos } from './photos';
@@ -29,12 +30,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   const staff = await requireStaff();
   const { id } = await params;
 
-  const job = await getJob(id);
+  const job = await timed('tyo:getJob', getJob(id));
   if (!job) notFound();
   /* Asentajalle toisen keikka on olematon, ei kielletty: sama 404 kuin
      tuntemattomalle tunnisteelle, jottei osoitteesta voi päätellä keiden
      keikkoja on olemassa. */
-  if (!(await ownsJob(staff, id))) notFound();
+  if (!(await timed('tyo:ownsJob', ownsJob(staff, id)))) notFound();
 
   /* Asennusnäkymässä sama työ näytetään toisin: ei muokkauslomakkeita
      vaan tiedot ja Viimeistele-nappi. */
@@ -47,33 +48,33 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
   // Rivit, viestiloki ja liitokset ovat toisistaan riippumattomia — rinnakkain.
   const [lines, mails, links, photos, deliveryRows, calendars, reportRes, kartoitusRows, unitRows] = await Promise.all([
-    sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
+    timed('tyo:lines', sql<{ name: string; quantity: number; unit_price_cents: number }[]>`
       select name, quantity, unit_price_cents from tk.job_lines
        where job_id = ${id} order by sort_order
-    `,
-    sql<{ kind: string; to_email: string; sent_at: Date | null; error: string | null }[]>`
+    `),
+    timed('tyo:mails', sql<{ kind: string; to_email: string; sent_at: Date | null; error: string | null }[]>`
       select kind::text as kind, to_email, sent_at, error from tk.mail_log
        where job_id = ${id} order by created_at
-    `,
-    jobLinks(id),
-    listJobPhotos(id),
+    `),
+    timed('tyo:links', jobLinks(id)),
+    timed('tyo:photos', listJobPhotos(id)),
     /* Vahvistuksen ja kalenterin tila: kumpikin voi puuttua toisistaan
        riippumatta, eikä sitä näe mistään muualta työn sivulla. */
-    sql<{ confirmation_sent_at: Date | null; google_event_id: string | null }[]>`
+    timed('tyo:delivery', sql<{ confirmation_sent_at: Date | null; google_event_id: string | null }[]>`
       select confirmation_sent_at, google_event_id from tk.jobs where id = ${id}
-    `,
+    `),
     /* Siirtolistan vaihtoehdot. Vain käytössä olevat, jottei työtä voi antaa
        lopettaneelle asentajalle. */
-    listCalendars(true),
+    timed('tyo:calendars', listCalendars(true)),
     /* Asentajan työraportti (db/033). Puuttuva taulu ei kaada sivua. */
-    getJobReport(id),
+    timed('tyo:report', getJobReport(id)),
     /* Työltä tehty kartoitus (db/038). Puuttuva taulu ei kaada sivua. */
-    sql<{ id: string }[]>`
+    timed('tyo:kartoitus', sql<{ id: string }[]>`
       select id from tk.kartoitukset where job_id = ${id} order by created_at desc limit 1
-    `.catch(() => [] as { id: string }[]),
+    `.catch(() => [] as { id: string }[])),
     /* Saman hetken väli riittää: haetaan vain tämän varauksen luvut. */
-    jobUnitCounts(new Date(job.starts_at.getTime() - 1000).toISOString(),
-                  new Date(job.starts_at.getTime() + 1000).toISOString(), null, { crew: true }),
+    timed('tyo:units', jobUnitCounts(new Date(job.starts_at.getTime() - 1000).toISOString(),
+                  new Date(job.starts_at.getTime() + 1000).toISOString(), null, { crew: true })),
   ]);
   const units = unitRows.find((u) => u.job_id === id);
   const report = reportRes.report;
