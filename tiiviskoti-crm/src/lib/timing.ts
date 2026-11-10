@@ -1,4 +1,5 @@
 import 'server-only';
+import { resetDb } from './db';
 
 /* =========================================================
    Hitaan tai jumittuvan kutsun paljastin.
@@ -25,6 +26,8 @@ export async function timed<T>(label: string, work: PromiseLike<T>, hangMs = HAN
   const hang = new Promise<never>((_, reject) => {
     timer = setTimeout(() => {
       console.error(`[jumi] ${label} ei palannut ${hangMs} ms:ssa`);
+      // Jumi = todennäköisesti kuollut yhteysjoukko → seuraava lataus saa uudet.
+      resetDb(`jumi: ${label}`);
       reject(new Error(`Aikakatkaisu: ${label}`));
     }, hangMs);
   });
