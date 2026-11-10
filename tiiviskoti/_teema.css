@@ -437,3 +437,16 @@ body .qty.tap{min-height:44px;display:inline-flex;align-items:center;justify-con
   body nav.top .logo svg{width:26px;height:26px}
   body .burger{padding:0 14px;gap:8px}
 }
+
+/* Soittonappi puhelimessa, iPhone-Safari (10.11.2026, Josuan kuva IMG_8222):
+   luuri oli ympyrän VASEMMALLA PUOLELLA ja sivu levisi näyttöä leveämmäksi.
+   Numero piilotettiin pelkällä font-size:0:lla, mutta flex-rivi keskitti
+   luurin + numeron yhdessä; jos numerolle jää leveyttä, luuri työntyy ulos
+   ja ylivuoto leventää koko sivua. Nyt luuri on keskitetty absoluuttisesti,
+   numero on läpinäkyvä ja kaikki ylimenevä leikataan — ei riipu siitä,
+   miten selain käsittelee nollakokoista tekstiä. Numero jää ruudunlukijalle. */
+@media (max-width:620px){
+  body .ntel,body nav.top .ntel{position:relative;overflow:hidden;color:transparent!important;justify-content:flex-start;
+    flex:none;width:48px;min-width:48px;max-width:48px;padding:0}
+  body .ntel::before{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px}
+}

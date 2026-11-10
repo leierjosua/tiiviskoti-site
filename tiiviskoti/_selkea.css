@@ -544,8 +544,10 @@ body.selkea .faq .q.op{border-color:var(--line)}
   body.selkea .btn-p:hover{background:var(--green)}
 }
 .s-nav-tel{flex:none}
-body.selkea :is(h1,h2,h3,.s-quote blockquote,.title){text-wrap:balance}
-body.selkea :is(p,dd,li){text-wrap:pretty}
+/* text-wrap-STYLE eikä text-wrap: lyhenne nollaa myös text-wrap-moden, jolloin
+   white-space:nowrap (esim. hinnat "75–90 €") lakkasi toimimasta. */
+body.selkea :is(h1,h2,h3,.s-quote blockquote,.title){text-wrap-style:balance}
+body.selkea :is(p,dd,li){text-wrap-style:pretty}
 body.selkea #laskuri .kicker{display:none}
 .s-hero-img img{outline:1px solid rgba(0,0,0,.08);outline-offset:-1px}
 body.selkea .mfoot .mf-col a{display:flex;align-items:center;min-height:44px;line-height:1.3;margin:0}
@@ -638,4 +640,44 @@ body.selkea .mcta.show{transition:transform .51s var(--spring-b),visibility 0s}
   .s-nav .s-wrap{padding-inline:16px;gap:8px}
   .s-logo{font-size:19px;gap:8px}.s-logo svg{width:26px;height:26px;flex:none}
   .s-burger{flex:none;padding:0 14px}
+}
+
+/* ---------- Designarvion korjaukset 9.11.2026 (Superfuture design-review) ---------- */
+/* 1. Hero ei viivytä: kaikki valinnat näkyvissä ≤ 0,45 s, kuva viimeisenä.
+   Ennen pääpainike tuli 0,8 s ja koko hero asettui ~1,9 s:ssa. */
+.s-hero .s-rating,.s-hero h1,.s-hero .s-lead,.s-hero .s-choose,.s-hero .s-opt,.s-hero .s-more{animation-duration:.5s}
+.s-hero .s-rating{animation-delay:0s}
+.s-hero h1{animation-delay:.04s}
+.s-hero .s-lead{animation-delay:.08s}
+.s-hero .s-choose{animation-delay:.1s}
+.s-hero .s-opt:nth-child(1){animation-delay:.12s}
+.s-hero .s-opt:nth-child(2){animation-delay:.16s}
+.s-hero .s-opt:nth-child(3){animation-delay:.2s}
+.s-hero .s-more{animation-delay:.24s}
+.s-hero-img{animation-duration:.6s;animation-delay:.2s}
+@media (max-width:620px){
+  .s-hero .s-choose{animation-delay:0s}
+  .s-hero .s-opt:nth-child(1){animation-delay:.04s}
+  .s-hero .s-opt:nth-child(2){animation-delay:.08s}
+  .s-hero .s-opt:nth-child(3){animation-delay:.12s}
+  .s-hero .s-more{animation-delay:.16s}
+  .s-hero-img{animation-delay:.2s}
+}
+/* 2. Hinnat + laskuri ovat yksi kokonaisuus samalla harmaalla: ei 240 px:n
+   reikää väliin, laskuri jatkuu suoraan hinnaston alta. */
+body.selkea #hinnat + #laskuri{padding-top:32px}
+body.selkea #hinnat:has(+ #laskuri){padding-bottom:56px}
+/* 3. Yhteysosio tiiviimmäksi (otsikko nyt "Soita tai kirjoita"). */
+body.selkea #yhteys{padding:88px 0}
+@media (max-width:860px){ body.selkea #yhteys{padding:64px 0} }
+/* 4. Postinumerovaihe: tyhjä aluehuomio piiloon (_shared.js is-empty). */
+.area-note.is-empty{display:none}
+/* Polish: säästölaskurissa ei korttia kortin sisällä — tulos suoraan harmaalle. */
+body.selkea .sv-res{background:none;padding:4px 0 0}
+/* Polish: edistyminen kerran — "Vaihe 1/4" jää (selkeämpi kuin pisteet). */
+body.selkea .stepdots{display:none}
+/* Sama varmistus etusivun soittonapille (svg + piilotettu numero). */
+@media (max-width:620px){
+  .s-nav-tel{position:relative;overflow:hidden;min-width:48px;max-width:48px}
+  .s-nav-tel svg{position:absolute;left:50%;top:50%;margin:-10px 0 0 -10px}
 }

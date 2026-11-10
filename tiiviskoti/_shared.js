@@ -1005,9 +1005,11 @@ function renderAreaNote(){
   const box = document.getElementById('areaNote'); if(!box) return;
   const s = avail.state;
 
+  /* Ennen postinumeroa laatikko on tyhjä ja piilossa: kentän otsikko ja
+     vihje kertovat jo saman asian (ennen sama ohje oli kolmesti). */
   if(s==='postal'){
-    box.className='area-note';
-    box.innerHTML='<b>Syötä postinumero</b><span>Näytämme vapaat ajat sen asentajan kalenterista, joka palvelee aluettasi.</span>';
+    box.className='area-note is-empty';
+    box.innerHTML='';
     return;
   }
   if(s==='loading'){

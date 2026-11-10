@@ -210,8 +210,10 @@ summary, .morecats{ transition: color var(--anim-fast) var(--anim-ease); }
    riippumatta siitä mikä komponentti se on. */
 .rv{
   opacity:0;
-  transform: translateY(24px);
-  transition: opacity .7s var(--anim-ease), transform .7s var(--anim-ease);
+  /* 9.11.2026: 24 px / .7 s → 12 px / .5 s. Nopeassa vierityksessä osio
+     oli hetken tyhjä; lyhyempi nousu tuntuu samalta mutta ei piilota mitään. */
+  transform: translateY(12px);
+  transition: opacity .5s var(--anim-ease), transform .5s var(--anim-ease);
   will-change: opacity, transform;
 }
 .rv.in{ opacity:1; transform:none; will-change:auto; }
