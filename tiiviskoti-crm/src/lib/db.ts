@@ -14,7 +14,18 @@ import postgres from 'postgres';
    niitä.
    ========================================================= */
 
-const url = process.env.DATABASE_URL;
+/* ISTUNTOTILA (portti 5432), EI transaktiotila (6543) — 10.11.2026.
+   postgres.js lähettää prepare:false-tilassa jokaisen parametrillisen kyselyn
+   kahdessa osassa: Parse+Describe+Flush, odottaa parametrityypit ja vasta sitten
+   Bind+Execute+Sync. Supavisorin transaktiotila hukkasi välillä ensimmäisen osan
+   vastauksen: tuotannon pg_stat_activity näytti työraportin yhden rivin haun
+   tilassa `active / ClientRead` 13 s — kanta odotti CRM:ää ja CRM kantaa.
+   Siitä seurasi koko CRM:n jumi (5 yhteyttä tukossa → kaikki kyselyt jonossa).
+   Istuntotilassa sama pooleri antaa jokaiselle yhteydelle oman kantayhteyden,
+   joten protokolla kulkee kokonaisena. Yhteyksiä on vähän (max 4 / instanssi,
+   suljetaan 15–20 s joutilaisuuden jälkeen), joten istuntopoolin koko riittää.
+   DATABASE_URL Vercelissä on yhä 6543-muotoinen; portti vaihdetaan tässä. */
+const url = process.env.DATABASE_URL?.replace(':6543/', ':5432/');
 if (!url) throw new Error('DATABASE_URL puuttuu');
 
 const globalForDb = globalThis as unknown as { __tkSql?: postgres.Sql };
@@ -27,7 +38,7 @@ function makePool(): postgres.Sql {
        jonoon yhdelle yhteydelle, eli Promise.all ei rinnakkaistanut mitään.
        Supabasen pooler on transaktiotilassa, joten useampi yhteys per
        instanssi on turvallista — se kierrättää ne omassa poolissaan. */
-    max: 5,
+    max: 4,
     idle_timeout: 20,
     max_lifetime: 60 * 5,
     keep_alive: 30,
