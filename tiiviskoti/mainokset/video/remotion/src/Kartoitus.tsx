@@ -10,7 +10,7 @@ import { Block, Check, Eyebrow, H1, Pill, Price, ShotLayer, type Shot } from './
    kotikartoitusta. Sama kuvamateriaali ja rytmi kuin TK58:ssa (paras
    video 30 pv), vain viesti vaihtuu. Kaksi versiota, jotka eroavat VAIN
    ensimmäisestä tekstilohkosta = puhdas koukkutesti:
-     a = "Ilmainen kartoituskäynti" suoraan
+     a = "Maksuton kartoituskäynti" suoraan
      b = kysymys "Vetääkö ikkuna tai ovi?"
    Ei säästölupauksia (ks. lupauskieli) — käynti ja kiinteä hinta ovat lupaus. */
 
@@ -119,7 +119,7 @@ export const Kartoitus: React.FC<{ ratio: '916' | '45'; variant: 'a' | 'b' }> = 
         <Img src={staticFile('ikkuna-ovi/logo.png')} style={{ width: 300, marginBottom: 34, opacity: 0.95 }} />
         <H1 at={END_AT + 8}>Hinta paikan päällä.</H1>
         <Mint at={END_AT + 14}>Käynti 0&nbsp;€.</Mint>
-        <Cta at={END_AT + 30} label="Varaa ilmainen kartoitus" />
+        <Cta at={END_AT + 30} label="Varaa maksuton kartoitus" />
       </Block>
 
       <Audio

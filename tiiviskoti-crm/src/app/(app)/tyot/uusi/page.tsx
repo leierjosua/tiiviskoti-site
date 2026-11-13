@@ -102,7 +102,7 @@ export default async function NewJobPage({
 
   /* Oletukseksi asennuskalenteri, ei taloyhtiöiden kartoituskalenteria.
      Se sattui olemaan listan ensimmäinen, joten "Laita aika" olisi
-     tarjonnut ilmaisen kartoituskäynnin aikoja asennukselle — ja varaus
+     tarjonnut maksuttoman kartoituskäynnin aikoja asennukselle — ja varaus
      olisi mennyt väärään kalenteriin ilman että kukaan huomaa. Valittavissa
      se on yhä, jos joku tarvitsee sitä tietoisesti. */
   const kartoitus = kartoitusCalendarId();

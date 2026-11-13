@@ -6,7 +6,7 @@
 //
 // Miksi tämä on erillään `create-booking.mjs`:stä: varausreitti laskee hinnan
 // `pricing.mjs`:stä ja hylkää nollahintaisen tilauksen tarkoituksella
-// ("Emme tee ilmaisia kartoituskäyntejä"). Kartoitus on nimenomaan
+// ("Emme tee maksuttomia kartoituskäyntejä"). Kartoitus on nimenomaan
 // veloitukseton eikä siinä ole hinnoiteltuja kohteita — sen ajaminen
 // varausreitin läpi vaatisi juuri sen nollahintapoikkeuksen, joka sinne
 // kirjoitettiin estämään hiljaiset 0 €:n varaukset.

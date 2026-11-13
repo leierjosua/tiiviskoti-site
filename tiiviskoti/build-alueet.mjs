@@ -99,13 +99,13 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
    osoittavat ankkuriin jota sivulla ei ole eivätkä tee yhtään mitään.
    Todettu 12.9.2026 auditissa: 10 sivua, joilla pääkutsu oli kuollut. */
 /* Navin linkit ovat SAMAT joka sivulla (Josua 27.10.2026): Hinnat,
-   Ilmainen kartoitus, Taloyhtiöt, Meistä, Yhteystiedot. Ikkuna- ja
+   Maksuton kartoitus, Taloyhtiöt, Meistä, Yhteystiedot. Ikkuna- ja
    ovisivut löytyvät footerista. Etusivun (index.html) navi on käsin
    tehty — pidä sen linkit samoina. */
 const nav = (R, calc = '#laskuri') => `<nav class="top" id="nav"><div class="wrap">
   <a href="/" class="logo"><svg class="mark" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#217A4E"/><rect x="31" y="20" width="38" height="60" rx="3" fill="none" stroke="#F6F7F3" stroke-width="5"/><rect x="35" y="20" width="4" height="60" fill="#F6F7F3"/></svg><span><span class="d">Tiivis</span><span class="b">Koti</span></span></a>
   <div class="nlinks" id="nlinks">
-    <a href="${R}hinta.html">Hinnat</a><a href="${R}kartoitus.html">Ilmainen kartoitus</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}meista.html">Meistä</a><a href="${R}ota-yhteytta.html">Yhteystiedot</a>
+    <a href="${R}hinta.html">Hinnat</a><a href="${R}kartoitus.html">Maksuton kartoitus</a><a href="${R}taloyhtio.html">Taloyhtiöt</a><a href="${R}meista.html">Meistä</a><a href="${R}ota-yhteytta.html">Yhteystiedot</a>
   </div>
   <a href="tel:${TELH}" class="ntel">${TEL}</a>
   <a href="${calc}" class="btn btn-p" style="padding:10px 20px">Varaa aika</a>
@@ -243,7 +243,7 @@ function selkeaHero(R, otsikko, lead, lisa) {
       </a>
       <a class="s-opt" href="${R}kartoitus.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
-        <span><b>Ilmainen kartoitus</b><small>Asentaja käy ja kertoo hinnan paikan päällä</small></span>
+        <span><b>Maksuton kartoitus</b><small>Asentaja käy ja kertoo hinnan paikan päällä</small></span>
         <svg class="s-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
       <a class="s-opt" href="tel:${TELH}">
@@ -252,7 +252,7 @@ function selkeaHero(R, otsikko, lead, lisa) {
         <svg class="s-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
-    <p class="s-more">Taloyhtiö? <a href="${R}taloyhtio.html">Varaa ilmainen kartoituskäynti</a></p>
+    <p class="s-more">Taloyhtiö? <a href="${R}taloyhtio.html">Varaa maksuton kartoituskäynti</a></p>
   </div>
   <figure class="s-hero-img">
     <picture><img src="${R}img/hero-entrance-1600.webp?v=4" srcset="${R}img/hero-entrance-1600.webp?v=4 1600w, ${R}img/hero-entrance-2400.webp?v=4 2400w" sizes="(max-width:900px) 100vw, 520px" alt="Kaksi TiivisKodin asentajaa talon ulko-oven edessä" width="2400" height="1803" fetchpriority="high"></picture>

@@ -1183,7 +1183,7 @@ if(stepCard){
     }
 
     /* Taloyhtiövälilehti asuu postinumerovaiheessa, joka B:ssä ei ole enää
-       ensimmäisenä. Ilman korviketta ilmainen kartoitus katoaisi kortin
+       ensimmäisenä. Ilman korviketta maksuton kartoitus katoaisi kortin
        ensimmäiseltä ruudulta kokonaan — se olisi testin sivuvahinko eikä
        testattava muutos.
 
@@ -1196,7 +1196,7 @@ if(stepCard){
     valinta.className='ab-seg';
     valinta.innerHTML=
       '<button type="button" class="ab-seg-on"><b>Yksi koti</b><span>hinta heti alla</span></button>'
-      + '<button type="button" class="ab-yhtio"><b>Taloyhtiö</b><span>ilmainen kartoitus</span></button>';
+      + '<button type="button" class="ab-yhtio"><b>Taloyhtiö</b><span>maksuton kartoitus</span></button>';
     valinta.addEventListener('click', (e)=>{
       if(!e.target.closest('.ab-yhtio')) return;
       const t=document.getElementById('tabYhtio'); if(t) t.click();
@@ -1643,7 +1643,7 @@ function syncBookingSummary(){
     whenTxt.textContent = `${wd} ${selDay.getDate()}.${selDay.getMonth()+1}.${selDay.getFullYear()} klo ${selSlot}`; }
   else { whenTxt.textContent='Valitse aika kalenterista'; }
 }
-/* Emme tee ilmaisia kartoituskäyntejä: varausta ei voi lähettää ilman laskurista
+/* Emme tee maksuttomia kartoituskäyntejä: varausta ei voi lähettää ilman laskurista
    tullutta ovivalintaa. Estää myös suoraan varaa.html:ään saapuvat (kaupunkilinkit,
    hakukone, vanha bookmark) tekemästä 0 €:n varausta. */
 function gateBookingOnCalculator(){
@@ -1907,7 +1907,7 @@ if(document.getElementById('tabKoti')){
   }
 
   /* Kortin hinta tulee laskurin valinnasta. Ilman valintaa ei näytetä
-     summaa vaan ohjataan laskuriin — emme tee ilmaisia kartoituskäyntejä,
+     summaa vaan ohjataan laskuriin — emme tee maksuttomia kartoituskäyntejä,
      joten varaus ilman kohteita ei ole mahdollinen. */
   function renderGatePrice(){
     const p=document.getElementById('gPrice'), n=document.getElementById('gNet'),

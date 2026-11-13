@@ -8,7 +8,7 @@
         15 e/vrk, sama kohdennus kuin TK29:ssä. Mainosjoukko PÄÄTTYY
         ITSESTÄÄN 30.10.2026 klo 23.59 — rahaa ei kulu vahingossa yli.
      2. Kaksi mainosta (15 e/vrk ei riitä neljälle): kuva TK67 sakset ja
-        video TK69 "Ilmainen kartoituskäynti". TK68/TK70-materiaali on valmiina.
+        video TK69 "Maksuton kartoituskäynti". TK68/TK70-materiaali on valmiina.
         Linkki https://tiiviskoti.fi/kartoitus.html?src=meta-kartoitus-tk6x,
         jolloin jokainen varaus kantaa CRM:ssä mainoksen tunnuksen.
      3. TK29 (liidilomake) JATKAA 30 e/vrk rinnalla (Josua 16.10.) — 30.10.
@@ -52,17 +52,17 @@ const LOPPU = '2026-10-30T23:59:00+0200';  // mainosjoukko pysähtyy itsestään
 const SIVU = 'https://tiiviskoti.fi/kartoitus.html';
 
 const TEKSTI =
-`Vetävätkö ikkunat tai ovet? Varaa ilmainen kartoituskäynti — asentajamme tulee kotiisi, katsoo ikkunat ja ovet ja kertoo kiinteän hinnan paikan päällä.
+`Vetävätkö ikkunat tai ovet? Varaa maksuton kartoituskäynti — asentajamme tulee kotiisi, katsoo ikkunat ja ovet ja kertoo kiinteän hinnan paikan päällä.
 
 Käynti on maksuton eikä sido sinua mihinkään. Näet summan ennen kuin päätät.
 
 Ikkunan tiivistys alkaen 75 €, ja mitä useampi ikkuna kerralla, sitä halvempi kappalehinta. Ulko-oven tiivistys 99 €. Työn osuudesta saat kotitalousvähennyksen.
 
 Valitse sopiva aika kalenterista — vahvistus tulee heti sähköpostiin.`;
-const OTSIKKO = 'Varaa ilmainen kartoitus';
+const OTSIKKO = 'Varaa maksuton kartoitus';
 const KUVAUS = 'Kiinteä hinta paikan päällä · Uusimaa';
 
-/* Videot: Remotion `video/remotion/src/Kartoitus.tsx` (a = "Ilmainen kartoituskäynti",
+/* Videot: Remotion `video/remotion/src/Kartoitus.tsx` (a = "Maksuton kartoituskäynti",
    b = "Vetääkö ikkuna tai ovi?") — sama kuvamateriaali kuin TK58:ssa. */
 const VIDEOT = path.join(process.env.HOME, 'Desktop', 'tiiviskoti-mainosvideot');
 const UUDET = [

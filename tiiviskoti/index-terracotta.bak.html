@@ -803,7 +803,7 @@ const FAQ = [
   ['Kannattaako vetävä ovi tiivistää vai vaihtaa?','Jos ovilehti ja karmi ovat suorassa ja ovi toimii, pelkkä tiivisteiden uusiminen riittää lähes aina — se maksaa murto-osan uuden oven (2 200–4 900 €) hinnasta ja poistaa vedon. Arvioimme kunnon paikan päällä ja kerromme rehellisesti.'],
   ['Kuinka paljon säästän lämmityksessä?','Yksi vetävä ulko-ovi voi nostaa lämmityskuluja 10–15 %. Kun veto loppuu, lämpö pysyy sisällä ja lämmitystarve pienenee — tiivistys maksaa itsensä usein takaisin jo yhden lämmityskauden aikana.'],
   ['Millä alueella toimitte?','Koko Uudenmaan alueella — Helsinki, Espoo, Vantaa ja kehyskunnat. Kerro postinumerosi varauksen yhteydessä, niin vahvistamme, että palvelemme alueellasi.'],
-  ['Miten ajanvaraus toimii?','Valitset laskurista ovet, näet kiinteän hinnan ja varaat vapaan ajan suoraan kalenterista. Saat vahvistuksen sähköpostiin. Voit varata myös ilmaisen kartoituskäynnin ilman laskuria.'],
+  ['Miten ajanvaraus toimii?','Valitset laskurista ovet, näet kiinteän hinnan ja varaat vapaan ajan suoraan kalenterista. Saat vahvistuksen sähköpostiin. Voit varata myös maksuttoman kartoituskäynnin ilman laskuria.'],
   ['Miten kotitalousvähennys toimii?','Ovien ja ikkunoiden tiivistys on kotitaloustyötä. Saat meiltä laskun, jossa työn osuus on valmiiksi eritelty — ilmoitat sen OmaVerossa ja vähennät jopa 40 % työn osuudesta (enintään 2 100 € / henkilö vuosina 2026–2027, omavastuu 150 €).']
 ];
 
@@ -1037,7 +1037,7 @@ function syncBookingSummary(){
     const net = Math.round(booking.total*NET_FACTOR);
     priceEl.innerHTML = `${booking.total.toLocaleString('fi-FI')} € <span style="font-size:13px;color:#ECDCC7;font-weight:600">· vähennyksen jälk. n. ${net.toLocaleString('fi-FI')} €</span>`;
   } else {
-    priceEl.textContent = 'Ilmainen kartoituskäynti — hinta mittauksen mukaan';
+    priceEl.textContent = 'Maksuton kartoituskäynti — hinta mittauksen mukaan';
   }
   const whenEl = document.getElementById('bWhen'), whenTxt = document.getElementById('bWhenText');
   if(selDay && selSlot){

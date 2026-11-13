@@ -167,7 +167,7 @@ export default async function TalousPage({
       <p className="text-xs leading-relaxed text-faint">
         Myynti on <b>kaikki kalenteriin tulleet keikat</b> työn päivän mukaan — alustavat,
         vahvistetut ja tehdyt, myös vielä tekemättömät tulevat keikat. Pois jäävät vain
-        peruutetut, keskeneräiset varaukset ja ilmainen kartoituskäynti. Jakso on koko
+        peruutetut, keskeneräiset varaukset ja maksuton kartoituskäynti. Jakso on koko
         kalenterijakso, ja muutosprosentti vertaa edelliseen samanmittaiseen jaksoon.
         Kuluprosentit lasketaan liikevaihdosta ja kiinteät kulut jaetaan jaksolle päivien
         suhteessa. Käsin kirjatut kulut lisätään päälle samaan kategoriaan.

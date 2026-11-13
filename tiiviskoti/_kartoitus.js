@@ -90,7 +90,7 @@ const FORM_HTML_KOTI = `
   <div class="steprecap">
     <div>
       <div class="when" data-k="when">—</div>
-      <div class="svc">Ilmainen kartoituskäynti · noin ${KOTI_MIN} min</div>
+      <div class="svc">Maksuton kartoituskäynti · noin ${KOTI_MIN} min</div>
     </div>
     <button type="button" class="chg" data-k="change">Vaihda aika</button>
   </div>
@@ -107,7 +107,7 @@ const FORM_HTML_KOTI = `
   <div class="bk-field"><label>Ikkunoiden ja ovien määrä (arvio)</label>
     <select class="bk-input" data-k="doors"><option>En osaa sanoa</option><option>1–4 kpl</option><option>5–9 kpl</option><option>10–15 kpl</option><option>Yli 15 kpl</option></select></div>
   <div class="bk-err" data-k="err" style="display:none"></div>
-  <button type="button" class="btn btn-p btn-lg" data-k="book" style="width:100%">Varaa ilmainen kartoituskäynti</button>
+  <button type="button" class="btn btn-p btn-lg" data-k="book" style="width:100%">Varaa maksuton kartoituskäynti</button>
   <div class="bk-trust">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/></svg>
     Käynti on maksuton eikä sido sinua mihinkään · <a href="tietosuoja.html" data-k="privacy" style="text-decoration:underline;text-underline-offset:2px;color:inherit">Tietosuoja</a>
@@ -140,7 +140,7 @@ const FORM_HTML = `
   <div class="bk-field"><label>Ovien ja ikkunoiden määrä (arvio)</label>
     <select class="bk-input" data-k="doors"><option>En osaa sanoa</option><option>1–5 kpl</option><option>6–15 kpl</option><option>16–30 kpl</option><option>Yli 30 kpl</option></select></div>
   <div class="bk-err" data-k="err" style="display:none"></div>
-  <button type="button" class="btn btn-p btn-lg" data-k="book" style="width:100%">Varaa ilmainen kartoituskäynti</button>
+  <button type="button" class="btn btn-p btn-lg" data-k="book" style="width:100%">Varaa maksuton kartoituskäynti</button>
   <div class="bk-trust">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/></svg>
     Käynti on veloitukseton eikä sido taloyhtiötä mihinkään · <a href="tietosuoja.html" data-k="privacy" style="text-decoration:underline;text-underline-offset:2px;color:inherit">Tietosuoja</a>
@@ -364,7 +364,7 @@ export function mountKartoitus(o) {
           ...(koti ? { kind:'yksityinen' } : { yhtio:f.yhtio, role:f.role }),
           contact:f.contact, phone:f.phone, email:f.email,
           addr:`${f.addr}, ${st.postal}`, doors:f.doors,
-          message: koti ? 'Varasi ilmaisen kotikartoituksen verkosta.' : 'Varasi kartoituskäynnin verkosta.',
+          message: koti ? 'Varasi maksuttoman kotikartoituksen verkosta.' : 'Varasi kartoituskäynnin verkosta.',
           pageUrl: location.href, fbc: fbc(), fbp: fbp(),
           campaign: campaign(), gclid: gclid(),
         }),

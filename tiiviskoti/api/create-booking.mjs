@@ -156,7 +156,7 @@ export default async function handler(req, res) {
     // --- hinta: sama laskenta kuin sivun laskurissa ---
     const quote = computePricing(counts, extras);
 
-    // Emme tee ilmaisia kartoituskäyntejä: varaus vaatii vähintään yhden
+    // Emme tee maksuttomia kartoituskäyntejä: varaus vaatii vähintään yhden
     // kohteen. Aiemmin nolla kohdetta tuotti hiljaisesti 0 €:n varauksen.
     if (quote.work <= 0 || quote.count <= 0) {
       return res.status(400).json({ error: 'no_items' });

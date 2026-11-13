@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* =========================================================
    16.10.2026: kartoitusmainosten TK67 ja TK69 luovat uusiksi (Josua: mainoksessa
-   pitää lukea "Varaa ilmainen kartoitus").
+   pitää lukea "Varaa maksuton kartoitus").
 
    Metan harmaan napin tekstiä EI voi kirjoittaa vapaasti — se on aina jokin
    Metan valmiista (BOOK_TRAVEL = "Varaa nyt"). Siksi lause tulee:
@@ -43,17 +43,17 @@ const LOPPU = '2026-10-30T23:59:00+0200';  // mainosjoukko pysähtyy itsestään
 const SIVU = 'https://tiiviskoti.fi/kartoitus.html';
 
 const TEKSTI =
-`Vetävätkö ikkunat tai ovet? Varaa ilmainen kartoituskäynti — asentajamme tulee kotiisi, katsoo ikkunat ja ovet ja kertoo kiinteän hinnan paikan päällä.
+`Vetävätkö ikkunat tai ovet? Varaa maksuton kartoituskäynti — asentajamme tulee kotiisi, katsoo ikkunat ja ovet ja kertoo kiinteän hinnan paikan päällä.
 
 Käynti on maksuton eikä sido sinua mihinkään. Näet summan ennen kuin päätät.
 
 Ikkunan tiivistys alkaen 75 €, ja mitä useampi ikkuna kerralla, sitä halvempi kappalehinta. Ulko-oven tiivistys 99 €. Työn osuudesta saat kotitalousvähennyksen.
 
 Valitse sopiva aika kalenterista — vahvistus tulee heti sähköpostiin.`;
-const OTSIKKO = 'Varaa ilmainen kartoitus';
+const OTSIKKO = 'Varaa maksuton kartoitus';
 const KUVAUS = 'Kiinteä hinta paikan päällä · Uusimaa';
 
-/* Videot: Remotion `video/remotion/src/Kartoitus.tsx` (a = "Ilmainen kartoituskäynti",
+/* Videot: Remotion `video/remotion/src/Kartoitus.tsx` (a = "Maksuton kartoituskäynti",
    b = "Vetääkö ikkuna tai ovi?") — sama kuvamateriaali kuin TK58:ssa. */
 const VIDEOT = path.join(process.env.HOME, 'Desktop', 'tiiviskoti-mainosvideot');
 const MAINOKSET = [

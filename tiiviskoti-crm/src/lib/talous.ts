@@ -133,7 +133,7 @@ export async function getTalous(rangeKey: RangeKey, now: Date = new Date()): Pro
      where j.status in ('tentative', 'confirmed', 'done')
        and j.starts_at >= ${fromIso}
        and j.starts_at <  ${toIso}
-       -- Ilmainen kartoituskäynti ei ole myynti eikä varaus: se on nollan
+       -- Maksuton kartoituskäynti ei ole myynti eikä varaus: se on nollan
        -- euron rivi, joka vetäisi keskimääräisen varausarvon alas.
        and (${kartoitus}::uuid is null or j.calendar_id <> ${kartoitus}::uuid)
      group by 1
